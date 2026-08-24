@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ZEITSPRUNG — Steinerne Brücke (Demo Preview)</title>
+<meta name="description" content="ZEITSPRUNG — Steinerne Brücke client demo preview. Temporary, not for public indexing.">
+<meta name="robots" content="noindex,nofollow">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- INTRO GATE                                                    -->
+<!-- ============================================================ -->
+<div id="intro-gate" class="intro-gate">
+  <div class="intro-gate__inner">
+    <p class="intro-gate__eyebrow" data-i18n="introEyebrow">ZEITSPRUNG</p>
+    <h1 class="intro-gate__title" data-i18n="introTitle">STEINERNE BRÜCKE</h1>
+    <p class="intro-gate__city" data-i18n="introCity">REGENSBURG</p>
+    <p class="intro-gate__range" data-i18n="introRange">1135 → HEUTE</p>
+
+    <button id="introStartBtn" class="intro-gate__start" data-i18n="introStart" type="button">ERLEBNIS STARTEN</button>
+
+    <button id="introSoundToggle" class="intro-gate__sound" type="button" aria-pressed="false">
+      <span class="intro-gate__sound-icon" aria-hidden="true">♪</span>
+      <span id="introSoundLabel" class="intro-gate__sound-label">TON AUS</span>
+    </button>
+
+    <p class="intro-gate__hint" data-i18n="introHint">Bereit für eine Reise durch 890 Jahre Geschichte</p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PRELOADER                                                     -->
+<!-- ============================================================ -->
+<div id="preloader" class="preloader" hidden>
+  <p class="preloader__label" data-i18n="preloaderLabel">WIRD GELADEN</p>
+  <div class="preloader__bar"><div id="preloaderFill" class="preloader__fill"></div></div>
+  <p id="preloaderPct" class="preloader__pct">0%</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- APP                                                           -->
+<!-- ============================================================ -->
+<div id="app" hidden>
+
+  <nav class="navbar">
+    <span class="navbar__brand">ZEITSPRUNG</span>
+    <div class="navbar__links">
+      <button type="button" data-scroll-to="#stage" data-i18n="navRoute">ROUTE</button>
+      <button type="button" data-scroll-to="#facts" data-i18n="navTimeline">ZEITLEISTE</button>
+      <button type="button" data-scroll-to="#threeD" data-i18n="nav3d">3D</button>
+      <button type="button" data-scroll-to="#videoChapter" data-i18n="navHistory">GESCHICHTE</button>
+    </div>
+    <div class="navbar__lang">
+      <button type="button" data-lang="de">DE</button>
+      <button type="button" data-lang="en">EN</button>
+      <button type="button" data-lang="es">ES</button>
+    </div>
+  </nav>
+
+  <p class="scroll-hint" data-i18n="scrollHint">SCROLLEN, UM DURCH DIE ZEIT ZU REISEN</p>
+
+  <!-- ========================================================== -->
+  <!-- STAGE — 9-state scrubbed historical journey                -->
+  <!-- ========================================================== -->
+  <section id="stage" class="stage">
+    <div class="stage__sticky">
+      <div class="stage__bg-layer stage__bg-layer--a"></div>
+      <div class="stage__bg-layer stage__bg-layer--b"></div>
+      <div class="stage__vignette" aria-hidden="true"></div>
+
+      <div id="portal" class="portal" aria-hidden="true"></div>
+
+      <div class="stage__caption">
+        <span id="stateYear" class="stage__year">HEUTE</span>
+        <h2 id="stateTitle" class="stage__title">—</h2>
+        <p id="stateText" class="stage__text">—</p>
+      </div>
+
+      <div id="stageDots" class="stage__dots" role="presentation"></div>
+    </div>
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- FACTS — validated historical data (trilingual)              -->
+  <!-- ========================================================== -->
+  <section id="facts" class="facts">
+    <div class="facts__grid">
+      <div class="fact-card">
+        <span id="factBaubeginnLabel" class="fact-card__label">BAUBEGINN</span>
+        <span class="fact-card__value">1135</span>
+      </div>
+      <div class="fact-card">
+        <span id="factFertigstellungLabel" class="fact-card__label">FERTIGSTELLUNG</span>
+        <span class="fact-card__value">1146</span>
+      </div>
+      <div class="fact-card fact-card--verified">
+        <span id="factBoegenLabel" class="fact-card__label">BÖGEN</span>
+        <span class="fact-card__value">16</span>
+        <span id="factBoegenNote" class="fact-card__note">validiert</span>
+      </div>
+      <div class="fact-card fact-card--unverified" data-status="unverified">
+        <span id="factPfeilerLabel" class="fact-card__label">PFEILER</span>
+        <span class="fact-card__value">*</span>
+        <span id="factPfeilerNote" class="fact-card__note">nicht bestätigt</span>
+      </div>
+    </div>
+    <p id="factSourceNote" class="facts__source">* siehe ZEITSPRUNG Accuracy Rules</p>
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- VIDEO CHAPTER — FPV                                         -->
+  <!-- ========================================================== -->
+  <section id="videoChapter" class="video-chapter">
+    <div class="video-chapter__frame">
+      <h3 data-i18n="videoChapterTitle">Der Flug über die Brücke</h3>
+      <p data-i18n="videoChapterText">Eine FPV-Aufnahme der Steinerne Brücke aus der Vogelperspektive.</p>
+      <div class="video-chapter__viewport">
+        <video id="fpvVideo" playsinline muted loop preload="none"></video>
+        <p id="videoFallback" class="video-chapter__fallback" data-i18n="videoUnavailable" hidden>
+          Video konnte in diesem Browser nicht geladen werden.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- 3D CHAPTER — GLB viewer                                     -->
+  <!-- ========================================================== -->
+  <section id="threeD" class="threed-chapter">
+    <div class="threed-chapter__inner">
+      <h3 data-i18n="threeDTitle">Interaktives 3D-Modell</h3>
+      <p data-i18n="threeDText">Erkunden Sie die Konstruktion der Brücke in drei Dimensionen.</p>
+
+      <div class="threed-chapter__stage">
+        <div id="threeDMount" class="threed-chapter__mount"></div>
+        <div id="threeDLoading" class="threed-chapter__loading" hidden>
+          <span data-i18n="threeDLoading">3D-Modell wird geladen…</span>
+          <span id="threeDProgress">0%</span>
+        </div>
+        <p id="threeDError" class="threed-chapter__error" hidden>GLB konnte nicht geladen werden.</p>
+      </div>
+
+      <div class="threed-chapter__controls">
+        <button id="btn3dReset" type="button" data-i18n="threeDReset">RESET</button>
+        <button id="btn3dFront" type="button" data-i18n="threeDFront">FRONT</button>
+        <button id="btn3dThreeQuarter" type="button" data-i18n="threeD34">3/4</button>
+        <button id="btn3dTop" type="button" data-i18n="threeDTop">TOP</button>
+        <span class="threed-chapter__orbit-label" data-i18n="threeDOrbit">ORBIT</span>
+      </div>
+
+      <p class="threed-chapter__note" data-i18n="threeDStateNote">
+        Hinweis: Dieses Master-GLB liegt bereits in einem teil-explodierten Zustand vor.
+      </p>
+    </div>
+  </section>
+
+  <footer class="continue">
+    <h3 data-i18n="continueTitle">Reise fortsetzen</h3>
+    <p data-i18n="continueText">Weitere Monumente von ZEITSPRUNG folgen in Kürze.</p>
+    <button id="footerBackBtn" type="button" data-i18n="footerBack">ZURÜCK ZUM ANFANG</button>
+  </footer>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- Motion stack — GSAP + ScrollTrigger + Lenis via CDN (UMD)     -->
+<!-- ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+
+<!-- Import map required: three.js example modules (GLTFLoader, OrbitControls) use the
+     bare specifier "from 'three'" internally, which native ES modules cannot resolve
+     without this map. -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
