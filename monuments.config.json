@@ -1,0 +1,115 @@
+{
+  "_readme": "ZEITSPRUNG V2 — MAIN INDEX monument gallery config (Phase 2.7, extended Phase 2.7C.2). Single source of truth read by js/gallery.js. Fields: id, order, name{de,en,es}, subtitle{de,en,es}, description{de,en,es}, visual, poster, status(active|in_development), enabled(bool), route(relative path from ZEITSPRUNG_V2/index.html, or null), cta{de,en,es} (label shown on the action affordance; for non-enabled monuments this is a status badge, not a link), languages. Image paths are relative to ZEITSPRUNG_V2/ (this file's own folder), mirroring how `route` is also resolved relative to index.html — a deliberate, documented choice distinct from STEINERNE_BRUECKE/js/main.js's own internal absolute-from-server-root WEB_ASSET_BASE convention (that convention is scoped to files living one level deeper, under STEINERNE_BRUECKE/js/). Adding monument #6+ in the future = appending one object here; no HTML/JS template changes required as long as it reuses this same field set. PHASE 2.7C.2 additive fields: `video` (relative path to the primary clip, or null — muted/playsinline/no controls, only plays while this monument is the active one), `video_reverse` (relative path to a companion clip that continues the SAME transformation in reverse, or null — when present, gallery.js chains video<->video_reverse on `ended` for a true ping-pong assembly/disassembly loop instead of a native single-file loop; today only steinerne-bruecke has this), `video_mode` (`assembly_loop` = structural transformation content, native loop=true unless video_reverse is present, in which case it is the ping-pong pair described above | `ambient_loop` = single self-contained reveal clip, native loop=true | `static` = no video, still image only), `poster` now doubles as the `<video poster>` for whichever monument has a `video` (kept equal to `visual` when no dedicated frame grab exists), `background` (path used for the blurred full-bleed backdrop layer — video path when a video exists so the backdrop plays the same clip blurred, else the same value as `visual`; never a separate/different asset, see gallery.js applyBg()). PHASE 2.7C.4 — final index media reconnection: dom-st-peter/altes-rathaus/porta-praetoria/neupfarrplatz now point `video`/`poster`/`background` at the new monument-specific derivatives under `assets/video/index/monument_presentation/<id>/card_loop_01_web.mp4` (+ `card_poster_01.jpg`), all audio-stripped/+faststart web copies of 03_ASSETS/VIDEO/INDEX/MONUMENT_PRESENTATION masters. neupfarrplatz is the ONE exception to the `visual`-stays-a-curated-hero-shot rule noted above: it has no separate curated hero PNG, so `visual` is set equal to the new `poster` (not just `poster` alone) — gallery.js's tab-thumbnail empty-state check (`renderTabs()`) keys off `visual` specifically, so leaving `visual: null` would still render this monument's tab as the empty/placeholder swatch even with a real video wired. steinerne-bruecke's `video`/`video_reverse` pair (the bespoke pier/arch assembly<->disassembly transformation) was deliberately NOT replaced by the new `assets/video/index/monument_presentation/steinerne_bruecke/card_loop_01_web.mp4` file — that new file is a generic materials-cube presentation loop (same template as the other 4 monuments' new clips), not a bridge-specific structural transformation, and is judged lower-value than the already-working bespoke pair for this specific monument; the new file stays on disk, unreferenced, for a possible future Bau&Materialien use. dom-st-peter/altes-rathaus's PRIOR `*_gallery_loop_01_web.mp4` files (Phase 2.7C.2B, GLOBAL_INBOX-derived) remain on disk untouched (LEGACY_REFERENCE_ONLY, superseded by the MASTER-derived MONUMENT_PRESENTATION files).",
+  "monuments": [
+    {
+      "id": "steinerne-bruecke",
+      "order": 1,
+      "name": { "de": "Steinerne Brücke", "en": "Steinerne Brücke", "es": "Steinerne Brücke" },
+      "subtitle": { "de": "1135 → HEUTE", "en": "1135 → TODAY", "es": "1135 → HOY" },
+      "description": {
+        "de": "Über 300 Meter, 16 Bögen, fast 900 Jahre alt — die mittelalterliche Donaubrücke Regensburgs, vom Fundament bis heute.",
+        "en": "Over 300 meters, 16 arches, almost 900 years old — Regensburg's medieval Danube bridge, from its foundations to today.",
+        "es": "Más de 300 metros, 16 arcos, casi 900 años de historia — el puente medieval de Regensburg sobre el Danubio, desde sus cimientos hasta hoy."
+      },
+      "visual": "assets/steinerne-bruecke/hero/sb_hero_current_9x16_v01.png",
+      "poster": "assets/steinerne-bruecke/hero/sb_hero_current_9x16_v01.png",
+      "video": "assets/steinerne-bruecke/loops/overview/bridge_overview_assembly_v02_web.mp4",
+      "video_reverse": "assets/steinerne-bruecke/loops/overview/bridge_overview_disassembly_v02_web.mp4",
+      "video_mode": "assembly_loop",
+      "background": "assets/steinerne-bruecke/loops/overview/bridge_overview_assembly_v02_web.mp4",
+      "status": "active",
+      "enabled": true,
+      "route": "STEINERNE_BRUECKE/index.html",
+      "cta": { "de": "ERLEBNIS STARTEN", "en": "START EXPERIENCE", "es": "EXPERIENCIA INICIAR" },
+      "languages": ["de", "en", "es"]
+    },
+    {
+      "id": "dom-st-peter",
+      "order": 2,
+      "name": { "de": "Dom St. Peter", "en": "Dom St. Peter", "es": "Dom St. Peter" },
+      "subtitle": { "de": "KATHEDRALE", "en": "CATHEDRAL", "es": "CATEDRAL" },
+      "description": {
+        "de": "Die gotische Kathedrale Regensburgs über der Donau.",
+        "en": "Regensburg's Gothic cathedral above the Danube.",
+        "es": "La catedral gótica de Regensburg sobre el Danubio."
+      },
+      "visual": "assets/dom-st-peter/hero/dsp_hero_concept_v01.png",
+      "poster": "assets/video/index/monument_presentation/dom_st_peter/card_poster_01.jpg",
+      "video": "assets/video/index/monument_presentation/dom_st_peter/card_loop_01_web.mp4",
+      "video_reverse": null,
+      "video_mode": "ambient_loop",
+      "background": "assets/video/index/monument_presentation/dom_st_peter/card_loop_01_web.mp4",
+      "status": "in_development",
+      "enabled": false,
+      "route": null,
+      "cta": { "de": "IN ARBEIT", "en": "IN DEVELOPMENT", "es": "EN CONSTRUCCIÓN" },
+      "languages": ["de", "en", "es"]
+    },
+    {
+      "id": "altes-rathaus",
+      "order": 3,
+      "name": { "de": "Altes Rathaus · Reichssaal", "en": "Altes Rathaus · Reichssaal", "es": "Altes Rathaus · Reichssaal" },
+      "subtitle": { "de": "REICHSSTADT", "en": "IMPERIAL CITY", "es": "CIUDAD IMPERIAL" },
+      "description": {
+        "de": "Rathaus und Reichssaal der Freien Reichsstadt Regensburg.",
+        "en": "Town hall and Reichssaal of the Free Imperial City of Regensburg.",
+        "es": "Ayuntamiento y Reichssaal de la Ciudad Imperial Libre de Regensburg."
+      },
+      "visual": "assets/altes-rathaus/hero/ar_hero_model_v01.png",
+      "poster": "assets/video/index/monument_presentation/altes_rathaus/card_poster_01.jpg",
+      "video": "assets/video/index/monument_presentation/altes_rathaus/card_loop_01_web.mp4",
+      "video_reverse": null,
+      "video_mode": "assembly_loop",
+      "background": "assets/video/index/monument_presentation/altes_rathaus/card_loop_01_web.mp4",
+      "status": "in_development",
+      "enabled": false,
+      "route": null,
+      "cta": { "de": "IN ARBEIT", "en": "IN DEVELOPMENT", "es": "EN CONSTRUCCIÓN" },
+      "languages": ["de", "en", "es"]
+    },
+    {
+      "id": "porta-praetoria",
+      "order": 4,
+      "name": { "de": "Porta Praetoria · Castra Regina", "en": "Porta Praetoria · Castra Regina", "es": "Porta Praetoria · Castra Regina" },
+      "subtitle": { "de": "RÖMISCHES REGENSBURG", "en": "ROMAN REGENSBURG", "es": "REGENSBURG ROMANA" },
+      "description": {
+        "de": "Das römische Tor des Legionslagers Castra Regina.",
+        "en": "The Roman gate of the Castra Regina legionary fortress.",
+        "es": "La puerta romana del campamento legionario Castra Regina."
+      },
+      "visual": "assets/porta-praetoria/hero/pp_hero_gate_v01.png",
+      "poster": "assets/video/index/monument_presentation/porta_praetoria/card_poster_01.jpg",
+      "video": "assets/video/index/monument_presentation/porta_praetoria/card_loop_01_web.mp4",
+      "video_reverse": null,
+      "video_mode": "assembly_loop",
+      "background": "assets/video/index/monument_presentation/porta_praetoria/card_loop_01_web.mp4",
+      "status": "in_development",
+      "enabled": false,
+      "route": null,
+      "cta": { "de": "IN ARBEIT", "en": "IN DEVELOPMENT", "es": "EN CONSTRUCCIÓN" },
+      "languages": ["de", "en", "es"]
+    },
+    {
+      "id": "neupfarrplatz",
+      "order": 5,
+      "name": { "de": "Neupfarrplatz · Jüdisches Viertel", "en": "Neupfarrplatz · Jewish Quarter", "es": "Neupfarrplatz · Barrio Judío" },
+      "subtitle": { "de": "ALTSTADT", "en": "OLD TOWN", "es": "CASCO ANTIGUO" },
+      "description": {
+        "de": "Ehemaliges jüdisches Viertel im Herzen der Regensburger Altstadt.",
+        "en": "Former Jewish quarter in the heart of Regensburg's old town.",
+        "es": "Antiguo barrio judío en el corazón del casco antiguo de Regensburg."
+      },
+      "visual": "assets/video/index/monument_presentation/neupfarrplatz/card_poster_01.jpg",
+      "poster": "assets/video/index/monument_presentation/neupfarrplatz/card_poster_01.jpg",
+      "video": "assets/video/index/monument_presentation/neupfarrplatz/card_loop_01_web.mp4",
+      "video_reverse": null,
+      "video_mode": "ambient_loop",
+      "background": "assets/video/index/monument_presentation/neupfarrplatz/card_loop_01_web.mp4",
+      "status": "in_development",
+      "enabled": false,
+      "route": null,
+      "cta": { "de": "IN ARBEIT", "en": "IN DEVELOPMENT", "es": "EN CONSTRUCCIÓN" },
+      "languages": ["de", "en", "es"]
+    }
+  ]
+}

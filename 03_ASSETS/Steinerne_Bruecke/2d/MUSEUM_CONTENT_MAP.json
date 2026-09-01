@@ -1,0 +1,410 @@
+{
+  "$schema_note": "Content/editorial layer for the Steinerne Brücke 2.5D museum module (#museum25d). Complements ASSET_SWAP_MAP.json (visual slots) — this file supplies the DE/EN/ES labels, descriptions, material/construction/period metadata and evidence_status for each architectural/material component actually backed by a real source or a clearly visible approved asset. Built under ZEITSPRUNG_ACCURACY_RULES.md (Freigabe/source discipline has absolute priority) and ZEITSPRUNG_WEB_OPERATING_RULES.md / ZEITSPRUNG_CONTENT_ASSET_STRUCTURE.md (multilingual + sourcing rules). Do not add an entry without a real source in `sources` or a directly visible approved asset backing it — an empty sources array is acceptable but must correspond to evidence_status NEEDS_VALIDATION.",
+  "monument": "Steinerne_Bruecke",
+  "module": "museum25d",
+  "evidence_status_values": [
+    "PRESERVED",
+    "PARTIALLY_PRESERVED",
+    "RECONSTRUCTED",
+    "ESTIMATED",
+    "NEEDS_VALIDATION"
+  ],
+  "primary_source_note": "The authorized principal source for this monument per ZEITSPRUNG_ACCURACY_RULES.md is 'Die Steinerne Brücke – 2010 bis 2018' (Tiefbauamt Regensburg), registered as SB_SRC_001 in 02_CONTENT/SOURCES/SOURCE_REGISTRY.md. This content map cites it via the local OCR working transcript at 03_ASSETS/Steinerne_Bruecke/DOCUMENTS/Die_Steinerne_Bruecke_Textextraktion.pdf — that transcript itself carries a printed disclaimer that it is an automated OCR working transcript of the photographed book and that the printed edition (ISBN 978-3-86646-366-0, Battenberg Gietl Verlag) remains authoritative for exact scholarly citation. Page/Aufnahme references below point at the OCR transcript's own internal 'Scanreferenz: Aufnahme NN' markers so a reviewer can re-locate each claim.",
+  "components": [
+    {
+      "id": "bridge_overview_structure",
+      "chapter": "overview",
+      "asset_slot": "bridge_alpha",
+      "labels": {
+        "de": "Die Steinerne Brücke",
+        "en": "The Stone Bridge",
+        "es": "El Puente de Piedra"
+      },
+      "short_description": {
+        "de": "Erbaut 1135–1146, über 300 Meter lang, mit ursprünglich 16 Bögen über die Donau.",
+        "en": "Built 1135–1146, more than 300 metres long, originally spanning the Danube with 16 arches.",
+        "es": "Construido entre 1135 y 1146, con más de 300 metros de longitud y originalmente 16 arcos sobre el Danubio."
+      },
+      "extended_description": {
+        "de": "Die Steinerne Brücke ist kein einheitliches Bauwerk aus einem Guss, sondern ein steinernes Archiv: Pfeiler, Bögen und Fahrbahn stammen zu großen Teilen noch aus der Bauzeit des 12. Jahrhunderts, während Türme, Kapellen, Tore und die Fahrbahnoberfläche über Jahrhunderte hinweg wiederholt erneuert wurden. Es gibt deshalb keinen einzigen 'Originalzustand', sondern mehrere übereinanderliegende Bauphasen.",
+        "en": "The Stone Bridge is not a single, uniform structure but a stone archive: the piers, arches and roadway substructure largely date back to the 12th-century construction phase, while towers, chapels, gates and the road surface were repeatedly renewed over the centuries. There is therefore no single 'original state', but several overlapping construction phases.",
+        "es": "El Puente de Piedra no es una obra homogénea de una sola fase, sino un auténtico archivo en piedra: los pilares, los arcos y la subestructura de la calzada corresponden en gran parte a la fase constructiva del siglo XII, mientras que torres, capillas, puertas y la superficie de la calzada fueron renovadas repetidamente a lo largo de los siglos. Por eso no existe un único 'estado original', sino varias fases constructivas superpuestas."
+      },
+      "material": "Kalkstein, Grünsandstein (Regensburger Grünsandstein), Kalkmörtel-Gussmauerwerk im Kern",
+      "construction_method": "Pfeiler-Bogen-Konstruktion mit vorgesetzten Eisbrechern und inselförmigen Beschlächten",
+      "historical_period": "Bauzeit 1135–1146 (Mittelalter); heutiger baulicher Zustand geprägt von Reparaturen bis zur Generalsanierung 2010–2018",
+      "evidence_status": "PARTIALLY_PRESERVED",
+      "sources": [
+        "01_ARCHITECTURE/ZEITSPRUNG_ACCURACY_RULES.md (Monumento 1 — Steinerne Brücke, Datos validados)",
+        "03_ASSETS/Steinerne_Bruecke/DOCUMENTS/Die_Steinerne_Bruecke_Textextraktion.pdf (Scanreferenz Aufnahme 020–022, 'Die Brücke – ein Bauwerk von gigantischer Größe')",
+        "02_CONTENT/SOURCES/SOURCE_REGISTRY.md (SB_CONSTRUCTION_DATE, SB_ARCH_COUNT, SB_LENGTH)"
+      ],
+      "interaction": {
+        "show_on_scroll": true,
+        "show_label": true,
+        "show_info_card": true
+      }
+    },
+    {
+      "id": "pier_structure",
+      "chapter": "pfeiler",
+      "asset_slot": "pfeiler_detail",
+      "labels": {
+        "de": "Der Pfeiler",
+        "en": "The Pier",
+        "es": "El Pilar"
+      },
+      "short_description": {
+        "de": "Jeder Pfeiler besitzt eine Werksteinschale aus Grünsandstein-Quadern mit einem vermörtelten Bruchstein-Kern.",
+        "en": "Each pier has an outer shell of dressed green-sandstone ashlar around a mortared rubble-stone core.",
+        "es": "Cada pilar tiene una envoltura de sillares de arenisca verde con un núcleo interior de mampostería de relleno unida con mortero de cal."
+      },
+      "extended_description": {
+        "de": "Die Pfeiler wurden aus großformatigen Grünsandstein-Quadern als äußere Schale errichtet; das Innere ist mit Bruchstein verfüllt und mit Kalkmörtel in einer Gusstechnik vergossen ('Gussmauerwerk'), vergleichbar römischen Techniken. Nach den Bohrbefunden der Sanierung 2010–2018 gründen die Pfeiler direkt auf dem Donaukies — es wurde kein durchgängiges Pfahlwerk unter den mittelalterlichen Pfeilern gefunden; nur an Stellen mit schlechter gelagertem Kies kommen punktuell Eichenroste vor.",
+        "en": "The piers were built with an outer shell of large dressed green-sandstone blocks; the interior is filled with rubble stone and cast with lime mortar in a technique comparable to Roman construction ('Gussmauerwerk'). According to the core-drilling surveys carried out during the 2010–2018 restoration, the piers are founded directly on the Danube gravel — no continuous timber pile foundation was found beneath the medieval piers; oak grillages appear only locally where the gravel was poorly compacted.",
+        "es": "Los pilares se construyeron con una envoltura exterior de grandes sillares de arenisca verde; el interior se rellenó con mampostería de cascotes y se vertió con mortero de cal mediante una técnica comparable a la romana ('Gussmauerwerk'). Según las perforaciones de estudio realizadas durante la restauración de 2010-2018, los pilares se apoyan directamente sobre la grava del Danubio — no se halló un entramado continuo de pilotes bajo los pilares medievales; solo aparecen puntualmente emparrillados de roble en zonas con grava mal compactada."
+      },
+      "material": "Grünsandstein (Werksteinschale), Bruchstein + Kalkmörtel (Kern)",
+      "construction_method": "Flachgründung direkt auf Donaukies; Quaderschale mit Gussmauerwerk-Kern",
+      "historical_period": "1135–1146; Kernsubstanz in mehreren Pfeilern noch aus der Bauzeit erhalten",
+      "evidence_status": "PARTIALLY_PRESERVED",
+      "sources": [
+        "01_ARCHITECTURE/ZEITSPRUNG_ACCURACY_RULES.md (Cimentación confirmada)",
+        "03_ASSETS/Steinerne_Bruecke/DOCUMENTS/Die_Steinerne_Bruecke_Textextraktion.pdf (Scanreferenz Aufnahme 050–051, 'Beobachtungen zum Bau der Brücke 1135-46')"
+      ],
+      "interaction": {
+        "show_on_scroll": true,
+        "show_label": true,
+        "show_info_card": true
+      }
+    },
+    {
+      "id": "beschlaechte_pier_protection",
+      "chapter": "pfeiler",
+      "asset_slot": "pfeiler_detail",
+      "labels": {
+        "de": "Die Beschlächte",
+        "en": "The Beschlächte (cutwater island)",
+        "es": "El Beschlächte (isla protectora)"
+      },
+      "short_description": {
+        "de": "Insel­förmige Vorbauten aus Holzpfählen, Steinpaketen und Astgeflecht schützten die Pfeiler vor Unterspülung.",
+        "en": "Island-shaped cutwater structures of timber piles, stone packing and wattle protected the piers against scouring.",
+        "es": "Estructuras protectoras en forma de isla, hechas de pilotes de madera, paquetes de piedra y entramado de ramas, protegían los pilares contra la socavación."
+      },
+      "extended_description": {
+        "de": "Die Beschlächte waren ursprünglich aus Holzpfählen, Steinpaketen und Astgeflecht gefertigte Uferbefestigungen, die jährlich ausgebessert und erneuert werden mussten und die zunehmend verengte Durchflüsse zwischen sich verursachten ('Donaustrudel'). Erst nach dem Zweiten Weltkrieg (Sanierungsarbeiten 1951–1962) wurden die historischen Beschlächte durch Beton-Inseln ersetzt, die an der Oberfläche weiterhin eine historisierende Pflasterung zeigen. Wichtig laut Accuracy Rules: die Beschlächte gehören zu den Pfeilervorbauten, nicht zu einer durchgehenden Pfahlgründung unter dem Pfeiler selbst.",
+        "en": "The Beschlächte were originally shoreline reinforcements built of timber piles, stone packing and wattle, requiring annual repair, and they progressively narrowed the flow between them, producing the feared 'Donaustrudel' (Danube whirlpools). Only after the Second World War (repair works 1951–1962) were the historic Beschlächte replaced with concrete islands, whose surface still shows a historicising paving pattern. Per the Accuracy Rules, the Beschlächte are pier-side cutwater structures, not a continuous timber-pile foundation beneath the pier itself.",
+        "es": "Los Beschlächte eran originalmente refuerzos de orilla hechos de pilotes de madera, paquetes de piedra y entramado de ramas, que debían repararse anualmente y que fueron estrechando progresivamente el cauce entre ellos, generando los temidos remolinos del Danubio. Solo después de la Segunda Guerra Mundial (obras de 1951-1962) los Beschlächte históricos fueron sustituidos por islas de hormigón, cuya superficie conserva un adoquinado de aspecto histórico. Según las reglas de exactitud del proyecto, los Beschlächte son estructuras protectoras laterales del pilar, no una cimentación continua de pilotes bajo el propio pilar."
+      },
+      "material": "Eichenholzpfähle, Steinpakete, Astgeflecht (historisch); Beton mit historisierender Pflasterung (heute)",
+      "construction_method": "Jährlich ausgebesserte Uferbefestigung zum Kolkschutz; nach 1951–1962 durch Betoninseln ersetzt",
+      "historical_period": "Bauzeit bis frühe Neuzeit (Holzkonstruktion); grundlegend erneuert 1951–1962",
+      "evidence_status": "RECONSTRUCTED",
+      "sources": [
+        "03_ASSETS/Steinerne_Bruecke/DOCUMENTS/Die_Steinerne_Bruecke_Textextraktion.pdf (Scanreferenz Aufnahme 022, 'Die Pfeiler der Steinernen Brücke sind auf den Flusskies gesetzt...')",
+        "01_ARCHITECTURE/ZEITSPRUNG_ACCURACY_RULES.md (Cimentación confirmada — Beschlächte)"
+      ],
+      "interaction": {
+        "show_on_scroll": true,
+        "show_label": true,
+        "show_info_card": true
+      }
+    },
+    {
+      "id": "arch_construction",
+      "chapter": "boegen",
+      "asset_slot": "boegen_detail",
+      "labels": {
+        "de": "Der Bogen",
+        "en": "The Arch",
+        "es": "El Arco"
+      },
+      "short_description": {
+        "de": "16 Bögen aus Werksteinen wurden über hölzernen Lehrgerüsten gemauert und mit Kränen versetzt.",
+        "en": "16 arches of dressed stone were built over wooden centering frames and set in place with cranes.",
+        "es": "Los 16 arcos de sillería se construyeron sobre cimbras de madera y se colocaron con la ayuda de grúas."
+      },
+      "extended_description": {
+        "de": "Jeder Bogen besteht aus außen sichtbaren Schildbögen aus hohen Werksteinen und dazwischenliegenden, etwas schwächeren Gewölbequadern. Für die Wölbung war ein stabiles hölzernes Lehrgerüst ('Spantenkonstruktion') notwendig, dessen Auflagerspuren als schlitzartige Ausnehmungen im Pfeilermauerwerk noch heute nachweisbar sind. Die einzelnen Werksteine wurden vermutlich mit einem 'Wolf' (einer zangenartigen Hebeklammer, wie sie schon aus römischer Zeit bekannt ist) versetzt; entsprechende Wolfslöcher sind an mehreren Steinen erhalten.",
+        "en": "Each arch consists of visible outer 'shield arches' of tall dressed stones with somewhat lighter vault stones between them. Building the vault required a sturdy wooden centering framework ('Spantenkonstruktion'), whose bearing marks survive as slot-like recesses in the pier masonry today. The individual dressed stones were most likely lifted using a 'Wolf' — a tongs-like lifting clamp already known from Roman times — and matching 'wolf holes' survive on several stones.",
+        "es": "Cada arco se compone de 'arcos de escudo' visibles hechos de sillares altos, con dovelas algo más ligeras entre ellos formando la bóveda. Construir la bóveda requería una cimbra de madera robusta ('construcción de cerchas'), cuyas huellas de apoyo aún se conservan como ranuras en la mampostería de los pilares. Los sillares individuales se izaban probablemente mediante un 'lobo' (una grapa de izado en forma de tenaza, ya conocida en época romana); varios sillares conservan los correspondientes orificios de anclaje."
+      },
+      "material": "Grünsandstein-Werksteine (Schildbögen), Gewölbequader",
+      "construction_method": "Lehrgerüst (Spantenkonstruktion), lagenweiser Quaderversatz, Hebetechnik mit dem 'Wolf'",
+      "historical_period": "1135–1146; mehrere Bögen im Kern noch bauzeitlich",
+      "evidence_status": "PARTIALLY_PRESERVED",
+      "sources": [
+        "03_ASSETS/Steinerne_Bruecke/DOCUMENTS/Die_Steinerne_Bruecke_Textextraktion.pdf (Scanreferenz Aufnahme 052–053, 'Die massiv ausgeführten Brückenbögen...' / Hebewerkzeug 'Wolf')",
+        "01_ARCHITECTURE/ZEITSPRUNG_ACCURACY_RULES.md (Herramientas del s. XII: grúas simples de madera, poleas, cabrestantes)"
+      ],
+      "interaction": {
+        "show_on_scroll": true,
+        "show_label": true,
+        "show_info_card": true
+      }
+    },
+    {
+      "id": "fahrbahn_belag",
+      "chapter": "fahrbahn",
+      "asset_slot": "fahrbahn_main",
+      "labels": {
+        "de": "Die Fahrbahn",
+        "en": "The Roadway",
+        "es": "La Calzada"
+      },
+      "short_description": {
+        "de": "Die heutige Fahrbahn aus großformatigen Granitplatten stammt aus der Generalsanierung 2010–2018.",
+        "en": "The current roadway of large granite slabs dates from the general restoration of 2010–2018.",
+        "es": "La calzada actual, con grandes losas de granito, procede de la restauración general de 2010-2018."
+      },
+      "extended_description": {
+        "de": "Die Fahrbahnoberfläche der Brücke wurde seit dem Mittelalter immer wieder komplett erneuert — vom mittelalterlichen Pflaster über Kopfsteinpflaster im 19. Jahrhundert bis zum Granit-Großsteinpflaster der Trambahnzeit. Bei der Sanierung 2010–2018 entschied man sich bewusst für großformatige, fugenarme Granitplatten aus Flossenbürger und Thansteiner Granit, angelehnt an den historisch belegten Zustand des 18. Jahrhunderts, verlegt auf einer neuen, zuvor fehlenden Abdichtungs- und Entwässerungsebene über dem historischen Füllmauerwerk.",
+        "en": "The bridge's road surface has been completely renewed again and again since the Middle Ages — from medieval paving to 19th-century cobblestones and the large granite sett paving of the tramway era. During the 2010–2018 restoration, large, low-joint granite slabs of Flossenbürg and Thansteiner granite were deliberately chosen, modelled on the historically documented 18th-century appearance, and laid on a new waterproofing and drainage layer above the historic core masonry — a layer that had previously been missing entirely.",
+        "es": "La superficie de la calzada del puente ha sido renovada por completo repetidas veces desde la Edad Media — desde el empedrado medieval hasta el adoquinado del siglo XIX y el gran adoquinado de granito de la época del tranvía. En la restauración de 2010-2018 se optó deliberadamente por grandes losas de granito de Flossenbürg y Thansteiner con juntas reducidas, inspiradas en el estado documentado del siglo XVIII, colocadas sobre una nueva capa de impermeabilización y drenaje sobre la mampostería histórica de relleno — una capa que antes no existía."
+      },
+      "material": "Flossenbürger und Thansteiner Granit (2010–2018); historisch u.a. Kopfsteinpflaster, Sandsteinplatten",
+      "construction_method": "Ungebundene Verlegung auf Gussasphalt-Abdichtung mit Polyurethan-Spritzabdichtung und Drainasphalt",
+      "historical_period": "Aktuelle Oberfläche: Sanierung 2010–2018, angelehnt an das 18. Jahrhundert",
+      "evidence_status": "RECONSTRUCTED",
+      "sources": [
+        "03_ASSETS/Steinerne_Bruecke/DOCUMENTS/Die_Steinerne_Bruecke_Textextraktion.pdf (Scanreferenz Aufnahme 013–014, 'technische An... Fahrbahnbelag... Flossenbürger Granit')",
+        "02_CONTENT/SOURCES/SOURCE_REGISTRY.md (SB_RESTORATION)"
+      ],
+      "interaction": {
+        "show_on_scroll": true,
+        "show_label": true,
+        "show_info_card": true
+      }
+    },
+    {
+      "id": "material_kalkstein",
+      "chapter": "material",
+      "asset_slot": "material_stone",
+      "labels": {
+        "de": "Kalkstein",
+        "en": "Limestone",
+        "es": "Piedra caliza"
+      },
+      "short_description": {
+        "de": "Heller Kalkstein, teils aus Zweitverwendung römischer Quader, findet sich vor allem in den Pfeilersockeln.",
+        "en": "Pale limestone, in some cases reused Roman ashlar, occurs mainly in the pier plinths.",
+        "es": "La piedra caliza clara, en parte procedente de sillares romanos reutilizados, aparece sobre todo en los zócalos de los pilares."
+      },
+      "extended_description": {
+        "de": "An nahezu allen Pfeilersockeln finden sich regelhaft verbaute Kalksteinquader, darunter auch sekundär vermauerte römische Quader — vermutlich aus der ehemaligen römischen Legionslagermauer. Der Einsatz des gegenüber Grünsandstein robusteren Kalksteins diente primär der Pfeilersolidität im wassernahen, hochwassergefährdeten Bereich. Die für das 12. Jahrhundert diskutierte Herkunftsfrage (römischer vs. mittelalterlicher Ursprung der ganzen Brücke) lässt sich gerade an diesen Zweitverwendungsquadern historisch verfolgen.",
+        "en": "Regularly built-in limestone ashlar occurs at nearly all pier plinths, including secondarily reused Roman blocks — likely from the former Roman legionary-camp wall. The use of limestone, more robust than green sandstone, primarily served pier stability in the water-exposed, flood-prone zone. The long-debated question of the bridge's origin (Roman vs. medieval) can be traced historically through exactly these reused blocks.",
+        "es": "En casi todos los zócalos de los pilares aparecen sillares de piedra caliza colocados de forma sistemática, incluidos bloques romanos reutilizados en segundo uso — probablemente procedentes de la antigua muralla del campamento legionario romano. El empleo de la caliza, más resistente que la arenisca verde, servía principalmente para dar solidez al pilar en la zona expuesta al agua y a las crecidas. La cuestión, debatida largamente, sobre el origen romano o medieval del puente puede rastrearse precisamente en estos bloques de reutilización."
+      },
+      "material": "Kalkstein (teils römische Zweitverwendungsquader)",
+      "construction_method": "Regelhaft verbaute Quader in den Pfeilersockeln; Verwendung wegen höherer Robustheit im wassernahen Bereich",
+      "historical_period": "Zweitverwendung teils römisch; verbaut in der Bauzeit 1135–1146",
+      "evidence_status": "PRESERVED",
+      "sources": [
+        "03_ASSETS/Steinerne_Bruecke/DOCUMENTS/Die_Steinerne_Bruecke_Textextraktion.pdf (Scanreferenz Aufnahme 041, 'Bauforschung an der Steinernen Brücke... Kalksteinquader')"
+      ],
+      "interaction": {
+        "show_on_scroll": true,
+        "show_label": true,
+        "show_info_card": true
+      }
+    },
+    {
+      "id": "material_gruensandstein",
+      "chapter": "material",
+      "asset_slot": "material_stone",
+      "labels": {
+        "de": "Grünsandstein",
+        "en": "Green sandstone",
+        "es": "Arenisca verde"
+      },
+      "short_description": {
+        "de": "Der Regensburger Grünsandstein ist das dominierende Baumaterial der Bögen, Pfeilerschalen und Schildwände.",
+        "en": "Regensburg green sandstone is the dominant building material of the arches, pier shells and spandrel walls.",
+        "es": "La arenisca verde de Regensburg es el material constructivo dominante en los arcos, las envolturas de los pilares y los muros laterales."
+      },
+      "extended_description": {
+        "de": "Regensburger Grünsandstein gilt als einer der inhomogensten Sandsteine deutscher Abbaustätten: bereichsweise Anreicherungen großer Muschelschalen und ein wechselnder Glaukonitgehalt erschweren die Verarbeitung, machten aber bei der Sanierung 2010–2018 eine sorgfältige Klassifikation der verfügbaren Blöcke (>35 N/mm², 25–35 N/mm², <25 N/mm²) notwendig. Da kein aktiver Steinbruch mehr existierte, wurde für die Sanierung überwiegend auf Grünsandsteinquader vom Abbruch der Schwabelweiser Eisenbahnbrücke (1859) zurückgegriffen, die die Stadt Regensburg auf ihrem Bauhof eingelagert hatte.",
+        "en": "Regensburg green sandstone is considered one of the most inhomogeneous sandstones among German quarry sites: locally dense shell fossils and varying glauconite content complicate working the stone, and during the 2010–2018 restoration required a careful classification of the available blocks (>35 N/mm², 25–35 N/mm², <25 N/mm²). Since no active quarry remained, the restoration relied mainly on green-sandstone ashlar salvaged from the demolition of the Schwabelweis railway bridge (1859), which the City of Regensburg had stored at its municipal yard.",
+        "es": "La arenisca verde de Regensburg está considerada una de las areniscas más heterogéneas entre las canteras alemanas: acumulaciones locales de grandes conchas y un contenido variable de glauconita complican su trabajo, y durante la restauración de 2010-2018 exigieron una clasificación cuidadosa de los bloques disponibles (>35 N/mm², 25-35 N/mm², <25 N/mm²). Al no existir ya una cantera activa, la restauración recurrió principalmente a sillares de arenisca verde procedentes de la demolición del puente ferroviario de Schwabelweis (1859), que la ciudad de Regensburg había almacenado en su patio municipal."
+      },
+      "material": "Grünsandstein (Regensburger Fazies)",
+      "construction_method": "Werksteinschalen der Pfeiler, Schildbögen, Gewölbequader; Klassifizierung nach Druckfestigkeit bei Reparaturen",
+      "historical_period": "Bauzeit 1135–1146; Reparaturmaterial 2010–2018 aus Zweitverwendung (Eisenbahnbrücke 1859)",
+      "evidence_status": "PRESERVED",
+      "sources": [
+        "03_ASSETS/Steinerne_Bruecke/DOCUMENTS/Die_Steinerne_Bruecke_Textextraktion.pdf (Scanreferenz Aufnahme 087–088, 'Stein... Regensburger Grünsandstein gilt als einer der inhomogensten Sandsteine')",
+        "01_ARCHITECTURE/ZEITSPRUNG_ACCURACY_RULES.md (Materiales: Kalkstein, Grünsandstein)"
+      ],
+      "interaction": {
+        "show_on_scroll": true,
+        "show_label": true,
+        "show_info_card": true
+      }
+    },
+    {
+      "id": "material_fuellmauerwerk",
+      "chapter": "material",
+      "asset_slot": "material_stone",
+      "labels": {
+        "de": "Füllmauerwerk / Gusskern",
+        "en": "Rubble-fill core (Gusskern)",
+        "es": "Relleno de mampostería (núcleo de vertido)"
+      },
+      "short_description": {
+        "de": "Das Innere von Pfeilern und Bögen besteht aus Bruchstein, der lagenweise mit Kalkmörtel vergossen wurde.",
+        "en": "The interior of the piers and arches consists of rubble stone cast in layers with lime mortar.",
+        "es": "El interior de pilares y arcos está formado por piedra de cascote vertida en capas con mortero de cal."
+      },
+      "extended_description": {
+        "de": "Zwischen den äußeren Werksteinschalen wurde grob gebrochener Grünsandstein mit Kalkmörtel in einer Gusstechnik ('Gusskern', vergleichbar römischem Vorbild) lagenweise vermörtelt. Bohrkernproben aus der Sanierung 2010–2018 zeigten, dass dieser historische Kalkmörtel noch heute bemerkenswert gute Festigkeits- und Elastizitätseigenschaften besitzt — ein wesentlicher Grund für die Langlebigkeit des Bauwerks trotz jahrhundertelanger Belastung.",
+        "en": "Between the outer dressed-stone shells, roughly broken green sandstone was mortared in layers using a lime-mortar casting technique ('Gusskern', comparable to Roman practice). Core samples taken during the 2010–2018 restoration showed that this historic lime mortar still has remarkably good strength and elasticity — a key reason for the structure's durability despite centuries of stress.",
+        "es": "Entre las envolturas exteriores de sillería se colocó arenisca verde toscamente fracturada, unida en capas con mortero de cal mediante una técnica de vertido ('núcleo de vertido', comparable a la práctica romana). Las muestras de sondeo obtenidas durante la restauración de 2010-2018 mostraron que este mortero de cal histórico conserva hoy una resistencia y elasticidad notablemente buenas — una razón clave de la durabilidad de la obra a pesar de siglos de esfuerzo."
+      },
+      "material": "Bruchstein (Grünsandstein) + Kalkmörtel",
+      "construction_method": "Lagenweise Vermörtelung im Gussverfahren ('Gusskern'), römischen Techniken entsprechend",
+      "historical_period": "Bauzeit 1135–1146; historischer Mörtel in weiten Teilen erhalten",
+      "evidence_status": "PRESERVED",
+      "sources": [
+        "03_ASSETS/Steinerne_Bruecke/DOCUMENTS/Die_Steinerne_Bruecke_Textextraktion.pdf (Scanreferenz Aufnahme 108–109, 'Die größte Menge an Originalmörtel befindet sich... im Kern... Gusskern')",
+        "01_ARCHITECTURE/ZEITSPRUNG_ACCURACY_RULES.md (núcleo de Füllmauerwerk)"
+      ],
+      "interaction": {
+        "show_on_scroll": true,
+        "show_label": true,
+        "show_info_card": true
+      }
+    },
+    {
+      "id": "material_holzpfahl",
+      "chapter": "material",
+      "asset_slot": "material_stone",
+      "labels": {
+        "de": "Eichenholzpfähle",
+        "en": "Oak piles",
+        "es": "Pilotes de roble"
+      },
+      "short_description": {
+        "de": "Eichenholzpfähle sicherten die Beschlächte und die Fundamente der jüngeren Rampenbrücke — nicht die mittelalterlichen Hauptpfeiler.",
+        "en": "Oak piles secured the Beschlächte cutwaters and the foundations of the later ramp bridge — not the medieval main piers.",
+        "es": "Los pilotes de roble aseguraban los Beschlächte y los cimientos del puente rampa posterior — no los pilares principales medievales."
+      },
+      "extended_description": {
+        "de": "Eichenholzpfähle wurden bei der Steinernen Brücke für die Uferbefestigungen (Beschlächte) sowie für die Fundamente der Rampenbrücke zum Oberen Wöhrd (16. Jahrhundert) verwendet — dendrochronologisch datiert auf 1565–1575. Für die mittelalterlichen Hauptpfeiler selbst wurde bei den Erkundungsbohrungen 2010–2018 dagegen kein durchgängiges Pfahlwerk gefunden; sie gründen direkt auf dem Donaukies. Diese Unterscheidung ist zentral, um Verwechslungen zwischen Rampenbrücke und Hauptbrücke zu vermeiden.",
+        "en": "Oak piles were used at the Stone Bridge for the shoreline Beschlächte and for the foundations of the ramp bridge to the Oberer Wöhrd (16th century) — dendrochronologically dated to 1565–1575. For the medieval main piers themselves, however, the 2010–2018 exploratory drillings found no continuous pile foundation; they are founded directly on the Danube gravel. This distinction is essential to avoid confusing the ramp bridge with the main bridge.",
+        "es": "Los pilotes de roble se emplearon en el Puente de Piedra para los refuerzos de orilla (Beschlächte) y para los cimientos del puente rampa hacia la isla del Oberer Wöhrd (siglo XVI) — datados dendrocronológicamente entre 1565 y 1575. En cambio, para los pilares principales medievales, las perforaciones exploratorias de 2010-2018 no hallaron un entramado continuo de pilotes; se cimentan directamente sobre la grava del Danubio. Esta distinción es esencial para no confundir el puente rampa con el puente principal."
+      },
+      "material": "Eichenholz (Quercus)",
+      "construction_method": "Rammpfähle zur Fundamentsicherung der Beschlächte und der Rampenbrücke (16. Jh.); NICHT unter den mittelalterlichen Hauptpfeilern",
+      "historical_period": "Beschlächte: fortlaufend erneuert; Rampenbrücke-Pfähle dendrochronologisch 1565–1575",
+      "evidence_status": "PRESERVED",
+      "sources": [
+        "03_ASSETS/Steinerne_Bruecke/DOCUMENTS/Die_Steinerne_Bruecke_Textextraktion.pdf (Scanreferenz Aufnahme 070–071, 'Die Verbindungsbrücke (Rampenbrücke)... Eichenpfähle... dendrochronologisch... 1565 und 1575')",
+        "01_ARCHITECTURE/ZEITSPRUNG_ACCURACY_RULES.md (Cimentación confirmada — no representar pilotes bajo pilares medievales)"
+      ],
+      "interaction": {
+        "show_on_scroll": true,
+        "show_label": true,
+        "show_info_card": true
+      }
+    },
+    {
+      "id": "material_eisenklammer",
+      "chapter": "material",
+      "asset_slot": "material_stone",
+      "labels": {
+        "de": "Eisenklammern (in Blei verankert)",
+        "en": "Iron cramps (lead-anchored)",
+        "es": "Grapas de hierro (ancladas en plomo)"
+      },
+      "short_description": {
+        "de": "Werksteinquader wurden untereinander mit eingebleiten Eisenklammern verbunden, um den Verbund zu sichern.",
+        "en": "Dressed stone blocks were tied together with lead-anchored iron cramps to secure the bond between them.",
+        "es": "Los sillares se unían entre sí mediante grapas de hierro ancladas en plomo para asegurar su trabazón."
+      },
+      "extended_description": {
+        "de": "An mehreren freigelegten Stellen konnte die Bauforschung nachweisen, dass Werksteinquader an ihrer Oberseite mit eingebleiten Eisenklammern verbunden waren. Diese Verbindungstechnik erhöhte den Zusammenhalt der Quaderschalen und ist auch an den historischen Brüstungen belegt, wo Steinplatten laut Abt Anselm Godin (1729) 'mit eisernen Clammern in Bley vereinander gefügt' waren, damit 'kein Gewalt selbe leicht zertrümmeren mag'.",
+        "en": "At several exposed points, building-history research confirmed that dressed stone blocks were joined at their upper faces with lead-anchored iron cramps. This joining technique increased the cohesion of the ashlar shells and is also documented for the historic parapets, where, according to Abbot Anselm Godin (1729), stone slabs were 'joined to one another with iron cramps in lead' so that 'no force could easily shatter them'.",
+        "es": "En varios puntos expuestos, la investigación arqueológico-constructiva confirmó que los sillares se unían en su cara superior mediante grapas de hierro ancladas en plomo. Esta técnica de unión aumentaba la cohesión de las envolturas de sillería y también está documentada en los antepechos históricos, donde, según el abad Anselm Godin (1729), las losas de piedra estaban 'unidas entre sí con grapas de hierro en plomo' para que 'ninguna fuerza pudiera romperlas fácilmente'."
+      },
+      "material": "Eisen (Klammern), Blei (Verankerung)",
+      "construction_method": "Eingebleite Eisenklammern zur Verbindung benachbarter Werksteinquader",
+      "historical_period": "Bauzeit und spätere Reparaturphasen (u.a. Brüstungen 18. Jh.)",
+      "evidence_status": "PRESERVED",
+      "sources": [
+        "03_ASSETS/Steinerne_Bruecke/DOCUMENTS/Die_Steinerne_Bruecke_Textextraktion.pdf (Scanreferenz Aufnahme 052, 'Freigelegte, ursprüngliche Eisenverklammerung mit... Verbleiung'; Aufnahme 050-051, Godin-Zitat 1729)"
+      ],
+      "interaction": {
+        "show_on_scroll": true,
+        "show_label": true,
+        "show_info_card": true
+      }
+    },
+    {
+      "id": "material_findling",
+      "chapter": "material",
+      "asset_slot": "material_stone",
+      "labels": {
+        "de": "Findlinge (Steinpakete der Beschlächte)",
+        "en": "Boulders (Beschlächte stone packing)",
+        "es": "Bloques erráticos (relleno pétreo del Beschlächte)"
+      },
+      "short_description": {
+        "de": "Große, runde Feldsteine bildeten zusammen mit Holzpfählen und Astgeflecht die schützenden Steinpakete der Beschlächte.",
+        "en": "Large rounded field stones, combined with timber piles and wattle, formed the protective stone packing of the Beschlächte.",
+        "es": "Grandes canchales redondeados, combinados con pilotes de madera y entramado de ramas, formaban el relleno pétreo protector de los Beschlächte."
+      },
+      "extended_description": {
+        "de": "Die Beschlächte bestanden ursprünglich aus einer Kombination von Holzpfählen, Astgeflecht und Steinpaketen aus großen Feldsteinen bzw. Findlingen, die die Pfeilersohle vor Auskolkung durch die Strömung schützen sollten. Diese Bauweise musste jährlich ausgebessert werden, da neue Pfähle meist vor die alten gesetzt wurden — mit der Folge zunehmend verengter Durchflüsse zwischen den Beschlächten.",
+        "en": "The Beschlächte originally consisted of a combination of timber piles, wattle and stone packing made of large field stones or boulders, intended to protect the pier footing from scouring by the current. This construction had to be repaired annually, since new piles were usually driven in front of the old ones — resulting in progressively narrowed flow channels between the Beschlächte.",
+        "es": "Los Beschlächte consistían originalmente en una combinación de pilotes de madera, entramado de ramas y relleno pétreo de grandes canchales o bloques erráticos, destinada a proteger la base del pilar frente a la socavación por la corriente. Esta construcción debía repararse anualmente, ya que los nuevos pilotes se colocaban generalmente por delante de los antiguos — lo que provocaba un estrechamiento progresivo del cauce entre los Beschlächte."
+      },
+      "material": "Feldsteine / Findlinge, in Kombination mit Holzpfählen und Astgeflecht",
+      "construction_method": "Steinpakete als Kolkschutz der Pfeilervorbauten (Beschlächte)",
+      "historical_period": "Bauzeit bis zur grundlegenden Erneuerung 1951–1962 (danach Beton)",
+      "evidence_status": "RECONSTRUCTED",
+      "sources": [
+        "03_ASSETS/Steinerne_Bruecke/DOCUMENTS/Die_Steinerne_Bruecke_Textextraktion.pdf (Scanreferenz Aufnahme 022, 'Steinpaketen und Astgeflecht gefertigte Uferbefestigungen')",
+        "01_ARCHITECTURE/ZEITSPRUNG_ACCURACY_RULES.md (islas con Findlinge)"
+      ],
+      "interaction": {
+        "show_on_scroll": true,
+        "show_label": true,
+        "show_info_card": true
+      }
+    },
+    {
+      "id": "bau_process_lehrgeruest_kran",
+      "chapter": "bau",
+      "asset_slot": "bau_construction",
+      "labels": {
+        "de": "Baustellenbetrieb: Lehrgerüst und Kran",
+        "en": "The construction site: centering and crane",
+        "es": "La obra: cimbra y grúa"
+      },
+      "short_description": {
+        "de": "Archäologisch gut belegt: hölzerne Lehrgerüste, Kräne und die Hebeklammer 'Wolf' beim Versetzen der Werksteine.",
+        "en": "Well documented archaeologically: wooden centering, cranes and the 'Wolf' lifting clamp used to move the dressed stones into place.",
+        "es": "Bien documentado arqueológicamente: cimbras de madera, grúas y la grapa de izado 'lobo' para colocar los sillares."
+      },
+      "extended_description": {
+        "de": "Für den Bau der Bögen war ein stabiles, hölzernes Lehrgerüst notwendig, dessen Auflagerspuren als schlitzartige Nischen im Pfeilermauerwerk archäologisch nachgewiesen sind. Die schweren Werksteine wurden vermutlich mit einfachen hölzernen Kränen, Flaschenzügen oder Seilwinden und einer zangenartigen Hebeklammer ('Wolf') versetzt. Laufkräne/Tretkräne werden als für die Epoche plausibel eingeschätzt, gelten aber nicht als gesicherter Nachweis.",
+        "en": "Building the arches required a sturdy wooden centering framework, whose bearing marks survive archaeologically as slot-like recesses in the pier masonry. The heavy dressed stones were most likely moved using simple wooden cranes, block-and-tackle systems or capstans together with a tongs-like lifting clamp (the 'Wolf'). Treadwheel cranes are considered plausible for the period but are not confirmed as certain fact.",
+        "es": "La construcción de los arcos requería una cimbra de madera robusta, cuyas huellas de apoyo se conservan arqueológicamente como ranuras en la mampostería de los pilares. Los pesados sillares se desplazaban probablemente con grúas de madera sencillas, poleas o cabrestantes, junto con una grapa de izado en forma de tenaza (el 'lobo'). Las grúas de rueda de tracción humana se consideran plausibles para la época, pero no están confirmadas como hecho seguro."
+      },
+      "material": "Holz (Lehrgerüst, Kran), Seile, Eisen (Hebeklammer 'Wolf')",
+      "construction_method": "Lehrgerüst-Wölbung, Krantechnik, Wolf-Hebeklammer",
+      "historical_period": "Bauzeit 1135–1146",
+      "evidence_status": "ESTIMATED",
+      "sources": [
+        "03_ASSETS/Steinerne_Bruecke/DOCUMENTS/Die_Steinerne_Bruecke_Textextraktion.pdf (Scanreferenz Aufnahme 052–053, Lehrgerüst-Nischen und 'Wolf'-Hebetechnik)",
+        "01_ARCHITECTURE/ZEITSPRUNG_ACCURACY_RULES.md (Herramientas del s. XII: grúas simples de madera, poleas, cabrestantes; grúa de rueda plausible, no certeza)"
+      ],
+      "interaction": {
+        "show_on_scroll": true,
+        "show_label": true,
+        "show_info_card": true
+      }
+    }
+  ]
+}

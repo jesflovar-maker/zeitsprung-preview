@@ -1,0 +1,1514 @@
+/* ZEITSPRUNG V2 — style.css
+   Experimental, parallel motion language (GSAP + ScrollTrigger + Lenis).
+   Independent from ZEITSPRUNG_DESIGN_SYSTEM_V1_APPROVED.md — not a replacement,
+   a separate exploration. Mobile-first (portrait), desktop enhanced. */
+
+:root{
+  --z-bg: #08090b;
+  --z-bg-soft: #101216;
+  --z-ink: #f4efe6;
+  --z-ink-dim: rgba(244,239,230,0.62);
+  --z-ink-faint: rgba(244,239,230,0.34);
+  --z-gold: #d4af78;
+  --z-gold-dim: rgba(212,175,120,0.55);
+  --z-line: rgba(244,239,230,0.14);
+  --z-warn: #e8a15c;
+
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --nav-h: 60px;
+}
+
+*{ box-sizing: border-box; }
+html,body{ margin:0; padding:0; background: var(--z-bg); color: var(--z-ink); }
+body{
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+button{ font-family: inherit; cursor: pointer; background:none; border:none; color: inherit; }
+h1,h2,h3,p{ margin:0; }
+img{ max-width:100%; display:block; }
+
+[hidden]{ display:none !important; }
+
+/* ---------------------------------------------------------------- */
+/* INTRO GATE                                                        */
+/* ---------------------------------------------------------------- */
+.intro-gate{
+  position: fixed; inset:0; z-index: 200;
+  /* Kept as the base fill so a browser that never even attempts the media
+     layer below (JS disabled, etc.) still shows a deliberate dark surface,
+     not an unstyled white flash. */
+  background: radial-gradient(ellipse at 50% 30%, #14161a 0%, #08090b 70%);
+  display:flex; align-items:center; justify-content:center;
+  padding: 24px;
+  overflow: hidden;
+}
+/* PHASE 2.6 TASK 2 — cinematic video layer, behind .intro-gate__inner.
+   Poster (img) is the permanent base; video is layered above it and only
+   revealed once actually playing (js/main.js buildIntroMedia()). */
+.intro-gate__media{
+  position:absolute; inset:0; z-index:0;
+}
+.intro-gate__media-poster,
+.intro-gate__media-video{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit: cover;
+}
+.intro-gate__media-video{ opacity: 0; }
+/* Dark scrim over the media layer for text legibility — same visual
+   language as .intro-gate's own radial gradient, no new colours. */
+.intro-gate__scrim{
+  position:absolute; inset:0; z-index:1;
+  background:
+    linear-gradient(to top, rgba(8,9,11,0.92) 0%, rgba(8,9,11,0.55) 45%, rgba(8,9,11,0.35) 100%),
+    radial-gradient(ellipse at 50% 30%, rgba(20,22,26,0.35) 0%, rgba(8,9,11,0.7) 75%);
+}
+.intro-gate__inner{
+  position: relative; z-index: 2;
+  text-align:center;
+  max-width: 480px;
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+}
+.intro-gate__reveal-group{
+  display:flex; flex-direction:column; align-items:center; gap:14px;
+}
+/* zt-typography.js's char-mode split container needs to inherit the exact
+   type treatment already on .intro-gate__title — see .kf__cap-line for the
+   identical convention this mirrors. */
+.intro-gate__title-line{ display:block; }
+.intro-gate__eyebrow{
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.35em;
+  color: var(--z-gold);
+}
+.intro-gate__title{
+  font-family: var(--font-mono);
+  font-weight:600;
+  font-size: clamp(28px, 8vw, 44px);
+  letter-spacing: 0.12em;
+  line-height:1.15;
+}
+.intro-gate__city{
+  font-family: var(--font-mono);
+  font-size: 13px; letter-spacing: 0.3em;
+  color: var(--z-ink-dim);
+}
+.intro-gate__range{
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.2em;
+  color: var(--z-gold-dim);
+  margin-bottom: 18px;
+}
+.intro-gate__start{
+  font-family: var(--font-mono);
+  font-size: 12px; letter-spacing: 0.25em;
+  padding: 15px 34px;
+  border: 1px solid rgba(244,239,230,0.4);
+  color: var(--z-ink);
+  transition: border-color .25s ease, background-color .25s ease, letter-spacing .25s ease;
+}
+.intro-gate__start:hover, .intro-gate__start:focus-visible{
+  border-color: var(--z-gold);
+  background: rgba(212,175,120,0.08);
+  letter-spacing: 0.32em;
+}
+.intro-gate__sound{
+  display:flex; align-items:center; gap:8px;
+  font-family: var(--font-mono);
+  font-size: 10px; letter-spacing: 0.2em;
+  color: var(--z-ink-faint);
+  margin-top: 8px;
+  padding: 6px 10px;
+}
+.intro-gate__sound-icon{ opacity:.7; }
+.intro-gate__sound.is-on .intro-gate__sound-icon{ color: var(--z-gold); opacity:1; }
+.intro-gate__hint{
+  font-size: 12px;
+  color: var(--z-ink-faint);
+  margin-top: 22px;
+  max-width: 320px;
+}
+
+/* ---------------------------------------------------------------- */
+/* PRELOADER                                                         */
+/* ---------------------------------------------------------------- */
+.preloader{
+  position: fixed; inset:0; z-index: 190;
+  background: var(--z-bg);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap: 14px;
+}
+.preloader__label{
+  font-family: var(--font-mono);
+  font-size: 11px; letter-spacing: 0.3em;
+  color: var(--z-ink-faint);
+}
+.preloader__bar{
+  width: min(240px, 60vw); height: 2px;
+  background: rgba(244,239,230,0.12);
+  overflow:hidden;
+}
+.preloader__fill{
+  width:0%; height:100%;
+  background: var(--z-gold);
+}
+.preloader__pct{
+  font-family: var(--font-mono); font-size: 11px; color: var(--z-ink-dim);
+}
+
+/* ---------------------------------------------------------------- */
+/* APP SHELL / NAV                                                   */
+/* ---------------------------------------------------------------- */
+#app{ position:relative; }
+
+.navbar{
+  position: fixed; top:0; left:0; right:0; z-index: 100;
+  height: var(--nav-h);
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 0 18px;
+  background: linear-gradient(to bottom, rgba(8,9,11,0.85), rgba(8,9,11,0));
+  backdrop-filter: blur(6px);
+  opacity: 0; transform: translateY(-12px);
+}
+.navbar__brand{
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.28em; color: var(--z-gold);
+  text-decoration: none;
+}
+.navbar__brand:hover{ color: var(--z-ink); }
+.navbar__links{ display:none; gap: 20px; }
+.navbar__links button{
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.18em; color: var(--z-ink-dim);
+  padding: 6px 2px; border-bottom: 1px solid transparent;
+}
+.navbar__links button:hover{ color: var(--z-ink); border-color: var(--z-gold-dim); }
+/* Phase 2.5 — ZEITLEISTE's "full timeline in development" status marker.
+   The button itself stays a real, working control (scrolls to #facts); this
+   badge only marks the FULL interactive timeline ambition as unfinished. */
+.navbar__timeline-btn{ display:flex; align-items:center; gap: 6px; }
+.navbar__timeline-badge{
+  font-family: var(--font-mono); font-size: 7.5px; letter-spacing: 0.1em;
+  color: var(--z-warn);
+  border: 1px dashed rgba(232,161,92,0.45);
+  padding: 3px 5px;
+  /* Phase 2.7C.3 — copy is now genuinely two lines ("ZEITLEISTE" /
+     "IN VISUELLER PRODUKTION" etc., via a literal <br> in the i18n string).
+     line-height raised from 1 to fit two rows legibly at this tiny size;
+     text-align:center keeps both rows visually balanced against the shorter
+     first line. Still a plain, non-interactive status label — the parent
+     button remains the only click target. */
+  line-height: 1.35;
+  text-align: center;
+}
+.navbar__lang{ display:flex; gap: 6px; }
+.navbar__lang button{
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em;
+  padding: 5px 8px; color: var(--z-ink-faint); border: 1px solid transparent;
+}
+.navbar__lang button.is-active{ color: var(--z-ink); border-color: var(--z-line); }
+
+/* PHASE 2.4A — persistent global mute control, styled identically to the
+   adjacent DE/EN/ES language buttons (no new visual language introduced). */
+.navbar__sound{
+  font-family: var(--font-mono); font-size: 12px; line-height: 1;
+  padding: 5px 8px; margin-left: 2px;
+  color: var(--z-ink-faint); border: 1px solid transparent;
+  background: none; cursor: pointer;
+}
+.navbar__sound:hover{ color: var(--z-ink); border-color: var(--z-gold-dim); }
+.navbar__sound.is-on{ color: var(--z-gold); border-color: var(--z-line); }
+
+.scroll-hint{
+  position: fixed; left:50%; bottom: 22px; transform: translateX(-50%);
+  z-index: 90;
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.24em;
+  color: var(--z-ink-faint);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ---------------------------------------------------------------- */
+/* STAGE — pinned scrubbed historical journey                        */
+/* ---------------------------------------------------------------- */
+.stage{ position: relative; }
+.stage__sticky{
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: #000;
+}
+.stage__bg-layer{
+  position:absolute; inset:0;
+  background-size: cover; background-position: center;
+  will-change: opacity, transform;
+}
+.stage__bg-layer--a{ opacity:1; z-index:1; }
+.stage__bg-layer--b{ opacity:0; z-index:2; }
+.stage__vignette{
+  position:absolute; inset:0; z-index:3;
+  background:
+    linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 42%, rgba(0,0,0,0.35) 100%),
+    radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 45%, rgba(0,0,0,0.55) 100%);
+  pointer-events: none;
+}
+
+.portal{
+  position:absolute; top: 50%; left:50%;
+  transform: translate(-50%,-50%);
+  width: min(72vw, 380px); height: min(72vw, 380px);
+  z-index: 4;
+  pointer-events: none;
+  opacity: 0.9;
+}
+.portal__svg{ width:100%; height:100%; overflow: visible; }
+.portal__ring{ stroke-width: 1; }
+.portal__ring--outer{ stroke: rgba(226,232,240,0.4); }
+.portal__ring--mid{ stroke: rgba(212,175,120,0.5); stroke-dasharray: 4 10; }
+.portal__aperture{ opacity: 0.1; }
+.portal__tick{ stroke: rgba(244,239,230,0.25); stroke-width: 1; }
+
+.stage__caption{
+  position:absolute; left: 20px; right: 20px; bottom: 78px;
+  z-index: 6;
+  text-align: left;
+}
+.stage__year{
+  display:inline-block;
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.3em;
+  color: var(--z-gold);
+  margin-bottom: 8px;
+}
+.stage__title{
+  font-size: clamp(22px, 6.5vw, 34px);
+  font-weight: 600;
+  line-height: 1.15;
+  margin-bottom: 8px;
+  max-width: 560px;
+}
+.stage__text{
+  font-size: 14px; line-height: 1.55;
+  color: var(--z-ink-dim);
+  max-width: 480px;
+}
+.stage__dots{
+  position:absolute; right: 18px; top: 50%; transform: translateY(-50%);
+  z-index: 6;
+  display:flex; flex-direction: column; gap: 8px;
+}
+.stage__dot{
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(244,239,230,0.25);
+  transition: background-color .3s ease, transform .3s ease;
+}
+.stage__dot.is-active{ background: var(--z-gold); transform: scale(1.6); }
+
+/* ---------------------------------------------------------------- */
+/* FACTS                                                             */
+/* ---------------------------------------------------------------- */
+.facts{
+  position: relative; z-index: 5;
+  background: var(--z-bg-soft);
+  padding: 90px 20px;
+}
+.facts__grid{
+  display:grid; grid-template-columns: 1fr; gap: 14px;
+  max-width: 920px; margin: 0 auto;
+}
+.fact-card{
+  border: 1px solid var(--z-line);
+  padding: 22px 18px;
+  display:flex; flex-direction: column; gap: 6px;
+  opacity: 0;
+}
+.fact-card__label{
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.2em;
+  color: var(--z-ink-faint);
+}
+.fact-card__value{
+  font-family: var(--font-mono); font-size: 34px; font-weight: 600;
+  color: var(--z-ink);
+}
+.fact-card__note{ font-size: 11.5px; color: var(--z-ink-faint); }
+.fact-card--verified{ border-color: rgba(212,175,120,0.4); }
+.fact-card--verified .fact-card__value{ color: var(--z-gold); }
+.fact-card--unverified{ border-style: dashed; border-color: rgba(232,161,92,0.5); }
+.fact-card--unverified .fact-card__value{ color: var(--z-warn); font-size: 22px; }
+.fact-card--unverified .fact-card__note{ color: var(--z-warn); }
+/* Phase 2.7C.3, Section 4 — PFEILER card is no longer "unverified" (that
+   styling reads as a warning, which the number itself does not deserve — it
+   is a confident, direct structural consequence of an APPROVED fact, just
+   not independently attested). Neutral solid border, normal ink color,
+   normal value size — visually indistinguishable from an ordinary fact card
+   except that it deliberately does NOT get the gold --verified treatment
+   either, since it is not itself an independently sourced figure. */
+.fact-card--derived{ border-color: var(--z-line); }
+.fact-card--derived .fact-card__value{ color: var(--z-ink); font-size: 34px; }
+.fact-card--derived .fact-card__note{ color: var(--z-ink-faint); }
+.facts__source{
+  max-width: 920px; margin: 26px auto 0;
+  font-family: var(--font-mono); font-size: 10.5px;
+  color: var(--z-ink-faint);
+}
+
+@media (min-width: 720px){
+  .facts__grid{ grid-template-columns: repeat(4, 1fr); }
+}
+
+/* ---------------------------------------------------------------- */
+/* 2.5D MUSEUM — ONE scroll-scrubbed 10-chapter architectural journey */
+/* Every layer is a WHOLE, geometrically-locked cutout, moved only as */
+/* a unit (depth/scale/translate/opacity) — never split or warped.    */
+/* CSS-generated museum backdrop, no photo used.                      */
+/* .museum__sticky is pinned by ONE ScrollTrigger created in          */
+/* js/museum2d-scroll.js (assets resolved by js/museum25d.js),        */
+/* mirroring .stage__sticky's pin/scrub pattern — a contained,        */
+/* independent pinned segment, not a whole-page scroll hijack.        */
+/* ---------------------------------------------------------------- */
+.museum{
+  position: relative; z-index: 5;
+  background: var(--z-bg);
+  padding: 90px 0 0;
+}
+.museum__inner{ max-width: 640px; margin: 0 auto 8px; padding: 0 20px; text-align: center; opacity: 0; }
+.museum__inner h3{ font-size: 22px; margin-bottom: 8px; }
+.museum__inner > p{ color: var(--z-ink-dim); font-size: 14px; }
+
+.museum__sticky{
+  position: relative;
+  /* 100vh fallback first (older Safari/WebKit, browsers without svh
+     support), then 100svh overrides it where supported — the second
+     declaration always wins the cascade when the unit is recognized,
+     and is silently ignored (leaving the vh fallback) otherwise.
+     Chose svh over dvh deliberately for this PINNED/scroll-triggered
+     stage specifically: dvh recalculates live as mobile browser chrome
+     (address bar) shows/hides, which happens naturally while the user
+     scrolls into/out of a ScrollTrigger pin — that would change this
+     element's height mid-pin and could visually jitter the pinned
+     stage. svh (small viewport height) is fixed to the viewport size
+     with browser UI fully expanded, so it stays stable for the whole
+     pinned scroll sequence instead of shifting under the user. */
+  height: 100vh;
+  height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  background: #050506;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Mobile-first: near-full-bleed exhibition stage. No fixed aspect-ratio
+   box — the stage itself just fills the pinned 100vh sticky area; each
+   image inside sizes itself according to its own preferred_fit (see the
+   fit-mode system below), so a landscape cutout and a tall portrait plate
+   both get to use the available height on their own terms instead of being
+   letterboxed inside one box tuned for a different aspect ratio. */
+.museum__viewport{
+  position: relative;
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #000;
+  perspective: 1100px;
+  touch-action: pan-y;
+}
+
+/* CSS-generated museum backdrop — deep charcoal, warm radial glow,
+   soft vignette, restrained dust motes. No environment photography. */
+.museum__backdrop{ position:absolute; inset:0; z-index:1; background: #050506; }
+.museum__glow{
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse 62% 46% at 50% 46%, rgba(212,175,120,0.16) 0%, rgba(212,175,120,0.05) 42%, rgba(5,5,6,0) 72%);
+}
+.museum__dust{
+  position:absolute; inset:0;
+  opacity: 0.5;
+  background-image:
+    radial-gradient(rgba(244,239,230,0.5) 1px, transparent 1px),
+    radial-gradient(rgba(212,175,120,0.4) 1px, transparent 1px);
+  background-size: 180px 180px, 260px 260px;
+  background-position: 0 0, 90px 130px;
+  animation: museumDustDrift 40s linear infinite;
+}
+@keyframes museumDustDrift{
+  from{ background-position: 0 0, 90px 130px; }
+  to{ background-position: -180px 220px, -160px -170px; }
+}
+.museum__vignette{
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse at 50% 50%, rgba(0,0,0,0) 40%, rgba(0,0,0,0.65) 100%),
+    linear-gradient(to top, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0) 30%);
+}
+
+/* Primary rigid layer — bridge + (currently empty) foreground alpha.
+   MOBILE COMPOSITION RULE (Phase 2): the architectural object lives in the
+   UPPER part of the pinned stage and the caption owns the lower ~30vh, so
+   typography never sits on top of structural detail. Implemented as
+   padding-bottom on the flex centring box (not a transform) so it survives
+   every scroll-driven transform the master timeline applies. */
+.museum__primary{
+  position:absolute; inset:0; z-index:2;
+  display:flex; align-items:center; justify-content:center;
+  /* PHASE 2.1 — chapters 01/02/10 vertical composition.
+     The 30vh reserve inherited from .museum__flat was correct for the tall
+     portrait cutouts (chapters 03-09, which really do fill the object zone)
+     but wrong for the PANORAMIC bridge: bridge_alpha renders as a ~7:1 band
+     only ~51px tall on a 375px-wide phone, so a 30vh reserve pushed that thin
+     band well ABOVE the optical centre of the space actually available to it
+     and produced the reported one-sided void between the bridge and the
+     caption. Measured at 375x812: caption block (worst case = chapter 10's
+     beat B, the longest ES extended_description) tops out around y=542, i.e.
+     it really occupies ~33vh, while chapter 01's short lead occupies ~21vh.
+     A 21vh reserve centres the band at y~321 (band 295-347), which is
+     equidistant from the stage top (295px) and from chapter 01's caption top
+     (295px) — genuine optical centring — while still clearing chapter 10's
+     tallest caption by ~195px. Implemented as layout padding, not a
+     transform, exactly like the original 30vh rule, so it survives every
+     scroll-driven transform the master timeline applies and introduces no
+     second positioning system. svh mirrors .museum__sticky's own height unit
+     so the reserve cannot drift as mobile browser chrome collapses.
+     Scoped to phones only: the 720-899px block and the 900px+ block below
+     both override this value. */
+  padding-bottom: 21vh;
+  padding-bottom: 21svh;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+.museum__primary-inner{
+  position: relative;
+  display: inline-block; /* shrink-wraps to the rigid layer's own rendered
+                             size, so it stays exactly matched to
+                             .museum__bridge regardless of fit-mode sizing */
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.museum__bridge{
+  display:block;
+  width: auto; height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 26px 46px rgba(0,0,0,0.6));
+  /* PHASE 2.1 — optical horizontal centring of the VISIBLE alpha content.
+     Re-decoded from SB_DEPTH_02_BRIDGE_ALPHA.png (per-pixel alpha scan,
+     thresholds 16/32/64/128, result stable): the visible geometry occupies
+     x = 17..1488 of the 1536px canvas, i.e. its centre sits at 48.99% of the
+     canvas — 1.009% LEFT of the canvas centre (asymmetric transparent
+     margins: 1.11% left vs 3.13% right). Because the canvas is flex-centred,
+     the BRIDGE ITSELF was therefore rendered off-centre: at 375px stage width
+     its visible margins were 6.0px left vs 13.5px right. A single static
+     translateX of the measured offset equalises them (7.9px / 7.9px at the
+     current max_width). Percentage translate resolves against the element's
+     own border box, so this is resolution-independent and identical at every
+     breakpoint. The source PNG is untouched.
+     SINGLE-OWNERSHIP: .museum__bridge is the one element in this module that
+     NO animation system drives — the master timeline owns .museum__primary
+     and the pointer/touch parallax owns #museumPrimaryInner — so this static
+     transform can never be overwritten or fight a tween. */
+  transform: translateX(1.01%);
+}
+.museum__foreground{
+  position:absolute; inset:0;
+  width:100%; height:100%; object-fit:contain;
+  pointer-events:none;
+  /* Same optical-centring correction as .museum__bridge above. This overlay
+     is inset:0 of #museumPrimaryInner, whose box equals the bridge's own
+     layout box, so an identical percentage translate keeps the two layers
+     pixel-registered. foreground_alpha is READY_EMPTY_BY_DESIGN today (zero
+     visible pixels), so this has no current visual effect — it exists so a
+     future non-empty foreground plate cannot land 1% out of register with
+     the bridge it belongs to. */
+  transform: translateX(1.01%);
+}
+.museum__guides{
+  position:absolute; inset:0; z-index:3;
+  width:100%; height:100%;
+  pointer-events:none;
+  opacity: 0;
+}
+.museum__guide-line{ stroke: var(--z-gold-dim); stroke-width: 0.25; }
+.museum__guide-dot{ fill: var(--z-gold); }
+
+/* Flat museum layer — the container for every chapter cutout. Phase 2 no
+   longer alternates two <img>s and swaps their src per segment: museum25d.js
+   injects ONE permanent <img class="museum__flat-img" data-slot="..."> per
+   unique manifest slot, and the master timeline moves each of them
+   individually in depth. The container itself is always visible; visibility
+   is carried per layer via opacity, which is what lets two layers overlap
+   during a transition instead of hard-cutting.
+   Same mobile composition rule as .museum__primary above. */
+.museum__flat{
+  position:absolute; inset:0; z-index:2;
+  display:flex; align-items:center; justify-content:center;
+  padding: 14px;
+  padding-bottom: 30vh;
+}
+.museum__flat-img{
+  position:absolute;
+  width: auto; height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 22px 40px rgba(0,0,0,0.55));
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  /* Every layer starts invisible; the timeline's gsap.set() takes ownership
+     as soon as JS runs. Also covers the window before the preload gate
+     attaches any src, so no half-loaded image can flash. */
+  opacity: 0;
+  box-sizing: border-box;
+}
+
+/* -------------------------------------------------------------------- */
+/* GENERIC FIT-MODE SYSTEM — applied by museum25d.js (applyFitToImage())  */
+/* to whichever <img> it populates (bridge, flatA, flatB), driven by each */
+/* manifest slot's OPTIONAL preferred_fit/background_mode fields. Rules   */
+/* branch only on fit-mode VALUES, never on slot_id — reusable as-is for  */
+/* any future monument/slot with the same fields. --fit-max-w/--fit-max-h */
+/* are set inline by JS only when a slot explicitly overrides them; the   */
+/* var() fallbacks below (which differ per breakpoint further down) are   */
+/* the "sensible defaults computed from real aspect ratio/fit-mode" the   */
+/* schema note describes.                                                 */
+/* -------------------------------------------------------------------- */
+
+/* cutout_stage — true RGBA cutouts (e.g. the bridge_alpha layer): float
+   free over the backdrop, no card/frame, sized up to dominate the stage.
+
+   PHASE 2 mobile note: the default max-heights below are tuned to the
+   ~70vh object zone left by .museum__flat/.museum__primary's 30vh caption
+   reserve, so a portrait cutout fills the object zone without ever reaching
+   under the caption. A manifest slot that declares its own max_height still
+   wins (that is the documented override contract) — bridge_alpha's 88vh is
+   harmless because it is width-bound (1536x512 panorama) long before it is
+   height-bound. */
+.museum__fit--cutout-stage{
+  max-width: var(--fit-max-w, 94%);
+  max-height: var(--fit-max-h, 62vh);
+}
+
+/* portrait_focus — tall RGB plates (exploded/detail views): read as a
+   vertical poster, no card border, scaled up via max-height so they stay
+   dominant rather than boxed small. */
+.museum__fit--portrait-focus{
+  max-width: var(--fit-max-w, 88%);
+  max-height: var(--fit-max-h, 64vh);
+}
+
+/* contain_tall — reserved for future tall assets that need a card frame
+   (currently unused by any of the 6 live slots). */
+.museum__fit--contain-tall{
+  max-width: var(--fit-max-w, 80%);
+  max-height: var(--fit-max-h, 76vh);
+}
+
+/* contain_wide — future non-cutout landscape assets: contained in a
+   refined frame, never stretched. */
+.museum__fit--contain-wide{
+  max-width: var(--fit-max-w, 90%);
+  max-height: var(--fit-max-h, 62vh);
+}
+
+/* detail_card — specimen/card presentation (e.g. material_stone): smaller,
+   bordered, deliberately reads as an object on a card rather than a
+   free-floating poster. */
+.museum__fit--detail-card{
+  max-width: var(--fit-max-w, 62%);
+  max-height: var(--fit-max-h, 60vh);
+}
+
+/* background_mode — independent of preferred_fit sizing above. */
+.museum__bgmode--none{ /* free float, no card — default look */ }
+.museum__bgmode--framed{
+  border: 1px solid var(--z-gold-dim);
+  padding: 10px;
+  background: rgba(244,239,230,0.02);
+}
+.museum__bgmode--soft-glow{
+  filter: drop-shadow(0 0 60px rgba(212,175,120,0.22)) drop-shadow(0 26px 46px rgba(0,0,0,0.6));
+}
+
+/* Pending state — explicit, never a substituted image. Also hosts the
+   built-but-hidden construction video_loop capability (#museumPendingVideo,
+   see bau_loop_01 in ASSET_SWAP_MAP.json) for zero-code-change activation
+   once an approved video is READY. */
+.museum__pending{
+  position:absolute; inset:0; z-index:2;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  gap: 14px; padding: 30px; padding-bottom: 30vh; text-align:center;
+  /* opacity only (no visibility:hidden): this element is a real animatable
+     chapter layer whenever a slot fails to resolve, or whenever bau_loop_01
+     becomes READY and the video takes over the BAU chapter. The timeline
+     drives its opacity like any other layer. */
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.museum__pending-badge{
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.25em;
+  color: var(--z-warn);
+  border: 1px dashed rgba(232,161,92,0.5);
+  padding: 8px 16px;
+}
+.museum__pending p{ color: var(--z-ink-faint); font-size: 12.5px; max-width: 280px; }
+.museum__pending-video{
+  position:absolute; inset:0; z-index:1;
+  width:100%; height:100%; object-fit:cover;
+}
+.museum__pending--video-ready .museum__pending-badge,
+.museum__pending--video-ready p{ display:none; }
+
+/* -------------------------------------------------------------------- */
+/* CAPTION SYSTEM (Phase 2) — replaces the old fixed .museum__label.      */
+/* One permanent block per chapter, built by museum2d-scroll.js, animated */
+/* by the SAME master timeline that moves the objects. Mobile: full-width */
+/* bottom band. Desktop: a left text column (see the 900px block below) — */
+/* a genuinely different composition, not the mobile layout scaled up.    */
+/* -------------------------------------------------------------------- */
+
+/* Legibility scrim. Mobile: bottom-up. Desktop: left-to-right (see below). */
+.museum__scrim{
+  position:absolute; left:0; right:0; bottom:0; height:52%;
+  z-index: 4; pointer-events:none;
+  background: linear-gradient(to top,
+    rgba(5,5,6,0.92) 0%, rgba(5,5,6,0.70) 26%, rgba(5,5,6,0) 100%);
+}
+
+.museum__caption{
+  position:absolute; inset:0; z-index: 6;
+  pointer-events:none;
+}
+.museum__cap{ position:absolute; inset:0; }
+/* Bottom-anchored so a longer EN/ES translation grows UPWARD and can never be
+   clipped or pushed off-screen. Nothing here contributes to document flow, so
+   text length never feeds back into the pinned scroll length. */
+.museum__cap-beat{
+  position:absolute;
+  left: 16px; right: 16px;
+  bottom: calc(34px + env(safe-area-inset-bottom, 0px));
+  will-change: transform, opacity;
+}
+.museum__cap-eyebrow{
+  display:flex; flex-wrap:wrap; align-items:center; gap: 8px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em;
+  color: var(--z-gold);
+  margin: 0 0 10px;
+}
+.museum__cap-index{ color: var(--z-ink-faint); }
+/* Evidence-status chip — the content map's own evidence_status, translated as
+   UI terminology only. Reconstructed / estimated material is visibly marked so
+   it is never read as confirmed fact. */
+.museum__cap-evidence{
+  font-size: 8.5px; letter-spacing: 0.16em;
+  color: var(--z-ink-faint);
+  border: 1px solid var(--z-line);
+  padding: 3px 6px;
+}
+.museum__cap-evidence[data-status="RECONSTRUCTED"],
+.museum__cap-evidence[data-status="ESTIMATED"],
+.museum__cap-evidence[data-status="NEEDS_VALIDATION"]{
+  color: var(--z-warn);
+  border-color: rgba(232,161,92,0.42);
+}
+/* Masked vertical title reveal: the h4 clips, the inner line is translated. */
+.museum__cap-title{ overflow: hidden; margin: 0 0 8px; }
+.museum__cap-line{
+  display: block;
+  font-size: clamp(20px, 5.6vw, 26px);
+  font-weight: 600; line-height: 1.15;
+}
+.museum__cap-lead{
+  font-size: 13px; line-height: 1.55;
+  color: var(--z-ink-dim);
+  max-width: 46ch;
+}
+.museum__cap-lead--long{ font-size: 12.5px; line-height: 1.6; }
+
+/* MATERIAL chapter — a specimen investigation, not another picture caption.
+   The description slot sits above a persistent chip index; the active chip
+   goes gold as its specimen is on screen. */
+.museum__cap-spec-slot{ position: relative; min-height: 6.6em; }
+.museum__cap-spec{
+  position:absolute; left:0; right:0; bottom:0;
+  font-size: 12.5px; line-height: 1.55;
+  color: var(--z-ink-dim);
+  max-width: 46ch;
+}
+.museum__cap-evidence--inline{ display:inline-block; margin-right: 8px; }
+.museum__cap-chips{
+  display:flex; flex-wrap:wrap; gap: 6px 12px;
+  margin-top: 12px;
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.museum__cap-chip{ color: var(--z-ink-faint); white-space: nowrap; }
+
+/* -------------------------------------------------------------------- */
+/* ZT TYPOGRAPHY MOTION SYSTEM v1 (PHASE 2.2)                            */
+/* Presentation only. Every motion VALUE lives in js/zt-typography.js —  */
+/* nothing here animates anything. These rules are deliberately generic  */
+/* (zt-* namespace, no museum-specific selectors) so the same module can */
+/* be reused by another monument or by the landing page later.           */
+/* -------------------------------------------------------------------- */
+
+/* Visually-hidden, still announced. Carries the COMPLETE, unfragmented
+   string for assistive technology whenever the visible rendering is split
+   into characters or into drop-cap + remainder. Standard clip-rect pattern:
+   not display:none, not visibility:hidden, so screen readers still read it. */
+.zt-sr{
+  position:absolute !important;
+  width:1px; height:1px;
+  margin:-1px; padding:0; border:0;
+  overflow:hidden; white-space:nowrap;
+  clip: rect(0 0 0 0); clip-path: inset(50%);
+}
+
+/* ZT_REVEAL_CHAR ---------------------------------------------------- */
+/* The masked vertical line reveal (.museum__cap-title{overflow:hidden})
+   is correct for a single translated line but would clip characters that
+   start BELOW their baseline on a multi-line title, so character mode
+   opts out of the mask. Line mode (long titles + reduced motion) keeps
+   the original masked behaviour untouched. */
+.museum__cap-title.zt-mode-char{ overflow: visible; }
+
+/* Words are inline-block + nowrap so a line can only ever break BETWEEN
+   words — never mid-word between two character spans. Essential because
+   DE/EN/ES title lengths differ a lot and the mobile column is narrow. */
+.zt-word{ display:inline-block; white-space:nowrap; }
+/* No will-change here on purpose: there are several hundred character
+   spans across the ten chapters and promoting them all to their own
+   compositor layer would cost far more than it saves. GSAP's default
+   force3D:"auto" gives each character a 3D layer only while it is
+   actually tweening. */
+.zt-char{ display:inline-block; }
+
+/* ZT_DROP_CAP -------------------------------------------------------- */
+/* Reusable oversized initial capital. Uses the existing warm-gold token
+   (--z-gold, the same colour as the eyebrow/active chip) — no new colour
+   is introduced. The character inside it is always the exact first
+   character of the validated sentence; the sentence itself is never
+   rewritten, only rendered in two visual pieces. */
+.zt-dropcap{
+  float: left;
+  font-size: 3.8em;      /* ≈2.4 body lines at the mobile lead size */
+  line-height: 0.78;
+  font-weight: 600;
+  color: var(--z-gold);
+  margin: 0.02em 0.12em 0 0;
+  /* A drop cap must never become a text-selection/keyboard artefact: it is
+     aria-hidden and purely decorative duplication of the sr-only string. */
+  user-select: none;
+}
+.zt-has-dropcap{ overflow: hidden; } /* contains the float */
+.zt-dc-body,
+.zt-line-body{ display: inline; }
+
+/* Reduced motion: the drop cap is a TYPOGRAPHIC device, not an effect, so
+   it is still rendered — it simply never moves or scales (handled in JS).
+   Nothing here needs to change; the rule exists only to document that. */
+
+/* Optional cinematic loop layer (PHASE 2.2). No <video> with this class is
+   created while its manifest slot is PENDING, so today this rule matches
+   nothing — it exists so a future READY loop inherits the exact same box
+   treatment, drop shadow and generic fit-mode sizing as the still images
+   (the element carries .museum__flat-img as well). */
+.museum__loop-video{
+  pointer-events: none;
+  background: transparent;
+}
+
+/* PHASE 2.3 — one-shot directional transition clips (assembly/disassembly).
+   Distinct from .museum__loop-video above: NOT ambient, never looping, and
+   NOT tracked by the master GSAP timeline/`states` map at all — museum25d.js
+   toggles its opacity directly with plain inline styles, entirely independent
+   of the depth-tweened static image it sits above. The short opacity
+   transition below only softens the hand-off back to that static PNG once a
+   clip ends or is superseded; the clip itself is always played at its own
+   rate, never scroll-scrubbed. Stacked above the flat static image via
+   z-index (both are position:absolute children of the same #museumFlat flex
+   box), so no DOM-order dependency. */
+.museum__transition-video{
+  z-index: 1;
+  pointer-events: none;
+  background: transparent;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+/* PHASE 2.3A FIX (was PHASE 2.3 — primary-layer transition clip, used only by
+   the 'complete' chapter's overview_transition_assembly/disassembly pair).
+   ROOT CAUSE of the "small black 9:16 rectangle" bug this replaces: the old
+   rule sized the video to inset:0/100%/100% of #museumPrimaryInner — but that
+   element is display:inline-block and SHRINK-WRAPS to .museum__bridge's own
+   rendered box, which is a ~3:1 LANDSCAPE shape (the bridge_alpha panorama).
+   A 1080x1920 PORTRAIT video object-fit:containED inside a landscape-shaped
+   box renders as a small vertical strip centred in that wide box — the
+   video's own aspect ratio was never given a full-stage box to size against.
+   FIX: this element is now appended (in museum25d.js) as a direct child of
+   #museumPrimary (.museum__primary — the TRUE full-stage flex container:
+   position:absolute;inset:0;display:flex;align-items:center;justify-content:
+   center), not of #museumPrimaryInner, and carries the SAME generic
+   .museum__flat-img base box (position:absolute;width:auto;height:auto;
+   object-fit:contain) plus the SAME cutout_stage fit-mode class every other
+   portrait/landscape cutout in this module already uses (applyFitToMedia is
+   now called on it) — the exact mechanism #museumFlat's chapter images use to
+   size themselves against their own real aspect ratio inside a flex stage.
+   This rule now only adds the properties .museum__flat-img does not already
+   provide. No baked optical-centring transform is applied here (unlike
+   .museum__bridge/.museum__foreground's translateX(1.01%)) — no per-pixel
+   alpha analysis has been done on this video asset; flagged as a judgment
+   call, carried over from the original Phase 2.3 delivery report. */
+.museum__primary-transition-video{
+  z-index: 1;
+  pointer-events:none;
+  /* PHASE 2.3B — lengthened from 0.35s. The video's own intrinsic box
+     (cutout_stage-sized, tall) and bridge_alpha's box (3:1 panorama, sized to
+     its own near-ceiling per Phase 2.1) are fundamentally different shapes —
+     no CSS transition can make one become the other, and bridge_alpha cannot
+     scale up further without clipping (see COMPLETE_SETTLE_SCALE's comment in
+     museum2d-scroll.js). A slower, gentler dissolve is the honest lever left:
+     it reads as the camera settling rather than a hard cut, even though the
+     underlying size difference is real. Scoped to this one class only — no
+     other chapter's video (PFEILER/BOEGEN/FAHRBAHN/MATERIAL/BAU all use
+     different classes) is affected. */
+  transition: opacity 0.6s ease-out;
+}
+
+/* Chapter dots — secondary orientation only, mirrors .stage__dots.
+   Scroll remains the primary interaction; clicking a dot jumps to that
+   chapter, it never functions as a mode-switcher grid. */
+.museum__chapter-dots{
+  position:absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  z-index: 5;
+  display:flex; flex-direction: column; gap: 7px;
+}
+.museum__chapter-dot{
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(244,239,230,0.25);
+  transition: background-color .3s ease, transform .3s ease;
+  padding: 5px; /* enlarges tap target without enlarging the visible dot */
+  background-clip: content-box;
+}
+.museum__chapter-dot.is-active{ background-color: var(--z-gold); transform: scale(1.5); }
+
+/* Tablet museum stage (e.g. 768x1024) — an explicit in-between treatment
+   so it never sits awkwardly between the mobile full-bleed stage (base
+   rules above) and the desktop exhibition frame (900px+ block below): a
+   moderate inset frame, generous height. Placed AFTER the base .museum__*
+   rules so it correctly wins the cascade at this width — must stay below
+   them in source order (an equal-specificity rule earlier in the
+   stylesheet, like the old min-width:720px facts-grid block above, would
+   be overridden by the unconditional base rule that follows it). */
+@media (min-width: 720px) and (max-width: 899px){
+  .museum__viewport{
+    width: min(88vw, 760px);
+    height: min(84vh, 900px);
+    border: 1px solid var(--z-line);
+  }
+  .museum__flat{ padding: 22px; padding-bottom: 26vh; }
+  .museum__primary,
+  .museum__pending{ padding-bottom: 26vh; }
+  .museum__fit--cutout-stage{ max-height: var(--fit-max-h, 56vh); }
+  .museum__fit--portrait-focus{ max-height: var(--fit-max-h, 58vh); }
+  .museum__fit--contain-tall{ max-height: var(--fit-max-h, 56vh); }
+  .museum__fit--contain-wide{ max-height: var(--fit-max-h, 48vh); }
+  .museum__fit--detail-card{ max-height: var(--fit-max-h, 50vh); }
+  /* Only the horizontal inset changes here; `bottom` and the right-hand
+     clearance from the chapter dots are owned by the max-width:899px block
+     near the end of this file (which comes later in source order and would
+     otherwise override anything set for them here). */
+  .museum__cap-beat{ left: 40px; }
+}
+
+/* ---------------------------------------------------------------- */
+/* VIDEO CHAPTER                                                     */
+/* ---------------------------------------------------------------- */
+.video-chapter{
+  position:relative; z-index:5;
+  background: #000;
+  padding: 90px 20px 110px;
+  display:flex; justify-content:center;
+}
+.video-chapter__frame{
+  max-width: 520px; width:100%; text-align:center;
+  opacity: 0;
+}
+.video-chapter__frame h3{ font-size: 22px; margin-bottom: 8px; }
+.video-chapter__frame p{ color: var(--z-ink-dim); font-size: 14px; margin-bottom: 26px; }
+.video-chapter__viewport{
+  position: relative;
+  width: 100%; max-width: 340px; margin: 0 auto;
+  aspect-ratio: 9 / 16;
+  background: #050506;
+  border: 1px solid var(--z-line);
+  overflow: hidden;
+}
+.video-chapter__viewport video{ width:100%; height:100%; object-fit: cover; }
+.video-chapter__fallback{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  padding: 24px; font-size: 12px; color: var(--z-ink-faint); text-align:center;
+}
+
+/* ---------------------------------------------------------------- */
+/* 3D CHAPTER                                                        */
+/* ---------------------------------------------------------------- */
+.threed-chapter{
+  position:relative; z-index:5;
+  background: var(--z-bg-soft);
+  padding: 90px 20px 110px;
+  display:flex; justify-content:center;
+}
+.threed-chapter__inner{
+  max-width: 640px; width:100%; text-align:center;
+  opacity: 0;
+}
+.threed-chapter__inner h3{ font-size: 22px; margin-bottom: 8px; }
+.threed-chapter__inner > p{ color: var(--z-ink-dim); font-size: 14px; margin-bottom: 26px; }
+.threed-chapter__stage{
+  position: relative;
+  width: 100%; aspect-ratio: 4 / 5;
+  border: 1px solid var(--z-line);
+  background: radial-gradient(ellipse at 50% 35%, #16181d 0%, #08090b 75%);
+  overflow: hidden;
+}
+.threed-chapter__mount{ position:absolute; inset:0; }
+.threed-chapter__loading{
+  position:absolute; inset:0; z-index:2;
+  display:flex; flex-direction: column; gap:8px; align-items:center; justify-content:center;
+  font-family: var(--font-mono); font-size: 11px; color: var(--z-ink-dim);
+  background: rgba(8,9,11,0.6);
+}
+.threed-chapter__error{
+  position:absolute; inset:0; z-index:2;
+  display:flex; align-items:center; justify-content:center;
+  padding: 24px; font-size: 12px; color: var(--z-warn); text-align:center;
+  background: rgba(8,9,11,0.75);
+}
+.threed-chapter__controls{
+  display:flex; flex-wrap:wrap; gap: 8px; justify-content:center;
+  margin-top: 18px;
+}
+.threed-chapter__controls button{
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.16em;
+  padding: 9px 14px; border: 1px solid var(--z-line); color: var(--z-ink-dim);
+}
+.threed-chapter__controls button:hover{ border-color: var(--z-gold); color: var(--z-ink); }
+.threed-chapter__orbit-label{
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.16em;
+  padding: 9px 14px; color: var(--z-ink-faint);
+}
+.threed-chapter__note{
+  margin-top: 16px; font-size: 11px; color: var(--z-ink-faint); max-width: 480px; margin-inline:auto;
+}
+
+/* ---------------------------------------------------------------- */
+/* FOOTER / CONTINUE                                                  */
+/* ---------------------------------------------------------------- */
+.continue{
+  position: relative; z-index:5;
+  background: var(--z-bg);
+  padding: 100px 20px 70px;
+  text-align: center;
+  border-top: 1px solid var(--z-line);
+}
+.continue h3{ font-size: 22px; margin-bottom: 10px; }
+.continue p{ color: var(--z-ink-dim); font-size: 14px; margin-bottom: 24px; }
+.continue button{
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em;
+  padding: 13px 26px; border: 1px solid var(--z-line); color: var(--z-ink-dim);
+}
+.continue button:hover{ border-color: var(--z-gold); color: var(--z-ink); }
+
+/* ---------------------------------------------------------------- */
+/* DESKTOP ENHANCEMENTS                                               */
+/* ---------------------------------------------------------------- */
+@media (min-width: 900px){
+  /* Image framing — generic pre-JS-paint fallback only. Source photographs
+     are portrait (1024x1536); on wide landscape viewports background-size:
+     cover at position:center pushed the bridge itself out of frame, leaving
+     only rooftops/towers visible. This kept bridge + Salzstadel/Brückturm +
+     cathedral readable as ONE global value for all 9 states.
+     PHASE (2026-08-29): each STATES entry in js/main.js now carries its own
+     deliberate objectPosition/mobile override, applied inline per layer by
+     applyStageLayerStyle() — those inline styles always win over this rule
+     once JS runs. This declaration is kept only as the safe default shown
+     for the ~one frame before JS applies the real per-state value (and as a
+     no-JS fallback), not as the effective production value anymore. */
+  .stage__bg-layer{ background-position: center 62%; }
+
+  .navbar{ padding: 0 44px; }
+  .navbar__links{ display:flex; gap: 28px; }
+  .navbar__lang{ gap: 8px; }
+
+  /* Caption / overlay positioning + text width balance */
+  .stage__caption{
+    left: 72px; right: auto; bottom: 112px;
+    max-width: 620px;
+  }
+  .stage__title{ max-width: 600px; font-size: clamp(30px, 3.6vw, 42px); }
+  .stage__text{ max-width: 520px; font-size: 15px; line-height: 1.65; }
+  .stage__dots{ right: 48px; }
+  .portal{ width: min(40vw, 460px); height: min(40vw, 460px); }
+
+  /* Section spacing — more generous horizontal/vertical rhythm on wide
+     viewports instead of the mobile-first flat 20px/90px. */
+  .facts{ padding: 130px 60px; }
+  .facts__grid{ max-width: 1040px; gap: 22px; }
+  .fact-card{ padding: 28px 24px; }
+  .fact-card__value{ font-size: 40px; }
+  .facts__source{ max-width: 1040px; }
+
+  /* Desktop museum stage uses the extra width meaningfully — a large
+     centered exhibition frame instead of one fixed-aspect box: width AND
+     height are set independently so a wide cutout and a tall portrait
+     plate can each dominate the stage on their own aspect ratio, rather
+     than both being squeezed into one 16:10 box. */
+  .museum{ padding: 130px 0 0; }
+  .museum__inner{ max-width: 1220px; text-align:center; }
+  .museum__inner h3{ font-size: 26px; }
+  /* PHASE 2.1 — desktop composition.
+     OLD: width min(78vw,1400px) / height min(84vh,940px). At 1920x1080 the
+     1600px block below then CAPPED this to min(64vw,1360px)=1229px, so the
+     widest desktops actually got the SMALLEST stage — the exhibition frame
+     shrank as the screen grew, which is the main reason the module read as
+     "a small image floating in a big black page" on a 1920 monitor.
+     NEW: the frame tracks the viewport (92vw / 90vh) with a cap that now
+     GROWS with the breakpoint instead of shrinking. Margins stay deliberate
+     (4vw each side, 5vh top/bottom) rather than edge-to-edge. */
+  .museum__viewport{
+    width: min(92vw, 1560px);
+    height: min(90vh, 1000px);
+    border: 1px solid var(--z-line);
+  }
+  /* DESKTOP COMPOSITION (Phase 2) — deliberately NOT the mobile layout scaled
+     up. The extra width becomes a real two-zone museum wall:
+       left  : a fixed text column (caption beats, left-to-right scrim)
+       right : the architectural object
+     The portrait cutouts are pushed right by padding-left. The PANORAMIC
+     bridge (.museum__primary, 1536x512) is the documented exception: it keeps
+     the FULL stage width so it reads at maximum size, and it simply does not
+     collide with the caption because at that aspect ratio it only occupies a
+     shallow horizontal band through the vertical centre. It is never squeezed
+     into a portrait-like box and never stretched vertically. */
+  /* PHASE 2.1 — the text column is now DERIVED from the caption's own
+     geometry instead of a flat 40% of the stage. 40% was a fixed proportion
+     of a variable width: on a 1229px stage it reserved 492px for a 397px
+     caption (fine), but on a 1880px stage it would reserve 752px for the SAME
+     400px-capped caption — i.e. the wider the monitor, the more empty wall
+     was wasted and the further the object was squeezed right. The calc below
+     reserves exactly the caption's left inset + its capped width + a 44px
+     clearance gutter, so the object zone absorbs every extra pixel of width.
+     Resolved widths: 900px stage -> 342px; 1325 -> 491; 1560 -> 494;
+     1728 -> 494; 1880 -> 494. */
+  .museum__flat{
+    padding: 30px clamp(32px, 3vw, 56px) 30px calc(54px + min(400px, 30%) + 44px);
+  }
+  .museum__pending{
+    padding: 30px clamp(32px, 3vw, 56px) 30px calc(54px + min(400px, 30%) + 44px);
+  }
+  /* The panoramic bridge keeps the FULL stage width (documented exception,
+     see the block comment above) but gains a bottom reserve: it is a shallow
+     band through the vertical centre, and at the new stage heights its band
+     bottom edge came within ~10px of the desktop caption column's tallest
+     state (chapter 10 beat B). 13vh lifts the band's optical centre to ~43%
+     of the stage, restoring a 28-75px clearance at every tested width while
+     keeping the bridge visually centred in the space above the caption. */
+  .museum__primary{ padding-bottom: 13vh; }
+  /* PHASE 2.1 — PORTRAIT CUTOUTS: height is the dominant dimension for every
+     one of the 6 live cutouts (941x1672 / 1024x1536 -> all height-bound), so
+     the max-height ceiling is what actually determines how big they read.
+     OLD 74vh was measured against the WINDOW, which meant the object could
+     never use the stage frame it sits in (74vh of 1080 = 799px inside a
+     907px stage = 88%, and only 74% of the window). NEW ceiling is measured
+     against the STAGE itself: calc(100% - 60px) = the full stage height minus
+     the 2x30px frame inset, so the object fills its frame edge-to-inset with
+     an intentional, constant 30px architectural margin at every viewport.
+     (Percentages on these absolutely-positioned <img>s resolve against
+     .museum__flat's padding box = the stage, which is why this is exact.)
+     max-width fallbacks are lowered so a future WIDE asset can never grow
+     back across the text column; none of the 6 live portraits is width-bound
+     at these values. Manifest-declared max_width/max_height still override
+     both, unchanged (bridge_alpha supplies its own and is unaffected here). */
+  .museum__fit--cutout-stage{ max-width: var(--fit-max-w, 58%); max-height: var(--fit-max-h, calc(100% - 60px)); }
+  .museum__fit--portrait-focus{ max-width: var(--fit-max-w, 58%); max-height: var(--fit-max-h, calc(100% - 60px)); }
+  .museum__fit--contain-tall{ max-width: var(--fit-max-w, 54%); max-height: var(--fit-max-h, calc(100% - 72px)); }
+  .museum__fit--contain-wide{ max-width: var(--fit-max-w, 62%); max-height: var(--fit-max-h, calc(100% - 72px)); }
+  .museum__fit--detail-card{ max-width: var(--fit-max-w, 44%); max-height: var(--fit-max-h, calc(100% - 96px)); }
+  .museum__chapter-dots{ right: 28px; }
+
+  .museum__scrim{
+    /* Capped so the legibility gradient does not keep growing across the
+       object zone as the stage widens (46% of 1880px would be 865px). */
+    height: 100%; width: min(46%, 760px); right: auto;
+    background: linear-gradient(to right,
+      rgba(5,5,6,0.90) 0%, rgba(5,5,6,0.52) 46%, rgba(5,5,6,0) 100%);
+  }
+  .museum__cap-beat{
+    left: 54px; right: auto;
+    width: min(400px, 30%);
+    bottom: 13%;
+  }
+  .museum__cap-line{ font-size: clamp(26px, 2vw, 34px); }
+  .museum__cap-lead{ font-size: 14px; }
+  .museum__cap-lead--long{ font-size: 13.5px; line-height: 1.65; }
+  .museum__cap-spec-slot{ min-height: 5.8em; }
+  .museum__cap-eyebrow{ font-size: 10.5px; }
+  /* Desktop drop cap: larger editorial presence in the wider text column.
+     ≈2.8 body lines at the desktop lead--long size. The object keeps its
+     full size — this only uses the space the caption column already has. */
+  .zt-dropcap{ font-size: 4.6em; margin: 0.02em 0.14em 0 0; }
+
+  .video-chapter{ padding: 130px 60px 150px; }
+  .video-chapter__frame{ max-width: 420px; }
+  .video-chapter__viewport{ max-width: 300px; }
+
+  .threed-chapter{ padding: 130px 60px 150px; }
+  .threed-chapter__inner{ max-width: 620px; }
+
+  .continue{ padding: 140px 60px 90px; }
+}
+
+@media (min-width: 1600px){
+  /* Ultra-wide refinement — slightly less aggressive crop needed at this
+     aspect, and content given more room without exceeding a comfortable
+     reading measure (visual balance, not a layout redesign). Same
+     pre-JS-paint-fallback-only status as the 900px rule above — per-state
+     inline styles from js/main.js take over once JS runs. */
+  .stage__bg-layer{ background-position: center 58%; }
+  .stage__caption{ left: 96px; max-width: 700px; }
+  .stage__title{ font-size: clamp(34px, 3vw, 46px); max-width: 680px; }
+  .stage__text{ max-width: 560px; font-size: 16px; }
+
+  .facts__grid{ max-width: 1220px; }
+  .facts__source{ max-width: 1220px; }
+  .museum__inner{ max-width: 1360px; }
+  /* PHASE 2.1 — this rule previously SHRANK the stage on wide screens
+     (min(64vw,1360px) is narrower than the 900px block's 1400px cap at every
+     width >= 1600px), which is what made 1920/2560 look emptier than 1440.
+     It now extends the frame instead: 1600x900 -> 1440x810, 1920x1080 ->
+     1728x972 (90% x 90%), 2560x1440 -> 1880x1296 (73% x 90%). The 1880px cap
+     is deliberate on 2560+: the portrait cutouts are height-bound, so extra
+     width past that point would only add empty wall, not object size — the
+     HEIGHT cap (1320px) is the one that had to be generous, because height is
+     what actually sizes them. */
+  .museum__viewport{
+    width: min(90vw, 1880px);
+    height: min(90vh, 1320px);
+  }
+  .video-chapter__frame{ max-width: 460px; }
+  .video-chapter__viewport{ max-width: 340px; }
+  .threed-chapter__inner{ max-width: 680px; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; }
+}
+
+/* ---------------------------------------------------------------- */
+/* MOBILE-ONLY FINAL OPTIMIZATION PASS — scoped to max-width:899px,   */
+/* never touches desktop (locked). Safe-area handling for fixed/     */
+/* bottom-anchored elements on notch/home-indicator devices.         */
+/* ---------------------------------------------------------------- */
+@media (max-width: 899px){
+  .scroll-hint{
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+  .intro-gate{
+    padding-top: calc(24px + env(safe-area-inset-top, 0px));
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+  }
+  .stage__caption{
+    bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+  }
+  .navbar{
+    padding-top: env(safe-area-inset-top, 0px);
+    height: calc(var(--nav-h) + env(safe-area-inset-top, 0px));
+  }
+  /* caption/.scroll-hint collision fix, part 2 — PRESERVED from Phase 1, just
+     retargeted from the removed .museum__label to its Phase 2 replacement.
+     Belt-and-suspenders alongside the scroll-hint auto-dismiss in main.js:
+     the two keep a clearly separate vertical zone on mobile, so there is no
+     overlap even in the brief window before the first-scroll dismissal fires
+     (e.g. a fast programmatic chapter-dot jump) or if the reduced-motion /
+     no-JS fallback ever leaves the scroll hint visible. */
+  .museum__cap-beat{
+    bottom: calc(34px + env(safe-area-inset-bottom, 0px));
+    /* Chapter dots sit on the right edge; keep the caption clear of them. */
+    right: 34px;
+  }
+}
+
+/* -------------------------------------------------------------------- */
+/* REDUCED MOTION — the museum module keeps its full information         */
+/* architecture (all 10 chapters, all validated copy, the same scroll    */
+/* order). museum2d-scroll.js neutralises every depth/scale/rotation     */
+/* endpoint in JS, leaving opacity-only crossfades; this rule only stops */
+/* the ambient CSS dust drift.                                           */
+/* -------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce){
+  .museum__dust{ animation: none; }
+}
+
+/* ---------------------------------------------------------------- */
+/* K-FRAMES GALLERY — Phase 2.5. K01-K12 historical construction      */
+/* gallery (#kframesGallery). A NEW, separate pinned scroll section,  */
+/* mirroring .stage__* (crossfade layers) and .museum__cap-*/          */
+/* .museum__chapter-dots (caption + secondary dots) visual language   */
+/* so it reads as part of the SAME product, not a new visual style.   */
+/* ---------------------------------------------------------------- */
+.kf{ position: relative; }
+.kf__inner{
+  position: relative; z-index: 2;
+  padding: 64px 20px 28px;
+  max-width: 560px;
+}
+.kf__inner h3{ font-size: clamp(22px, 5.5vw, 30px); font-weight: 600; margin-bottom: 10px; }
+.kf__inner p{ font-size: 14px; line-height: 1.6; color: var(--z-ink-dim); }
+
+.kf__sticky{
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+  background: #000;
+}
+.kf__img{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit: cover;
+  will-change: opacity;
+}
+.kf__img--a{ opacity:1; z-index:1; }
+.kf__img--b{ opacity:0; z-index:2; }
+.kf__vignette{
+  position:absolute; inset:0; z-index:3;
+  background:
+    linear-gradient(to top, rgba(0,0,0,0.88) 0%, rgba(0,0,0,0.08) 40%, rgba(0,0,0,0.3) 100%);
+  pointer-events:none;
+}
+
+.kf__caption{ position:absolute; inset:0; z-index: 6; pointer-events:none; }
+.kf__cap{ position:absolute; inset:0; }
+.kf__cap-beat,
+.kf__cap{
+  position:absolute;
+  left: 18px; right: 18px;
+  /* .kf__cap already has `inset:0` from the rule above (top:0/right:0/
+     bottom:0/left:0, matching .museum__cap's role as the full-viewport
+     backdrop container in the museum module). This combined rule reuses
+     that same selector to ALSO carry the bottom-anchored caption-content
+     positioning (skipping a separate .kf__cap-beat wrapper div, unlike
+     museum25d's markup) — but without `top: auto` here, the earlier
+     `top:0` persists (a later rule only overrides properties it sets),
+     stretching .kf__cap from top:0 to bottom:84px instead of anchoring it
+     to the bottom edge with auto height. Caught live: caption content
+     (date/title/lead) rendered pinned to the TOP of the screen instead of
+     bottom-anchored growing upward, unlike every other caption in this
+     product (.museum__cap-beat, .stage__caption). */
+  top: auto;
+  bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+}
+.kf__cap-eyebrow{
+  display:flex; flex-wrap:wrap; align-items:center; gap: 8px;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em;
+  color: var(--z-gold);
+  margin: 0 0 10px;
+}
+.kf__cap-index{ color: var(--z-ink-faint); }
+.kf__cap-date{ color: var(--z-gold); }
+.kf__cap-evidence{
+  font-size: 8.5px; letter-spacing: 0.16em;
+  color: var(--z-ink-faint);
+  border: 1px solid var(--z-line);
+  padding: 3px 6px;
+}
+.kf__cap-evidence[data-status="RECONSTRUCTED"],
+.kf__cap-evidence[data-status="ESTIMATED"],
+.kf__cap-evidence[data-status="NEEDS_VALIDATION"]{
+  color: var(--z-warn);
+  border-color: rgba(232,161,92,0.42);
+}
+.kf__cap-title{ overflow:hidden; margin: 0 0 8px; max-width: 560px; }
+.kf__cap-line{
+  display:block;
+  font-size: clamp(20px, 6vw, 30px);
+  font-weight: 600;
+  line-height: 1.15;
+}
+.kf__cap-lead{
+  font-size: 14px; line-height: 1.55;
+  color: var(--z-ink-dim);
+  max-width: 480px;
+  margin: 0 0 12px;
+  pointer-events: auto;
+}
+.kf__cap-needs-validation{
+  font-size: 12.5px; line-height: 1.55;
+  color: var(--z-warn);
+  max-width: 420px;
+  margin: 0 0 12px;
+}
+.kf__cap-hotspot{
+  pointer-events: auto;
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.14em;
+  color: var(--z-ink);
+  border: 1px solid var(--z-line);
+  padding: 9px 14px;
+  transition: border-color .25s ease, background-color .25s ease;
+}
+.kf__cap-hotspot:hover, .kf__cap-hotspot:focus-visible{
+  border-color: var(--z-gold);
+  background: rgba(212,175,120,0.08);
+}
+/* Phase 2.7C.3, Section 3 — restrained per-frame source attribution. Small,
+   subtle, last element in the caption's reading order (see kframes-gallery.js
+   revealBeat's DOM-order-driven sequencing) — image and story stay dominant,
+   no bibliography wall. Frames with no registered source (K08/K09) never get
+   this element populated (kframes-gallery.js leaves it out entirely). */
+.kf__cap-source{
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.1em;
+  color: var(--z-ink-faint);
+  margin: 0;
+  pointer-events: none;
+}
+.kf__cap-source-label{ color: var(--z-gold); margin-right: 5px; }
+
+.kf__nav{
+  position:absolute; right: 14px; top: 50%; transform: translateY(-50%);
+  z-index: 6;
+  display:flex; flex-direction:column; align-items:flex-end; gap: 10px;
+}
+.kf__counter{
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.14em;
+  color: var(--z-ink-faint);
+}
+.kf__dots{ display:flex; flex-direction: column; gap: 7px; }
+.kf__dot{
+  width: 5px; height: 5px; border-radius: 50%;
+  background: rgba(244,239,230,0.25);
+  transition: background-color .3s ease, transform .3s ease;
+  padding: 5px;
+  background-clip: content-box;
+  pointer-events: auto;
+}
+.kf__dot.is-active{ background-color: var(--z-gold); transform: scale(1.6); }
+
+@media (min-width: 900px){
+  .kf__inner{ max-width: 640px; padding: 84px 96px 32px; }
+  .kf__cap-beat,
+  .kf__cap{ left: 96px; right: auto; max-width: 620px; bottom: 96px; }
+  .kf__cap-title{ font-size: clamp(30px, 3.4vw, 42px); }
+  .kf__cap-lead{ font-size: 15px; max-width: 540px; }
+  .kf__nav{ right: 48px; }
+}
+
+@media (max-width: 899px){
+  .kf__cap-beat,
+  .kf__cap{
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+    right: 34px; /* keep clear of .kf__nav on the right edge */
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  /* The gallery's own motion is already opacity-only crossfades (image
+     layers + caption beats) authored directly in JS with duration values
+     that stay short but non-zero for a perceivable state change; this rule
+     only removes the CSS hover/focus transitions on the hotspot button. */
+  .kf__cap-hotspot{ transition: none; }
+}
+
+/* ---------------------------------------------------------------- */
+/* HISTORICAL REEL — Phase 2.6 TASK 4                                 */
+/* A small, standalone editorial "cinematic summary" beat placed AFTER  */
+/* #kframesGallery, wired in js/main.js's buildHistoricalReel() — NOT   */
+/* part of kframes-gallery.js's own pinned scroll/crossfade module.    */
+/* Same dark charcoal/black environment as the rest of the product     */
+/* (reuses --z-bg/--z-gold/--z-ink* only — no new colours).            */
+/* ---------------------------------------------------------------- */
+.reel{
+  position:relative; z-index:5;
+  background: var(--z-bg);
+  padding: 90px 20px 60px;
+  display:flex; flex-direction:column; align-items:center;
+}
+.reel__frame{
+  position: relative;
+  width: 100%; max-width: 380px;
+  aspect-ratio: 9 / 16;
+  background: #050506;
+  border: 1px solid var(--z-line);
+  overflow: hidden;
+  /* Initial state read by js/main.js's gsap.to(frame, {autoAlpha:1, y:0, ...})
+     on scroll-into-view — see buildHistoricalReel(). */
+  opacity: 0;
+  transform: translateY(24px);
+}
+.reel__video{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit: cover;
+}
+.reel__scrim{
+  position:absolute; inset:0; z-index:1;
+  background: linear-gradient(to top, rgba(5,5,6,0.92) 0%, rgba(5,5,6,0.15) 55%, rgba(5,5,6,0) 100%);
+  pointer-events: none;
+}
+.reel__caption{
+  position:absolute; left:18px; right:18px; bottom:20px; z-index:2;
+  text-align:left;
+}
+.reel__eyebrow{
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.3em;
+  color: var(--z-gold);
+  margin-bottom: 8px;
+}
+.reel__title{
+  font-size: clamp(19px, 5.5vw, 26px); font-weight:600; line-height:1.2;
+  margin-bottom: 8px; max-width: 320px;
+}
+/* zt-typography.js's char-mode split container — same inheritance
+   convention as .intro-gate__title-line / .kf__cap-line. */
+.reel__title-line{ display:block; }
+.reel__note{
+  font-size: 12.5px; line-height:1.5;
+  color: var(--z-ink-dim);
+  max-width: 300px;
+}
+.reel__replay{
+  position:absolute; top:14px; right:14px; z-index:3;
+  width: 34px; height: 34px;
+  display:flex; align-items:center; justify-content:center;
+  border: 1px solid rgba(244,239,230,0.3);
+  border-radius: 50%;
+  color: var(--z-ink-dim);
+  font-size: 15px;
+  background: rgba(8,9,11,0.35);
+  transition: border-color .2s ease, color .2s ease;
+}
+.reel__replay:hover, .reel__replay:focus-visible{
+  border-color: var(--z-gold); color: var(--z-ink);
+}
+
+/* Phase 2.6 TASK 5 — Brückmandl status. Same restrained "reserve the
+   shape, don't wire the click" visual family as .navbar__timeline-badge
+   (Phase 2.5): dashed warn-coloured border, mono font, no interactive
+   affordance of any kind (no href, no button, no click handler). */
+.reel__status-note{
+  display:flex; align-items:center; gap: 10px;
+  margin-top: 22px;
+}
+.reel__status-name{
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em;
+  color: var(--z-ink-dim);
+}
+.reel__status-badge{
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em;
+  color: var(--z-warn);
+  border: 1px dashed rgba(232,161,92,0.45);
+  padding: 3px 7px;
+  line-height: 1;
+}
+
+@media (min-width: 900px){
+  .reel{ padding: 130px 60px 80px; }
+  .reel__frame{ max-width: 420px; }
+  .reel__title{ font-size: clamp(22px, 2.6vw, 28px); }
+}

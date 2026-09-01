@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ZEITSPRUNG V2 — Steinerne Brücke</title>
+<meta name="description" content="ZEITSPRUNG V2 — experimental GSAP + ScrollTrigger + Lenis prototype, Steinerne Brücke Regensburg.">
+<meta name="robots" content="noindex, nofollow">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- PHASE 2.6B — INTRO ENTRY RELIABILITY MICRO-FIX.
+     Root cause (confirmed, not guessed): js/main.js is loaded as
+     type="module", which is fetched+executed deferred (like `defer`) — the
+     browser can paint #introStartBtn (plain HTML, parsed immediately) well
+     before that module graph (main.js + its imports: zt-audio.js,
+     zt-typography.js, i18n.js) has finished loading over the network and
+     registered wireIntroGate()'s click listener on DOMContentLoaded. A
+     click/tap that lands in that real (if usually brief) window does
+     nothing — no listener exists yet — explaining the observed "failed
+     once immediately after page load, then worked" behaviour exactly.
+     Fix: a plain, non-module, synchronous inline script — runs immediately
+     during parsing, ordered before the module script — captures any
+     click/pointerdown that TARGETS #introStartBtn into a single boolean
+     flag on `window`, via a capture-phase listener on `document` (so it
+     works regardless of whether the button itself exists yet at the exact
+     instant this script runs). It does NOT call startExperience() itself —
+     it only records that the visitor already tried. wireIntroGate() (in
+     main.js) checks this flag once, synchronously, right after attaching
+     its real listener, and immediately enters the experience if a click
+     was buffered. No polling, no timeout, no arbitrary delay — purely
+     event-driven, so the fix costs nothing when the race never happens
+     (the overwhelming majority of loads) and costs nothing more than "the
+     click that already happened" when it does. -->
+<script>
+  window.__ztIntroEarlyClick = false;
+  document.addEventListener("click", function (e) {
+    if (window.__ztIntroEarlyClick) return; // only the FIRST such click matters
+    var t = e.target;
+    if (t && t.closest && t.closest("#introStartBtn")) {
+      window.__ztIntroEarlyClick = true;
+    }
+  }, { capture: true });
+</script>
+
+<!-- ============================================================ -->
+<!-- INTRO GATE                                                    -->
+<!-- ============================================================ -->
+<div id="intro-gate" class="intro-gate">
+  <!-- PHASE 2.6 TASK 2 — cinematic video layer, BEHIND the existing content
+       block below. #introPosterImg (the new production hero) is the
+       always-present base layer; #introVideo is layered above it and only
+       faded in once it is actually playing (see js/main.js buildIntroMedia()).
+       Both are aria-hidden — purely atmospheric, never assistive content. -->
+  <div class="intro-gate__media" aria-hidden="true">
+    <img id="introPosterImg" class="intro-gate__media-poster" alt="" draggable="false">
+    <video id="introVideo" class="intro-gate__media-video" muted playsinline preload="metadata"></video>
+  </div>
+  <div class="intro-gate__scrim" aria-hidden="true"></div>
+
+  <div class="intro-gate__inner">
+    <!-- Beat container for zt-typography.js's revealBeat()/initBeat() (see
+         js/main.js buildIntroTypography()) — data-reveal marks which parts
+         participate in the reveal and in what order (DOM order = reading
+         order: eyebrow -> title -> line -> line). -->
+    <div class="intro-gate__reveal-group" id="introRevealGroup">
+      <p class="intro-gate__eyebrow" data-reveal="eyebrow" data-i18n="introEyebrow">ZEITSPRUNG</p>
+      <h1 class="intro-gate__title" id="introTitle" data-reveal="title">STEINERNE BRÜCKE</h1>
+      <p class="intro-gate__city" data-reveal="line" data-i18n="introCity">REGENSBURG</p>
+      <p class="intro-gate__range" data-reveal="line" data-i18n="introRange">1135 → HEUTE</p>
+    </div>
+
+    <button id="introStartBtn" class="intro-gate__start" data-i18n="introStart" type="button">ERLEBNIS STARTEN</button>
+
+    <button id="introSoundToggle" class="intro-gate__sound" type="button" aria-pressed="false">
+      <span class="intro-gate__sound-icon" aria-hidden="true">♪</span>
+      <span id="introSoundLabel" class="intro-gate__sound-label">TON AUS</span>
+    </button>
+
+    <p class="intro-gate__hint" data-i18n="introHint">Bereit für eine Reise durch 890 Jahre Geschichte</p>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- PRELOADER                                                     -->
+<!-- ============================================================ -->
+<div id="preloader" class="preloader" hidden>
+  <p class="preloader__label" data-i18n="preloaderLabel">WIRD GELADEN</p>
+  <div class="preloader__bar"><div id="preloaderFill" class="preloader__fill"></div></div>
+  <p id="preloaderPct" class="preloader__pct">0%</p>
+</div>
+
+<!-- ============================================================ -->
+<!-- APP                                                           -->
+<!-- ============================================================ -->
+<div id="app" hidden>
+
+  <nav class="navbar">
+    <!-- PHASE 2.7 — minimal, justified navigation-only change: brand text is
+         now a real link back to the ZEITSPRUNG main index (../index.html),
+         so a visitor arriving via the gallery's Steinerne Brücke card is
+         never stuck inside this single-monument experience. No other
+         behaviour of this bridge is touched. -->
+    <a href="../index.html" class="navbar__brand" aria-label="ZEITSPRUNG — zur Startseite / back to start / volver al inicio">ZEITSPRUNG</a>
+    <div class="navbar__links">
+      <button type="button" data-scroll-to="#stage" data-i18n="navRoute">ROUTE</button>
+      <button type="button" data-scroll-to="#facts" class="navbar__timeline-btn">
+        <span data-i18n="navTimeline">ZEITLEISTE</span>
+        <!-- Phase 2.5 — the full interactive timeline is not built yet; this
+             badge marks that ambition as in-progress without disabling the
+             button (it still scrolls to the real #facts section).
+             Phase 2.7C.3 — copy is now a genuine two-line "TIMELINE / VISUAL
+             PRODUCTION" placeholder (data-i18n-html because navTimelineStatus
+             now contains a literal <br>, see i18n.js). Still just a status
+             label on a real, working, non-interactive-badge button — no new
+             control, nothing to click inside the badge itself. -->
+        <span class="navbar__timeline-badge" data-i18n-html="navTimelineStatus">ZEITLEISTE<br>IN VISUELLER PRODUKTION</span>
+      </button>
+      <button type="button" data-scroll-to="#museum25d" data-i18n="navMuseum">AUSSTELLUNG</button>
+      <button type="button" data-scroll-to="#threeD" data-i18n="nav3d">3D</button>
+      <button type="button" data-scroll-to="#videoChapter" data-i18n="navHistory">GESCHICHTE</button>
+    </div>
+    <div class="navbar__lang">
+      <button type="button" data-lang="de">DE</button>
+      <button type="button" data-lang="en">EN</button>
+      <button type="button" data-lang="es">ES</button>
+      <!-- PHASE 2.4A — persistent, icon-only mute control covering the whole
+           experience (shares state with #introSoundToggle — see main.js). -->
+      <button id="navSoundToggle" type="button" class="navbar__sound" aria-pressed="false" aria-label="Sound">
+        <span aria-hidden="true">♪</span>
+      </button>
+    </div>
+  </nav>
+
+  <p class="scroll-hint" data-i18n="scrollHint">SCROLLEN, UM DURCH DIE ZEIT ZU REISEN</p>
+
+  <!-- ========================================================== -->
+  <!-- STAGE — 9-state scrubbed historical journey                -->
+  <!-- ========================================================== -->
+  <section id="stage" class="stage">
+    <div class="stage__sticky">
+      <div class="stage__bg-layer stage__bg-layer--a"></div>
+      <div class="stage__bg-layer stage__bg-layer--b"></div>
+      <div class="stage__vignette" aria-hidden="true"></div>
+
+      <div id="portal" class="portal" aria-hidden="true"></div>
+
+      <div class="stage__caption">
+        <span id="stateYear" class="stage__year">HEUTE</span>
+        <h2 id="stateTitle" class="stage__title">—</h2>
+        <p id="stateText" class="stage__text">—</p>
+      </div>
+
+      <div id="stageDots" class="stage__dots" role="presentation"></div>
+    </div>
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- FACTS — validated historical data (trilingual)              -->
+  <!-- ========================================================== -->
+  <section id="facts" class="facts">
+    <div class="facts__grid">
+      <div class="fact-card">
+        <span id="factBaubeginnLabel" class="fact-card__label">BAUBEGINN</span>
+        <span class="fact-card__value">1135</span>
+      </div>
+      <div class="fact-card">
+        <span id="factFertigstellungLabel" class="fact-card__label">FERTIGSTELLUNG</span>
+        <span class="fact-card__value">1146</span>
+      </div>
+      <div class="fact-card fact-card--verified">
+        <span id="factBoegenLabel" class="fact-card__label">BÖGEN</span>
+        <span class="fact-card__value">16</span>
+        <span id="factBoegenNote" class="fact-card__note">validiert</span>
+      </div>
+      <!-- Phase 2.7C.3, Section 4 — no more alarming inline asterisk anywhere
+           on this card: the value is the real number (15), the card uses the
+           new, neutral-but-honest "derived" treatment (not the warn/dashed
+           "unverified" styling, since this number IS confidently known, just
+           not independently sourced beyond the arithmetic derivation — see
+           SB_PIER_COUNT, verification_status DERIVED, in
+           02_CONTENT/Steinerne_Bruecke/SOURCES/). -->
+      <div class="fact-card fact-card--derived" data-status="derived">
+        <span id="factPfeilerLabel" class="fact-card__label">PFEILER</span>
+        <span class="fact-card__value">15</span>
+        <span id="factPfeilerNote" class="fact-card__note">direkte strukturelle Folge der 16 validierten Bögen</span>
+      </div>
+    </div>
+    <p id="factSourceNote" class="facts__source">QUELLE — Tiefbauamt Regensburg · Die Steinerne Brücke – 2010 bis 2018</p>
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- 2.5D MUSEUM — ONE cinematic scroll-scrubbed architectural   -->
+  <!-- journey in 10 chapters:                                     -->
+  <!--   COMPLETE > OPENING > EXPLODED > PFEILER > BÖGEN >          -->
+  <!--   FAHRBAHN > MATERIAL > BAU > REASSEMBLY > COMPLETE          -->
+  <!-- Every image layer is a WHOLE, rigid, geometrically-locked    -->
+  <!-- cutout, moved only as a unit. Layers and captions are built  -->
+  <!-- by JS (js/museum25d.js resolves assets from the manifest,    -->
+  <!-- js/museum2d-scroll.js owns the single master timeline), so   -->
+  <!-- the hosts below are intentionally empty. Chapter dots are a  -->
+  <!-- secondary jump affordance only — scroll is primary.          -->
+  <!-- ========================================================== -->
+  <section id="museum25d" class="museum">
+    <div class="museum__inner">
+      <h3 data-i18n="museumTitle">Die Brücke im Raum</h3>
+      <p data-i18n="museumText">Eine interaktive Ausstellung der Konstruktion — isoliert, ohne Umgebung, wie im Museum betrachtet.</p>
+    </div>
+
+    <div class="museum__sticky" id="museumSticky">
+      <div class="museum__viewport" id="museumViewport">
+        <div class="museum__backdrop" aria-hidden="true">
+          <div class="museum__glow"></div>
+          <div class="museum__dust"></div>
+          <div class="museum__vignette"></div>
+        </div>
+
+        <div class="museum__primary">
+          <div class="museum__primary-inner" id="museumPrimaryInner">
+            <img id="museumBridgeImg" class="museum__bridge" alt="Steinerne Brücke — isolierte Tragstruktur" draggable="false">
+            <img id="museumForegroundImg" class="museum__foreground" alt="" draggable="false" aria-hidden="true">
+          </div>
+          <svg id="museumPrimaryGuides" class="museum__guides" aria-hidden="true"></svg>
+        </div>
+
+        <!-- One permanent <img class="museum__flat-img"> per UNIQUE manifest
+             slot is injected here by museum25d.js (explosion_main is shared by
+             the EXPLODED and REASSEMBLY chapters and gets exactly one
+             element). Sources are attached lazily by the preload gate, never
+             swapped on scroll. -->
+        <div id="museumFlat" class="museum__flat">
+          <svg id="museumFlatGuides" class="museum__guides" aria-hidden="true"></svg>
+        </div>
+
+        <!-- Safe PENDING placeholder — the fallback layer for ANY chapter
+             whose manifest slot fails to resolve. Not used today: all six
+             chapter cutouts (including bau_construction) are READY.
+             #museumPendingVideo is the built-but-inactive video_loop
+             capability (bau_loop_01 in ASSET_SWAP_MAP.json). While that slot
+             is PENDING the video stays hidden and BAU shows its approved
+             still cutout; the moment the slot becomes READY this element
+             becomes the BAU chapter's animated layer automatically. A broken
+             <video> is never rendered. -->
+        <div id="museumPending" class="museum__pending">
+          <span class="museum__pending-badge" data-i18n="museumPendingBadge">PENDING</span>
+          <p data-i18n="museumPendingText">Für diese Bauphase liegt noch kein freigegebenes Bildmaterial vor.</p>
+          <video id="museumPendingVideo" class="museum__pending-video" muted loop playsinline preload="none" hidden></video>
+        </div>
+
+        <!-- Bottom scrim — keeps the caption legible over a cutout without
+             covering the object itself (mobile) / anchors the left text
+             column (desktop). Purely presentational. -->
+        <div class="museum__scrim" aria-hidden="true"></div>
+
+        <!-- Caption host. museum2d-scroll.js builds ONE permanent caption
+             block per chapter here (eyebrow / evidence chip / title / lead,
+             plus a second reading beat where the validated content is longer
+             than fits at once). Text content is never swapped during scroll —
+             the master timeline only crossfades these blocks, which is what
+             makes the typography reverse deterministically. All copy comes
+             from MUSEUM_CONTENT_MAP.json or the approved i18n label strings. -->
+        <div class="museum__caption" id="museumCaption"></div>
+
+        <!-- Secondary orientation only — scroll drives the sequence. -->
+        <div class="museum__chapter-dots" id="museumChapterDots" role="group" aria-label="Museum chapters"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- K-FRAMES GALLERY — Phase 2.5. K01–K12 historical-construction   -->
+  <!-- visual gallery, strict chronological order. A NEW, SEPARATE     -->
+  <!-- scroll-driven module — NOT merged with #stage's 9-state journey -->
+  <!-- nor with #museum25d's 10-chapter exhibition. All structure/text -->
+  <!-- is built by js/kframes-gallery.js from                          -->
+  <!-- 03_ASSETS/Steinerne_Bruecke/2d/KFRAMES_STORY_MAP.json, so the    -->
+  <!-- host below is intentionally empty except for its section intro. -->
+  <!-- ========================================================== -->
+  <section id="kframesGallery" class="kf">
+    <div class="kf__inner">
+      <h3 data-i18n="kframesTitle">Die Baustelle im Bild</h3>
+      <p data-i18n="kframesText">Zwölf Bildmomente der Bauzeit, chronologisch geordnet — von der Fundamentierung bis heute.</p>
+    </div>
+
+    <div class="kf__sticky" id="kfSticky">
+      <div class="kf__viewport" id="kfViewport">
+        <img id="kfImgA" class="kf__img kf__img--a" alt="" draggable="false">
+        <img id="kfImgB" class="kf__img kf__img--b" alt="" draggable="false">
+        <div class="kf__vignette" aria-hidden="true"></div>
+
+        <!-- Caption host. kframes-gallery.js builds ONE permanent caption
+             beat per K-frame here (eyebrow/date, evidence chip, title,
+             description, optional real hotspot CTA). Text is never swapped
+             mid-scroll — only these permanent blocks crossfade. -->
+        <div class="kf__caption" id="kfCaption"></div>
+
+        <!-- Secondary orientation only — scroll drives the sequence. -->
+        <div class="kf__nav" id="kfNav">
+          <span class="kf__counter" id="kfCounter">K01 / 12</span>
+          <div class="kf__dots" id="kfDots" role="group" aria-label="K-Frame gallery"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- HISTORICAL REEL — Phase 2.6 TASK 4. A small, standalone       -->
+  <!-- editorial "cinematic summary" beat placed AFTER the K01–K12   -->
+  <!-- gallery — NOT part of #kframesGallery's own pinned scroll/    -->
+  <!-- crossfade mechanics (kframes-gallery.js is untouched). A       -->
+  <!-- normal reveal-on-scroll section, wired in js/main.js's         -->
+  <!-- buildHistoricalReel(). Also hosts the standalone, non-         -->
+  <!-- interactive Brückmandl status note (Phase 2.6 TASK 5).        -->
+  <!-- ========================================================== -->
+  <section id="historicalReel" class="reel">
+    <div class="reel__frame">
+      <video id="reelVideo" class="reel__video" muted playsinline preload="none"></video>
+      <div class="reel__scrim" aria-hidden="true"></div>
+      <div class="reel__caption" aria-hidden="false">
+        <p class="reel__eyebrow" data-reveal="eyebrow" data-i18n="reelEyebrow">1135–2018</p>
+        <h3 class="reel__title" id="reelTitle" data-reveal="title">Die Brücke im Zeitraffer</h3>
+        <p class="reel__note" data-reveal="line" data-i18n="reelNote">Redaktionelle Zusammenfassung — die vollständige Geschichte setzt sich oben fort.</p>
+      </div>
+      <!-- Small, subtle replay affordance — an icon-button, not a
+           video-player-style control. Restarts the single play; the video
+           never loops on its own (see js/main.js buildHistoricalReel()). -->
+      <button id="reelReplayBtn" class="reel__replay" type="button" aria-label="Replay">
+        <span aria-hidden="true">&#8635;</span>
+      </button>
+    </div>
+
+    <!-- Phase 2.6 TASK 5 — Brückmandl status. Reuses the id/label already
+         reserved (but never wired to a real target) in
+         03_ASSETS/Steinerne_Bruecke/2d/ASSET_SWAP_MAP.json's
+         hotspots_registry.bruckmandl entry (status PENDING_DESTINATION: "no
+         real Brückmandl landing page, anchor, or content section exists
+         anywhere in this project"). Name + status only, NO historical copy,
+         NO link, NO click handler — a plain, non-interactive status line,
+         same visual family as .navbar__timeline-badge (Phase 2.5). Reuses
+         navTimelineStatus's already-approved DE/EN/ES copy instead of
+         duplicating the translated string.
+         Phase 2.7C.3 — navTimelineStatus's copy became Timeline-specific
+         ("ZEITLEISTE / IN VISUELLER PRODUKTION", two lines), which no longer
+         fits this unrelated Brückmandl note. Split into its own dedicated key
+         (bruckmandlStatus) carrying navTimelineStatus's OLD, still-accurate
+         "in development" text instead, so this note's meaning is completely
+         unchanged by the Timeline copy update. -->
+    <div class="reel__status-note">
+      <span class="reel__status-name" data-i18n="bruckmandlName">Brückmandl</span>
+      <span class="reel__status-badge" data-i18n="bruckmandlStatus">IN ARBEIT</span>
+    </div>
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- VIDEO CHAPTER — FPV                                         -->
+  <!-- ========================================================== -->
+  <section id="videoChapter" class="video-chapter">
+    <div class="video-chapter__frame">
+      <h3 data-i18n="videoChapterTitle">Der Flug über die Brücke</h3>
+      <p data-i18n="videoChapterText">Eine FPV-Aufnahme der Steinerne Brücke aus der Vogelperspektive.</p>
+      <div class="video-chapter__viewport">
+        <video id="fpvVideo" playsinline muted loop preload="none"></video>
+        <p id="videoFallback" class="video-chapter__fallback" data-i18n="videoUnavailable" hidden>
+          Video konnte in diesem Browser nicht geladen werden.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================================== -->
+  <!-- 3D CHAPTER — GLB viewer                                     -->
+  <!-- ========================================================== -->
+  <section id="threeD" class="threed-chapter">
+    <div class="threed-chapter__inner">
+      <h3 data-i18n="threeDTitle">Interaktives 3D-Modell</h3>
+      <p data-i18n="threeDText">Erkunden Sie die Konstruktion der Brücke in drei Dimensionen.</p>
+
+      <div class="threed-chapter__stage">
+        <div id="threeDMount" class="threed-chapter__mount"></div>
+        <div id="threeDLoading" class="threed-chapter__loading" hidden>
+          <span data-i18n="threeDLoading">3D-Modell wird geladen…</span>
+          <span id="threeDProgress">0%</span>
+        </div>
+        <p id="threeDError" class="threed-chapter__error" hidden>GLB konnte nicht geladen werden.</p>
+      </div>
+
+      <div class="threed-chapter__controls">
+        <button id="btn3dReset" type="button" data-i18n="threeDReset">RESET</button>
+        <button id="btn3dFront" type="button" data-i18n="threeDFront">FRONT</button>
+        <button id="btn3dThreeQuarter" type="button" data-i18n="threeD34">3/4</button>
+        <button id="btn3dTop" type="button" data-i18n="threeDTop">TOP</button>
+        <span class="threed-chapter__orbit-label" data-i18n="threeDOrbit">ORBIT</span>
+      </div>
+
+      <p class="threed-chapter__note" data-i18n="threeDStateNote">
+        Hinweis: Dieses Master-GLB liegt bereits in einem teil-explodierten Zustand vor.
+      </p>
+    </div>
+  </section>
+
+  <footer class="continue">
+    <h3 data-i18n="continueTitle">Reise fortsetzen</h3>
+    <p data-i18n="continueText">Weitere Monumente von ZEITSPRUNG folgen in Kürze.</p>
+    <button id="footerBackBtn" type="button" data-i18n="footerBack">ZURÜCK ZUM ANFANG</button>
+  </footer>
+
+</div>
+
+<!-- ============================================================ -->
+<!-- Motion stack — GSAP + ScrollTrigger + Lenis via CDN (UMD)     -->
+<!-- ============================================================ -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+
+<!-- Import map required: three.js example modules (GLTFLoader, OrbitControls) use the
+     bare specifier "from 'three'" internally, which native ES modules cannot resolve
+     without this map. -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

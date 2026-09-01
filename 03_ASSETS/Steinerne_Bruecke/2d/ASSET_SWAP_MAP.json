@@ -1,0 +1,1103 @@
+{
+  "$schema_note": "Authoritative asset registry for the Steinerne Br\u00fccke 2.5D museum module (#museum25d). This file lives under 03_ASSETS/Steinerne_Bruecke/ (the project's asset-registry root, same convention as 2_5D_ASSET_MAP.json) and is fetched at runtime by 04_PREVIEWS/PROTOTYPES/ZEITSPRUNG_V2/STEINERNE_BRUECKE/js/museum25d.js. Do not fork/duplicate this file into the web-slot copy folder \u2014 the web module reads this path directly over HTTP.",
+  "monument": "Steinerne_Bruecke",
+  "module": "museum25d",
+  "web_fetch_url": "/03_ASSETS/Steinerne_Bruecke/2d/ASSET_SWAP_MAP.json",
+  "slot_base": "/04_PREVIEWS/PROTOTYPES/ZEITSPRUNG_V2/assets/steinerne-bruecke",
+  "slot_base_note": "Every slot's file_path is relative to slot_base \u2014 identical resolution rule the module previously used for its hardcoded SLOT_BASE constant. slot_base itself points at the curated WEB COPIES, never at 03_ASSETS/Steinerne_Bruecke/IMAGES/MASTER/.",
+  "status_values": [
+    "READY",
+    "PENDING",
+    "DISABLED"
+  ],
+  "type_values": [
+    "bridge_alpha",
+    "flat_image",
+    "support_image",
+    "video_loop",
+    "video_transition"
+  ],
+  "video_transition_contract": {
+    "$note": "PHASE 2.3 \u2014 ONE-SHOT DIRECTIONAL TRANSITION CLIPS (distinct from the ambient video_loop contract above). A 'video_transition' slot is one HALF of an assembly/disassembly pair for a chapter that already has an approved still fallback image. SCHEMA CHOICE: option (b) from the Phase 2.3 brief \u2014 two sibling slots per chapter (one per pair_role), linked via a shared chapter_key + a `transition_pair` block, mirroring the pre-existing loop_pair convention used by explosion_loop/reassembly_loop. Chosen over option (a) (one slot, two file_path fields) because resolveSlot()/the loop-slot discovery pattern already resolves ONE slot_id -> ONE status/file_path uniformly; two sibling slots reuse that resolver completely unmodified, whereas a dual-file_path slot would have needed a second resolution branch inside resolveSlot() for this one type.",
+    "discovery": "museum25d.js scans manifest.slots for type === 'video_transition' AND a non-empty chapter_key, grouping by chapter_key into { assembly, disassembly } pairs (via each slot's pair_role). A chapter is only offered transition playback when AT LEAST ONE of its two pair_role slots resolves (status READY + file_path). A pair_role that fails to resolve simply is not available for that direction \u2014 never a broken <video>.",
+    "render_target": "'flat_layer' = both clips are injected as <video class=\"museum__flat-img museum__transition-video\"> siblings of the chapter's existing static <img> inside #museumFlat, stacked on top of it (higher z-index) while playing. 'primary_layer' = both clips are injected as <video class=\"museum__flat-img museum__primary-transition-video\"> children of #museumPrimary (primaryOuter \u2014 the true full-stage flex container), a SIBLING of #museumPrimaryInner rather than a child of it, stacked above the bridge via z-index while playing (used only by the 'complete' chapter's overview_transition_* pair, since kind:'primary' chapters share one physical layer element across overview/opening/complete). PHASE 2.3A FIX: originally injected as a child of #museumPrimaryInner, which shrink-wraps to bridge_alpha's own ~3:1 landscape box \u2014 a portrait 1080x1920 clip object-fit:contain'ed inside that landscape-shaped ancestor rendered as a small vertical strip (the 'small black 9:16 rectangle' bug). Moved to be a direct child of #museumPrimary and given the same generic cutout_stage display-fit system (applyFitToMedia) every flat_layer cutout already uses, so it sizes against the real full stage instead of an ancestor shaped for a different asset's aspect ratio. See museum25d.js/style.css PHASE 2.3A comments for the full fix.",
+    "playback": "NOT looping, NOT ambient. autoplay is entirely event-driven: a clip plays ONCE, exactly when its chapter becomes the ACTIVE chapter via the master timeline's chapter-change event AND the scroll direction at that moment selects that clip's pair_role (forward navigation entering the chapter for the first time in a given direction plays assembly if the chapter is being entered while the structure is becoming whole, disassembly if it is being entered while the structure is separating \u2014 see museum25d.js's TRANSITION_DIRECTION_RULE for the exact per-chapter mapping). On 'ended' (or immediately, if the slot does not resolve), the video is hidden and the chapter's existing approved static fallback image (`fallback_slot_id`) is revealed/stays visible underneath \u2014 byte-identical to today's rendering once settled. There is deliberately NO scroll-scrubbed video playback, exactly like the video_loop contract above: a transition clip plays once at its own rate or not at all, it is never scrubbed by scroll position. Only ONE video element (across BOTH the video_loop and video_transition systems) may be in an actively-playing state system-wide.",
+    "single_flight": "Each chapter_key tracks its own monotonically increasing requestId. Triggering a (re)play bumps the id; the clip's own 'ended'/'pause' handlers and the play() promise resolution compare their captured id against the current one and no-op if superseded \u2014 so a stale handler from an aborted/overtaken request can never hide the wrong element or restart playback out of order. Repeated dot-nav clicks or fast scroll therefore only ever result in the LATEST requested direction's clip playing.",
+    "fallback_slot_id": "Same meaning as the video_loop contract: the approved still slot this transition pair settles on / falls back to when PENDING or after the clip ends.",
+    "freigabe": "Each slot's own status/file_path is the sole source of truth for whether a real approved file exists. This contract block documents mechanism only and asserts nothing about which slots are currently READY \u2014 see each slot's own entry."
+  },
+  "display_fit_note": "OPTIONAL per-slot display-fit metadata (orientation, preferred_fit, max_width, max_height, align_x, align_y, background_mode) \u2014 added to fix the 2.5D museum stage sizing so each slot is presented according to its own real aspect ratio/type instead of one fixed box. All fields are optional; a slot that omits them inherits sensible CSS defaults for its preferred_fit (or, if preferred_fit itself is omitted, a default inferred from orientation in museum25d.js). See ASSET_SWAP_SYSTEM.md section 3a for the full definitions of each preferred_fit value and how museum25d.js/style.css consume these fields generically (never branched on slot_id).",
+  "orientation_values": [
+    "landscape",
+    "portrait",
+    "square"
+  ],
+  "preferred_fit_values": [
+    "portrait_focus",
+    "contain_tall",
+    "contain_wide",
+    "cutout_stage",
+    "detail_card"
+  ],
+  "align_x_values": [
+    "center",
+    "left",
+    "right"
+  ],
+  "align_y_values": [
+    "center",
+    "top",
+    "bottom"
+  ],
+  "background_mode_values": [
+    "none",
+    "soft-glow",
+    "framed"
+  ],
+  "loop_slot_contract": {
+    "$note": "PHASE 2.2 \u2014 OPTIONAL CINEMATIC LOOP SLOTS. Every slot with type 'video_loop' is an OPTIONAL enhancement of one chapter that already has an approved still image. The contract museum25d.js implements generically (no slot_id is hardcoded anywhere in the code):",
+    "discovery": "museum25d.js scans manifest.slots for type === 'video_loop' AND a non-empty chapter_key. It builds a chapterKey -> loopSlot map at runtime. Adding a loop slot for any future chapter therefore needs a manifest entry only, never a code change.",
+    "activation": "A loop is used for its chapter ONLY when resolveSlot() succeeds, i.e. status === 'READY' AND file_path !== null. Any other state (PENDING, DISABLED, missing, null path) resolves to ok:false and the chapter falls back to its normal still-image layer, byte-identically to how it renders with no loop slot present at all. A <video> element is not even created in that case, so a broken/empty video tag is structurally impossible.",
+    "render_target": "'flat_layer' = a <video class=\"museum__flat-img museum__loop-video\"> is injected into #museumFlat and becomes that chapter's animated layer, inheriting the same generic display-fit system as the images. 'pending_layer' = the pre-existing #museumPendingVideo element is used instead (bau_loop_01's already-proven Phase 1/2 path, preserved unchanged).",
+    "playback": "muted + loop + playsinline + no controls + preload='none'. src is only assigned inside the module's deferred asset gate, and playback only starts while BOTH (a) the museum section is intersecting the viewport and (b) the loop's own chapter is the current chapter per the master timeline's progress->chapter map. Pausing happens on either condition failing. There is deliberately NO scroll-scrubbed video playback \u2014 the loop runs at its own rate or not at all.",
+    "fallback_slot_id": "Documentation of which approved still slot the loop would take over from. Read by nothing at runtime; the actual fallback is structural (see 'activation').",
+    "freigabe": "No video file for ANY of these slots exists on disk. reserved_file_path records the intended location only. Nothing here asserts that an approved loop exists."
+  },
+  "sections": {
+    "overview": {
+      "kind": "primary",
+      "guides": false,
+      "label": "\u00dcberblick \u2014 full rigid bridge layer, no reframing"
+    },
+    "struktur": {
+      "kind": "primary",
+      "guides": false,
+      "guide_points": [
+        [
+          8,
+          20,
+          30,
+          42
+        ],
+        [
+          92,
+          22,
+          68,
+          44
+        ],
+        [
+          12,
+          78,
+          32,
+          58
+        ],
+        [
+          88,
+          80,
+          70,
+          58
+        ],
+        [
+          50,
+          6,
+          50,
+          30
+        ]
+      ],
+      "label": "Struktur \u2014 same rigid bridge layer, reframed (scale/rotate/offset). Guide lines disabled (guides:false) as of the scroll-chapter refactor \u2014 they pointed at no real interactive target. guide_points geometry kept, not deleted, for possible future re-enablement with real hotspot targets."
+    },
+    "explosion": {
+      "kind": "flat",
+      "guides": false,
+      "guide_points": [
+        [
+          8,
+          20,
+          30,
+          42
+        ],
+        [
+          92,
+          22,
+          68,
+          44
+        ],
+        [
+          12,
+          78,
+          32,
+          58
+        ],
+        [
+          88,
+          80,
+          70,
+          58
+        ],
+        [
+          50,
+          6,
+          50,
+          30
+        ]
+      ],
+      "label": "Explosion \u2014 exploded-assembly chapter image. The GESAMT/PFEILER/B\u00d6GEN/FAHRBAHN chip switcher was removed as a UI control in the scroll-chapter refactor (chapters PIERS/ARCHES/DECK now cover that ground via scroll); explosion_piers/explosion_arches/explosion_deck slots stay in the manifest, unused. Guide lines disabled (guides:false) for the same reason as struktur \u2014 geometry kept, not deleted."
+    },
+    "reassembly": {
+      "kind": "flat",
+      "guides": false,
+      "label": "Reassembly \u2014 no dedicated reassembly imagery exists. Implemented in museum25d.js as a controlled crossfade FROM explosion_main BACK TO bridge_alpha (the reverse of the overview/struktur -> explosion crossfade), never as fake geometry motion. Reuses the explosion_main and bridge_alpha slot_ids already defined above \u2014 no new image slots required."
+    },
+    "pfeiler": {
+      "kind": "flat",
+      "guides": false,
+      "label": "Pfeiler \u2014 pier detail image + small exploded-piers support thumbnail"
+    },
+    "boegen": {
+      "kind": "flat",
+      "guides": false,
+      "label": "B\u00f6gen \u2014 arch detail image + small exploded-arches support thumbnail"
+    },
+    "fahrbahn": {
+      "kind": "flat",
+      "guides": false,
+      "label": "Fahrbahn \u2014 deck-level exploded image"
+    },
+    "material": {
+      "kind": "flat",
+      "guides": false,
+      "label": "Material \u2014 stone specimen image, specimen framing"
+    },
+    "bau": {
+      "kind": "pending",
+      "guides": false,
+      "label": "Bau \u2014 construction phase, no approved image or video exists yet (intentional PENDING). See slot bau_loop_01 (type video_loop, status PENDING) for the future muted/autoplay/loop video."
+    },
+    "reset": {
+      "kind": "primary",
+      "guides": false,
+      "label": "Reset control \u2014 returns to the overview section/framing, reuses the overview primary slots"
+    }
+  },
+  "slots": [
+    {
+      "slot_id": "bridge_alpha",
+      "section": "overview",
+      "label": "Bridge structure \u2014 single rigid depth layer",
+      "file_path": "depth/SB_DEPTH_02_BRIDGE_ALPHA.png",
+      "type": "bridge_alpha",
+      "status": "READY",
+      "order": 1,
+      "language_neutral": true,
+      "orientation": "landscape",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "max_width": "100%",
+      "max_height": "88vh",
+      "notes": "1536x512 RGBA. Geometrically-locked layer \u2014 reframed only (scale/rotate/translate), never split or warped. Shared across the overview, struktur and reset sections via the same slot_id (not duplicated as three separate slots). The only true RGBA cutout among the current slots and the only landscape asset \u2014 presented free-floating (background_mode:none, no card/frame) and large (cutout_stage), scaled up via max-height rather than boxed to a small letterboxed strip. PHASE 1B CENTERING AUDIT (prior task): verified via raw alpha-bbox decode that the visible bridge content sits at ~52.1% of the 512px canvas height (i.e. ~2% below true vertical center \u2014 negligible) and, combined with the CHAPTERS overview/complete framing values ({scale:1, rotate:0, y:0}) and the flex-centered #museumPrimary layout, the layer IS already geometrically centered \u2014 no positional/offset bug found. The real driver of the reported 'excessive empty space above/below' is this asset's extreme 3:1 landscape aspect ratio (content itself ~7:1) rendered inside a tall portrait mobile stage, which is unavoidable without cropping/distorting the geometrically-locked layer (forbidden). align_y left at 'center' \u2014 confirmed via code inspection that align_y has no effect on this specific layer anyway (#museumBridgeImg's parent #museumPrimaryInner is display:inline-block, not a flex container, so CSS align-self is inert here; it only matters for the flat-layer chapters where images are flex children). PHASE 1C RE-AUDIT (this task, 2026-08-29): independently re-decoded the raw alpha channel (PIL-based per-pixel scan, alpha threshold tested at 25/32/40 \u2014 result stable across all three) and got bbox_w=95.77% / bbox_h=40.82% of the 1536x512 canvas, horizontal offset from canvas center=-1.0%, vertical offset=+2.05% (matches the prior 52.1%-of-height finding) \u2014 confirms centering is correct as-is, no numeric align offset needed (the generic 3-way align_y enum stays sufficient for this asset; the numeric-offset extension point discussed for this task was evaluated and NOT implemented anywhere in the 7 audited slots because every measured bbox offset came back under 3% of canvas \u2014 visually negligible). On max-width: because the aspect ratio is fixed at 3:1 and mobile viewports are far narrower than tall (max-height 88vh is never the binding constraint at any tested width \u2014 confirmed by computing rendered size at 375/390/393/430px: image is always sized by max-width, landing at roughly 121-141px tall vs. 88vh being 580-820px+, nowhere near binding), max-width is the only lever that changes the bridge's rendered size on mobile. Raised from 97% (this slot's own prior-phase value) to 99% \u2014 the tightest ceiling that still leaves a hairline safety margin against edge-to-edge touching/rounding, since the source canvas itself already has only ~1.1%/3.1% left/right margin so nothing is clipped at any percentage up to 100%. This is a real but modest further gain (~2.06% relative size increase over the already-raised 97% baseline, ~5.3% relative over the original pre-Phase-1B 94% default) \u2014 flagged honestly per instruction: the large jump already happened in the prior phase's 94%->97% change, and 97%->99% is inherently a small increment because it's this close to the format's own ceiling. Any materially bigger 'dominance' improvement would require accepting the 3:1 landscape-in-portrait-stage tension as a fixed characteristic of this specific asset, not a fixable CSS bug. max_height left at 88vh unchanged (confirmed still never binding at 99% either). PHASE 2.1 (2026-08-30, web polish pass): max_width raised 99% -> 100% and a static optical-centring correction added in css/style.css (.museum__bridge { transform: translateX(1.01%) }). Independent re-decode of the raw alpha channel at thresholds 16/32/64/128 (stable across all four) gives the visible geometry at x=17..1488 / y=162..371 of the 1536x512 canvas: bbox_w=95.77%, bbox_h=40.82%, horizontal centre at 48.99% (i.e. 1.009% LEFT of canvas centre), vertical centre at 52.05%. Because the canvas is flex-centred, that 1.009% asymmetry meant the BRIDGE ITSELF rendered off-centre: at a 375px stage its visible margins were 6.0px left vs 13.5px right. translateX(1.01%) equalises them. With the offset corrected, max_width 100% yields symmetric visible margins of 2.12% of stage width (7.9px @375, 8.3px @390/393, 9.1px @430) versus 2.59% at 99% \u2014 a ~1% linear size gain with BETTER, symmetric, still clearly intentional margins. Stated honestly: the absolute geometric ceiling is max_width 104.4% (visible content exactly edge-to-edge, zero margin), so 100% is ~96% of the theoretical maximum and no further meaningful size is available from this lever. max_height 88vh still never binding (canvas height at 100% = stage_width/3). Source PNG untouched. The remaining perceived empty space on portrait phones is inherent to a ~7:1 visible band in a portrait stage and was addressed presentationally instead (21vh caption reserve for .museum__primary = optical centring in the space actually available, plus a deliberate spatial overlap between the complete bridge and the emerging exploded structure during chapter 02 OPENING).",
+      "content_ids": [
+        "bridge_overview_structure"
+      ]
+    },
+    {
+      "slot_id": "foreground_alpha",
+      "section": "overview",
+      "label": "Foreground alpha overlay (currently fully transparent)",
+      "file_path": "depth/SB_DEPTH_03_FOREGROUND_ALPHA.png",
+      "type": "bridge_alpha",
+      "status": "READY",
+      "order": 2,
+      "language_neutral": true,
+      "notes": "1536x512 RGBA, READY_EMPTY_BY_DESIGN \u2014 file exists and loads correctly but currently contributes no visible pixels. Kept READY (not PENDING) because the asset itself is present and valid; it is simply empty content. Shared across overview/struktur/reset like bridge_alpha.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "explosion_main",
+      "section": "explosion",
+      "label": "Exploded assembly \u2014 overall (GESAMT chip)",
+      "file_path": "exploded/explosion_main_cutout.png",
+      "type": "flat_image",
+      "status": "READY",
+      "order": 1,
+      "language_neutral": true,
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PROMOTED (PHASE 1, this task): live asset is now exploded/explosion_main_cutout.png \u2014 a true RGBA cutout (verified via raw alpha decode), no baked title/text. QUALITY ISSUE (report, not silently fixed): visible red/yellow-green matting-halo fringing around most edges (deck, arches, piers) \u2014 more pronounced than the previous clean_replacement_source. Previous live file preserved unmodified as exploded/explosion_main_clean.png and registered separately as LEGACY/REFERENCE_ONLY (slot 'explosion_main_legacy').",
+      "content_ids": [],
+      "clean_replacement_source": {
+        "file_path": "03_ASSETS/Steinerne_Bruecke/2d/IMAGES/EXPLOSION/explosion_main_clean.png",
+        "status": "READY",
+        "role": "CLEAN_EXPLODED_ASSEMBLY",
+        "orientation": "portrait",
+        "preferred_fit": "portrait_focus",
+        "background_mode": "transparent_or_dark_museum_stage",
+        "verified": "File exists, opened and visually inspected: 941x1672 RGB (colortype 2, not literal RGBA alpha \u2014 background_mode is a dark rendered museum-stage backdrop baked into the render, not transparency), no title block, no legend, no baked text of any kind \u2014 genuinely clean, matches the NEEDS_CLEAN_VERSION request from the prior asset-curation pass.",
+        "promotion_note": "PROMOTED. Copied to 04_PREVIEWS/PROTOTYPES/ZEITSPRUNG_V2/assets/steinerne-bruecke/exploded/explosion_main_clean.png and wired as this slot's live file_path."
+      }
+    },
+    {
+      "slot_id": "explosion_piers",
+      "section": "explosion",
+      "label": "Exploded assembly \u2014 piers (PFEILER chip)",
+      "file_path": "exploded/exploded_piers.png",
+      "type": "flat_image",
+      "status": "READY",
+      "order": 2,
+      "language_neutral": true,
+      "notes": "1024x1536 RGB. Also reused as the support thumbnail in the pfeiler section. AUDIT (this task): CLEAN_IMAGE \u2014 single-pier cutaway render, no baked text (distinct from the GRAPHICS/ technical plates of the same conceptual subject, which do carry German labels).",
+      "content_ids": []
+    },
+    {
+      "slot_id": "explosion_arches",
+      "section": "explosion",
+      "label": "Exploded assembly \u2014 arches (B\u00d6GEN chip)",
+      "file_path": "exploded/exploded_arches.png",
+      "type": "flat_image",
+      "status": "READY",
+      "order": 3,
+      "language_neutral": true,
+      "notes": "1024x1536 RGB. Also reused as the support thumbnail in the boegen section. AUDIT (this task): CLEAN_IMAGE \u2014 arch/pier/centering cutaway render, no baked text.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "explosion_deck",
+      "section": "explosion",
+      "label": "Exploded assembly \u2014 deck (FAHRBAHN chip)",
+      "file_path": "exploded/exploded_deck.png",
+      "type": "flat_image",
+      "status": "READY",
+      "order": 4,
+      "language_neutral": true,
+      "notes": "1024x1536 RGB. Also reused as the single image in the fahrbahn section. AUDIT (this task): CLEAN_IMAGE \u2014 deck/parapet exploded layers render, no baked text.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "pfeiler_detail",
+      "section": "pfeiler",
+      "label": "Pier \u2014 architectural detail photo/render",
+      "file_path": "details/pfeiler_detail_cutout.png",
+      "type": "flat_image",
+      "status": "READY",
+      "order": 1,
+      "language_neutral": true,
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PROMOTED (PHASE 1, this task): live asset is now details/pfeiler_detail_cutout.png \u2014 a true RGBA cutout (verified via raw alpha decode), no baked title/text. QUALITY ISSUE (report, not silently fixed): visible red/yellow matting-halo fringing around edges. PHASE 1B MOBILE AUDIT (this task): re-verified via raw alpha-bbox decode (threshold 40) that the LIVE file's visible content actually spans ~97.8% of the canvas height (top margin ~1.7%, bottom margin ~0.5%) \u2014 the 'large empty transparent margin at the bottom' that justified align_y:'top' in the previous phase no longer holds for the current file (whether it changed on disk or the original assessment was based on a different render). Corrected align_y from 'top' to 'center' to match explosion_main/fahrbahn_main/material_stone/bau_construction and eliminate an inconsistent vertical-anchor jump between chapters during scroll (pfeiler/boegen were the only two chapters anchored to the top while every other flat chapter is centered). Previous live file preserved unmodified as details/detail_pier_01.png and registered separately as LEGACY/REFERENCE_ONLY (slot 'pfeiler_detail_legacy').",
+      "content_ids": [
+        "pier_structure",
+        "beschlaechte_pier_protection"
+      ]
+    },
+    {
+      "slot_id": "pfeiler_support",
+      "section": "pfeiler",
+      "label": "Pier \u2014 small exploded-view support thumbnail",
+      "file_path": "exploded/exploded_piers.png",
+      "type": "support_image",
+      "status": "READY",
+      "order": 2,
+      "language_neutral": true,
+      "notes": "Same file as explosion_piers, referenced here as a distinct slot_id (support_image type) for the pfeiler section's corner thumbnail.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "boegen_detail",
+      "section": "boegen",
+      "label": "Arch \u2014 architectural detail photo/render",
+      "file_path": "details/boegen_detail_cutout.png",
+      "type": "flat_image",
+      "status": "READY",
+      "order": 1,
+      "language_neutral": true,
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PROMOTED (PHASE 1, this task): live asset is now details/boegen_detail_cutout.png \u2014 a true RGBA cutout (verified via raw alpha decode), no baked title/text. QUALITY ISSUE (report, not silently fixed): visible red/yellow matting-halo fringing around edges. PHASE 1B MOBILE AUDIT (this task): re-verified via raw alpha-bbox decode (threshold 40) that the LIVE file's visible content actually spans ~99.0% of the canvas height (top margin ~0.9%, bottom margin ~0.1%) \u2014 the bottom-empty-margin justification for align_y:'top' no longer holds for the current file. Corrected align_y from 'top' to 'center' for the same reason and consistency goal as pfeiler_detail (see that slot's note). Previous live file preserved unmodified as details/detail_arch_01.png and registered separately as LEGACY/REFERENCE_ONLY (slot 'boegen_detail_legacy').",
+      "content_ids": [
+        "arch_construction"
+      ]
+    },
+    {
+      "slot_id": "boegen_support",
+      "section": "boegen",
+      "label": "Arch \u2014 small exploded-view support thumbnail",
+      "file_path": "exploded/exploded_arches.png",
+      "type": "support_image",
+      "status": "READY",
+      "order": 2,
+      "language_neutral": true,
+      "notes": "Same file as explosion_arches, referenced here as a distinct slot_id (support_image type) for the boegen section's corner thumbnail.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "fahrbahn_main",
+      "section": "fahrbahn",
+      "label": "Deck level \u2014 exploded image",
+      "file_path": "exploded/fahrbahn_main_cutout.png",
+      "type": "flat_image",
+      "status": "READY",
+      "order": 1,
+      "language_neutral": true,
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PROMOTED (PHASE 1, this task): live asset is now exploded/fahrbahn_main_cutout.png \u2014 a true RGBA cutout (verified via raw alpha decode), no baked title/text. QUALITY ISSUE (report, not silently fixed): visible red/yellow matting-halo fringing around edges. Previous live file preserved unmodified as exploded/exploded_deck.png and registered separately as LEGACY/REFERENCE_ONLY (slot 'fahrbahn_main_legacy').",
+      "content_ids": [
+        "fahrbahn_belag"
+      ]
+    },
+    {
+      "slot_id": "material_stone",
+      "section": "material",
+      "label": "Stone material specimen \u2014 limestone/greensandstone",
+      "file_path": "materials/materials_cutout.png",
+      "type": "flat_image",
+      "status": "READY",
+      "order": 1,
+      "language_neutral": true,
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PROMOTED (PHASE 1, this task): live asset is now materials/materials_cutout.png \u2014 a true RGBA cutout (verified via raw alpha decode), no baked title/text. QUALITY ISSUE (report, not silently fixed): visible red/yellow matting-halo fringing around edges. background_mode changed from 'framed' to 'none' and preferred_fit from 'detail_card' to 'cutout_stage' per instruction 3 ('no framed museum-card treatment unless explicitly intended') now that this is a genuine floating cutout rather than a bordered specimen photo. Previous live file preserved unmodified as materials/material_stone_01.png and registered separately as LEGACY/REFERENCE_ONLY (slot 'material_stone_legacy').",
+      "content_ids": [
+        "material_kalkstein",
+        "material_gruensandstein",
+        "material_fuellmauerwerk",
+        "material_holzpfahl",
+        "material_eisenklammer",
+        "material_findling"
+      ]
+    },
+    {
+      "slot_id": "bau_construction",
+      "section": "bau",
+      "label": "Construction phase \u2014 no approved image",
+      "file_path": "bau/bau_construction_cutout.png",
+      "type": "flat_image",
+      "status": "READY",
+      "order": 1,
+      "language_neutral": true,
+      "notes": "ACTIVATED (PHASE 1, this task): live image is now bau/bau_construction_cutout.png. Verified via raw alpha decode: genuine RGBA with ~35% fully-transparent corner pixels (true cutout, not a flat rectangle), no baked title/text. QUALITY ISSUE (report, not silently fixed): the opaque/content region itself has a dark vignette treatment baked into its pixels (a rendered dark-brown radial gradient behind the construction scene, inside the alpha=~253 region) \u2014 this is NOT something museum25d.js's background_mode CSS can remove, since it is part of the source image's own pixels, not a card/frame applied by our presentation layer. The result will still read as having a 'dark baked panel' look around the scene despite background_mode:none. Flagged per instruction 8, not corrected/regenerated in this task. bau_loop_01 (video) remains separately PENDING as instructed \u2014 this image does not activate the video slot.",
+      "content_ids": [
+        "bau_process_lehrgeruest_kran"
+      ],
+      "source_asset": {
+        "file_path": "03_ASSETS/Steinerne_Bruecke/2d/IMAGES/CONSTRUCTION/bau_construction_source_01.png",
+        "status": "READY_SOURCE",
+        "role": "BAU_LOOP_SOURCE",
+        "verified": "File exists, opened and visually inspected: 941x1672, true RGBA cutout (colortype 6), medieval bridge-construction scene (treadwheel crane, masons, timber centering/Lehrger\u00fcst, stone blocks). QUALITY NOTE: a faint red/pink matting-halo artifact is visible at some edges (near the hoisted block and the crane-wheel figures) \u2014 flagged, not corrected in this task.",
+        "promotion_note": "SUPERSEDED \u2014 a separate, different approved cutout (bau_construction_cutout.png) was promoted directly to this slot's top-level file_path instead of deriving a video from this source_asset. This source_asset entry is preserved for reference, not deleted."
+      },
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none"
+    },
+    {
+      "slot_id": "bau_loop_01",
+      "section": "bau",
+      "label": "Construction phase \u2014 muted looping video",
+      "file_path": "loops/bau/bau_construction_loop_01_web.mp4",
+      "type": "video_loop",
+      "status": "READY",
+      "order": 2,
+      "language_neutral": true,
+      "loop_seconds_intended": 6,
+      "playback": {
+        "autoplay": true,
+        "muted": true,
+        "loop": true,
+        "controls": false,
+        "pause_when_out_of_viewport": true
+      },
+      "chapter_key": "construction",
+      "render_target": "pending_layer",
+      "fallback_slot_id": "bau_construction",
+      "aliases": [
+        "bau_loop"
+      ],
+      "notes": "PROMOTED (PHASE 2.3, this task): live asset is now loops/bau/bau_construction_loop_01.mp4 \u2014 copied from 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/BAU/bau_construction_loop_01.mp4 (file existence + byte-size match verified after copy). Muted, autoplay, looping video of the construction phase, paused automatically whenever the museum section scrolls out of the viewport (IntersectionObserver-driven) OR whenever the CONSTRUCTION chapter is not the active chapter \u2014 this is the pre-existing generic loop play/pause gate (syncLoopPlayback in museum25d.js), unmodified in its playback semantics; only status/file_path changed on this slot. PHASE 2.2: this slot IS the BAU cinematic loop slot \u2014 no separate 'bau_loop' slot_id was created, because a second id for the same asset would be a confusing duplicate. 'bau_loop' is registered above as an alias for documentation only; nothing resolves by alias. render_target 'pending_layer' preserves the exact, already-proven Phase 1/2 activation path for this slot (#museumPendingVideo). PHASE 2.3A (this task): file_path repointed to loops/bau/bau_construction_loop_01_web.mp4 \u2014 a byte-identical-quality, faststart-remuxed derivative (stream-copy, zero re-encode) of the original file, created because the original's moov atom sat at the END of the file (byte-level atom scan confirmed), which can stall/prevent playback start over progressive HTTP delivery and plausibly explains a reported black-screen symptom specific to BAU. The original bau_construction_loop_01.mp4 is untouched on disk (both in 03_ASSETS/.../LOOPS/BAU/ and in this web-copy folder) as the source master/fallback. Content itself (crane/treadwheel construction scene, bright daylight sky) was independently re-verified via extracted first/mid/last frames and is correct \u2014 this was a container/muxing fix only, no re-encode.",
+      "content_ids": [],
+      "reserved_file_path": "03_ASSETS/Steinerne_Bruecke/2d/VIDEO/BAU/bau_loop_01.mp4"
+    },
+    {
+      "slot_id": "bridge_opening_loop",
+      "section": "struktur",
+      "label": "Struktur / \u00d6ffnung \u2014 optional cinematic loop (future)",
+      "file_path": null,
+      "type": "video_loop",
+      "status": "PENDING",
+      "order": 10,
+      "language_neutral": true,
+      "chapter_key": "opening",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "bridge_alpha",
+      "loop_seconds_intended": 6,
+      "playback": {
+        "autoplay": true,
+        "muted": true,
+        "loop": true,
+        "controls": false,
+        "pause_when_out_of_viewport": true,
+        "pause_when_chapter_inactive": true
+      },
+      "orientation": "landscape",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "max_width": "100%",
+      "max_height": "88vh",
+      "notes": "PHASE 2.2 SLOT RESERVATION ONLY \u2014 no approved/Freigabe video exists and none was generated. status PENDING + file_path null means the OPENING chapter renders exactly what it renders today: the approved rigid bridge_alpha PNG layer, unchanged. ACTIVATION CAVEAT, stated honestly: because the OPENING chapter is driven by the rigid PRIMARY layer (#museumPrimary, which also carries the pointer/touch parallax), flipping this slot to READY would make chapter 02 use the video element INSTEAD of the rigid bridge layer for that chapter only \u2014 chapters 01 OVERVIEW and 10 COMPLETE keep the still bridge either way. That is a deliberate content decision, not an automatic consequence to be taken lightly; if a loop is ever approved here it must respect the geometric-integrity rule (the bridge is never warped or split). PHASE 2.3A INVESTIGATION (this task) \u2014 deliberately kept PENDING, NOT promoted even though a ready ping-pong asset now exists at loops/overview/bridge_assembly_disassembly_loop_10s_01.mp4: static read of museum2d-scroll.js's CHAPTER_SCRIPT/layerFor()/chapterEls wiring shows chapters overview(0)/opening(1)/complete(9) currently all resolve to the SAME DOM node (primaryOuter, i.e. #museumPrimary) via layerFor()'s kind:'primary' fallback branch \u2014 the whole authored 'opening' choreography (tw(layer,...scale/y/rotateX) at museum2d-scroll.js's ch.key==='opening' branch) depends on that shared identity: it never sets opacity on `layer` for chapter 'opening' because chapter 0 already left that SAME node at opacity 1. If this slot resolves, layerFor() returns loopLayers['opening'].el instead (a genuinely separate video element per the loop_slot_contract's discovery step), breaking that identity chain: (a) the video's opacity would never be driven to 1 anywhere in the authored timeline (nothing tweens chapterEls[1] opacity during the 'opening' branch, and the later 'exploded' branch's tw(prevLayer,...) would run a 0-to-0 opacity no-op), so the video would stay invisible; and (b) primaryOuter itself would then never receive an exit tween either (its own identity would stop being chapterEls[1], and nothing else fades it), most likely leaving the still bridge_alpha PNG permanently visible underneath every later chapter. This is a choreography-authoring change in museum2d-scroll.js (out of this task's declared 'small CSS/JS guard' scope, and that file's animation logic was not to be touched), not a CSS sizing bug, so it is NOT fixed by the same primary_layer box-model correction applied to the video_transition system in this task. Flagged honestly for a follow-up phase rather than risking a live regression that could not be verified in a browser during this task. The primary_layer CSS/DOM-attachment fix delivered in PHASE 2.3A (see museum25d.js/style.css) DOES already fully apply to and fix the unrelated, unambiguously-scoped overview_transition_assembly/disassembly pair (chapter_key 'complete'), which is a fully independent overlay system (opacity toggled directly, not part of chapterEls/the master timeline) and has no such identity dependency.",
+      "content_ids": [
+        "bridge_overview_structure"
+      ],
+      "reserved_file_path": "03_ASSETS/Steinerne_Bruecke/2d/VIDEO/STRUKTUR/bridge_opening_loop.mp4"
+    },
+    {
+      "slot_id": "explosion_loop",
+      "section": "explosion",
+      "label": "Explosion \u2014 optional cinematic loop (future)",
+      "file_path": null,
+      "type": "video_loop",
+      "status": "PENDING",
+      "order": 10,
+      "language_neutral": true,
+      "chapter_key": "exploded",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "explosion_main",
+      "loop_pair": {
+        "paired_slot_id": "reassembly_loop",
+        "role": "forward",
+        "shared_source_allowed": true,
+        "note": "explosion_loop and reassembly_loop are deliberately given IDENTICAL manifest shapes so a future single source animation ('complete -> separation -> exploded') can serve both: either by pointing both file_path values at the same MP4 (reassembly_loop then declaring playback.direction 'reverse' or supplying a pre-rendered reverse encode), or by keeping two independent clips. NOTHING of that motion is implemented today \u2014 this field only records the intent so the two slots are never structured in a way that makes pairing them awkward later. No playback.direction key is emitted yet, because no code reads one."
+      },
+      "loop_seconds_intended": 6,
+      "playback": {
+        "autoplay": true,
+        "muted": true,
+        "loop": true,
+        "controls": false,
+        "pause_when_out_of_viewport": true,
+        "pause_when_chapter_inactive": true
+      },
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PHASE 2.2 SLOT RESERVATION ONLY \u2014 no approved/Freigabe video exists and none was generated. While PENDING, the EXPLODED chapter renders the approved explosion_main PNG cutout exactly as it does today.",
+      "content_ids": [],
+      "reserved_file_path": "03_ASSETS/Steinerne_Bruecke/2d/VIDEO/EXPLOSION/explosion_loop.mp4"
+    },
+    {
+      "slot_id": "pfeiler_loop",
+      "section": "pfeiler",
+      "label": "Pfeiler \u2014 optional cinematic loop (future)",
+      "file_path": "loops/pfeiler/pfeiler_assembly_disassembly_loop_10s_01.mp4",
+      "type": "video_loop",
+      "status": "READY",
+      "order": 10,
+      "language_neutral": true,
+      "chapter_key": "piers",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "pfeiler_detail",
+      "loop_seconds_intended": 6,
+      "playback": {
+        "autoplay": true,
+        "muted": true,
+        "loop": true,
+        "controls": false,
+        "pause_when_out_of_viewport": true,
+        "pause_when_chapter_inactive": true
+      },
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PROMOTED (PHASE 2.3A, this task): live asset is now loops/pfeiler/pfeiler_assembly_disassembly_loop_10s_01.mp4 \u2014 a frame-exact ping-pong loop (forward EXPLODED->ASSEMBLED then exact frame-reverse back to EXPLODED, ~9.83s; the source clip's native frame count is 118, not 120, so the loop is ~0.17s shorter than the filename suggests \u2014 harmless, forward/reverse frame counts match exactly so the seam is still frame-perfect) built from the existing pfeiler_assembly_01.mp4/pfeiler_disassembly_01.mp4 5s clips, H.264/yuv420p/1080x1920/faststart. render_target 'flat_layer' and every fit field here already exactly match pfeiler_detail's own (cutout_stage, no max_width/max_height override, center/center/none), so this loop inherits the identical default sizing/dominance as the static PNG it replaces \u2014 no override was needed. This chapter has NO shared-DOM-identity dependency with any other chapter (unlike the 'opening'/primary-kind chapters \u2014 see bridge_opening_loop's notes), so promoting it does not risk the choreography regression flagged there. Per the loop-priority guard added in museum25d.js this task, this loop is now the PIERS chapter's default/active layer; the pfeiler_transition_assembly/disassembly 5s clips remain registered and resolvable but are no longer triggered for this chapter.",
+      "content_ids": [
+        "pier_structure",
+        "beschlaechte_pier_protection"
+      ],
+      "reserved_file_path": "03_ASSETS/Steinerne_Bruecke/2d/VIDEO/PFEILER/pfeiler_loop.mp4"
+    },
+    {
+      "slot_id": "boegen_loop",
+      "section": "boegen",
+      "label": "B\u00f6gen \u2014 optional cinematic loop (future)",
+      "file_path": "loops/boegen/boegen_assembly_disassembly_loop_10s_01.mp4",
+      "type": "video_loop",
+      "status": "READY",
+      "order": 10,
+      "language_neutral": true,
+      "chapter_key": "arches",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "boegen_detail",
+      "loop_seconds_intended": 6,
+      "playback": {
+        "autoplay": true,
+        "muted": true,
+        "loop": true,
+        "controls": false,
+        "pause_when_out_of_viewport": true,
+        "pause_when_chapter_inactive": true
+      },
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PROMOTED (PHASE 2.3A, this task): live asset is now loops/boegen/boegen_assembly_disassembly_loop_10s_01.mp4 \u2014 a frame-exact ping-pong loop (forward EXPLODED->ASSEMBLED then exact frame-reverse back to EXPLODED, 10.00s) built from the existing boegen_assembly_01.mp4/boegen_disassembly_01.mp4 5s clips, H.264/yuv420p/1080x1920/faststart. render_target 'flat_layer' and every fit field here already exactly match boegen_detail's own (cutout_stage, no max_width/max_height override, center/center/none), so this loop inherits the identical default sizing/dominance as the static PNG it replaces \u2014 no override was needed. No shared-DOM-identity risk (see pfeiler_loop's notes for the equivalent reasoning). Per the loop-priority guard added in museum25d.js this task, this loop is now the ARCHES chapter's default/active layer; the boegen_transition_assembly/disassembly 5s clips remain registered and resolvable but are no longer triggered for this chapter.",
+      "content_ids": [
+        "arch_construction"
+      ],
+      "reserved_file_path": "03_ASSETS/Steinerne_Bruecke/2d/VIDEO/BOEGEN/boegen_loop.mp4"
+    },
+    {
+      "slot_id": "fahrbahn_loop",
+      "section": "fahrbahn",
+      "label": "Fahrbahn \u2014 optional cinematic loop (future)",
+      "file_path": "loops/fahrbahn/fahrbahn_assembly_disassembly_loop_10s_01.mp4",
+      "type": "video_loop",
+      "status": "READY",
+      "order": 10,
+      "language_neutral": true,
+      "chapter_key": "deck",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "fahrbahn_main",
+      "loop_seconds_intended": 6,
+      "playback": {
+        "autoplay": true,
+        "muted": true,
+        "loop": true,
+        "controls": false,
+        "pause_when_out_of_viewport": true,
+        "pause_when_chapter_inactive": true
+      },
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PROMOTED (PHASE 2.3A, this task): live asset is now loops/fahrbahn/fahrbahn_assembly_disassembly_loop_10s_01.mp4 \u2014 a frame-exact ping-pong loop (forward EXPLODED->ASSEMBLED then exact frame-reverse back to EXPLODED, 10.00s) built from the existing fahrbahn_assembly_01.mp4/fahrbahn_disassembly_01.mp4 5s clips, H.264/yuv420p/1080x1920/faststart. render_target 'flat_layer' and every fit field here already exactly match fahrbahn_main's own (cutout_stage, no max_width/max_height override, center/center/none), so this loop inherits the identical default sizing/dominance as the static PNG it replaces \u2014 no override was needed. No shared-DOM-identity risk (see pfeiler_loop's notes for the equivalent reasoning). Per the loop-priority guard added in museum25d.js this task, this loop is now the DECK chapter's default/active layer; the fahrbahn_transition_assembly/disassembly 5s clips remain registered and resolvable but are no longer triggered for this chapter.",
+      "content_ids": [
+        "fahrbahn_belag"
+      ],
+      "reserved_file_path": "03_ASSETS/Steinerne_Bruecke/2d/VIDEO/FAHRBAHN/fahrbahn_loop.mp4"
+    },
+    {
+      "slot_id": "pfeiler_transition_assembly",
+      "section": "pfeiler",
+      "label": "Pfeiler \u2014 assembly transition clip (PHASE 2.3)",
+      "file_path": "loops/pfeiler/pfeiler_assembly_01.mp4",
+      "type": "video_transition",
+      "status": "READY",
+      "order": 11,
+      "language_neutral": true,
+      "chapter_key": "piers",
+      "pair_role": "assembly",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "pfeiler_detail",
+      "transition_pair": {
+        "paired_slot_id": "pfeiler_transition_disassembly",
+        "role": "assembly"
+      },
+      "playback": {
+        "autoplay": false,
+        "muted": true,
+        "loop": false,
+        "controls": false
+      },
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PHASE 2.3 \u2014 one-shot directional transition clip, NOT an ambient loop. Copied from 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/PFEILER/pfeiler_assembly_01.mp4 (existence + byte-size verified after copy). Plays once when the PIERS chapter is entered in the direction that assembles the pier, then settles on the approved pfeiler_detail PNG. See video_transition_contract above and museum25d.js's TRANSITION_DIRECTION_RULE for exact trigger logic.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "pfeiler_transition_disassembly",
+      "section": "pfeiler",
+      "label": "Pfeiler \u2014 disassembly transition clip (PHASE 2.3)",
+      "file_path": "loops/pfeiler/pfeiler_disassembly_01.mp4",
+      "type": "video_transition",
+      "status": "READY",
+      "order": 12,
+      "language_neutral": true,
+      "chapter_key": "piers",
+      "pair_role": "disassembly",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "pfeiler_detail",
+      "transition_pair": {
+        "paired_slot_id": "pfeiler_transition_assembly",
+        "role": "disassembly"
+      },
+      "playback": {
+        "autoplay": false,
+        "muted": true,
+        "loop": false,
+        "controls": false
+      },
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PHASE 2.3 \u2014 one-shot directional transition clip, NOT an ambient loop. Copied from 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/PFEILER/pfeiler_disassembly_01.mp4 (existence + byte-size verified after copy). Plays once when the PIERS chapter is entered in the direction that disassembles the pier (reverse scroll from arches back into piers), then settles on the approved pfeiler_detail PNG.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "boegen_transition_assembly",
+      "section": "boegen",
+      "label": "B\u00f6gen \u2014 assembly transition clip (PHASE 2.3)",
+      "file_path": "loops/boegen/boegen_assembly_01.mp4",
+      "type": "video_transition",
+      "status": "READY",
+      "order": 11,
+      "language_neutral": true,
+      "chapter_key": "arches",
+      "pair_role": "assembly",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "boegen_detail",
+      "transition_pair": {
+        "paired_slot_id": "boegen_transition_disassembly",
+        "role": "assembly"
+      },
+      "playback": {
+        "autoplay": false,
+        "muted": true,
+        "loop": false,
+        "controls": false
+      },
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PHASE 2.3 \u2014 one-shot directional transition clip, NOT an ambient loop. Copied from 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/BOEGEN/boegen_assembly_01.mp4 (existence + byte-size verified after copy). Plays once when the ARCHES chapter is entered forward (from piers), then settles on the approved boegen_detail PNG.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "boegen_transition_disassembly",
+      "section": "boegen",
+      "label": "B\u00f6gen \u2014 disassembly transition clip (PHASE 2.3)",
+      "file_path": "loops/boegen/boegen_disassembly_01.mp4",
+      "type": "video_transition",
+      "status": "READY",
+      "order": 12,
+      "language_neutral": true,
+      "chapter_key": "arches",
+      "pair_role": "disassembly",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "boegen_detail",
+      "transition_pair": {
+        "paired_slot_id": "boegen_transition_assembly",
+        "role": "disassembly"
+      },
+      "playback": {
+        "autoplay": false,
+        "muted": true,
+        "loop": false,
+        "controls": false
+      },
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PHASE 2.3 \u2014 one-shot directional transition clip, NOT an ambient loop. Copied from 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/BOEGEN/boegen_disassembly_01.mp4 (existence + byte-size verified after copy). Plays once when the ARCHES chapter is entered in reverse (from deck back into arches), then settles on the approved boegen_detail PNG.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "fahrbahn_transition_assembly",
+      "section": "fahrbahn",
+      "label": "Fahrbahn \u2014 assembly transition clip (PHASE 2.3)",
+      "file_path": "loops/fahrbahn/fahrbahn_assembly_01.mp4",
+      "type": "video_transition",
+      "status": "READY",
+      "order": 11,
+      "language_neutral": true,
+      "chapter_key": "deck",
+      "pair_role": "assembly",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "fahrbahn_main",
+      "transition_pair": {
+        "paired_slot_id": "fahrbahn_transition_disassembly",
+        "role": "assembly"
+      },
+      "playback": {
+        "autoplay": false,
+        "muted": true,
+        "loop": false,
+        "controls": false
+      },
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PHASE 2.3 \u2014 one-shot directional transition clip, NOT an ambient loop. Copied from 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/FAHRBAHN/fahrbahn_assembly_01.mp4 (existence + byte-size verified after copy). Plays once when the DECK chapter is entered forward (from arches), then settles on the approved fahrbahn_main PNG.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "fahrbahn_transition_disassembly",
+      "section": "fahrbahn",
+      "label": "Fahrbahn \u2014 disassembly transition clip (PHASE 2.3)",
+      "file_path": "loops/fahrbahn/fahrbahn_disassembly_01.mp4",
+      "type": "video_transition",
+      "status": "READY",
+      "order": 12,
+      "language_neutral": true,
+      "chapter_key": "deck",
+      "pair_role": "disassembly",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "fahrbahn_main",
+      "transition_pair": {
+        "paired_slot_id": "fahrbahn_transition_assembly",
+        "role": "disassembly"
+      },
+      "playback": {
+        "autoplay": false,
+        "muted": true,
+        "loop": false,
+        "controls": false
+      },
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PHASE 2.3 \u2014 one-shot directional transition clip, NOT an ambient loop. Copied from 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/FAHRBAHN/fahrbahn_disassembly_01.mp4 (existence + byte-size verified after copy). Plays once when the DECK chapter is entered in reverse (from materials back into deck), then settles on the approved fahrbahn_main PNG.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "overview_transition_assembly",
+      "section": "overview",
+      "label": "\u00dcberblick / Komplett \u2014 assembly transition clip (PHASE 2.3)",
+      "file_path": "loops/overview/bridge_overview_assembly_v02_web.mp4",
+      "type": "video_transition",
+      "status": "READY",
+      "order": 11,
+      "language_neutral": true,
+      "chapter_key": "complete",
+      "pair_role": "assembly",
+      "render_target": "primary_layer",
+      "fallback_slot_id": "bridge_alpha",
+      "transition_pair": {
+        "paired_slot_id": "overview_transition_disassembly",
+        "role": "assembly"
+      },
+      "playback": {
+        "autoplay": false,
+        "muted": true,
+        "loop": false,
+        "controls": false
+      },
+      "orientation": "landscape",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "max_width": "100%",
+      "max_height": "88vh",
+      "notes": "PHASE 2.3 \u2014 one-shot directional transition clip, NOT an ambient loop. Copied from 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/OVERVIEW/bridge_assembly_01.mp4 (existence + byte-size verified after copy). JUDGMENT CALL, stated honestly: the source folder is named OVERVIEW, but the manifest's chapter_key for this pair is 'complete', not 'overview'. Reasoning: (1) the OPENING chapter (the other primary-layer, chapter-2 slot) already has its own dedicated, still-PENDING reservation ('bridge_opening_loop', chapter_key 'opening') \u2014 reusing it for a structurally different assembly/disassembly-pair schema would collide with that existing reservation; (2) the CHAPTER_SCRIPT's only OTHER primary-layer chapter is 'complete' (chapter 10), which currently has NO video_loop/video_transition slot of any kind reserved anywhere in this manifest; (3) the brief's own worked example \u2014 'complete\u2192exploded uses disassembly; exploded\u2192complete uses assembly' \u2014 describes exactly the COMPLETE chapter's behaviour: arriving at COMPLETE (from REASSEMBLY, the whole bridge re-forming) plays assembly, and leaving COMPLETE backward toward REASSEMBLY/EXPLODED plays disassembly. This pair is therefore attached to chapter_key 'complete', reusing the existing 'bridge_alpha' fallback (which the 'complete' chapter's still layer already uses via layerFor's shared primary-layer resolution) as its settle target. Because layerFor() resolves ALL three primary-layer chapters (overview/opening/complete) to the SAME physical #museumPrimary/#museumPrimaryInner container, this pair's <video> is inserted (render_target 'primary_layer') as a direct child of #museumPrimary \u2014 a sibling of #museumPrimaryInner, not a child of it, per the PHASE 2.3A small-rectangle fix (see video_transition_contract's render_target field above) \u2014 stacked above #museumBridgeImg, and is only ever triggered while the CURRENT chapter is 'complete' \u2014 it never fires for chapters 'overview' or 'opening', which remain completely unaffected static-image behaviour. | PHASE 2.4 MICRO-FIX (STONE BRIDGE OVERVIEW/STRUCTURE TRANSITION, v02 promotion): file_path repointed to a NEW direction-specific derivative cut from the single combined source 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/OVERVIEW/bridge_assembly_disassembly_loop_16s_v02.mp4 (16.15s, 1080x1920, h264/yuv420p/24fps, embedded AAC audio never surfaced). A video-only web derivative (bridge_assembly_disassembly_loop_16s_v02_web.mp4, -map 0:v:0 -an -c:v copy, lossless remux) was produced first, then frame-inspected (extracted + visually compared stills at 0.1s, 2s, 4s, 6-10s in 0.125s steps, 12s, 16s, plus a frame-diff curve) to confirm it is a genuine symmetric ping-pong: COMPLETE (0s) -> EXPLODED (~8s, confirmed by a local minimum in the frame-to-frame difference curve at t=7.875-8.0s, the slowest/most settled point) -> COMPLETE (16.08s, frame diff vs t=0.1s = 0.17, i.e. a clean loop). ffprobe/showinfo confirmed an encoded I-frame at exactly pts_time=8.0s (24fps, frame 192 of 386 total), so the split at that exact frame is a lossless, frame-accurate stream copy with zero re-encode: frames 0-191 (192 frames, 8.00s) -> bridge_overview_disassembly_v02_web.mp4 (COMPLETE->EXPLODED), frames 192-385 (194 frames, 8.08s) -> bridge_overview_assembly_v02_web.mp4 (EXPLODED->COMPLETE). Boundary continuity verified by comparing the last frame of the disassembly cut against the first frame of the assembly cut (identical exploded-parts layout, no visible jump) and the first frame of the disassembly cut against the last frame of the assembly cut (both the same fully assembled bridge). Both new files copied byte-identical into the web-copy assets folder. The v01 pair (bridge_assembly_01.mp4 / bridge_disassembly_01.mp4) is preserved untouched on disk in both 03_ASSETS/.../LOOPS/OVERVIEW/ and the web-copy folder and is now LEGACY_REFERENCE_ONLY for this slot family only (see top-level 'legacy_assets' annotation) \u2014 not deleted, not overwritten.",
+      "content_ids": [
+        "bridge_overview_structure"
+      ]
+    },
+    {
+      "slot_id": "overview_transition_disassembly",
+      "section": "overview",
+      "label": "\u00dcberblick / Komplett \u2014 disassembly transition clip (PHASE 2.3)",
+      "file_path": "loops/overview/bridge_overview_disassembly_v02_web.mp4",
+      "type": "video_transition",
+      "status": "READY",
+      "order": 12,
+      "language_neutral": true,
+      "chapter_key": "complete",
+      "pair_role": "disassembly",
+      "render_target": "primary_layer",
+      "fallback_slot_id": "bridge_alpha",
+      "transition_pair": {
+        "paired_slot_id": "overview_transition_assembly",
+        "role": "disassembly"
+      },
+      "playback": {
+        "autoplay": false,
+        "muted": true,
+        "loop": false,
+        "controls": false
+      },
+      "orientation": "landscape",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "max_width": "100%",
+      "max_height": "88vh",
+      "notes": "PHASE 2.3 \u2014 one-shot directional transition clip, NOT an ambient loop. Copied from 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/OVERVIEW/bridge_disassembly_01.mp4 (existence + byte-size verified after copy). Paired with overview_transition_assembly on chapter_key 'complete' \u2014 see that slot's notes for the full chapter_key judgment call. Plays once when the visitor scrolls BACKWARD out of COMPLETE toward REASSEMBLY/EXPLODED, i.e. the bridge visibly beginning to separate again, then the layer fades per the existing 'complete' choreography in museum2d-scroll.js (untouched). | PHASE 2.4 MICRO-FIX (STONE BRIDGE OVERVIEW/STRUCTURE TRANSITION, v02 promotion): file_path repointed to a NEW direction-specific derivative cut from the single combined source 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/OVERVIEW/bridge_assembly_disassembly_loop_16s_v02.mp4 (16.15s, 1080x1920, h264/yuv420p/24fps, embedded AAC audio never surfaced). A video-only web derivative (bridge_assembly_disassembly_loop_16s_v02_web.mp4, -map 0:v:0 -an -c:v copy, lossless remux) was produced first, then frame-inspected (extracted + visually compared stills at 0.1s, 2s, 4s, 6-10s in 0.125s steps, 12s, 16s, plus a frame-diff curve) to confirm it is a genuine symmetric ping-pong: COMPLETE (0s) -> EXPLODED (~8s, confirmed by a local minimum in the frame-to-frame difference curve at t=7.875-8.0s, the slowest/most settled point) -> COMPLETE (16.08s, frame diff vs t=0.1s = 0.17, i.e. a clean loop). ffprobe/showinfo confirmed an encoded I-frame at exactly pts_time=8.0s (24fps, frame 192 of 386 total), so the split at that exact frame is a lossless, frame-accurate stream copy with zero re-encode: frames 0-191 (192 frames, 8.00s) -> bridge_overview_disassembly_v02_web.mp4 (COMPLETE->EXPLODED), frames 192-385 (194 frames, 8.08s) -> bridge_overview_assembly_v02_web.mp4 (EXPLODED->COMPLETE). Boundary continuity verified by comparing the last frame of the disassembly cut against the first frame of the assembly cut (identical exploded-parts layout, no visible jump) and the first frame of the disassembly cut against the last frame of the assembly cut (both the same fully assembled bridge). Both new files copied byte-identical into the web-copy assets folder. The v01 pair (bridge_assembly_01.mp4 / bridge_disassembly_01.mp4) is preserved untouched on disk in both 03_ASSETS/.../LOOPS/OVERVIEW/ and the web-copy folder and is now LEGACY_REFERENCE_ONLY for this slot family only (see top-level 'legacy_assets' annotation) \u2014 not deleted, not overwritten.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "exploded_transition_disassembly",
+      "section": "explosion",
+      "label": "Explosion \u2014 disassembly transition clip, exploded edge (PHASE 2.3 fix)",
+      "file_path": "loops/overview/bridge_overview_disassembly_v02_web.mp4",
+      "type": "video_transition",
+      "status": "READY",
+      "order": 11,
+      "language_neutral": true,
+      "chapter_key": "exploded",
+      "pair_role": "disassembly",
+      "forward_role": "disassembly",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "explosion_main",
+      "transition_pair": {
+        "paired_slot_id": "exploded_transition_assembly",
+        "role": "disassembly"
+      },
+      "playback": {
+        "autoplay": false,
+        "muted": true,
+        "loop": false,
+        "controls": false
+      },
+      "orientation": "landscape",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PHASE 2.3 POST-DELIVERY FIX. Reuses the SAME physical file as overview_transition_disassembly (loops/overview/bridge_disassembly_01.mp4) under a second slot_id, because the master spec's primary, most-visible requirement \u2014 'use bridge_disassembly_01.mp4 when transitioning from the complete bridge toward the exploded state' \u2014 describes the FORWARD edge overview/opening -> exploded (chapters 1-3), which the original delivery's chapter_key:'complete' pair never covers (that pair only fires on chapter 10). Live-browser verification (scrolling forward from progress 0 through the exploded chapter) confirmed the gap: no transition video ever played on that edge. This slot closes it by attaching the disassembly clip to chapter_key 'exploded' (layer.kind:'flat', so render_target is 'flat_layer', not 'primary_layer'). `forward_role: \"disassembly\"` is a new, additive, opt-in field read by museum25d.js's triggerTransition(): for this chapter only, entering FORWARD (direction 1, coming from opening) plays disassembly (bridge breaking apart, matching the spec exactly), and entering BACKWARD (direction -1, coming from piers) plays the paired assembly clip (exploded_transition_assembly) instead \u2014 the inverse of the generic pfeiler/arches/deck/complete rule, which is unaffected (no forward_role field on those slots, so they keep defaulting to forward=assembly exactly as before). Settles on the approved explosion_main PNG exactly like the exploded chapter already does with no video present. | PHASE 2.4 MICRO-FIX (STONE BRIDGE OVERVIEW/STRUCTURE TRANSITION, v02 promotion): file_path repointed to a NEW direction-specific derivative cut from the single combined source 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/OVERVIEW/bridge_assembly_disassembly_loop_16s_v02.mp4 (16.15s, 1080x1920, h264/yuv420p/24fps, embedded AAC audio never surfaced). A video-only web derivative (bridge_assembly_disassembly_loop_16s_v02_web.mp4, -map 0:v:0 -an -c:v copy, lossless remux) was produced first, then frame-inspected (extracted + visually compared stills at 0.1s, 2s, 4s, 6-10s in 0.125s steps, 12s, 16s, plus a frame-diff curve) to confirm it is a genuine symmetric ping-pong: COMPLETE (0s) -> EXPLODED (~8s, confirmed by a local minimum in the frame-to-frame difference curve at t=7.875-8.0s, the slowest/most settled point) -> COMPLETE (16.08s, frame diff vs t=0.1s = 0.17, i.e. a clean loop). ffprobe/showinfo confirmed an encoded I-frame at exactly pts_time=8.0s (24fps, frame 192 of 386 total), so the split at that exact frame is a lossless, frame-accurate stream copy with zero re-encode: frames 0-191 (192 frames, 8.00s) -> bridge_overview_disassembly_v02_web.mp4 (COMPLETE->EXPLODED), frames 192-385 (194 frames, 8.08s) -> bridge_overview_assembly_v02_web.mp4 (EXPLODED->COMPLETE). Boundary continuity verified by comparing the last frame of the disassembly cut against the first frame of the assembly cut (identical exploded-parts layout, no visible jump) and the first frame of the disassembly cut against the last frame of the assembly cut (both the same fully assembled bridge). Both new files copied byte-identical into the web-copy assets folder. The v01 pair (bridge_assembly_01.mp4 / bridge_disassembly_01.mp4) is preserved untouched on disk in both 03_ASSETS/.../LOOPS/OVERVIEW/ and the web-copy folder and is now LEGACY_REFERENCE_ONLY for this slot family only (see top-level 'legacy_assets' annotation) \u2014 not deleted, not overwritten.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "exploded_transition_assembly",
+      "section": "explosion",
+      "label": "Explosion \u2014 assembly transition clip, exploded edge (PHASE 2.3 fix)",
+      "file_path": "loops/overview/bridge_overview_assembly_v02_web.mp4",
+      "type": "video_transition",
+      "status": "READY",
+      "order": 12,
+      "language_neutral": true,
+      "chapter_key": "exploded",
+      "pair_role": "assembly",
+      "forward_role": "disassembly",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "explosion_main",
+      "transition_pair": {
+        "paired_slot_id": "exploded_transition_disassembly",
+        "role": "assembly"
+      },
+      "playback": {
+        "autoplay": false,
+        "muted": true,
+        "loop": false,
+        "controls": false
+      },
+      "orientation": "landscape",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PHASE 2.3 POST-DELIVERY FIX \u2014 see exploded_transition_disassembly's notes for the full rationale. Reuses the SAME physical file as overview_transition_assembly (loops/overview/bridge_assembly_01.mp4) under a second slot_id. Plays only when the EXPLODED chapter is entered BACKWARD (direction -1, scrolling up from PIERS), i.e. the pieces visibly drawing back together toward the exploded overview, per this chapter's `forward_role:\"disassembly\"` inversion (see the other slot's notes). Settles on the approved explosion_main PNG. | PHASE 2.4 MICRO-FIX (STONE BRIDGE OVERVIEW/STRUCTURE TRANSITION, v02 promotion): file_path repointed to a NEW direction-specific derivative cut from the single combined source 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/OVERVIEW/bridge_assembly_disassembly_loop_16s_v02.mp4 (16.15s, 1080x1920, h264/yuv420p/24fps, embedded AAC audio never surfaced). A video-only web derivative (bridge_assembly_disassembly_loop_16s_v02_web.mp4, -map 0:v:0 -an -c:v copy, lossless remux) was produced first, then frame-inspected (extracted + visually compared stills at 0.1s, 2s, 4s, 6-10s in 0.125s steps, 12s, 16s, plus a frame-diff curve) to confirm it is a genuine symmetric ping-pong: COMPLETE (0s) -> EXPLODED (~8s, confirmed by a local minimum in the frame-to-frame difference curve at t=7.875-8.0s, the slowest/most settled point) -> COMPLETE (16.08s, frame diff vs t=0.1s = 0.17, i.e. a clean loop). ffprobe/showinfo confirmed an encoded I-frame at exactly pts_time=8.0s (24fps, frame 192 of 386 total), so the split at that exact frame is a lossless, frame-accurate stream copy with zero re-encode: frames 0-191 (192 frames, 8.00s) -> bridge_overview_disassembly_v02_web.mp4 (COMPLETE->EXPLODED), frames 192-385 (194 frames, 8.08s) -> bridge_overview_assembly_v02_web.mp4 (EXPLODED->COMPLETE). Boundary continuity verified by comparing the last frame of the disassembly cut against the first frame of the assembly cut (identical exploded-parts layout, no visible jump) and the first frame of the disassembly cut against the last frame of the assembly cut (both the same fully assembled bridge). Both new files copied byte-identical into the web-copy assets folder. The v01 pair (bridge_assembly_01.mp4 / bridge_disassembly_01.mp4) is preserved untouched on disk in both 03_ASSETS/.../LOOPS/OVERVIEW/ and the web-copy folder and is now LEGACY_REFERENCE_ONLY for this slot family only (see top-level 'legacy_assets' annotation) \u2014 not deleted, not overwritten.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "materials_loop",
+      "section": "material",
+      "label": "Material \u2014 muted looping video",
+      "file_path": "loops/material/material_motion_loop_01.mp4",
+      "type": "video_loop",
+      "status": "READY",
+      "order": 10,
+      "language_neutral": true,
+      "chapter_key": "materials",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "material_stone",
+      "loop_seconds_intended": 6,
+      "playback": {
+        "autoplay": true,
+        "muted": true,
+        "loop": true,
+        "controls": false,
+        "pause_when_out_of_viewport": true,
+        "pause_when_chapter_inactive": true
+      },
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PROMOTED (PHASE 2.3, this task): live asset is now loops/material/material_motion_loop_01.mp4 \u2014 copied from 03_ASSETS/Steinerne_Bruecke/2d/LOOPS/MATERIAL/material_motion_loop_01.mp4 (existence + byte-size match verified after copy). Playback mechanism is the pre-existing generic ambient-loop gate (loopLayers/syncLoopPlayback in museum25d.js), unmodified. NOTE: this chapter cycles six validated specimen sub-beats in the caption column; the loop replaces only the single background object, it does not contradict or replace that text-driven sequence.",
+      "content_ids": [
+        "material_kalkstein",
+        "material_gruensandstein",
+        "material_fuellmauerwerk",
+        "material_holzpfahl",
+        "material_eisenklammer",
+        "material_findling"
+      ],
+      "reserved_file_path": "03_ASSETS/Steinerne_Bruecke/2d/VIDEO/MATERIAL/materials_loop.mp4"
+    },
+    {
+      "slot_id": "reassembly_loop",
+      "section": "reassembly",
+      "label": "Zusammenf\u00fcgung \u2014 optional cinematic loop (future)",
+      "file_path": null,
+      "type": "video_loop",
+      "status": "PENDING",
+      "order": 10,
+      "language_neutral": true,
+      "chapter_key": "reassembly",
+      "render_target": "flat_layer",
+      "fallback_slot_id": "explosion_main",
+      "loop_pair": {
+        "paired_slot_id": "explosion_loop",
+        "role": "reverse",
+        "shared_source_allowed": true,
+        "note": "Deliberately identical in shape to explosion_loop so the two can later share one source animation (see that slot's loop_pair note). Nothing is implemented today."
+      },
+      "loop_seconds_intended": 6,
+      "playback": {
+        "autoplay": true,
+        "muted": true,
+        "loop": true,
+        "controls": false,
+        "pause_when_out_of_viewport": true,
+        "pause_when_chapter_inactive": true
+      },
+      "orientation": "portrait",
+      "preferred_fit": "cutout_stage",
+      "align_x": "center",
+      "align_y": "center",
+      "background_mode": "none",
+      "notes": "PHASE 2.2 SLOT RESERVATION ONLY \u2014 no approved/Freigabe video exists and none was generated. While PENDING, the REASSEMBLY chapter renders the approved explosion_main PNG cutout exactly as it does today (the same element the EXPLODED chapter uses, re-entering from a wider framing).",
+      "content_ids": [],
+      "reserved_file_path": "03_ASSETS/Steinerne_Bruecke/2d/VIDEO/REASSEMBLY/reassembly_loop.mp4"
+    },
+    {
+      "slot_id": "explosion_main_legacy_baked_text",
+      "section": "explosion",
+      "label": "Exploded assembly \u2014 overall (LEGACY baked-text plate, superseded twice)",
+      "file_path": "exploded/exploded_main.png",
+      "type": "flat_image",
+      "status": "REFERENCE",
+      "order": 99,
+      "language_neutral": false,
+      "orientation": "portrait",
+      "preferred_fit": null,
+      "background_mode": null,
+      "notes": "LEGACY_ONLY. Superseded by 'explosion_main' (now pointing at explosion_main_clean.png) on 2026-08-29. Preserved unmodified, not deleted, not referenced by any live chapter/section in museum25d.js. Contains baked German title/legend/technical-label text and must never be reintroduced as a public-facing asset without regenerating a clean version.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "explosion_main_legacy",
+      "section": "explosion",
+      "label": "explosion_main \u2014 previous live version (superseded, LEGACY)",
+      "file_path": "exploded/explosion_main_clean.png",
+      "type": "flat_image",
+      "status": "REFERENCE",
+      "order": 98,
+      "language_neutral": false,
+      "notes": "LEGACY_ONLY. Was the live asset for 'explosion_main' before PHASE 1 cutout promotion (2026-08-29). Preserved unmodified, not deleted, not referenced by any live chapter. Previous status before supersession: READY. Note: this was itself already a promoted clean (non-cutout, dark-background) replacement of the original baked-text exploded_main.png, which remains separately registered as 'explosion_main_legacy_baked_text'-equivalent slot 'explosion_main_legacy' from the prior phase \u2014 see that entry for the original baked-text plate.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "pfeiler_detail_legacy",
+      "section": "pfeiler",
+      "label": "pfeiler_detail \u2014 previous live version (superseded, LEGACY)",
+      "file_path": "details/detail_pier_01.png",
+      "type": "flat_image",
+      "status": "REFERENCE",
+      "order": 98,
+      "language_neutral": false,
+      "notes": "LEGACY_ONLY. Was the live asset for 'pfeiler_detail' before PHASE 1 cutout promotion (2026-08-29). Preserved unmodified, not deleted, not referenced by any live chapter. Previous status before supersession: READY. ",
+      "content_ids": []
+    },
+    {
+      "slot_id": "boegen_detail_legacy",
+      "section": "boegen",
+      "label": "boegen_detail \u2014 previous live version (superseded, LEGACY)",
+      "file_path": "details/detail_arch_01.png",
+      "type": "flat_image",
+      "status": "REFERENCE",
+      "order": 98,
+      "language_neutral": false,
+      "notes": "LEGACY_ONLY. Was the live asset for 'boegen_detail' before PHASE 1 cutout promotion (2026-08-29). Preserved unmodified, not deleted, not referenced by any live chapter. Previous status before supersession: READY. ",
+      "content_ids": []
+    },
+    {
+      "slot_id": "fahrbahn_main_legacy",
+      "section": "fahrbahn",
+      "label": "fahrbahn_main \u2014 previous live version (superseded, LEGACY)",
+      "file_path": "exploded/exploded_deck.png",
+      "type": "flat_image",
+      "status": "REFERENCE",
+      "order": 98,
+      "language_neutral": false,
+      "notes": "LEGACY_ONLY. Was the live asset for 'fahrbahn_main' before PHASE 1 cutout promotion (2026-08-29). Preserved unmodified, not deleted, not referenced by any live chapter. Previous status before supersession: READY. Note: old file is exploded_deck.png, shared with the 'explosion_deck' registry slot which is untouched by this promotion.",
+      "content_ids": []
+    },
+    {
+      "slot_id": "material_stone_legacy",
+      "section": "material",
+      "label": "material_stone \u2014 previous live version (superseded, LEGACY)",
+      "file_path": "materials/material_stone_01.png",
+      "type": "flat_image",
+      "status": "REFERENCE",
+      "order": 98,
+      "language_neutral": false,
+      "notes": "LEGACY_ONLY. Was the live asset for 'material_stone' before PHASE 1 cutout promotion (2026-08-29). Preserved unmodified, not deleted, not referenced by any live chapter. Previous status before supersession: READY. ",
+      "content_ids": []
+    }
+  ],
+  "future_extension_note": "Each section currently maps to either a single slot or an ordered set of slots (see 'order'). A future 'sequence by scroll' or 'looping media' mode (e.g. an image sequence advancing with scroll position, or a looping video slot) can reuse this same array-of-ordered-slots shape per section without a schema change \u2014 just add more slots with the same section value and consecutive 'order' integers, and (for video) a new type value such as 'video_loop'. Partially implemented: museum25d.js was refactored into a 10-chapter scroll-driven sequence and the video_loop type (see bau_loop_01) now has full playback capability built, gated on status:READY.",
+  "hotspots_registry": {
+    "$note": "PREPARED-BUT-DISABLED data shape only (Phase 1C). Nothing in museum25d.js reads this key and no DOM element for any of these hotspots is rendered anywhere \u2014 this is documentation/data registration only, per the project's 'no orphans' rule (do not build a UI affordance that points at content that doesn't exist). See the HOTSPOT EXTENSION POINT comment block at the bottom of museum25d.js for the full future implementation shape this would eventually plug into.",
+    "bruckmandl": {
+      "id": "bruckmandl",
+      "status": "PENDING_DESTINATION",
+      "section": "overview",
+      "target": null,
+      "label": {
+        "de": "Br\u00fcckmandl",
+        "en": "Br\u00fcckmandl",
+        "es": "Br\u00fcckmandl"
+      },
+      "note": "Re-confirmed 2026-08-29 (Phase 1C): no real Br\u00fcckmandl landing page, anchor, or content section exists anywhere in this project (ZEITSPRUNG_V2 or otherwise) to point this hotspot at. id/label placeholders exist here so the eventual wiring has a stable id to reference, but target stays null and status stays PENDING_DESTINATION until real DE/EN/ES content + a real anchor/page are briefed and approved. Do not implement a tappable hotspot for this until then."
+    }
+  },
+  "legacy_assets": {
+    "bridge_overview_transition_v01_pair": {
+      "status": "LEGACY_REFERENCE_ONLY",
+      "scope": "Applies ONLY to the overview/complete<->exploded transition slot family (overview_transition_assembly, overview_transition_disassembly, exploded_transition_assembly, exploded_transition_disassembly). Does NOT apply to any PFEILER/BOEGEN/FAHRBAHN/MATERIAL/BAU/KFRAMES slot.",
+      "files": [
+        "loops/overview/bridge_assembly_01.mp4",
+        "loops/overview/bridge_disassembly_01.mp4"
+      ],
+      "source_originals": [
+        "03_ASSETS/Steinerne_Bruecke/2d/LOOPS/OVERVIEW/bridge_assembly_01.mp4",
+        "03_ASSETS/Steinerne_Bruecke/2d/LOOPS/OVERVIEW/bridge_disassembly_01.mp4"
+      ],
+      "note": "PHASE 2.4 MICRO-FIX \u2014 superseded on 2026-09-01 by the v02 derivatives (bridge_overview_assembly_v02_web.mp4 / bridge_overview_disassembly_v02_web.mp4) now referenced by the four slots above, cut from the single combined source bridge_assembly_disassembly_loop_16s_v02.mp4. Preserved on disk, not deleted, not overwritten, kept as reference/rollback only."
+    }
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "_meta": {
+    "monument": "steinerne-bruecke",
+    "purpose": "Maps historical claims already present in the Steinerne Brücke experience (fact cards, historical scroll, K-frame captions, 2.5D museum content) to source IDs registered in sources.json. NO_SOURCE -> claim stays explicitly unsupported; a claim is never marked SUPPORTED merely to fill this file in.",
+    "status_values": ["SUPPORTED", "DERIVED_FROM_CANONICAL_STRUCTURE", "NEEDS_REVIEW", "UNSUPPORTED"],
+    "last_updated": "2026-09-01"
+  },
+  "claims": {
+    "bridge_construction_period": {
+      "claim": "The Steinerne Brücke was built between 1135 and 1146.",
+      "sources": ["Q001", "Q002"],
+      "status": "SUPPORTED"
+    },
+    "bridge_16_arches": {
+      "claim": "The bridge originally had 16 arches.",
+      "sources": ["Q001", "Q002"],
+      "status": "SUPPORTED"
+    },
+    "bridge_15_piers": {
+      "claim": "The bridge has 15 piers.",
+      "sources": ["Q001"],
+      "status": "DERIVED_FROM_CANONICAL_STRUCTURE",
+      "notes": "Not an independently attested count in Q001 — follows directly from the validated 16-arch structure (16 arches between two abutments implies 15 intermediate piers). See SB_PIER_COUNT in the central SOURCE_REGISTRY for the identical reasoning."
+    },
+    "bridge_length_300m": {
+      "claim": "The bridge is more than 300 metres long.",
+      "sources": ["Q001", "Q002"],
+      "status": "SUPPORTED"
+    },
+    "bridge_materials": {
+      "claim": "Materials used: limestone (Kalkstein), green sandstone (Grünsandstein), historic lime mortar, and a heterogeneous rubble fill core (Füllmauerwerk).",
+      "sources": ["Q001", "Q003"],
+      "status": "SUPPORTED",
+      "notes": "Q003 (OCR transcript) Aufnahme 041 / 087–088 / 108–109 per MUSEUM_CONTENT_MAP.json component sources."
+    },
+    "pier_foundation_donaukies": {
+      "claim": "The medieval piers are founded directly on Danube gravel (Donaukies) — no forest of piles beneath the piers.",
+      "sources": ["Q001", "Q002", "Q003"],
+      "status": "SUPPORTED",
+      "notes": "Corrects a common misconception; must never be shown with piles under the main piers. Q003 Aufnahme 050–051."
+    },
+    "beschlaechte_pier_protection": {
+      "claim": "A protective edge row (Beschlächte) of timber piles, wattle and stone protects the pier edges/riverbanks — distinct from the piers' own gravel foundation.",
+      "sources": ["Q001", "Q003"],
+      "status": "SUPPORTED",
+      "notes": "Q003 Aufnahme 022."
+    },
+    "arch_construction_technique": {
+      "claim": "The arches were built over wooden centering frames (Lehrgerüst) and set with cranes; the 'Wolf' lifting clamp was used to move stone blocks.",
+      "sources": ["Q001", "Q002", "Q003"],
+      "status": "SUPPORTED",
+      "notes": "Q003 Aufnahme 052–053."
+    },
+    "bau_process_crane_technique": {
+      "claim": "12th-century construction used simple wooden cranes, pulleys and winches; a wheel-crane is plausible but not certain.",
+      "sources": ["Q002", "Q003"],
+      "status": "NEEDS_REVIEW",
+      "notes": "MUSEUM_CONTENT_MAP.json marks this component's evidence_status as ESTIMATED — the wheel-crane detail specifically is plausible reconstruction, not directly attested."
+    },
+    "bridge_restoration_2010_2018": {
+      "claim": "The bridge underwent a major restoration 2010–2018, documented by the Tiefbauamt Regensburg.",
+      "sources": ["Q001"],
+      "status": "SUPPORTED"
+    },
+    "bridge_tower_history": {
+      "claim": "The bridge had 3 towers until 1784, 2 towers until ~1810, and 1 tower since then.",
+      "sources": ["Q007"],
+      "status": "NEEDS_REVIEW",
+      "notes": "Internal production-planning figure only; no independent external primary source for the exact tower-count-by-year has been registered."
+    },
+    "bruckmandl_location": {
+      "claim": "The Bruckmandl figure stands at the Scheitelpunkt (highest point) of the bridge, facing the Dom St. Peter.",
+      "sources": ["Q004", "Q005"],
+      "status": "SUPPORTED"
+    },
+    "bruckmandl_legend": {
+      "claim": "According to legend, the bridge's master builder made a wager with the cathedral's master builder and, as the cathedral progressed faster, is said to have made a pact with the devil.",
+      "sources": ["Q004"],
+      "status": "SUPPORTED",
+      "notes": "content_type: LEGEND — must always be presented as Sage/Legende, never as historical fact."
+    },
+    "bruckmandl_interpretation": {
+      "claim": "The figure's exact historical meaning is not conclusively settled (interpretations range from a south/weather vane to a legendary depiction of the master builder).",
+      "sources": ["Q005"],
+      "status": "NEEDS_REVIEW"
+    },
+    "dom_gothic_background_rule": {
+      "claim": "The Gothic Dom St. Peter must not appear in the background before ~1275; before that, the Romanesque predecessor cathedral applies.",
+      "sources": ["Q002"],
+      "status": "SUPPORTED",
+      "notes": "Production/accuracy constraint, not itself a claim shown to visitors — governs which background asset may appear per K-frame date."
+    },
+    "k06_dom_spire_visual_review": {
+      "claim": "K06 (dated 1140–1146) appears to show a visually complete Gothic cathedral spire in the background.",
+      "sources": [],
+      "status": "UNSUPPORTED",
+      "notes": "Flagged VISUAL_REVIEW_REQUIRED in KFRAMES_STORY_MAP.json (Phase 2.7C.4) as a possible inconsistency with dom_gothic_background_rule. Not resolved — image, date and source_ids intentionally left untouched pending a Visual Lab asset replacement."
+    },
+    "k08_condition_unconfirmed": {
+      "claim": "K08's depicted repair/maintenance moment has no confirmed date or campaign.",
+      "sources": [],
+      "status": "UNSUPPORTED"
+    },
+    "k09_condition_unconfirmed": {
+      "claim": "K09's depicted moment has no confirmed date or historical placement.",
+      "sources": [],
+      "status": "UNSUPPORTED"
+    }
+  }
+}

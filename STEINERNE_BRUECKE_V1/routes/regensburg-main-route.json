@@ -1,0 +1,87 @@
+{
+  "_comment": "ZEITSPRUNG PHASE 1.5 - INTERACTIVE MONUMENT ROUTE SYSTEM. Route-level data, separate from any single monument's own monuments/<id>/ config folder. Schema intentionally mirrors the existing 3D-museum field-suffix i18n convention (title_de/title_en/title_es etc, see js/monument-3d/i18n-adapter-3d.js) so this file can be resolved with the same resolveI18nField() helper, no parallel resolver. stops[].layoutPosition is an ILLUSTRATIVE SCHEMATIC 2D drawing coordinate (SVG viewBox 0-1000 units) used only to lay out the on-screen route illustration - it is NOT a geographic coordinate and carries no claim of street-level or real-world positional accuracy. Real geographic coordinates and street-level routing (stops[].coordinates, routePoints, streetSegments, cameraPath) are reserved for later and left null/empty until validated geodata is ingested and approved - per Accuracy Rules, nothing here should be read as confirmed geography.",
+  "id": "regensburg-main-route",
+  "version": "1.5.0",
+  "status": "ACTIVE_SCHEMATIC",
+  "labels": {
+    "title": { "de": "Rundgang durch Regensburg", "en": "Regensburg Route", "es": "Recorrido por Regensburg" },
+    "subtitle": {
+      "de": "Fünf Orte, ein gemeinsamer Weg durch die Geschichte Regensburgs.",
+      "en": "Five places, one shared path through Regensburg's history.",
+      "es": "Cinco lugares, un mismo camino por la historia de Regensburg."
+    }
+  },
+  "stops": [
+    {
+      "order": 1,
+      "id": "01-steinerne-bruecke",
+      "monumentId": "steinerne-bruecke",
+      "name": { "de": "Steinerne Brücke", "en": "Steinerne Brücke", "es": "Steinerne Brücke" },
+      "era": "1135-1146",
+      "available": true,
+      "layoutPosition": { "x": 180, "y": 160 },
+      "coordinates": null,
+      "audio": null,
+      "historicalNotes": null
+    },
+    {
+      "order": 2,
+      "id": "02-dom-st-peter",
+      "monumentId": "dom-st-peter",
+      "name": { "de": "Dom St. Peter", "en": "Dom St. Peter", "es": "Dom St. Peter" },
+      "era": "1275–1520 (Gotik) · Türme 1859–1869",
+      "available": true,
+      "layoutPosition": { "x": 340, "y": 330 },
+      "coordinates": null,
+      "audio": null,
+      "historicalNotes": null
+    },
+    {
+      "order": 3,
+      "id": "03-altes-rathaus",
+      "monumentId": "altes-rathaus",
+      "name": { "de": "Altes Rathaus · Reichssaal", "en": "Altes Rathaus · Reichssaal", "es": "Altes Rathaus · Reichssaal" },
+      "era": "PENDING_BRIEFING",
+      "available": true,
+      "layoutPosition": { "x": 520, "y": 480 },
+      "coordinates": null,
+      "audio": null,
+      "historicalNotes": null
+    },
+    {
+      "order": 4,
+      "id": "04-porta-praetoria",
+      "monumentId": "porta-praetoria",
+      "name": { "de": "Porta Praetoria · Castra Regina", "en": "Porta Praetoria · Castra Regina", "es": "Porta Praetoria · Castra Regina" },
+      "era": "PENDING_BRIEFING",
+      "available": true,
+      "layoutPosition": { "x": 700, "y": 300 },
+      "coordinates": null,
+      "audio": null,
+      "historicalNotes": null
+    },
+    {
+      "order": 5,
+      "id": "05-neupfarrplatz",
+      "monumentId": "neupfarrplatz",
+      "name": { "de": "Neupfarrplatz · Jüdisches Viertel", "en": "Neupfarrplatz · Jewish Quarter", "es": "Neupfarrplatz · Barrio judío" },
+      "era": "PENDING_BRIEFING",
+      "available": true,
+      "layoutPosition": { "x": 830, "y": 560 },
+      "coordinates": null,
+      "audio": null,
+      "historicalNotes": null
+    }
+  ],
+  "routePoints": null,
+  "streetSegments": null,
+  "cameraPath": null,
+  "duration": null,
+  "distance": null,
+  "reserved": {
+    "_comment_reserved": "The following fields are explicitly RESERVED FOR LATER and intentionally left empty. They must stay empty/null until real, validated geodata or approved editorial content exists - never fabricated to fill the schema.",
+    "coordinatesSource": null,
+    "distanceSource": null,
+    "durationSource": null
+  }
+}
