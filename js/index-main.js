@@ -113,12 +113,15 @@ function wireSoundToggle() {
 // first thing to load -> preload="auto" (eager), unlike the
 // VISION/MISSION/OBJECTIVE loops which must stay lazily deferred.
 //
-// LEGACY_REFERENCE_ONLY (Phase 2.7C-era hero asset, NOT deleted, NOT dead):
-// assets/zeitsprung/intro/zt_intro_fpv_regensburg_15s_v01_web.mp4 (+ its
-// poster) is no longer the hero source, but it is NOT unused — Phase 2.7C.4
-// repurposes it as the VISION chapter's own background loop instead (see
-// the CHAPTERS array's "visionBeat" entry inside wireThesisMedia() below).
-// Do not delete this file or treat it as orphaned.
+// LEGACY_REFERENCE_ONLY (Phase 2.7C-era hero asset, NOT deleted): assets/
+// zeitsprung/intro/zt_intro_fpv_regensburg_15s_v01_web.mp4 (+ its poster) is
+// no longer the hero source. A Phase 2.7C.4 pass had briefly repurposed it
+// as VISION's background loop too, but that was a mistake (visitors saw
+// this generic city clip where the dedicated VISION loop belongs) — fixed
+// in the URGENT INDEX FIX task; VISION now uses its own real loop (see the
+// CHAPTERS array's "visionBeat" entry inside wireThesisMedia() below). This
+// file is kept on disk as a reusable asset, not currently referenced by any
+// chapter.
 // ---------------------------------------------------------------------------
 function wireHeroMedia() {
   const video = document.getElementById("heroVideo");
@@ -265,13 +268,15 @@ function buildBeatReveal(containerId, titleId, titleText, lineClass) {
 
 // ---------------------------------------------------------------------------
 // VISION/MISSION/OBJECTIVE background — PHASE 2.7C.1 architecture,
-// PHASE 2.7C.4 media: each chapter now has its OWN dedicated background loop
-// (three distinct new derivatives under
-// assets/video/index/vision_mission_objective/) instead of one shared clip.
-// VISION reuses the former hero flyover as its own poster/video pair (see
-// wireHeroMedia()'s LEGACY_REFERENCE_ONLY note above — it changes ROLE, not
-// status: still actively referenced, just as VISION's background now,
-// not the hero's). MISSION/OBJECTIVE use the two genuinely new loops.
+// PHASE 2.7C.4 media: each chapter has its OWN dedicated background loop,
+// all three genuinely distinct derivatives under
+// assets/video/index/vision_mission_objective/ (vision/mission/objective
+// _loop_01_web.mp4 + matching posters). URGENT INDEX FIX (this task): VISION
+// was incorrectly still pointing at the former hero flyover
+// (assets/zeitsprung/intro/zt_intro_fpv_regensburg_15s_v01_web.mp4) — a
+// leftover from before the dedicated VISION loop existed. That old flyover
+// asset remains on disk, LEGACY_REFERENCE_ONLY, no longer referenced by any
+// chapter here.
 //
 // Same sticky-background technique as before (css/index.css .thesis-media /
 // .thesis-chapters), just parametrized per chapter: three
@@ -296,8 +301,8 @@ function wireThesisMedia() {
   const CHAPTERS = [
     {
       beatId: "visionBeat", layerId: "thesisLayerVision",
-      poster: "assets/zeitsprung/intro/zt_intro_fpv_regensburg_poster_v01.jpg",
-      video: "assets/zeitsprung/intro/zt_intro_fpv_regensburg_15s_v01_web.mp4"
+      poster: "assets/video/index/vision_mission_objective/vision_poster_01.jpg",
+      video: "assets/video/index/vision_mission_objective/vision_loop_01_web.mp4"
     },
     {
       beatId: "missionBeat", layerId: "thesisLayerMission",
