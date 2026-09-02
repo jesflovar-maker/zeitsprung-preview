@@ -286,6 +286,21 @@
     <div class="kf__inner">
       <h3 data-i18n="kframesTitle">Die Baustelle im Bild</h3>
       <p data-i18n="kframesText">Zwölf Bildmomente der Bauzeit, chronologisch geordnet — von der Fundamentierung bis heute.</p>
+      <!-- RUNTIME HOTFIX — visible Quellen access point. Opens a compact
+           panel (built/populated by kframes-gallery.js from the SAME
+           sources.json registry already used for the per-frame source
+           lines — no second data source, no fabricated content). -->
+      <button type="button" class="kf__sources-btn" id="kfSourcesBtn" data-i18n="kfSourcesButton" aria-haspopup="dialog" aria-controls="kfSourcesPanel">QUELLEN</button>
+    </div>
+
+    <div class="kf__sources-panel" id="kfSourcesPanel" role="dialog" aria-modal="false" aria-labelledby="kfSourcesPanelTitle" hidden>
+      <div class="kf__sources-panel__inner">
+        <div class="kf__sources-panel__head">
+          <h4 id="kfSourcesPanelTitle" data-i18n="kfSourcesButton">QUELLEN</h4>
+          <button type="button" class="kf__sources-panel__close" id="kfSourcesCloseBtn" aria-label="Close">×</button>
+        </div>
+        <div class="kf__sources-panel__list" id="kfSourcesPanelList"></div>
+      </div>
     </div>
 
     <div class="kf__sticky" id="kfSticky">
@@ -365,7 +380,7 @@
       <h3 data-i18n="videoChapterTitle">Der Flug über die Brücke</h3>
       <p data-i18n="videoChapterText">Eine FPV-Aufnahme der Steinerne Brücke aus der Vogelperspektive.</p>
       <div class="video-chapter__viewport">
-        <video id="fpvVideo" playsinline muted loop preload="none"></video>
+        <video id="fpvVideo" playsinline muted loop preload="metadata"></video>
         <p id="videoFallback" class="video-chapter__fallback" data-i18n="videoUnavailable" hidden>
           Video konnte in diesem Browser nicht geladen werden.
         </p>

@@ -18,6 +18,7 @@ import { buildPortal } from "./portal.js";
 import { initMuseum25D } from "./museum25d.js";
 import { initKframesGallery } from "./kframes-gallery.js";
 import { ZT_AUDIO_BUS } from "../../js/zt-audio.js";
+import { safePlay, safePause } from "../../js/video-playback.js";
 // PHASE 2.6 — TASK 2 / TASK 4. Reuses the SAME reusable typography module
 // already consumed by museum2d-scroll.js and kframes-gallery.js (see those
 // files' own createZtTypography() call sites for the original pattern).
@@ -640,11 +641,12 @@ function buildIntroMedia() {
   });
 
   // Real-gesture-independent autoplay attempt, mirroring buildVideoChapter()
-  // below's existing FPV handling (video.play().catch(() => {})). If the
-  // browser blocks it, `playing` never fires, the video stays at opacity 0
-  // (see initial CSS state), and the poster underneath is what the visitor
-  // sees — never a broken/empty layer.
-  video.play().catch(() => {});
+  // below's existing FPV handling (safePlay()). If the browser blocks it,
+  // `playing` never fires, the video stays at opacity 0 (see initial CSS
+  // state), and the poster underneath is what the visitor sees — never a
+  // broken/empty layer. safePlay's gesture-retry queue also catches this
+  // case the moment the visitor's first real tap/click happens.
+  safePlay(video);
 }
 
 // ---------------------------------------------------------------------------
@@ -1200,7 +1202,7 @@ function buildHistoricalReel() {
     if (played || !video) return;
     played = true;
     video.src = encodeURI(`${WEB_ASSET_BASE}/reels/sb_kframes_history_reel_15s_v01_web.mp4`);
-    video.play().catch(() => {});
+    safePlay(video);
   }
 
   ScrollTrigger.create({
@@ -1221,7 +1223,7 @@ function buildHistoricalReel() {
     replayBtn.addEventListener("click", () => {
       if (!video) return;
       if (!video.src) playReel();
-      else { video.currentTime = 0; video.play().catch(() => {}); }
+      else { video.currentTime = 0; safePlay(video); }
     });
   }
 }
@@ -1261,10 +1263,22 @@ function buildVideoChapter() {
     trigger: section,
     start: "top 60%",
     end: "bottom 40%",
-    onEnter: () => video.play().catch(() => {}),
-    onEnterBack: () => video.play().catch(() => {}),
-    onLeave: () => video.pause(),
-    onLeaveBack: () => video.pause()
+    onEnter: () => safePlay(video),
+    onEnterBack: () => safePlay(video),
+    onLeave: () => safePause(video),
+    onLeaveBack: () => safePause(video)
+  });
+
+  // RUNTIME HOTFIX — Safari/iOS backgrounding: a video paused by the OS when
+  // the tab/app goes background does not always resume cleanly on return
+  // even after a later ScrollTrigger onEnter fires (WebKit quirk). Re-assert
+  // playback if this section is the one currently in view when the page
+  // becomes visible again.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState !== "visible") return;
+    const rect = section.getBoundingClientRect();
+    const inView = rect.top < window.innerHeight * 0.6 && rect.bottom > window.innerHeight * 0.4;
+    if (inView) safePlay(video);
   });
 }
 

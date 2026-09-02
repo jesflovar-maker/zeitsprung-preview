@@ -589,9 +589,49 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
     typo.showBeatStatic(capRefs[0].cap);
   }
 
+  // RUNTIME HOTFIX — visible Quellen access point. Renders the SAME
+  // sourcesMap already loaded above (no second fetch, no fabricated data)
+  // into the compact panel in index.html. sourcesMap entries carry
+  // `title`/`short_title`/`institution` per 02_CONTENT/Steinerne_Bruecke/
+  // SOURCES/sources.json's schema (see resolveFrameSourceText above).
+  function renderSourcesPanel(lang) {
+    const list = document.getElementById("kfSourcesPanelList");
+    if (!list) return;
+    list.innerHTML = "";
+    sourcesMap.forEach((s, id) => {
+      const entry = el("div", "kf__source-entry");
+      const idEl = el("p", "kf__source-entry__id");
+      idEl.textContent = id;
+      const titleEl = el("p", "kf__source-entry__title");
+      titleEl.textContent = s.short_title || s.title || "";
+      const instEl = el("p", "kf__source-entry__institution");
+      instEl.textContent = s.institution || "";
+      entry.append(idEl, titleEl, instEl);
+      list.appendChild(entry);
+    });
+    const titleLabel = document.getElementById("kfSourcesPanelTitle");
+    if (titleLabel) titleLabel.textContent = t(lang, "kfSourcesButton");
+    const btn = document.getElementById("kfSourcesBtn");
+    if (btn) btn.textContent = t(lang, "kfSourcesButton");
+  }
+  renderSourcesPanel(getLang());
+
+  const sourcesBtn = document.getElementById("kfSourcesBtn");
+  const sourcesPanel = document.getElementById("kfSourcesPanel");
+  const sourcesCloseBtn = document.getElementById("kfSourcesCloseBtn");
+  if (sourcesBtn && sourcesPanel) {
+    const openPanel = () => { sourcesPanel.hidden = false; };
+    const closePanel = () => { sourcesPanel.hidden = true; };
+    sourcesBtn.addEventListener("click", openPanel);
+    if (sourcesCloseBtn) sourcesCloseBtn.addEventListener("click", closePanel);
+    sourcesPanel.addEventListener("click", (e) => { if (e.target === sourcesPanel) closePanel(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !sourcesPanel.hidden) closePanel(); });
+  }
+
   return {
     refreshLabels: () => {
       fillCaptionText(getLang());
+      renderSourcesPanel(getLang());
       // PHASE 2.5 FIX — see the invalidateOnRefresh comment above. Forces
       // this trigger to recompute start/end against the post-switch layout
       // immediately, instead of waiting for some unrelated future refresh.

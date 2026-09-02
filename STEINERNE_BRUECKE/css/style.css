@@ -1363,12 +1363,78 @@ img{ max-width:100%; display:block; }
    no bibliography wall. Frames with no registered source (K08/K09) never get
    this element populated (kframes-gallery.js leaves it out entirely). */
 .kf__cap-source{
-  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.1em;
-  color: var(--z-ink-faint);
-  margin: 0;
+  /* RUNTIME HOTFIX — was 9.5px @ 34% opacity (--z-ink-faint): confirmed too
+     dim/small to read against a busy photo background, especially on
+     mobile. Bumped to a still-restrained but clearly legible size/contrast,
+     with a subtle scrim behind it so it holds up over any K-frame image. */
+  font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.08em;
+  color: rgba(244,239,230,0.82);
+  margin: 10px 0 0;
+  padding: 4px 8px;
+  display: inline-block;
+  background: rgba(8,9,11,0.45);
+  border-radius: 2px;
   pointer-events: none;
 }
-.kf__cap-source-label{ color: var(--z-gold); margin-right: 5px; }
+.kf__cap-source-label{ color: var(--z-gold); margin-right: 6px; font-weight: 600; }
+
+/* RUNTIME HOTFIX — visible Quellen access point + compact panel. */
+.kf__sources-btn{
+  margin-top: 14px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+  color: var(--z-gold); background: transparent;
+  border: 1px solid rgba(212,175,120,0.45); border-radius: 2px;
+  padding: 8px 14px; cursor: pointer;
+}
+.kf__sources-btn:hover, .kf__sources-btn:focus-visible{
+  background: rgba(212,175,120,0.1); outline: none;
+}
+.kf__sources-panel{
+  position: fixed; inset: 0; z-index: 80;
+  display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(8,9,11,0.72);
+}
+.kf__sources-panel[hidden]{ display: none; }
+.kf__sources-panel__inner{
+  width: 100%; max-width: 560px; max-height: 78vh;
+  background: #0e0f11; border: 1px solid rgba(212,175,120,0.25);
+  border-bottom: none; border-radius: 10px 10px 0 0;
+  padding: 20px 18px 24px; overflow-y: auto;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+}
+@media (min-width: 640px){
+  .kf__sources-panel{ align-items: center; }
+  .kf__sources-panel__inner{ border-radius: 10px; border-bottom: 1px solid rgba(212,175,120,0.25); max-height: 70vh; }
+}
+.kf__sources-panel__head{
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 1px solid rgba(244,239,230,0.12);
+}
+.kf__sources-panel__head h4{
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.16em;
+  color: var(--z-gold); margin: 0;
+}
+.kf__sources-panel__close{
+  background: none; border: none; color: var(--z-ink-faint);
+  font-size: 22px; line-height: 1; cursor: pointer; padding: 4px 8px;
+}
+.kf__sources-panel__close:hover{ color: var(--z-ink); }
+.kf__sources-panel__list{ display: flex; flex-direction: column; gap: 14px; }
+.kf__source-entry{
+  padding-bottom: 14px; border-bottom: 1px solid rgba(244,239,230,0.08);
+}
+.kf__source-entry:last-child{ border-bottom: none; padding-bottom: 0; }
+.kf__source-entry__id{
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em;
+  color: var(--z-gold); margin-bottom: 3px;
+}
+.kf__source-entry__title{
+  font-size: 14px; color: var(--z-ink); margin: 0 0 3px; line-height: 1.4;
+}
+.kf__source-entry__institution{
+  font-size: 12px; color: rgba(244,239,230,0.62); margin: 0;
+}
 
 .kf__nav{
   position:absolute; right: 14px; top: 50%; transform: translateY(-50%);

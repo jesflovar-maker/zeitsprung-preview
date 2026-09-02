@@ -22,6 +22,7 @@ import { ZT_AUDIO_BUS } from "./zt-audio.js";
 import { createZtTypography } from "../STEINERNE_BRUECKE/js/zt-typography.js";
 import { initGallery } from "./gallery.js";
 import { initRouteMap } from "./route-map.js";
+import { safePlay, safePause } from "./video-playback.js";
 
 const ZT_SOUND_PREF_KEY = "zeitsprung:soundEnabled"; // shared with STEINERNE_BRUECKE/js/main.js
 
@@ -142,7 +143,7 @@ function wireHeroMedia() {
   video.preload = "auto";
   video.addEventListener("canplay", () => {
     video.classList.add("is-ready");
-    video.play().catch(() => {}); // muted autoplay — allowed; failure is silent/non-blocking
+    safePlay(video);
   }, { once: true });
   // If the browser can't play it at all (unlikely, this derivative already
   // ships to STEINERNE_BRUECKE/index.html successfully), the poster image
@@ -344,7 +345,7 @@ function wireThesisMedia() {
     v.preload = "auto";
     v.addEventListener("canplay", () => {
       v.classList.add("is-ready");
-      v.play().catch(() => {});
+      safePlay(v);
     }, { once: true });
     v.addEventListener("error", () => { v.classList.remove("is-ready"); }, { once: true });
   }
@@ -353,8 +354,10 @@ function wireThesisMedia() {
   function activate(layer) {
     if (!layer || activeLayer === layer) return;
     layers.forEach((l) => l.layerEl.classList.toggle("is-active", l === layer));
+    if (activeLayer && activeLayer.videoEl) safePause(activeLayer.videoEl);
     activeLayer = layer;
     startVideo(layer);
+    if (layer.started && layer.videoEl) safePlay(layer.videoEl);
   }
 
   if (typeof IntersectionObserver === "undefined") { activate(layers[0]); return; }

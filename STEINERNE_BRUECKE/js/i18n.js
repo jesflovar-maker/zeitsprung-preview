@@ -116,6 +116,8 @@ export const DICT = {
     // 02_CONTENT/Steinerne_Bruecke/SOURCES/sources.json, resolved at render
     // time in kframes-gallery.js; this key is only the small "QUELLE" label.
     kfSourceLabel: "QUELLE",
+    // RUNTIME HOTFIX — visible Quellen access-point button/panel title.
+    kfSourcesButton: "QUELLEN",
     // Phase 2.7C.3, Section 5 — K-Frame-specific, more editorial label for
     // frames whose NEEDS_VALIDATION status is specifically about DATING
     // (K08/K09 today, via KFRAMES_STORY_MAP.json's new uncertainty_type
@@ -274,6 +276,7 @@ export const DICT = {
     kframesHotspotStage: "To the time journey",
     kframesNeedsValidationNote: "No confirmed historical placement exists yet for this visual moment.",
     kfSourceLabel: "SOURCE",
+    kfSourcesButton: "SOURCES",
     kfDateUnderReview: "DATE UNDER REVIEW",
     reelEyebrow: "1135–2018",
     reelTitle: "The bridge in fast-forward",
@@ -410,6 +413,7 @@ export const DICT = {
     kframesHotspotStage: "Al viaje en el tiempo",
     kframesNeedsValidationNote: "Todavía no existe una ubicación histórica confirmada para este momento visual.",
     kfSourceLabel: "FUENTE",
+    kfSourcesButton: "FUENTES",
     kfDateUnderReview: "DATACIÓN EN REVISIÓN",
     reelEyebrow: "1135–2018",
     reelTitle: "El puente en cámara rápida",
