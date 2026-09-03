@@ -22,7 +22,7 @@ import { ZT_AUDIO_BUS } from "./zt-audio.js";
 import { createZtTypography } from "../STEINERNE_BRUECKE/js/zt-typography.js";
 import { initGallery } from "./gallery.js";
 import { initRouteMap } from "./route-map.js";
-import { activate, deactivate, getDebugSnapshot } from "./video-playback.js";
+import { activate, deactivate, register, getDebugSnapshot } from "./video-playback.js";
 
 const ZT_SOUND_PREF_KEY = "zeitsprung:soundEnabled"; // shared with STEINERNE_BRUECKE/js/main.js
 
@@ -124,27 +124,27 @@ function wireSoundToggle() {
 }
 
 // ---------------------------------------------------------------------------
-// Hero cinematic flyover — PHASE 2.7C.4: main ZEITSPRUNG PROJECT intro,
-// swapped to the purpose-built INTRO master
-// (03_ASSETS/VIDEO/INDEX/INTRO/zeitsprung_intro_main_loop_final.mp4 — a
-// water-level Steinerne Brücke shot with the Regensburg Dom skyline behind
-// it, i.e. still the whole-city "PLACE" arrival moment, not one monument
-// page). Video-only h264 derivative (audio stripped, +faststart), poster =
-// t=0.5s frame. Muted/playsinline/no controls. This is the ONLY video
-// eager-loaded on the page; not required for the page to be understood if
-// it fails to load (poster + text remain fully legible). This is the very
-// first thing to load -> preload="auto" (eager), unlike the
-// VISION/MISSION/OBJECTIVE loops which must stay lazily deferred.
+// HERO — BUILD SCROLL EXPERIENCE (ZEITSPRUNG DESIGN REVISION + ZEITSPRUNG
+// MOTION REVISION, owner-approved). Replaces the previous PHASE 2.7C.4
+// simple autoplay/loop hero with a scroll-scrubbed architectural "build"
+// sequence: MASTER asset 03_ASSETS/VIDEO/INDEX/INTRO/zeitsprung_intro_build_v01.mp4
+// (an abstract wireframe that resolves into a photoreal aerial night shot of
+// the Steinerne Brücke + Altstadt + Dom towers), web derivative encoded with
+// a short GOP (keyframe every 4 frames, NO B-frames) specifically for
+// smooth bidirectional currentTime scrubbing — see that file's own header
+// comment in assets/video/index/intro/ for the exact ffmpeg recipe.
 //
-// LEGACY_REFERENCE_ONLY (Phase 2.7C-era hero asset, NOT deleted): assets/
-// zeitsprung/intro/zt_intro_fpv_regensburg_15s_v01_web.mp4 (+ its poster) is
-// no longer the hero source. A Phase 2.7C.4 pass had briefly repurposed it
-// as VISION's background loop too, but that was a mistake (visitors saw
-// this generic city clip where the dedicated VISION loop belongs) — fixed
-// in the URGENT INDEX FIX task; VISION now uses its own real loop (see the
-// CHAPTERS array's "visionBeat" entry inside wireThesisMedia() below). This
-// file is kept on disk as a reusable asset, not currently referenced by any
-// chapter.
+// IMPORTANT — the MASTER video is PORTRAIT (480x854, ~9:16), not 16:9.
+// Framed into this wide hero box via object-fit:cover (css/index.css),
+// object-position tuned against the actual final frame to keep the bridge
+// + Dom towers in view. This does not violate the frozen portrait-first 9:16
+// design system rule — the hero is one of its two documented exceptions
+// (HERO_BANNER_HORIZONTAL); cover-cropping a portrait source INTO that
+// horizontal exception is a framing decision, not a portrait-first violation.
+//
+// LEGACY_REFERENCE_ONLY (kept on disk, NOT deleted, no longer referenced by
+// any chapter): assets/video/index/intro/zeitsprung_intro_main_loop_final_web.mp4
+// (+ its poster) — the PREVIOUS hero source (a different, non-build clip).
 // ---------------------------------------------------------------------------
 function wireHeroMedia() {
   const video = document.getElementById("heroVideo");
@@ -152,31 +152,35 @@ function wireHeroMedia() {
   // Paths are relative to index.html (this page's own location), which
   // shares the ZEITSPRUNG_V2/assets/ folder with the bridge (see
   // monuments.config.json's own path convention note).
-  const POSTER_IMG = "assets/video/index/intro/zeitsprung_intro_poster_final.jpg";
+  // Poster = the video's own final, fully-resolved frame (not a separate
+  // asset) — the same completed-city composition the scrub ends on, so a
+  // reduced-motion visitor or a load/scrub failure sees the SAME approved
+  // result state, never an unrelated placeholder image.
+  const POSTER_IMG = "assets/video/index/intro/zeitsprung_intro_build_v01_poster.jpg";
   if (poster) poster.src = POSTER_IMG;
   if (!video) return;
   // prefers-reduced-motion: the poster stays the permanent hero image; the
-  // video is never even requested (css/index.css also hides it defensively).
+  // video is never even requested (css/index.css also hides it defensively,
+  // .hero__media video{display:none} under prefers-reduced-motion).
   if (reducedMotion()) return;
-  video.src = "assets/video/index/intro/zeitsprung_intro_main_loop_final_web.mp4";
-  video.muted = true;
-  video.playsInline = true;
-  video.loop = true;
-  video.preload = "auto";
-  video.addEventListener("canplay", () => {
+  video.src = "assets/video/index/intro/zeitsprung_intro_build_v01_web.mp4";
+  register(video, { id: "indexHero", role: "hero-build-scrub" });
+  video.preload = "auto"; // must be buffered enough to scrub smoothly, not just play once
+  video.addEventListener("loadedmetadata", () => {
     video.classList.add("is-ready");
-    activate(video, { id: "indexHero", role: "hero" });
+    initHeroScrub(video);
   }, { once: true });
-  // If the browser can't play it at all (unlikely, this derivative already
-  // ships to STEINERNE_BRUECKE/index.html successfully), the poster image
-  // stays the permanent, fully legible fallback — never a blank hero.
+  // If the browser can't load/decode it at all, the poster image (the
+  // video's own final frame) stays the permanent, fully legible fallback —
+  // never a black box, never a broken <video>, never an infinite spinner.
   video.addEventListener("error", () => { video.classList.remove("is-ready"); }, { once: true });
 }
 
 // ---------------------------------------------------------------------------
-// Hero title reveal — ONE-SHOT, real-time (not scroll-scrubbed), via the
-// shared zt-typography.js engine-adapter pattern (mirrors
-// STEINERNE_BRUECKE/js/main.js's ztRevealBeatNow()/getZtTypo() exactly).
+// Shared zt-typography.js engine-adapter pattern (mirrors
+// STEINERNE_BRUECKE/js/main.js's ztRevealBeatNow()/getZtTypo() exactly) —
+// used below for the hero's ONE-SHOT title/tagline reveal, now fired by
+// crossing a scroll-scrub threshold instead of firing on page load.
 // ---------------------------------------------------------------------------
 const ztPropState = new Map();
 function ztStFor(node) { if (!ztPropState.has(node)) ztPropState.set(node, {}); return ztPropState.get(node); }
@@ -198,44 +202,165 @@ function ztMakeTween(tl) {
   };
 }
 
-function buildHeroTypography() {
-  if (typeof gsap === "undefined") {
-    // No GSAP loaded (e.g. blocked CDN) — degrade to plain CSS-visible text,
-    // never a blank hero. index.css already shows these elements at
-    // opacity:1 by default; this function simply never runs a reveal.
-    return;
-  }
+// Prepares (mounts/pools) the hero title's char-reveal spans once, ahead of
+// time — mounting is idempotent layout prep, not an animation, so doing it
+// at boot (rather than lazily at reveal time) costs nothing and means the
+// actual reveal below has zero setup latency the first time it fires.
+let heroTypo = null;
+let heroRevealActiveTw = null;
+let heroRevealActiveTween = null;
+function prepareHeroTypography() {
+  if (typeof gsap === "undefined") return; // no GSAP -> base CSS keeps text visible by default, nothing to prepare
   const beat = document.getElementById("heroRevealGroup");
   const titleEl = document.getElementById("heroTitle");
   if (!beat || !titleEl) return;
-
-  const R = reducedMotion();
-  let activeTw = null, activeTween = null;
-  const typo = createZtTypography({
+  heroTypo = createZtTypography({
     engine: {
       set: ztEngineSet,
-      tw: (n, a, d, to, e) => { if (activeTw) activeTw(n, a, d, to, e); },
-      tween: (n, f, to, a, d, e) => { if (activeTween) activeTween(n, f, to, a, d, e); }
+      tw: (n, a, d, to, e) => { if (heroRevealActiveTw) heroRevealActiveTw(n, a, d, to, e); },
+      tween: (n, f, to, a, d, e) => { if (heroRevealActiveTween) heroRevealActiveTween(n, f, to, a, d, e); }
     },
-    reducedMotion: R,
+    reducedMotion: reducedMotion(),
     desktop: window.matchMedia("(min-width: 900px)").matches
   });
+  heroTypo.mountTitle(titleEl, "ZEITSPRUNG".length, "hero__title-line");
+  heroTypo.setTitleText(titleEl, "ZEITSPRUNG");
+  heroTypo.initBeat(beat);
+}
 
-  typo.mountTitle(titleEl, "ZEITSPRUNG".length, "hero__title-line");
-  typo.setTitleText(titleEl, "ZEITSPRUNG");
-  typo.initBeat(beat);
+// Fires the SAME char/line reveal choreography the hero always used
+// (eyebrow -> ZT_REVEAL_CHAR title -> ZT_REVEAL_LINE tagline), just once,
+// the first time the scrub crosses the title threshold — see
+// initHeroScrub() below. Reuses the existing ZEITSPRUNG typography/motion
+// language rather than inventing a new animation for this new trigger.
+function runHeroTitleReveal() {
+  const beat = document.getElementById("heroRevealGroup");
+  if (!heroTypo || !beat || typeof gsap === "undefined") return;
+  const tl = gsap.timeline();
+  heroRevealActiveTw = ztMakeTw(tl);
+  heroRevealActiveTween = ztMakeTween(tl);
+  heroTypo.revealBeat(beat, 0);
+}
 
-  const tl = gsap.timeline({ delay: 0.15 });
-  activeTw = ztMakeTw(tl);
-  activeTween = ztMakeTween(tl);
-  typo.revealBeat(beat, 0);
+// ---------------------------------------------------------------------------
+// Scroll-scrub controller — pins .hero (GSAP ScrollTrigger) for a fixed
+// scroll distance and maps scroll progress directly onto the build video's
+// currentTime, continuously and bidirectionally (scroll down = construction
+// advances, scroll up = it reverses, stop scrolling = frame holds exactly
+// where it is). This is deliberately NOT run through video-playback.js's
+// activate()/safePlay() — that shared runtime's contract is "play and keep
+// playing"; this hero video is never actually playing, only ever seeked, a
+// fundamentally different lifecycle that would not fit that API without
+// distorting it. register() (called in wireHeroMedia() above) still gives
+// it the same safe-autoplay attrs + debug-snapshot visibility as every
+// other tracked video, without pretending it is playback-active.
+// ---------------------------------------------------------------------------
+function initHeroScrub(video) {
+  const hero = document.querySelector(".hero");
+  if (!hero) return;
+
+  if (reducedMotion()) {
+    // css/index.css already hides .hero__media video entirely under
+    // prefers-reduced-motion (poster = the video's own final frame is the
+    // only visual) and the base (non-.hero--scrub-active) CSS already
+    // keeps eyebrow/title/tagline visible with no animation — nothing
+    // further to wire for a stable, readable reduced-motion presentation.
+    return;
+  }
+
+  if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
+    // CDN blocked / plugin failed to load — degrade to the previously-
+    // proven-safe simple autoplay/loop presentation rather than leaving a
+    // silent, permanently-static (if technically valid) single frame.
+    video.loop = true;
+    activate(video, { id: "indexHero", role: "hero-build-scrub-fallback" });
+    return;
+  }
+
+  const duration = video.duration;
+  if (!(duration > 0) || !isFinite(duration)) return; // safety guard — never scrub against an unknown duration
+
+  gsap.registerPlugin(ScrollTrigger);
+  hero.classList.add("hero--scrub-active");
+
+  const SEEK_EPSILON = 0.02; // seconds — avoid reassigning currentTime for negligible scroll deltas
+  let lastTarget = -1;
+  let hintShown = false;
+  let identityShown = false;
+  let titleShown = false;
+  let titleRevealFired = false;
+
+  function applyProgress(progress) {
+    const target = Math.min(Math.max(progress, 0), 1) * duration;
+    const clamped = Math.min(target, duration - SEEK_EPSILON);
+    if (Math.abs(clamped - lastTarget) > SEEK_EPSILON) {
+      video.currentTime = clamped;
+      lastTarget = clamped;
+    }
+
+    // Scrollhint — only as the initial "start scrolling" invitation.
+    const hintVisible = progress < 0.02;
+    if (hintVisible !== hintShown) {
+      hintShown = hintVisible;
+      hero.classList.toggle("is-hint-visible", hintVisible);
+    }
+
+    // 70% — subtle identity (eyebrow) begins to appear.
+    const identityVisible = progress >= 0.70;
+    if (identityVisible !== identityShown) {
+      identityShown = identityVisible;
+      hero.classList.toggle("is-identity-visible", identityVisible);
+    }
+
+    // 85% — full ZEITSPRUNG title + tagline reveal, once, via the shared
+    // char/line reveal engine (see runHeroTitleReveal()). Scrolling back
+    // below 85% hides it again via CSS (class toggle), but the one-shot
+    // GSAP reveal itself is never re-fired — re-running a char-by-char
+    // reveal on every scroll direction change would read as glitchy, not
+    // premium.
+    const titleVisible = progress >= 0.85;
+    if (titleVisible !== titleShown) {
+      titleShown = titleVisible;
+      hero.classList.toggle("is-title-visible", titleVisible);
+      if (titleVisible && !titleRevealFired) {
+        titleRevealFired = true;
+        runHeroTitleReveal();
+      }
+    }
+  }
+
+  ScrollTrigger.create({
+    trigger: hero,
+    start: "top top",
+    end: "+=260%", // ~260svh pinned scroll distance — within the suggested 220-300svh range
+    pin: true,
+    anticipatePin: 1,
+    onUpdate: (self) => applyProgress(self.progress),
+    onRefresh: (self) => applyProgress(self.progress)
+  });
+
+  // Page restoration (bfcache back/forward) — re-measure pin geometry and
+  // re-sync the video frame to whatever scroll position was restored,
+  // rather than leaving a stale pin/video state.
+  window.addEventListener("pageshow", (e) => {
+    if (e.persisted) ScrollTrigger.refresh();
+  });
+
+  // Orientation change (mobile) — ScrollTrigger already listens to plain
+  // resize internally; orientationchange on some mobile browsers fires a
+  // resize late/inconsistently, so this is a small, deliberate belt-and-
+  // suspenders refresh, not a second competing resize system.
+  window.addEventListener("orientationchange", () => {
+    ScrollTrigger.refresh();
+  });
 }
 
 // ---------------------------------------------------------------------------
 // Generic ONE-SHOT, scroll-triggered char/line reveal for a secondary beat
 // (PHASE 2.7C — "RUTA INTERACTIVA" gallery heading; PHASE 2.7C.1 — also used
-// for the VISION/MISSION/OBJECTIVE chapters). Mirrors buildHeroTypography
-// exactly (same createZtTypography adapter pattern), but fires the first time
+// for the VISION/MISSION/OBJECTIVE chapters). Same createZtTypography
+// adapter pattern as the hero's prepareHeroTypography()/runHeroTitleReveal()
+// above, but fires the first time
 // the beat's container enters the viewport instead of immediately on load —
 // a light, restrained IntersectionObserver reveal, NOT scroll-scrubbed/pinned
 // (matches kframes-gallery.js's own reveal-choreography restraint, per brief
@@ -439,8 +564,8 @@ async function boot() {
   });
   wireLangSwitcher();
   wireSoundToggle();
-  wireHeroMedia();
-  buildHeroTypography();
+  prepareHeroTypography(); // mount/pool the title spans before the video's loadedmetadata can fire initHeroScrub()
+  wireHeroMedia(); // fires initHeroScrub() -> runHeroTitleReveal() itself, once the scrub crosses 85%
   wireThesisMedia();
   buildBeatReveal("visionBeat", "visionTitle", t(lang, "visionTitle"), "thesis-chapter__title-line");
   buildBeatReveal("missionBeat", "missionTitle", t(lang, "missionTitle"), "thesis-chapter__title-line");

@@ -90,7 +90,15 @@ img{ max-width:100%; display:block; }
 .navbar__sound.is-on{ color: var(--z-gold); border-color: var(--z-gold-dim); }
 
 /* ---------------------------------------------------------------- */
-/* HERO                                                              */
+/* HERO — BUILD SCROLL EXPERIENCE (ZEITSPRUNG DESIGN REVISION +      */
+/* ZEITSPRUNG MOTION REVISION, owner-approved). GSAP ScrollTrigger    */
+/* pins .hero for a scroll distance while js/index-main.js drives     */
+/* video.currentTime directly from scroll progress (see              */
+/* buildHeroScrub() there). Text reveal below is PROGRESSIVE          */
+/* ENHANCEMENT: default state is fully visible (safe if GSAP/         */
+/* ScrollTrigger fails to load/CDN blocked — never a blank hero).     */
+/* Only once .hero gets the JS-added .hero--scrub-active class does   */
+/* the staged 0/70/85% reveal below apply.                            */
 /* ---------------------------------------------------------------- */
 .hero{
   position: relative; min-height: 100svh; display:flex; align-items:flex-end;
@@ -100,7 +108,12 @@ img{ max-width:100%; display:block; }
 .hero__media{ position:absolute; inset:0; z-index:0; }
 .hero__media img, .hero__media video{
   position:absolute; inset:0; width:100%; height:100%; object-fit: cover;
-  object-position: center 46%;
+  /* Build video master is portrait (480x854, ~9:16) — see
+     01_ARCHITECTURE note in js/index-main.js's buildHeroMedia() header.
+     object-position keeps the bridge + Dom towers (upper-right of the
+     source frame) in view once cover-cropped into this wide hero box;
+     re-tune only via visual QA against the actual frame, never guess. */
+  object-position: 62% 32%;
 }
 .hero__media video{ opacity:0; transition: opacity 0.9s ease; }
 .hero__media video.is-ready{ opacity:1; }
@@ -112,12 +125,8 @@ img{ max-width:100%; display:block; }
 .hero__eyebrow{
   font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.32em; color: var(--z-gold);
   margin-bottom: 14px;
-  /* No opacity:0 here on purpose: the one-shot GSAP reveal in
-     js/index-main.js applies its own inline opacity:0 -> 1 via
-     zt-typography.js's engine.set()/tw() ONLY when GSAP has actually
-     loaded. If the CDN script fails, this element (and .hero__tagline /
-     .hero__scrollhint below) must stay visible by default — never a
-     permanently blank hero. */
+  /* Default (no JS / ScrollTrigger unavailable): visible, no transform —
+     never a permanently blank hero. */
 }
 .hero__title{
   font-family: var(--font-sans); font-weight: 700; font-size: clamp(48px, 15vw, 96px);
@@ -126,12 +135,31 @@ img{ max-width:100%; display:block; }
 .hero__tagline{
   font-size: clamp(15px, 4vw, 20px); color: var(--z-ink-dim); max-width: 34ch;
   margin-bottom: 22px;
-  /* opacity:0 intentionally NOT set here — see .hero__eyebrow's comment above. */
 }
 .hero__scrollhint{
   font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.2em; color: var(--z-ink-faint);
-  /* opacity:0 intentionally NOT set here — see .hero__eyebrow's comment above. */
+  transition: opacity 0.5s ease;
 }
+
+/* Active scrub state — JS-added once GSAP+ScrollTrigger+video all
+   initialize successfully. Same reveal vocabulary already used elsewhere
+   (opacity 0->1 + translateY, e.g. .reel__frame) — reused, not reinvented. */
+.hero--scrub-active .hero__eyebrow,
+.hero--scrub-active .hero__title,
+.hero--scrub-active .hero__tagline{
+  opacity: 0; transform: translateY(18px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+.hero--scrub-active.is-identity-visible .hero__eyebrow{ opacity: 1; transform: translateY(0); }
+.hero--scrub-active.is-title-visible .hero__eyebrow,
+.hero--scrub-active.is-title-visible .hero__title,
+.hero--scrub-active.is-title-visible .hero__tagline{ opacity: 1; transform: translateY(0); }
+/* Scrollhint: visible only as the initial "start scrolling" invitation
+   (progress ~0), fades out the moment the visitor actually scrolls, and
+   stays hidden for the rest of the pinned sequence — it no longer applies
+   once construction is already underway. */
+.hero--scrub-active .hero__scrollhint{ opacity: 0; }
+.hero--scrub-active.is-hint-visible .hero__scrollhint{ opacity: 1; }
 
 /* ---------------------------------------------------------------- */
 /* VISION / MISSION / OBJECTIVE — PHASE 2.7C.1                       */
@@ -283,11 +311,24 @@ img{ max-width:100%; display:block; }
 .gallery__stage{ position:relative; z-index:2; padding: 28px 18px 92px; display:flex; justify-content:center; }
 .gallery__panel{
   width: 100%; max-width: 420px;
-  display:flex; flex-direction:column; gap: 18px;
+  display:flex; flex-direction:column; gap: 22px;
 }
+/* VISUAL LOCK (owner-approved DESIGN + MOTION REVISION) — groups exactly
+   the video+text pairing per the locked spatial reference. CTA lives
+   OUTSIDE this wrapper as .gallery__panel's other direct child (see
+   .gallery__cta-wrap below), always its own centered row underneath, never
+   flowing inside the text column. Mobile: video above text (column).
+   Desktop: video left, text right (row) — see the min-width:900px
+   override further down. */
+.gallery__top{ display:flex; flex-direction:column; gap: 18px; }
+/* VIDEO-IN-VIDEO CARD (owner-approved DESIGN + MOTION REVISION) — mobile:
+   the sharp foreground panel is deliberately NOT full-width so the moving
+   blurred background stays visible/legible around it (video-first, but not
+   edge-to-edge) — 72% sits in the owner-specified 65-78% range, centered. */
 .gallery__panel-media{
-  position:relative; width:100%; aspect-ratio: 9 / 16; border-radius: 12px; overflow:hidden;
+  position:relative; width:72%; margin: 0 auto; aspect-ratio: 9 / 16; border-radius: 12px; overflow:hidden;
   background: #0c0d10; border: 1px solid var(--z-line);
+  box-shadow: 0 18px 50px rgba(0,0,0,0.45), 0 4px 14px rgba(0,0,0,0.35);
 }
 .gallery__placeholder{
   position:absolute; inset:0;
@@ -317,23 +358,29 @@ img{ max-width:100%; display:block; }
 
 .gallery__info{ display:flex; flex-direction:column; gap: 6px; }
 /* PHASE 2.7C.2 — per-field switch choreography. gallery.js toggles
-   .is-in on .gallery__info after removing it + forcing reflow on every
-   monument switch, so this transition-delay ladder restarts every time,
-   giving the "visual first -> number -> category -> name -> description ->
-   status/CTA" sequencing the brief asks for. Visual itself is not part of
-   this ladder (it already crossfades independently, see .gallery__bg/
-   .gallery__panel-img/-video above, and starts at delay 0). Restrained
-   opacity + 6px translateY only — same vocabulary as the rest of the page. */
+   .is-in on .gallery__panel (VISUAL LOCK — was .gallery__info, moved up
+   since .gallery__cta-wrap is now a sibling of .gallery__top, not a child
+   of .gallery__info; the selector below matches both at any depth) after
+   removing it + forcing reflow on every monument switch, so this
+   transition-delay ladder restarts every time, giving the "visual first ->
+   number -> category -> name -> description -> status/CTA" sequencing the
+   brief asks for. Visual itself is not part of this ladder (it already
+   crossfades independently, see .gallery__bg/.gallery__panel-img/-video
+   above, and starts at delay 0). Restrained opacity + 6px translateY only —
+   same vocabulary as the rest of the page. */
 .gallery__field{
   opacity: 0; transform: translateY(6px);
   transition: opacity 0.38s ease, transform 0.38s ease;
 }
-.gallery__info.is-in .gallery__field{ opacity: 1; transform: translateY(0); }
+.gallery__panel.is-in .gallery__field{ opacity: 1; transform: translateY(0); }
 .gallery__counter{ font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.2em; color: var(--z-gold-dim); transition-delay: 0.06s; }
 .gallery__subtitle{ font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; color: var(--z-gold); transition-delay: 0.11s; }
 .gallery__name{ font-size: clamp(20px, 6vw, 26px); font-weight: 600; line-height: 1.15; transition-delay: 0.16s; }
 .gallery__desc{ font-size: 14px; line-height: 1.55; color: var(--z-ink-dim); max-width: 46ch; transition-delay: 0.21s; }
-.gallery__cta-wrap{ margin-top: 6px; transition-delay: 0.26s; }
+/* VISUAL LOCK — CTA is its own centered row below the video+text pairing
+   (align-self:center shrinks it to content width within .gallery__panel's
+   column flow and centers it), not right-flowing text-column content. */
+.gallery__cta-wrap{ align-self: center; transition-delay: 0.26s; }
 .gallery__cta{
   display:inline-flex; align-items:center; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em;
   padding: 11px 18px; border-radius: 3px; text-decoration:none;
@@ -411,7 +458,15 @@ img{ max-width:100%; display:block; }
   .thesis-chapter{ padding: 96px 64px; max-width: 900px; }
   .gallery{ margin: 0 64px; min-height: 720px; }
   .gallery__stage{ padding: 44px 40px 110px; }
-  .gallery__panel{ max-width: 460px; }
+  /* VISUAL LOCK (owner-approved DESIGN + MOTION REVISION) — desktop
+     reference layout: large portrait foreground LEFT/CENTER, editorial text
+     RIGHT, same moving blurred background behind both. Only .gallery__top's
+     internal direction flips to row — .gallery__panel itself stays column
+     (top row, then the centered CTA row below), per the locked spec. */
+  .gallery__panel{ max-width: 900px; }
+  .gallery__top{ flex-direction: row; align-items: center; gap: 48px; }
+  .gallery__panel-media{ width: 340px; flex: 0 0 340px; margin: 0; }
+  .gallery__info{ flex: 1 1 380px; }
   .navbar{ padding: 0 32px; }
   .route-map{ max-width: 560px; }
 }

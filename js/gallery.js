@@ -45,7 +45,7 @@ function pick(obj, lang) {
   return obj[lang] !== undefined ? obj[lang] : (obj.de || "");
 }
 
-import { activate, deactivate } from "./video-playback.js";
+import { activate, deactivate, safePlay, safePause, register } from "./video-playback.js";
 
 export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   if (!root) return null;
@@ -100,15 +100,25 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   const eyebrow = el("p", "gallery__subtitle gallery__field");
   const title = el("h3", "gallery__name gallery__field");
   const desc = el("p", "gallery__desc gallery__field");
-  const ctaWrap = el("div", "gallery__cta-wrap gallery__field");
   info.appendChild(counter);
   info.appendChild(eyebrow);
   info.appendChild(title);
   info.appendChild(desc);
-  info.appendChild(ctaWrap);
 
-  panel.appendChild(panelMedia);
-  panel.appendChild(info);
+  // VISUAL LOCK (owner-approved DESIGN + MOTION REVISION) — CTA is
+  // deliberately NOT the last item flowing inside .gallery__info's text
+  // column. Per the owner's locked spatial reference, it sits as its own
+  // centered row BELOW the video+text pairing, not tucked under the
+  // description on the right. .gallery__top groups exactly the video+text
+  // pairing (row on desktop, column on mobile — see css/index.css); ctaWrap
+  // is `.gallery__panel`'s other direct child, always centered under it.
+  const top = el("div", "gallery__top");
+  const ctaWrap = el("div", "gallery__cta-wrap gallery__field");
+  top.appendChild(panelMedia);
+  top.appendChild(info);
+
+  panel.appendChild(top);
+  panel.appendChild(ctaWrap);
 
   const nav = el("div", "gallery__nav", { role: "tablist", "aria-label": "ZEITSPRUNG monuments" });
   const prevBtn = el("button", "gallery__arrow gallery__arrow--prev", { type: "button", "aria-label": "Previous monument" });
@@ -252,10 +262,38 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   let mediaToken = 0;
   let lastMediaId = null;
 
+  // VIDEO-IN-VIDEO CARD (owner-approved DESIGN + MOTION REVISION) — the
+  // foreground panelVideo is the ONE authoritative playback instance (still
+  // owned via video-playback.js's activate()/deactivate(), same as before).
+  // bgVideo is a decorative, muted, synchronized MIRROR only: it is never
+  // activate()-d (never added to that runtime's owned `activeVideos`), never
+  // decides card state, and has no independent gallery/gesture logic of its
+  // own — it only reacts to panelVideo's real play/pause/position, via
+  // safePlay()/safePause() (the same race-safe primitives, without taking
+  // ownership). Wired ONCE here (not per monument switch) since panelVideo/
+  // bgVideo are the same two persistent elements reused across every switch.
+  register(bgVideo, { id: "gallery:bg-mirror", role: "gallery-bg-mirror" });
+  const BG_DRIFT_TOLERANCE = 0.3; // seconds — correct only visible drift, never every frame
+  function mirrorBgPosition() {
+    if (!bgVideo.src || bgVideo.readyState < 1) return;
+    if (Math.abs(bgVideo.currentTime - panelVideo.currentTime) > BG_DRIFT_TOLERANCE) {
+      bgVideo.currentTime = panelVideo.currentTime;
+    }
+  }
+  panelVideo.addEventListener("play", () => safePlay(bgVideo));
+  panelVideo.addEventListener("playing", () => safePlay(bgVideo));
+  panelVideo.addEventListener("pause", () => safePause(bgVideo));
+  // Native 'timeupdate' fires a few times per second (not a manual rAF
+  // loop) — restrained enough to prevent visible drift without constantly
+  // reassigning currentTime.
+  panelVideo.addEventListener("timeupdate", mirrorBgPosition);
+  panelVideo.addEventListener("seeked", mirrorBgPosition);
+
   function stopMedia() {
     mediaToken += 1;
+    deactivate(panelVideo);
+    safePause(bgVideo); // decorative mirror -- paused directly, never via deactivate()'s ownership bookkeeping
     [bgVideo, panelVideo].forEach((v) => {
-      deactivate(v);
       v.loop = false;
       v.removeAttribute("src");
       try { v.load(); } catch (err) { /* ignore */ }
@@ -264,22 +302,17 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   }
 
   // Applies the SAME clip to both the sharp foreground video and the
-  // blurred background video (background reuses the foreground clip file —
-  // see monuments.config.json's `background` field note — never a second,
-  // different asset). The two layers are not frame-locked to each other
-  // (the background is a decorative, blurred atmosphere layer, not a
-  // second readable subject), so a few-frame drift between them is
-  // acceptable and not worth the added complexity of a shared clock.
+  // blurred background mirror. bgVideo.src always mirrors `url` literally
+  // (the exact segment panelVideo is playing right now), not the static
+  // `background` config field — so the ping-pong assembly<->disassembly
+  // chain below (steinerne-bruecke) keeps both layers on the SAME segment
+  // at every step, per the owner's explicit "foreground changes source ->
+  // background changes to same source" requirement. The two layers are
+  // frame-synchronized (see mirrorBgPosition() above), not just same-file.
   function playClip(m, url, token) {
     if (token !== mediaToken || !url) return;
     panelVideo.src = url;
-    // `background` is read explicitly (not just re-hardcoded to `video`) so
-    // monuments.config.json stays the single source of truth for which
-    // asset drives the blurred backdrop — today it is always set equal to
-    // `video` for every monument that has one (see config _readme), but a
-    // future monument could point it at a different/lighter derivative
-    // without any gallery.js change.
-    bgVideo.src = m.background || url;
+    bgVideo.src = url;
     const loopNative = m.video_mode !== "assembly_loop" || !m.video_reverse;
     panelVideo.loop = loopNative;
     bgVideo.loop = loopNative;
@@ -289,7 +322,11 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
       panelVideo.classList.add("is-visible");
       bgVideo.classList.add("is-visible");
       activate(panelVideo, { id: `gallery:${m.id}:panel`, role: "gallery-panel" });
-      activate(bgVideo, { id: `gallery:${m.id}:bg`, role: "gallery-bg" });
+      // bgVideo is intentionally NOT activate()-d (see the mirror wiring
+      // above) -- kicked here too (safePlay is idempotent/race-safe) so it
+      // starts the moment the foreground reveals, not only on its next
+      // 'play'/'playing' event.
+      safePlay(bgVideo);
     };
     panelVideo.addEventListener("canplay", reveal, { once: true });
 
@@ -340,11 +377,13 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
     }
 
     // PHASE 2.7C.2 — per-field choreography restart (see .gallery__field /
-    // .gallery__info.is-in in css/index.css): drop the class, force a
+    // .gallery__panel.is-in in css/index.css): drop the class, force a
     // reflow, add it back, so every switch replays the same
     // counter -> subtitle -> name -> desc -> cta ladder rather than only
-    // running once on first load.
-    info.classList.remove("is-in");
+    // running once on first load. Toggled on `panel` (not `info`) since the
+    // VISUAL LOCK moved ctaWrap out of .gallery__info to be `panel`'s own
+    // direct child (see DOM scaffold above) — it must stay in this ladder.
+    panel.classList.remove("is-in");
 
     counter.textContent = `${String(activeIdx + 1).padStart(2, "0")} / ${String(n).padStart(2, "0")}`;
     eyebrow.textContent = pick(m.subtitle, lang);
@@ -354,8 +393,8 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
     renderTabs();
 
     // eslint-disable-next-line no-unused-expressions
-    void info.offsetWidth; // restart the CSS transition deterministically
-    info.classList.add("is-in");
+    void panel.offsetWidth; // restart the CSS transition deterministically
+    panel.classList.add("is-in");
 
     ensureLoaded(activeIdx);
     ensureLoaded((activeIdx + 1) % n);

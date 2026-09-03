@@ -51,7 +51,7 @@
       <p class="hero__eyebrow" data-reveal="eyebrow" data-i18n="heroEyebrow">ZEITSPRUNG · REGENSBURG</p>
       <h1 class="hero__title" id="heroTitle" data-reveal="title">ZEITSPRUNG</h1>
       <p class="hero__tagline" data-reveal="line" data-i18n="heroTagline">Geschichte sehen, nicht nur lesen.</p>
-      <p class="hero__scrollhint" data-reveal="line" data-i18n="heroScrollHint">SCROLLEN, UM ZU BEGINNEN</p>
+      <p class="hero__scrollhint" data-i18n="heroScrollHint">SCROLLEN, UM ZU BEGINNEN</p>
     </div>
   </div>
 </header>
@@ -155,6 +155,15 @@
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<!-- PHASE — HERO BUILD SCROLL EXPERIENCE (ZEITSPRUNG DESIGN REVISION +
+     ZEITSPRUNG MOTION REVISION, owner-approved). ScrollTrigger added to
+     THIS page for the first time — same version/CDN as
+     STEINERNE_BRUECKE/index.html's own gsap+ScrollTrigger pair, so no new
+     library or version is introduced project-wide, only reused on a second
+     page. Lenis (also used by Steinerne) is deliberately NOT added here —
+     this page has no other pinned/scrubbed section, so native scroll is
+     sufficient and stays within "no new animation libraries." -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script type="module" src="js/index-main.js"></script>
 </body>
 </html>
