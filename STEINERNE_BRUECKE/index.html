@@ -124,7 +124,6 @@
       </button>
       <button type="button" data-scroll-to="#museum25d" data-i18n="navMuseum">AUSSTELLUNG</button>
       <button type="button" data-scroll-to="#threeD" data-i18n="nav3d">3D</button>
-      <button type="button" data-scroll-to="#videoChapter" data-i18n="navHistory">GESCHICHTE</button>
     </div>
     <div class="navbar__lang">
       <button type="button" data-lang="de">DE</button>
@@ -325,31 +324,21 @@
   </section>
 
   <!-- ========================================================== -->
-  <!-- HISTORICAL REEL — Phase 2.6 TASK 4. A small, standalone       -->
-  <!-- editorial "cinematic summary" beat placed AFTER the K01–K12   -->
-  <!-- gallery — NOT part of #kframesGallery's own pinned scroll/    -->
-  <!-- crossfade mechanics (kframes-gallery.js is untouched). A       -->
-  <!-- normal reveal-on-scroll section, wired in js/main.js's         -->
-  <!-- buildHistoricalReel(). Also hosts the standalone, non-         -->
-  <!-- interactive Brückmandl status note (Phase 2.6 TASK 5).        -->
+  <!-- HISTORICAL REEL section — Phase 2.6 TASK 4's editorial        -->
+  <!-- "cinematic summary" video block (title/note/eyebrow + video)  -->
+  <!-- REMOVED per CONTENT HOTFIX (public block removal, owner-      -->
+  <!-- approved): "El puente en cámara rápida" / "Resumen editorial  -->
+  <!-- — la historia completa continúa más arriba." — video/caption/ -->
+  <!-- replay markup deleted, NOT the section itself, because the    -->
+  <!-- Brückmandl status note below (Phase 2.6 TASK 5, explicitly    -->
+  <!-- protected — Brückmandl content/architecture is out of scope   -->
+  <!-- for this hotfix) lives in the same <section>. Master reel     -->
+  <!-- video/i18n strings are untouched on disk — see js/i18n.js's   -->
+  <!-- reelTitle/reelNote/reelEyebrow/reelReplayLabel keys (now      -->
+  <!-- orphaned, kept for low-risk future re-enable) and             -->
+  <!-- 03_ASSETS/Steinerne_Bruecke/VIDEO/REELS/ (untouched). -->
   <!-- ========================================================== -->
   <section id="historicalReel" class="reel">
-    <div class="reel__frame">
-      <video id="reelVideo" class="reel__video" muted playsinline preload="none"></video>
-      <div class="reel__scrim" aria-hidden="true"></div>
-      <div class="reel__caption" aria-hidden="false">
-        <p class="reel__eyebrow" data-reveal="eyebrow" data-i18n="reelEyebrow">1135–2018</p>
-        <h3 class="reel__title" id="reelTitle" data-reveal="title">Die Brücke im Zeitraffer</h3>
-        <p class="reel__note" data-reveal="line" data-i18n="reelNote">Redaktionelle Zusammenfassung — die vollständige Geschichte setzt sich oben fort.</p>
-      </div>
-      <!-- Small, subtle replay affordance — an icon-button, not a
-           video-player-style control. Restarts the single play; the video
-           never loops on its own (see js/main.js buildHistoricalReel()). -->
-      <button id="reelReplayBtn" class="reel__replay" type="button" aria-label="Replay">
-        <span aria-hidden="true">&#8635;</span>
-      </button>
-    </div>
-
     <!-- Phase 2.6 TASK 5 — Brückmandl status. Reuses the id/label already
          reserved (but never wired to a real target) in
          03_ASSETS/Steinerne_Bruecke/2d/ASSET_SWAP_MAP.json's
@@ -373,20 +362,16 @@
   </section>
 
   <!-- ========================================================== -->
-  <!-- VIDEO CHAPTER — FPV                                         -->
+  <!-- VIDEO CHAPTER — FPV "Sobrevolando el puente" — REMOVED per   -->
+  <!-- CONTENT HOTFIX (public block removal, owner-approved).       -->
+  <!-- Entire section deleted (no other content shared this section, -->
+  <!-- unlike HISTORICAL REEL above). Master FPV video file is        -->
+  <!-- untouched on disk. buildVideoChapter() (the JS lifecycle for   -->
+  <!-- this section) removed from js/main.js — see that file. i18n    -->
+  <!-- strings (videoChapterTitle/videoChapterText/videoUnavailable)  -->
+  <!-- kept in js/i18n.js, now orphaned, for low-risk future re-enable. -->
+  <!-- Nav item pointing here (#navHistory) removed too, above. -->
   <!-- ========================================================== -->
-  <section id="videoChapter" class="video-chapter">
-    <div class="video-chapter__frame">
-      <h3 data-i18n="videoChapterTitle">Der Flug über die Brücke</h3>
-      <p data-i18n="videoChapterText">Eine FPV-Aufnahme der Steinerne Brücke aus der Vogelperspektive.</p>
-      <div class="video-chapter__viewport">
-        <video id="fpvVideo" playsinline muted loop preload="metadata"></video>
-        <p id="videoFallback" class="video-chapter__fallback" data-i18n="videoUnavailable" hidden>
-          Video konnte in diesem Browser nicht geladen werden.
-        </p>
-      </div>
-    </div>
-  </section>
 
   <!-- ========================================================== -->
   <!-- 3D CHAPTER — GLB viewer                                     -->

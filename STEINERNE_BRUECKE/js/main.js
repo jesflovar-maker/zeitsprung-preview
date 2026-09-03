@@ -338,22 +338,9 @@ const FUTURE_STAGE_CUTOUT_MAPPINGS_NOT_APPLIED = {
   construction: "bau_construction_cutout.png" // NOT APPLIED — no matching #stage state today
 };
 
-// PHASE 2.6 — TASK 3, ACTIVE. Approved production flyover
-// (03_ASSETS/Steinerne_Bruecke/VIDEO/FLYOVER/sb_flyover_city_8s_v01.mp4 —
-// filename says "8s", actual runtime is 15.04s, flagged not fixed here per
-// brief — muted/faststart web derivative below) replaces the previous
-// placeholder FPV source. Content verified by inspection: a dramatic sunset
-// aerial flyover of the bridge/Danube/Regensburg/cathedral — matches this
-// chapter's role exactly. #videoChapter's structure, fallback handling and
-// scroll-triggered play/pause (buildVideoChapter() below) are UNCHANGED —
-// this is a source swap only.
-const VIDEO_PATH = `${WEB_ASSET_BASE}/flyover/sb_flyover_city_8s_v01_web.mp4`;
-
-// LEGACY_REFERENCE_ONLY (Phase 2.6 TASK 3) — the previous FPV source stays
-// on disk, untouched, at:
-//   ASSET_BASE + "/VIDEO/FPV/fpv video szernernebrücke.mov"
-// i.e. 03_ASSETS/Steinerne_Bruecke/VIDEO/FPV/fpv video szernernebrücke.mov.
-// NOT deleted, NOT referenced by VIDEO_PATH above, NOT deployed.
+// VIDEO_PATH (former FPV source constant, ".../VIDEO/FLYOVER/sb_flyover_city_8s_v01_web.mp4")
+// removed — CONTENT HOTFIX, #videoChapter/FPV block deleted (see removal
+// note further down this file). Master file untouched on disk.
 
 let lang = getInitialLang();
 
@@ -682,12 +669,12 @@ function buildIntroMedia() {
     video.hidden = true;
   });
 
-  // Real-gesture-independent autoplay attempt, mirroring buildVideoChapter()
-  // below's existing FPV handling (activate()). If the browser blocks it,
-  // `playing` never fires, the video stays at opacity 0 (see initial CSS
-  // state), and the poster underneath is what the visitor sees — never a
-  // broken/empty layer. The shared runtime's gesture-retry queue also
-  // catches this case the moment the visitor's first real tap/click happens.
+  // Real-gesture-independent autoplay attempt via the shared video-playback.js
+  // runtime's activate(). If the browser blocks it, `playing` never fires,
+  // the video stays at opacity 0 (see initial CSS state), and the poster
+  // underneath is what the visitor sees — never a broken/empty layer. The
+  // shared runtime's gesture-retry queue also catches this case the moment
+  // the visitor's first real tap/click happens.
   activate(video, { id: "steinerneIntro", role: "intro" });
 }
 
@@ -901,8 +888,9 @@ function initLenisAndScroll() {
   // only once that promise settles, so its own ScrollTrigger.create() can
   // never run before the museum's pin-spacer is in the DOM.
   wireMuseum25D(lenis).then(() => wireKframesGallery(lenis));
-  buildHistoricalReel(); // PHASE 2.6 TASK 4 — after the K-frame gallery, before the flyover
-  buildVideoChapter();
+  // buildHistoricalReel() / buildVideoChapter() calls removed — CONTENT
+  // HOTFIX (both functions themselves also deleted, see their removal note
+  // further down this file, right before wireNav()).
   // Skipped entirely while disabled — no GLB fetch, no Three.js scene/
   // renderer/camera setup, no scroll-triggered load-on-enter wiring at all
   // (not just a visual hide) — see THREE_D_ENABLED above.
@@ -1184,146 +1172,23 @@ function buildFactsReveal() {
 }
 
 // ---------------------------------------------------------------------------
-// PHASE 2.6 — TASK 4: #historicalReel, a small editorial "cinematic summary"
-// beat placed AFTER the K01–K12 gallery. Deliberately NOT built inside
-// #kframesGallery / kframes-gallery.js (that file's pinned scroll/crossfade
-// logic is untouched by this task) — this is a normal, non-pinned,
-// reveal-on-scroll section, wired here in main.js like #facts/#museum25d's
-// own intro blocks, just once, ScrollTrigger `once:true` (no reverse — a
-// one-directional teaser, not a scrubbed chapter).
+// CONTENT HOTFIX — both #historicalReel's video content ("El puente en
+// cámara rápida") and #videoChapter/FPV ("Sobrevolando el puente") were
+// removed from the public visitor experience (owner-approved). This
+// deleted buildHistoricalReel() and buildVideoChapter() (each function's
+// ENTIRE reason to exist was building/scroll-triggering exactly one of
+// these two now-removed presentation blocks) along with their call sites
+// below. The Brückmandl status note that used to share #historicalReel's
+// <section> was NOT part of this removal — it needs no JS at all (plain
+// data-i18n text, walked generically by i18n.js's applyI18n()) and is
+// untouched in index.html.
 //
-// ACTIVE asset: 03_ASSETS/Steinerne_Bruecke/VIDEO/REELS/
-// sb_kframes_history_reel_15s_v01.mp4 (filename says "15s", actual runtime
-// is 8.04s — flagged, not corrected here) -> muted/faststart web derivative
-// below. Content verified by inspection: a ground-level cinematic shot of
-// the bridge deck/arches with the cathedral behind, golden light — a
-// premium editorial mood shot, distinct from the K-frame gallery's
-// construction-history stills, which is why a short clarifying caption
-// (reelNote, i18n) is included so this section does not read as a
-// duplicate of the gallery above it.
-// ---------------------------------------------------------------------------
-function buildHistoricalReel() {
-  const section = document.getElementById("historicalReel");
-  if (!section) return;
-  const frame = section.querySelector(".reel__frame");
-  const video = document.getElementById("reelVideo");
-  const beat = section.querySelector(".reel__caption");
-  const title = document.getElementById("reelTitle");
-  const replayBtn = document.getElementById("reelReplayBtn");
-
-  if (title) {
-    const poolSize = Math.max(
-      ztVisualLength(t("de", "reelTitle")),
-      ztVisualLength(t("en", "reelTitle")),
-      ztVisualLength(t("es", "reelTitle"))
-    );
-    getZtTypo().mountTitle(title, poolSize, "reel__title-line");
-    getZtTypo().setTitleText(title, t(lang, "reelTitle"));
-  }
-  if (beat) getZtTypo().initBeat(beat);
-
-  if (video) {
-    video.muted = true;
-    video.playsInline = true;
-    video.loop = false; // single restrained play, holds its last frame — no
-                         // controls, no SFX, matches the intro video's
-                         // documented decision above
-    video.preload = "none"; // this section is well below the fold; the
-                             // network request only starts once the visitor
-                             // actually scrolls near it (onEnter below)
-
-    video.addEventListener("error", () => {
-      // Never a broken/empty rectangle: hide the <video>, the section's own
-      // dark backdrop (.reel__frame background) remains a coherent surface.
-      video.hidden = true;
-    });
-  }
-
-  const REEL_ID = { id: "historicalReel", role: "reel" };
-  let played = false;
-  function playReel() {
-    if (played || !video) return;
-    played = true;
-    video.src = encodeURI(`${WEB_ASSET_BASE}/reels/sb_kframes_history_reel_15s_v01_web.mp4`);
-    activate(video, REEL_ID);
-  }
-
-  ScrollTrigger.create({
-    trigger: section,
-    start: "top 75%",
-    once: true,
-    onEnter: () => {
-      if (frame) gsap.to(frame, { autoAlpha: 1, y: 0, duration: 0.8, ease: "power2.out" });
-      if (beat) ztRevealBeatNow(beat, 0.2);
-      playReel();
-    }
-  });
-
-  // Small, subtle replay affordance (icon-button, not a video-player-style
-  // control) — restarts the single play, never loops on its own.
-  if (replayBtn) {
-    replayBtn.setAttribute("aria-label", t(lang, "reelReplayLabel"));
-    replayBtn.addEventListener("click", () => {
-      if (!video) return;
-      if (!video.src) playReel();
-      else { video.currentTime = 0; activate(video, REEL_ID); }
-    });
-  }
-}
-
-// ---------------------------------------------------------------------------
-// Video chapter
-// ---------------------------------------------------------------------------
-function buildVideoChapter() {
-  const section = document.getElementById("videoChapter");
-  const video = document.getElementById("fpvVideo");
-  const fallback = document.getElementById("videoFallback");
-
-  video.src = encodeURI(VIDEO_PATH);
-
-  video.addEventListener("error", () => {
-    fallback.hidden = false;
-    video.hidden = true;
-  });
-
-  gsap.fromTo(
-    section.querySelector(".video-chapter__frame"),
-    { autoAlpha: 0, scale: 0.92 },
-    {
-      autoAlpha: 1,
-      scale: 1,
-      duration: 1,
-      ease: "power2.out",
-      scrollTrigger: {
-        trigger: section,
-        start: "top 70%",
-        toggleActions: "play none none reverse"
-      }
-    }
-  );
-
-  const FPV_ID = { id: "steinerneFpv", role: "flyover" };
-  ScrollTrigger.create({
-    trigger: section,
-    start: "top 60%",
-    end: "bottom 40%",
-    onEnter: () => activate(video, FPV_ID),
-    onEnterBack: () => activate(video, FPV_ID),
-    onLeave: () => deactivate(video),
-    onLeaveBack: () => deactivate(video)
-  });
-
-  // PHASE 3.1 — the bespoke Safari/iOS-backgrounding visibilitychange
-  // re-assert that used to live here (a video paused by the OS when the tab
-  // goes background does not always resume cleanly on return, even after a
-  // later ScrollTrigger onEnter — WebKit quirk) is now handled by the ONE
-  // centralized pauseHidden()/resumeActive() mechanism in video-playback.js
-  // (Section 7 of the day's brief): this video only needs to be marked
-  // ACTIVE via activate() above — the shared runtime resumes it on its own
-  // the moment the tab becomes visible again, with no bespoke geometry
-  // check needed here.
-}
-
+// NOT deleted, for low-risk future re-enable if ever needed: the master
+// reel video (03_ASSETS/Steinerne_Bruecke/VIDEO/REELS/) and FPV video
+// (03_ASSETS/Steinerne_Bruecke/VIDEO/FLYOVER/) files on disk, their web
+// derivatives, and both sections' i18n strings in js/i18n.js (reelTitle/
+// reelNote/reelEyebrow/reelReplayLabel/videoChapterTitle/videoChapterText/
+// videoUnavailable — now orphaned, referenced by no data-i18n element).
 // ---------------------------------------------------------------------------
 // 3D chapter
 // ---------------------------------------------------------------------------
