@@ -18,6 +18,20 @@
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   --nav-h: 60px;
+
+  /* PHASE 3.0 — additive responsive tokens (Section 14/15), identical values
+     to css/index.css's own copy (see that file's header comment for the
+     shared-token-block convention this file already established). NEW
+     custom properties only; nothing below is wired into any existing rule
+     in this pass, so no visual shift occurs today. */
+  --zt-page-gutter: clamp(18px, 5vw, 24px);
+  --zt-content-max: 920px;
+  --zt-text-max: 46ch;
+  --zt-section-space: clamp(64px, 12vw, 96px);
+  --zt-safe-top: env(safe-area-inset-top, 0px);
+  --zt-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --zt-display-size: clamp(48px, 15vw, 96px);
+  --zt-body-size: clamp(15px, 4vw, 18px);
 }
 
 *{ box-sizing: border-box; }
@@ -236,7 +250,12 @@ img{ max-width:100%; display:block; }
 .stage{ position: relative; }
 .stage__sticky{
   position: relative;
+  /* Same svh strategy as .museum__sticky below: 100vh fallback first,
+     then 100svh overrides where supported. svh (not dvh) keeps this
+     pinned ScrollTrigger stage's height stable while mobile browser
+     chrome shows/hides mid-scroll, avoiding jitter during the pin. */
   height: 100vh;
+  height: 100svh;
   width: 100%;
   overflow: hidden;
   background: #000;
@@ -1264,7 +1283,12 @@ img{ max-width:100%; display:block; }
 
 .kf__sticky{
   position: relative;
+  /* Same svh strategy as .museum__sticky / .stage__sticky: 100vh
+     fallback first, then 100svh overrides where supported, to keep
+     this pinned ScrollTrigger stage stable while mobile browser
+     chrome shows/hides mid-scroll. */
   height: 100vh;
+  height: 100svh;
   width: 100%;
   overflow: hidden;
   background: #000;

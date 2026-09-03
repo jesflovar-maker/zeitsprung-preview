@@ -70,7 +70,11 @@
 
 // Shared web-copy location for every SFX/ambience WAV, sibling to every
 // monument folder (never duplicated inside a monument's own asset tree).
-const SFX_ROOT = new URL("../assets/audio/sfx", import.meta.url).href;
+// Resolved via ZT_PATHS (js/zt-paths.js) — the ONE base-path authority — so
+// this same value is correct whether this module is imported from the
+// top-level index.html or a monument sub-page's own index.html, and whether
+// it is running from the local MASTER runtime or the deploy repo copy.
+import { SFX_ROOT } from "./zt-paths.js";
 
 // One gain node per discovered category folder name.
 const CATEGORIES = ["ambience", "rope_pulley", "stone", "transition", "wood"];

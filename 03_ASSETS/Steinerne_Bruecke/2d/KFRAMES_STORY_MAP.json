@@ -5,8 +5,8 @@
   "monument": "Steinerne_Bruecke",
   "module": "kframes-gallery",
   "web_fetch_url": "/03_ASSETS/Steinerne_Bruecke/2d/KFRAMES_STORY_MAP.json",
-  "asset_base": "../03_ASSETS/Steinerne_Bruecke/2d/KFRAMES",
-  "asset_base_note": "Every record's `asset` is a bare filename resolved against asset_base. Source PNGs are read-only master assets (03_ASSETS/Steinerne_Bruecke/2d/KFRAMES/) — never copied, renamed or modified for this module.",
+  "asset_base": null,
+  "asset_base_note": "PHASE 3.0B — this field is intentionally non-authoritative (previously a hardcoded server-root-absolute string, '/03_ASSETS/Steinerne_Bruecke/2d/KFRAMES', flagged by 01_ARCHITECTURE/scripts/zeitsprung-validate.py as path debt: correct only under the MASTER local runtime, broken under any other base path such as the GitHub Pages deploy subpath). js/kframes-gallery.js now resolves every frame's `asset` (a bare filename) against KFRAMES_DEFAULT_ASSET_BASE, the ONE canonical path authority exported by js/zt-paths.js (ZT_PATHS, see 01_ARCHITECTURE/PLATFORM_ARCHITECTURE_V3.md Section 7) — never against this field. Source PNGs remain read-only master assets (03_ASSETS/Steinerne_Bruecke/2d/KFRAMES/) — never copied, renamed or modified for this module.",
   "known_duplicate_note": "STALE, RE-VERIFIED 2026-09-01: k08_master.png and k03_master.png were previously byte-identical (md5 e05117ec23dca86254c88b20478dc68e) but the user replaced BOTH files' contents on 2026-09-01 (Phase 2.7C asset drop) — they are now two genuinely distinct renders (k03 md5 4fa8c7cc448503f968c6baec27913a7b, k08 md5 08901fff5408a294b893cdb776267ea4). This note is kept only as a historical record of the PREVIOUS duplicate state; do not use it to justify K08 still carrying K03's copy — see K08's own record below, which was re-mapped after fresh visual inspection.",
   "hotspot_target_values_note": "A real, currently-working anchor id (e.g. '#museum25d', '#stage') OR the literal string 'PENDING_DESTINATION' (never rendered as a clickable hotspot — same 'reserve the shape, don't wire the click' convention as ASSET_SWAP_MAP.json's hotspots_registry.bruckmandl entry).",
   "frames": [

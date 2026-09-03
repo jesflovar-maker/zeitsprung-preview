@@ -17,8 +17,9 @@
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { STEINERNE_GLB_URL } from "../../js/zt-paths.js";
 
-const GLB_PATH = "../03_ASSETS/Steinerne_Bruecke/3D_GLB/STEINERNE_BRUECKE_EXPLODED_MASTER_v1.glb";
+const GLB_PATH = STEINERNE_GLB_URL;
 
 export function initViewer3D({ mount, onLoadStart, onLoadProgress, onLoadDone, onLoadError }) {
   let renderer, scene, camera, controls, modelRoot;

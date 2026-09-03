@@ -42,10 +42,11 @@
 
 import { CHAPTER_SCRIPT, buildMuseumScrollExperience } from "./museum2d-scroll.js";
 import { ZT_AUDIO_BUS } from "../../js/zt-audio.js";
+import { STEINERNE_WEB_ASSET_BASE, ASSET_SWAP_MANIFEST_URL, MUSEUM_CONTENT_MAP_URL as CONTENT_MAP_URL_RESOLVED } from "../../js/zt-paths.js";
 
-const SLOT_BASE = "../assets/steinerne-bruecke";
-const MANIFEST_URL = "../03_ASSETS/Steinerne_Bruecke/2d/ASSET_SWAP_MAP.json";
-const CONTENT_MAP_URL = "../03_ASSETS/Steinerne_Bruecke/2d/MUSEUM_CONTENT_MAP.json";
+const SLOT_BASE = STEINERNE_WEB_ASSET_BASE;
+const MANIFEST_URL = ASSET_SWAP_MANIFEST_URL;
+const CONTENT_MAP_URL = CONTENT_MAP_URL_RESOLVED;
 
 // Shared primary-layer slot ids (the rigid bridge + its optional foreground).
 const PRIMARY_BRIDGE_SLOT = "bridge_alpha";
@@ -647,6 +648,26 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     entry[slot.pair_role] = { el: v, resolved };
   });
 
+  // PHASE 3.1 — GLOBAL VIDEO RUNTIME audit exception (Section 14 of that
+  // phase's brief). This function and the 5 other raw .play()/.pause() call
+  // sites below it (playTransitionClip's `v.play()`/`other.el.pause()`,
+  // settleOtherTransitions' `e.activeEl.pause()`, syncLoopPlayback's
+  // `entry.video.play()`) were audited and DELIBERATELY NOT migrated onto
+  // js/video-playback.js's activate()/deactivate(). Reason: this module
+  // already has its own, independently-correct race-safety mechanism —
+  // every async play()-rejection/'ended' callback closes over `entry.gen`
+  // and re-checks it against the entry's CURRENT generation before touching
+  // the DOM (see playTransitionClip() below), which is what actually
+  // prevents a superseded request from fighting a newer one here, AND is
+  // tightly coupled to this module's own SFX play-start/settle audio hooks
+  // (handleTransitionPlayAudio/handleTransitionSettleAudio) and the 10-
+  // chapter assembly/disassembly choreography itself. Routing these through
+  // activate()/deactivate() would add a SECOND, differently-shaped
+  // ownership/generation system on top of an already-correct one, risking
+  // exactly the kind of subtle race this phase exists to eliminate, for a
+  // module with no reported symptom and an explicit protect-zone instruction
+  // ("approved choreography... do not touch"). Left exactly as-is.
+  //
   // Single-active-video rule, spanning BOTH the ambient-loop system (above)
   // and the transition-clip system: pausing here is the ONE place either
   // system stops playback belonging to the other, so at most one <video> can

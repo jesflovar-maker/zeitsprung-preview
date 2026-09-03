@@ -27,6 +27,23 @@
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 
   --nav-h: 60px;
+
+  /* PHASE 3.0 — additive responsive tokens (Section 14/15). NEW custom
+     properties only; nothing below is wired into any existing rule in this
+     pass, so no visual shift occurs today. Ranges were read directly off the
+     clamp()/max-width/padding values already in production use across
+     css/index.css and STEINERNE_BRUECKE/css/style.css (see
+     01_ARCHITECTURE/PLATFORM_ARCHITECTURE_V3.md, Section G) rather than
+     invented, so future incremental adoption will not visually shift
+     anything either. Available for future use by any module. */
+  --zt-page-gutter: clamp(18px, 5vw, 24px);
+  --zt-content-max: 920px;
+  --zt-text-max: 46ch;
+  --zt-section-space: clamp(64px, 12vw, 96px);
+  --zt-safe-top: env(safe-area-inset-top, 0px);
+  --zt-safe-bottom: env(safe-area-inset-bottom, 0px);
+  --zt-display-size: clamp(48px, 15vw, 96px);
+  --zt-body-size: clamp(15px, 4vw, 18px);
 }
 
 *{ box-sizing: border-box; }

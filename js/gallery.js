@@ -45,7 +45,7 @@ function pick(obj, lang) {
   return obj[lang] !== undefined ? obj[lang] : (obj.de || "");
 }
 
-import { safePlay, safePause } from "./video-playback.js";
+import { activate, deactivate } from "./video-playback.js";
 
 export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   if (!root) return null;
@@ -255,7 +255,7 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   function stopMedia() {
     mediaToken += 1;
     [bgVideo, panelVideo].forEach((v) => {
-      safePause(v);
+      deactivate(v);
       v.loop = false;
       v.removeAttribute("src");
       try { v.load(); } catch (err) { /* ignore */ }
@@ -288,8 +288,8 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
       if (token !== mediaToken) return;
       panelVideo.classList.add("is-visible");
       bgVideo.classList.add("is-visible");
-      safePlay(panelVideo);
-      safePlay(bgVideo);
+      activate(panelVideo, { id: `gallery:${m.id}:panel`, role: "gallery-panel" });
+      activate(bgVideo, { id: `gallery:${m.id}:bg`, role: "gallery-bg" });
     };
     panelVideo.addEventListener("canplay", reveal, { once: true });
 

@@ -22,9 +22,31 @@ import { ZT_AUDIO_BUS } from "./zt-audio.js";
 import { createZtTypography } from "../STEINERNE_BRUECKE/js/zt-typography.js";
 import { initGallery } from "./gallery.js";
 import { initRouteMap } from "./route-map.js";
-import { safePlay, safePause } from "./video-playback.js";
+import { activate, deactivate, getDebugSnapshot } from "./video-playback.js";
 
 const ZT_SOUND_PREF_KEY = "zeitsprung:soundEnabled"; // shared with STEINERNE_BRUECKE/js/main.js
+
+// PHASE 3.0 — Section 23 debug aid. `?debug=1` on the URL logs a one-shot
+// snapshot of route/basePath/language/current-monument/active-media-src to
+// the console (console.log only — never a visible UI panel, never wraps
+// existing logic in a new conditional beyond this single opt-in call at the
+// end of boot()). Absent the query param this entire block is inert.
+const ZT_DEBUG = new URLSearchParams(location.search).get("debug") === "1";
+function ztLogDebugState({ galleryHandle, routeMapHandle, lang }) {
+  if (!ZT_DEBUG) return;
+  const activeIdx = galleryHandle && typeof galleryHandle.getActiveIndex === "function" ? galleryHandle.getActiveIndex() : null;
+  const bgVideo = document.querySelector("#galleryRoot .gallery__bg-video, #galleryRoot video");
+  // eslint-disable-next-line no-console
+  console.log("[ZEITSPRUNG debug]", {
+    route: location.pathname,
+    basePath: location.pathname.replace(/index\.html?$/, ""),
+    language: lang,
+    activeMonumentIndex: activeIdx,
+    activeMonumentId: routeMapHandle && typeof routeMapHandle.getCurrentId === "function" ? routeMapHandle.getCurrentId() : null,
+    activeMediaSrc: bgVideo ? (bgVideo.currentSrc || bgVideo.src || null) : null,
+    videos: getDebugSnapshot()
+  });
+}
 
 let lang = getInitialLang();
 let soundEnabled = (function () {
@@ -143,7 +165,7 @@ function wireHeroMedia() {
   video.preload = "auto";
   video.addEventListener("canplay", () => {
     video.classList.add("is-ready");
-    safePlay(video);
+    activate(video, { id: "indexHero", role: "hero" });
   }, { once: true });
   // If the browser can't play it at all (unlikely, this derivative already
   // ships to STEINERNE_BRUECKE/index.html successfully), the poster image
@@ -345,22 +367,30 @@ function wireThesisMedia() {
     v.preload = "auto";
     v.addEventListener("canplay", () => {
       v.classList.add("is-ready");
-      safePlay(v);
+      // Only actually activate() if this layer is (still) the active one —
+      // startVideo() can be called ahead of a layer becoming active (see
+      // startVideo() call sites below), and 'canplay' is async: the visitor
+      // may have already scrolled past this chapter by the time it fires.
+      if (activeLayer === layer) activateLayer(layer);
     }, { once: true });
     v.addEventListener("error", () => { v.classList.remove("is-ready"); }, { once: true });
   }
 
   let activeLayer = null;
-  function activate(layer) {
+  function activateLayer(layer) {
+    if (!layer || !layer.videoEl) return;
+    activate(layer.videoEl, { id: layer.beatId, role: "thesis-chapter" });
+  }
+  function switchTo(layer) {
     if (!layer || activeLayer === layer) return;
     layers.forEach((l) => l.layerEl.classList.toggle("is-active", l === layer));
-    if (activeLayer && activeLayer.videoEl) safePause(activeLayer.videoEl);
+    if (activeLayer && activeLayer.videoEl) deactivate(activeLayer.videoEl);
     activeLayer = layer;
     startVideo(layer);
-    if (layer.started && layer.videoEl) safePlay(layer.videoEl);
+    if (layer.started && layer.videoEl) activateLayer(layer);
   }
 
-  if (typeof IntersectionObserver === "undefined") { activate(layers[0]); return; }
+  if (typeof IntersectionObserver === "undefined") { switchTo(layers[0]); return; }
 
   const beatEls = layers.map((l) => {
     const beat = document.getElementById(l.beatId);
@@ -373,7 +403,7 @@ function wireThesisMedia() {
   const armIo = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (!entry.isIntersecting) return;
-      activate(layers[0]);
+      switchTo(layers[0]);
       armIo.disconnect();
     });
   }, { rootMargin: "600px 0px" });
@@ -394,7 +424,7 @@ function wireThesisMedia() {
     });
     if (!best) return;
     const found = beatEls.find((b) => b.beat === best);
-    if (found) activate(found.layer);
+    if (found) switchTo(found.layer);
   }, { threshold: [0.15, 0.3, 0.5, 0.7, 0.9] });
   beatEls.forEach((b) => chapterIo.observe(b.beat));
 }
@@ -444,6 +474,8 @@ async function boot() {
     getGalleryHandle: () => galleryHandle,
     reducedMotion
   });
+
+  ztLogDebugState({ galleryHandle, routeMapHandle, lang });
 }
 
 if (document.readyState === "loading") {

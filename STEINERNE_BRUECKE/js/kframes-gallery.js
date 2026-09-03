@@ -45,15 +45,16 @@
    ============================================================================ */
 
 import { createZtTypography, ztVisualLength } from "./zt-typography.js";
+import { KFRAMES_MANIFEST_URL, KFRAMES_DEFAULT_ASSET_BASE, STEINERNE_SOURCES_URL } from "../../js/zt-paths.js";
 
-const MANIFEST_URL = "../03_ASSETS/Steinerne_Bruecke/2d/KFRAMES_STORY_MAP.json";
+const MANIFEST_URL = KFRAMES_MANIFEST_URL;
 // Phase 2.7C.3, Section 3 — monument-scoped source registry (mirrors
 // 02_CONTENT/SOURCES/SOURCE_REGISTRY.json's Steinerne_Bruecke sources under
 // the SAME SB_SRC_00x IDs; see 02_CONTENT/Steinerne_Bruecke/SOURCES/
 // SOURCES_MASTER.md for why no parallel ID scheme was introduced). Used only
 // to resolve each frame's `source_ids` into a short "institution · title"
 // string for the restrained source line below.
-const SOURCES_URL = "../02_CONTENT/Steinerne_Bruecke/SOURCES/sources.json";
+const SOURCES_URL = STEINERNE_SOURCES_URL;
 const LANGS = ["de", "en", "es"];
 
 // Real, currently-working anchors this gallery is allowed to link a hotspot
@@ -199,7 +200,12 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
     return null;
   }
 
-  const assetBase = (manifest.asset_base || "../03_ASSETS/Steinerne_Bruecke/2d/KFRAMES").replace(/\/$/, "");
+  // PHASE 3.0B — KFRAMES_DEFAULT_ASSET_BASE (js/zt-paths.js, the ONE ZT_PATHS
+  // authority) is always primary. manifest.asset_base is kept only as a
+  // last-resort fallback shape (never actually taken — the JSON field is now
+  // `null`, see KFRAMES_STORY_MAP.json's asset_base_note) so this line does
+  // not become a second, competing path authority.
+  const assetBase = (KFRAMES_DEFAULT_ASSET_BASE || manifest.asset_base).replace(/\/$/, "");
   const resolveUrl = (frame) => encodeURI(`${assetBase}/${frame.asset}`);
 
   const sticky = document.getElementById("kfSticky");

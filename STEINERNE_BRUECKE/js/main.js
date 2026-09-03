@@ -18,7 +18,13 @@ import { buildPortal } from "./portal.js";
 import { initMuseum25D } from "./museum25d.js";
 import { initKframesGallery } from "./kframes-gallery.js";
 import { ZT_AUDIO_BUS } from "../../js/zt-audio.js";
-import { safePlay, safePause } from "../../js/video-playback.js";
+import { activate, deactivate, getDebugSnapshot } from "../../js/video-playback.js";
+import { STEINERNE_ASSET_BASE, STEINERNE_WEB_ASSET_BASE, ASSET_SWAP_MANIFEST_URL } from "../../js/zt-paths.js";
+// PHASE 3.0A — Section 7. READ-ONLY proof that central "monument capability"
+// config can be loaded at runtime — see js/zt-feature-flags.js's own header
+// for why this is deliberately NOT used to gate any UI yet. Only consumed
+// below by ztLoadFeatureFlags(), a non-blocking, purely diagnostic call.
+import { getFeatureFlags } from "../../js/zt-feature-flags.js";
 // PHASE 2.6 — TASK 2 / TASK 4. Reuses the SAME reusable typography module
 // already consumed by museum2d-scroll.js and kframes-gallery.js (see those
 // files' own createZtTypography() call sites for the original pattern).
@@ -34,7 +40,41 @@ import { createZtTypography, ztVisualLength } from "./zt-typography.js";
 // when THREE_D_ENABLED is true — while disabled, none of those module files
 // are even requested over the network, not just visually hidden.
 
-const ASSET_BASE = "../03_ASSETS/Steinerne_Bruecke";
+const ASSET_BASE = STEINERNE_ASSET_BASE;
+
+// PHASE 3.0 — Section 23 debug aid, same convention as js/index-main.js's
+// ztLogDebugState(): `?debug=1` logs a one-shot state snapshot to the
+// console only. Inert otherwise.
+const ZT_DEBUG = new URLSearchParams(location.search).get("debug") === "1";
+// PHASE 3.0A — Section 7. Fire-and-forget, non-blocking read of this
+// monument's featureFlags via js/zt-feature-flags.js, stored on a namespaced
+// global for inspection (`window.ZT_FEATURE_FLAGS`) and always console-
+// logged (independent of `?debug=1` — this is architecture-proof, not a
+// debug aid). Does NOT gate/activate any feature: no `if (flags.x)`
+// conditional exists anywhere in this file. See zt-feature-flags.js's header
+// for why wiring an actual UI conditional is an explicitly separate, future
+// task.
+function ztLoadFeatureFlags() {
+  getFeatureFlags("steinerne-bruecke").then((flags) => {
+    window.ZT_FEATURE_FLAGS = flags;
+    // eslint-disable-next-line no-console
+    console.log("[ZT_FEATURE_FLAGS] steinerne-bruecke:", flags);
+  });
+}
+
+function ztLogDebugState() {
+  if (!ZT_DEBUG) return;
+  const introVideo = document.getElementById("introVideo");
+  // eslint-disable-next-line no-console
+  console.log("[ZEITSPRUNG debug]", {
+    route: location.pathname,
+    basePath: location.pathname.replace(/index\.html?$/, ""),
+    language: lang,
+    currentMonument: "steinerne-bruecke",
+    activeMediaSrc: introVideo ? (introVideo.currentSrc || introVideo.src || null) : null,
+    videos: getDebugSnapshot()
+  });
+}
 
 // ---------------------------------------------------------------------------
 // PHASE 2.6 — web-optimized derivative base for the NEW hero/intro/flyover/
@@ -45,7 +85,7 @@ const ASSET_BASE = "../03_ASSETS/Steinerne_Bruecke";
 // points at a raw 03_ASSETS/... master path, only at this derived, web-ready
 // copy. The masters themselves are untouched and remain the source of truth.
 // ---------------------------------------------------------------------------
-const WEB_ASSET_BASE = "../assets/steinerne-bruecke";
+const WEB_ASSET_BASE = STEINERNE_WEB_ASSET_BASE;
 
 // ---------------------------------------------------------------------------
 // FEATURE FLAGS
@@ -69,8 +109,8 @@ const THREE_D_ENABLED = false;
 // this one slot, using the identical MANIFEST_URL / SLOT_BASE / resolution
 // contract (status must be READY, file_path required).
 // ---------------------------------------------------------------------------
-const PFEILER_MANIFEST_URL = "../03_ASSETS/Steinerne_Bruecke/2d/ASSET_SWAP_MAP.json";
-const PFEILER_SLOT_BASE = "../assets/steinerne-bruecke";
+const PFEILER_MANIFEST_URL = ASSET_SWAP_MANIFEST_URL;
+const PFEILER_SLOT_BASE = STEINERNE_WEB_ASSET_BASE;
 const PFEILER_CUTOUT_SLOT_ID = "pfeiler_detail";
 
 async function resolvePfeilerCutoutUrl() {
@@ -403,6 +443,8 @@ function boot() {
   wireIntroGate();
   buildIntroMedia();       // PHASE 2.6 TASK 2 — cinematic video layer
   buildIntroTypography();  // PHASE 2.6 TASK 2 — ZT title reveal over it
+  ztLogDebugState();
+  ztLoadFeatureFlags();    // PHASE 3.0A — Section 7, read-only, non-gating
 }
 // PHASE 2.6B — defensive complement to the click-buffering fix in
 // wireIntroGate(): `type="module"` scripts execute deferred, so on a slow
@@ -641,12 +683,12 @@ function buildIntroMedia() {
   });
 
   // Real-gesture-independent autoplay attempt, mirroring buildVideoChapter()
-  // below's existing FPV handling (safePlay()). If the browser blocks it,
+  // below's existing FPV handling (activate()). If the browser blocks it,
   // `playing` never fires, the video stays at opacity 0 (see initial CSS
   // state), and the poster underneath is what the visitor sees — never a
-  // broken/empty layer. safePlay's gesture-retry queue also catches this
-  // case the moment the visitor's first real tap/click happens.
-  safePlay(video);
+  // broken/empty layer. The shared runtime's gesture-retry queue also
+  // catches this case the moment the visitor's first real tap/click happens.
+  activate(video, { id: "steinerneIntro", role: "intro" });
 }
 
 // ---------------------------------------------------------------------------
@@ -1197,12 +1239,13 @@ function buildHistoricalReel() {
     });
   }
 
+  const REEL_ID = { id: "historicalReel", role: "reel" };
   let played = false;
   function playReel() {
     if (played || !video) return;
     played = true;
     video.src = encodeURI(`${WEB_ASSET_BASE}/reels/sb_kframes_history_reel_15s_v01_web.mp4`);
-    safePlay(video);
+    activate(video, REEL_ID);
   }
 
   ScrollTrigger.create({
@@ -1223,7 +1266,7 @@ function buildHistoricalReel() {
     replayBtn.addEventListener("click", () => {
       if (!video) return;
       if (!video.src) playReel();
-      else { video.currentTime = 0; safePlay(video); }
+      else { video.currentTime = 0; activate(video, REEL_ID); }
     });
   }
 }
@@ -1259,27 +1302,26 @@ function buildVideoChapter() {
     }
   );
 
+  const FPV_ID = { id: "steinerneFpv", role: "flyover" };
   ScrollTrigger.create({
     trigger: section,
     start: "top 60%",
     end: "bottom 40%",
-    onEnter: () => safePlay(video),
-    onEnterBack: () => safePlay(video),
-    onLeave: () => safePause(video),
-    onLeaveBack: () => safePause(video)
+    onEnter: () => activate(video, FPV_ID),
+    onEnterBack: () => activate(video, FPV_ID),
+    onLeave: () => deactivate(video),
+    onLeaveBack: () => deactivate(video)
   });
 
-  // RUNTIME HOTFIX — Safari/iOS backgrounding: a video paused by the OS when
-  // the tab/app goes background does not always resume cleanly on return
-  // even after a later ScrollTrigger onEnter fires (WebKit quirk). Re-assert
-  // playback if this section is the one currently in view when the page
-  // becomes visible again.
-  document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState !== "visible") return;
-    const rect = section.getBoundingClientRect();
-    const inView = rect.top < window.innerHeight * 0.6 && rect.bottom > window.innerHeight * 0.4;
-    if (inView) safePlay(video);
-  });
+  // PHASE 3.1 — the bespoke Safari/iOS-backgrounding visibilitychange
+  // re-assert that used to live here (a video paused by the OS when the tab
+  // goes background does not always resume cleanly on return, even after a
+  // later ScrollTrigger onEnter — WebKit quirk) is now handled by the ONE
+  // centralized pauseHidden()/resumeActive() mechanism in video-playback.js
+  // (Section 7 of the day's brief): this video only needs to be marked
+  // ACTIVE via activate() above — the shared runtime resumes it on its own
+  // the moment the tab becomes visible again, with no bespoke geometry
+  // check needed here.
 }
 
 // ---------------------------------------------------------------------------

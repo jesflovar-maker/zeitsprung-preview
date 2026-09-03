@@ -40,7 +40,9 @@
    visitor as if it were a real date; the component falls back to the
    monument's own status/cta badge from monuments.config.json instead. */
 
-const ROUTE_JSON_URL = "STEINERNE_BRUECKE_V1/routes/regensburg-main-route.json";
+import { STEINERNE_ROUTE_JSON_URL } from "./zt-paths.js";
+
+const ROUTE_JSON_URL = STEINERNE_ROUTE_JSON_URL;
 const CONFIG_URL = "./monuments.config.json";
 const MAP_IMG = "assets/maps/regensburg_interactive_map_v01.png";
 
