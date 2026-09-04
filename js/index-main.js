@@ -547,7 +547,20 @@ function wireThesisMedia() {
         best = entry.target;
       }
     });
-    if (!best) return;
+    if (!best) {
+      // VIDEO DECODE PERFORMANCE HOTFIX (confirmed defect) — previously this
+      // branch didn't exist, so the last-active chapter's video kept
+      // playing indefinitely once the visitor scrolled past the whole
+      // thesis-wrap section (no beat intersecting at all). Reuses the SAME
+      // deactivate() this function already calls on every normal
+      // chapter-to-chapter switch -- clearing activeLayer (rather than
+      // leaving it set) is what lets switchTo() genuinely re-activate on
+      // re-entry instead of no-op'ing on its own `activeLayer === layer`
+      // guard.
+      if (activeLayer && activeLayer.videoEl) deactivate(activeLayer.videoEl);
+      activeLayer = null;
+      return;
+    }
     const found = beatEls.find((b) => b.beat === best);
     if (found) switchTo(found.layer);
   }, { threshold: [0.15, 0.3, 0.5, 0.7, 0.9] });

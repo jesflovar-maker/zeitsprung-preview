@@ -290,12 +290,14 @@ img{ max-width:100%; display:block; }
   opacity: 0; transition: opacity 0.6s ease;
 }
 .gallery__bg.is-visible{ opacity: 1; }
-/* PHASE 2.7C.2 — background VIDEO layer. Sits above bgA/bgB (which stay
-   mounted underneath as the always-present still fallback/poster-match), same
-   blur/brightness/scale treatment, its own independent opacity crossfade so
-   it only appears once the active monument's clip actually has a decoded
-   frame ready (canplay), never a blank flash over the still. */
-.gallery__bg-video{
+/* SINGLE-DECODER CANVAS MIRROR — replaces the former background VIDEO
+   layer with a <canvas> painted from panelVideo's own decoded frames (see
+   js/gallery.js). Same exact blur/brightness/scale treatment and stacking
+   as before; still sits above bgA/bgB (the always-present still
+   fallback/poster-match), same independent opacity crossfade so it only
+   appears once the foreground actually has a decoded frame to mirror,
+   never a blank flash over the still. */
+.gallery__bg-canvas{
   position:absolute; inset:0; z-index:0;
   width:100%; height:100%; object-fit: cover; object-position: center 42%;
   filter: blur(22px) brightness(0.55) saturate(0.9);
@@ -303,7 +305,7 @@ img{ max-width:100%; display:block; }
   opacity: 0; transition: opacity 0.6s ease;
   pointer-events: none;
 }
-.gallery__bg-video.is-visible{ opacity: 1; }
+.gallery__bg-canvas.is-visible{ opacity: 1; }
 .gallery__scrim{
   position:absolute; inset:0; z-index:1;
   background: linear-gradient(to top, rgba(8,9,11,0.94) 0%, rgba(8,9,11,0.55) 45%, rgba(8,9,11,0.25) 100%);
@@ -344,8 +346,9 @@ img{ max-width:100%; display:block; }
   opacity: 0; transition: opacity 0.5s ease;
 }
 .gallery__panel-img.is-visible{ opacity: 1; }
-/* PHASE 2.7C.2 — foreground VIDEO layer (dominant 9:16 panel). Same
-   stacking logic as .gallery__bg-video above: panelImgA/B stay mounted as
+/* PHASE 2.7C.2 — foreground VIDEO layer (dominant 9:16 panel, the single
+   decoder this card runs on). Same stacking logic as .gallery__bg-canvas
+   above: panelImgA/B stay mounted as
    the still fallback (and as the initial frame while the video decodes),
    the video crossfades in on top only once playable. `object-position`
    matches .gallery__panel-img's own 38% so a static-image monument and a
@@ -480,12 +483,13 @@ img{ max-width:100%; display:block; }
   .gallery__stage.is-shift-left .gallery__panel,
   .gallery__stage.is-shift-right .gallery__panel{ animation: none; }
   .gallery__bg, .gallery__panel-img{ transition: opacity 0.3s linear; }
-  /* PHASE 2.7C.2 — no video anywhere under reduced motion: gallery.js
-     itself never assigns a video src in this mode (see maybeStartVideo()),
-     this is a defensive CSS backstop matching the hero/thesis video pattern
-     above. The still (poster-matched) image stays the only visual, plain
+  /* PHASE 2.7C.2 — no video/canvas motion anywhere under reduced motion:
+     gallery.js itself never assigns a video src in this mode (see
+     syncMedia()) and startCanvasMirror() itself refuses to start under
+     reducedMotion(), so this is a defensive CSS backstop, not the primary
+     gate. The still (poster-matched) image stays the only visual, plain
      crossfade only. */
-  .gallery__bg-video, .gallery__panel-video{ display:none; }
+  .gallery__bg-canvas, .gallery__panel-video{ display:none; }
   /* Per-field ladder collapses to a single immediate, fully-readable
      crossfade — no staggered delays, no translateY motion. */
   .gallery__field{ transform:none; transition: opacity 0.25s linear; transition-delay: 0s !important; }

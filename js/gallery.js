@@ -45,7 +45,7 @@ function pick(obj, lang) {
   return obj[lang] !== undefined ? obj[lang] : (obj.de || "");
 }
 
-import { activate, deactivate, safePlay, safePause, register } from "./video-playback.js";
+import { activate, deactivate } from "./video-playback.js";
 
 export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   if (!root) return null;
@@ -70,14 +70,15 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   root.innerHTML = "";
   const bgA = el("div", "gallery__bg gallery__bg--a");
   const bgB = el("div", "gallery__bg gallery__bg--b");
-  // PHASE 2.7C.2 — ONE background video layer (not an A/B pair): only the
-  // active monument's clip is ever assigned/playing (see maybeStartVideo()/
-  // stopMedia() below), so there is never a second video to cross-fade
-  // against. bgA/bgB stay mounted underneath as the permanent still
-  // fallback and as what's already visible the instant a new monument is
-  // selected, before its video (if any) has a decoded frame ready.
-  const bgVideo = el("video", "gallery__bg-video", { "aria-hidden": "true", tabindex: "-1" });
-  bgVideo.muted = true; bgVideo.playsInline = true; bgVideo.disablePictureInPicture = true;
+  // SINGLE-DECODER CANVAS MIRROR (owner-approved performance experiment,
+  // replaces the two-<video> background) — bgA/bgB (the still-image
+  // crossfade pair) stay exactly as before, mounted underneath as the
+  // permanent still fallback and as what's visible before the foreground
+  // has a decoded frame. The moving atmosphere layer is now this ONE
+  // <canvas>, painted from panelVideo's own decoded frames (see the canvas
+  // mirror block below) — there is no second <video> element, so no second
+  // decoder, at all.
+  const bgCanvas = el("canvas", "gallery__bg-canvas", { "aria-hidden": "true" });
   const scrim = el("div", "gallery__scrim");
   const stage = el("div", "gallery__stage");
   const panel = el("article", "gallery__panel");
@@ -86,8 +87,10 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   const panelImgB = el("img", "gallery__panel-img gallery__panel-img--b");
   panelImgA.alt = ""; panelImgB.alt = ""; panelImgA.draggable = false; panelImgB.draggable = false;
   const placeholder = el("div", "gallery__placeholder", { "aria-hidden": "true" });
-  // PHASE 2.7C.2 — ONE foreground video layer, same single-instance
-  // reasoning as bgVideo above. Sits above the placeholder/img layers.
+  // PHASE 2.7C.2 — ONE foreground video layer, the single decoder this
+  // whole card runs on (the moving background is a <canvas> mirror, no
+  // second <video> — see the canvas mirror block below). Sits above the
+  // placeholder/img layers.
   const panelVideo = el("video", "gallery__panel-video", { "aria-hidden": "true", tabindex: "-1" });
   panelVideo.muted = true; panelVideo.playsInline = true; panelVideo.disablePictureInPicture = true;
   panelMedia.appendChild(placeholder);
@@ -139,7 +142,7 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   stage.appendChild(panel);
   root.appendChild(bgA);
   root.appendChild(bgB);
-  root.appendChild(bgVideo);
+  root.appendChild(bgCanvas);
   root.appendChild(scrim);
   root.appendChild(stage);
   root.appendChild(prevBtn);
@@ -262,71 +265,116 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   let mediaToken = 0;
   let lastMediaId = null;
 
-  // VIDEO-IN-VIDEO CARD (owner-approved DESIGN + MOTION REVISION) — the
-  // foreground panelVideo is the ONE authoritative playback instance (still
-  // owned via video-playback.js's activate()/deactivate(), same as before).
-  // bgVideo is a decorative, muted, synchronized MIRROR only: it is never
-  // activate()-d (never added to that runtime's owned `activeVideos`), never
-  // decides card state, and has no independent gallery/gesture logic of its
-  // own — it only reacts to panelVideo's real play/pause/position, via
-  // safePlay()/safePause() (the same race-safe primitives, without taking
-  // ownership). Wired ONCE here (not per monument switch) since panelVideo/
-  // bgVideo are the same two persistent elements reused across every switch.
-  register(bgVideo, { id: "gallery:bg-mirror", role: "gallery-bg-mirror" });
-  const BG_DRIFT_TOLERANCE = 0.3; // seconds — correct only visible drift, never every frame
-  function mirrorBgPosition() {
-    if (!bgVideo.src || bgVideo.readyState < 1) return;
-    if (Math.abs(bgVideo.currentTime - panelVideo.currentTime) > BG_DRIFT_TOLERANCE) {
-      bgVideo.currentTime = panelVideo.currentTime;
+  // SINGLE-DECODER CANVAS MIRROR (owner-approved performance experiment) —
+  // panelVideo is the ONE authoritative playback instance (unchanged, still
+  // owned via video-playback.js's activate()/deactivate()). bgCanvas has NO
+  // media ownership and NO independent playback of any kind: it is a plain
+  // 2D canvas repainted from panelVideo's own decoded frames on a throttled
+  // schedule, so there is only ever ONE video decoder for this card,
+  // period. This replaces both the original two-<video> mirror (activate-d
+  // background) and its immediate successor (a lightweight second <video>)
+  // — a measured runtime diagnostic showed the cost was tied to having a
+  // SECOND PLAYING VIDEO ELEMENT at all, not its resolution/bitrate, so the
+  // only remaining way to keep the moving-background effect at one-decoder
+  // cost is to source it from pixels already being decoded anyway.
+  const CANVAS_W = 270, CANVAS_H = 480; // experimental backing resolution — see the owner's max 270x480 ceiling; blur(22px) hides the low native detail
+  bgCanvas.width = CANVAS_W;
+  bgCanvas.height = CANVAS_H;
+  const bgCtx = bgCanvas.getContext("2d", { alpha: false });
+  let canvasFps = 8; // tunable for local A/B testing (6/8/10); the shipped default lives here
+  let canvasIntervalMs = 1000 / canvasFps;
+  let lastDrawTime = 0;
+  let canvasActive = false;
+  let canvasVfcHandle = null;
+  let canvasRafHandle = null;
+  window.__ztCanvasDrawCount = 0; // debug-only counter, mirrors the project's existing ?debug=1 conventions
+  window.__ztSetCanvasFps = (fps) => { canvasFps = fps; canvasIntervalMs = 1000 / fps; }; // debug-only tuning hook, same spirit
+
+  function drawMirrorFrame() {
+    if (panelVideo.paused || panelVideo.readyState < 2) return;
+    const vw = panelVideo.videoWidth, vh = panelVideo.videoHeight;
+    if (!vw || !vh) return;
+    // object-fit:cover-equivalent crop math -- never stretches/distorts.
+    const canvasAspect = CANVAS_W / CANVAS_H;
+    const videoAspect = vw / vh;
+    let sx, sy, sw, sh;
+    if (videoAspect > canvasAspect) {
+      sh = vh; sw = vh * canvasAspect; sx = (vw - sw) / 2; sy = 0;
+    } else {
+      sw = vw; sh = vw / canvasAspect; sx = 0; sy = (vh - sh) / 2;
+    }
+    bgCtx.drawImage(panelVideo, sx, sy, sw, sh, 0, 0, CANVAS_W, CANVAS_H);
+    window.__ztCanvasDrawCount += 1;
+  }
+
+  function canvasTick() {
+    if (!canvasActive) return;
+    const now = performance.now();
+    if (now - lastDrawTime >= canvasIntervalMs) {
+      lastDrawTime = now;
+      drawMirrorFrame();
+    }
+    scheduleCanvasTick();
+  }
+  function scheduleCanvasTick() {
+    if (!canvasActive) return;
+    // requestVideoFrameCallback (when available) only fires while the
+    // source video actually has a new decoded frame -- cheaper and more
+    // correct than a bare rAF loop, but the FPS throttle above still caps
+    // the actual draw rate regardless of how often it fires.
+    if (typeof panelVideo.requestVideoFrameCallback === "function") {
+      canvasVfcHandle = panelVideo.requestVideoFrameCallback(canvasTick);
+    } else {
+      canvasRafHandle = requestAnimationFrame(canvasTick);
     }
   }
-  panelVideo.addEventListener("play", () => safePlay(bgVideo));
-  panelVideo.addEventListener("playing", () => safePlay(bgVideo));
-  panelVideo.addEventListener("pause", () => safePause(bgVideo));
-  // Native 'timeupdate' fires a few times per second (not a manual rAF
-  // loop) — restrained enough to prevent visible drift without constantly
-  // reassigning currentTime.
-  panelVideo.addEventListener("timeupdate", mirrorBgPosition);
-  panelVideo.addEventListener("seeked", mirrorBgPosition);
+  function startCanvasMirror() {
+    if (canvasActive || reducedMotion() || document.visibilityState === "hidden") return;
+    canvasActive = true;
+    lastDrawTime = 0;
+    drawMirrorFrame(); // paint immediately -- never wait a full throttle interval for the first frame
+    scheduleCanvasTick();
+  }
+  function stopCanvasMirror() {
+    canvasActive = false;
+    if (canvasVfcHandle && typeof panelVideo.cancelVideoFrameCallback === "function") {
+      panelVideo.cancelVideoFrameCallback(canvasVfcHandle);
+    }
+    if (canvasRafHandle) cancelAnimationFrame(canvasRafHandle);
+    canvasVfcHandle = null; canvasRafHandle = null;
+  }
+  panelVideo.addEventListener("play", startCanvasMirror);
+  panelVideo.addEventListener("playing", startCanvasMirror);
+  panelVideo.addEventListener("pause", stopCanvasMirror);
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") stopCanvasMirror();
+    else if (!panelVideo.paused) startCanvasMirror();
+  });
 
   function stopMedia() {
     mediaToken += 1;
     deactivate(panelVideo);
-    safePause(bgVideo); // decorative mirror -- paused directly, never via deactivate()'s ownership bookkeeping
-    [bgVideo, panelVideo].forEach((v) => {
-      v.loop = false;
-      v.removeAttribute("src");
-      try { v.load(); } catch (err) { /* ignore */ }
-      v.classList.remove("is-visible");
-    });
+    stopCanvasMirror();
+    bgCanvas.classList.remove("is-visible");
+    bgCtx.clearRect(0, 0, CANVAS_W, CANVAS_H); // never let a stale monument's frame linger under the next reveal
+    panelVideo.loop = false;
+    panelVideo.removeAttribute("src");
+    try { panelVideo.load(); } catch (err) { /* ignore */ }
+    panelVideo.classList.remove("is-visible");
   }
 
-  // Applies the SAME clip to both the sharp foreground video and the
-  // blurred background mirror. bgVideo.src always mirrors `url` literally
-  // (the exact segment panelVideo is playing right now), not the static
-  // `background` config field — so the ping-pong assembly<->disassembly
-  // chain below (steinerne-bruecke) keeps both layers on the SAME segment
-  // at every step, per the owner's explicit "foreground changes source ->
-  // background changes to same source" requirement. The two layers are
-  // frame-synchronized (see mirrorBgPosition() above), not just same-file.
   function playClip(m, url, token) {
     if (token !== mediaToken || !url) return;
     panelVideo.src = url;
-    bgVideo.src = url;
     const loopNative = m.video_mode !== "assembly_loop" || !m.video_reverse;
     panelVideo.loop = loopNative;
-    bgVideo.loop = loopNative;
 
     const reveal = () => {
       if (token !== mediaToken) return;
       panelVideo.classList.add("is-visible");
-      bgVideo.classList.add("is-visible");
       activate(panelVideo, { id: `gallery:${m.id}:panel`, role: "gallery-panel" });
-      // bgVideo is intentionally NOT activate()-d (see the mirror wiring
-      // above) -- kicked here too (safePlay is idempotent/race-safe) so it
-      // starts the moment the foreground reveals, not only on its next
-      // 'play'/'playing' event.
-      safePlay(bgVideo);
+      startCanvasMirror();
+      bgCanvas.classList.add("is-visible"); // the immediate drawMirrorFrame() inside startCanvasMirror() already painted a real frame, so this never fades in over a blank/stale canvas
     };
     panelVideo.addEventListener("canplay", reveal, { once: true });
 
