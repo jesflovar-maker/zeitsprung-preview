@@ -45,7 +45,7 @@ function pick(obj, lang) {
   return obj[lang] !== undefined ? obj[lang] : (obj.de || "");
 }
 
-import { activate, deactivate } from "./video-playback.js";
+import { activate, deactivate } from "./video-playback.js?v=20260905";
 
 export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   if (!root) return null;

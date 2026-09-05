@@ -20,9 +20,9 @@
 import { getInitialLang, setLang, applyI18n, t } from "./index-i18n.js";
 import { ZT_AUDIO_BUS } from "./zt-audio.js";
 import { createZtTypography } from "../STEINERNE_BRUECKE/js/zt-typography.js";
-import { initGallery } from "./gallery.js";
+import { initGallery } from "./gallery.js?v=20260905";
 import { initRouteMap } from "./route-map.js";
-import { activate, deactivate, register, getDebugSnapshot } from "./video-playback.js";
+import { activate, deactivate, register, getDebugSnapshot } from "./video-playback.js?v=20260905";
 
 const ZT_SOUND_PREF_KEY = "zeitsprung:soundEnabled"; // shared with STEINERNE_BRUECKE/js/main.js
 
@@ -146,23 +146,49 @@ function wireSoundToggle() {
 // any chapter): assets/video/index/intro/zeitsprung_intro_main_loop_final_web.mp4
 // (+ its poster) — the PREVIOUS hero source (a different, non-build clip).
 // ---------------------------------------------------------------------------
+// INDEX HERO MOBILE FRAME-SCRUB REPAIR — capability check, not a UA/brand
+// sniff (brief Section 10 explicitly asks for this): "coarse" pointer or
+// "no hover" both indicate a touch-first device on every real browser engine,
+// covering iPhone Safari/Chrome and Android Chrome/Edge alike without ever
+// branching on a browser name/string.
+function isTouchFirstDevice() {
+  try {
+    return window.matchMedia("(pointer: coarse)").matches || window.matchMedia("(hover: none)").matches;
+  } catch (e) {
+    return false; // matchMedia unsupported (very old browser) -> fall back to the desktop/video path, never crash
+  }
+}
+
 function wireHeroMedia() {
   const video = document.getElementById("heroVideo");
   const poster = document.getElementById("heroPoster");
+  const canvas = document.getElementById("heroCanvas");
   // Paths are relative to index.html (this page's own location), which
   // shares the ZEITSPRUNG_V2/assets/ folder with the bridge (see
   // monuments.config.json's own path convention note).
   // Poster = the video's own final, fully-resolved frame (not a separate
   // asset) — the same completed-city composition the scrub ends on, so a
   // reduced-motion visitor or a load/scrub failure sees the SAME approved
-  // result state, never an unrelated placeholder image.
+  // result state, never an unrelated placeholder image. Shared by BOTH the
+  // desktop-video and mobile-canvas paths as the pre-ready fallback (brief
+  // Section 14) — never a black hero, empty canvas, or broken-image icon.
   const POSTER_IMG = "assets/video/index/intro/zeitsprung_intro_build_v01_poster.jpg";
   if (poster) poster.src = POSTER_IMG;
-  if (!video) return;
-  // prefers-reduced-motion: the poster stays the permanent hero image; the
-  // video is never even requested (css/index.css also hides it defensively,
-  // .hero__media video{display:none} under prefers-reduced-motion).
+  // prefers-reduced-motion: the poster stays the permanent hero image on
+  // EITHER path; neither the video nor the frame sequence is ever requested
+  // (css/index.css also hides both defensively under prefers-reduced-motion).
   if (reducedMotion()) return;
+
+  if (isTouchFirstDevice() && canvas) {
+    // Touch-first device: the MP4 is never assigned a src at all here (no
+    // download, no decode, no seeking) — see initHeroFrameScrub()'s own
+    // header comment for the full rationale. Desktop/non-touch falls
+    // through to the completely unchanged video path below.
+    initHeroFrameScrub(canvas);
+    return;
+  }
+
+  if (!video) return;
   video.src = "assets/video/index/intro/zeitsprung_intro_build_v01_web.mp4";
   register(video, { id: "indexHero", role: "hero-build-scrub" });
   video.preload = "auto"; // must be buffered enough to scrub smoothly, not just play once
@@ -255,6 +281,51 @@ function runHeroTitleReveal() {
 // it the same safe-autoplay attrs + debug-snapshot visibility as every
 // other tracked video, without pretending it is playback-active.
 // ---------------------------------------------------------------------------
+// Shared by BOTH the desktop-video scrub (initHeroScrub) and the
+// mobile-canvas frame scrub (initHeroFrameScrub) — the hint/identity/title
+// reveal choreography is authored exactly once here so the two rendering
+// paths can never drift apart on WHEN text appears, only HOW the visual
+// frame itself is produced. Returns a function that takes the current
+// progress (0-1) and applies every text-state side effect.
+function makeHeroTextState(hero) {
+  let hintShown = false;
+  let identityShown = false;
+  let titleShown = false;
+  let titleRevealFired = false;
+
+  return function applyTextState(progress) {
+    // Scrollhint — only as the initial "start scrolling" invitation.
+    const hintVisible = progress < 0.02;
+    if (hintVisible !== hintShown) {
+      hintShown = hintVisible;
+      hero.classList.toggle("is-hint-visible", hintVisible);
+    }
+
+    // 70% — subtle identity (eyebrow) begins to appear.
+    const identityVisible = progress >= 0.70;
+    if (identityVisible !== identityShown) {
+      identityShown = identityVisible;
+      hero.classList.toggle("is-identity-visible", identityVisible);
+    }
+
+    // 85% — full ZEITSPRUNG title + tagline reveal, once, via the shared
+    // char/line reveal engine (see runHeroTitleReveal()). Scrolling back
+    // below 85% hides it again via CSS (class toggle), but the one-shot
+    // GSAP reveal itself is never re-fired — re-running a char-by-char
+    // reveal on every scroll direction change would read as glitchy, not
+    // premium.
+    const titleVisible = progress >= 0.85;
+    if (titleVisible !== titleShown) {
+      titleShown = titleVisible;
+      hero.classList.toggle("is-title-visible", titleVisible);
+      if (titleVisible && !titleRevealFired) {
+        titleRevealFired = true;
+        runHeroTitleReveal();
+      }
+    }
+  };
+}
+
 function initHeroScrub(video) {
   const hero = document.querySelector(".hero");
   if (!hero) return;
@@ -285,48 +356,17 @@ function initHeroScrub(video) {
 
   const SEEK_EPSILON = 0.02; // seconds — avoid reassigning currentTime for negligible scroll deltas
   let lastTarget = -1;
-  let hintShown = false;
-  let identityShown = false;
-  let titleShown = false;
-  let titleRevealFired = false;
+  const applyTextState = makeHeroTextState(hero);
 
   function applyProgress(progress) {
-    const target = Math.min(Math.max(progress, 0), 1) * duration;
+    const p = Math.min(Math.max(progress, 0), 1);
+    const target = p * duration;
     const clamped = Math.min(target, duration - SEEK_EPSILON);
     if (Math.abs(clamped - lastTarget) > SEEK_EPSILON) {
       video.currentTime = clamped;
       lastTarget = clamped;
     }
-
-    // Scrollhint — only as the initial "start scrolling" invitation.
-    const hintVisible = progress < 0.02;
-    if (hintVisible !== hintShown) {
-      hintShown = hintVisible;
-      hero.classList.toggle("is-hint-visible", hintVisible);
-    }
-
-    // 70% — subtle identity (eyebrow) begins to appear.
-    const identityVisible = progress >= 0.70;
-    if (identityVisible !== identityShown) {
-      identityShown = identityVisible;
-      hero.classList.toggle("is-identity-visible", identityVisible);
-    }
-
-    // 85% — full ZEITSPRUNG title + tagline reveal, once, via the shared
-    // char/line reveal engine (see runHeroTitleReveal()). Scrolling back
-    // below 85% hides it again via CSS (class toggle), but the one-shot
-    // GSAP reveal itself is never re-fired — re-running a char-by-char
-    // reveal on every scroll direction change would read as glitchy, not
-    // premium.
-    const titleVisible = progress >= 0.85;
-    if (titleVisible !== titleShown) {
-      titleShown = titleVisible;
-      hero.classList.toggle("is-title-visible", titleVisible);
-      if (titleVisible && !titleRevealFired) {
-        titleRevealFired = true;
-        runHeroTitleReveal();
-      }
-    }
+    applyTextState(p);
   }
 
   ScrollTrigger.create({
@@ -352,6 +392,237 @@ function initHeroScrub(video) {
   // suspenders refresh, not a second competing resize system.
   window.addEventListener("orientationchange", () => {
     ScrollTrigger.refresh();
+  });
+}
+
+// ---------------------------------------------------------------------------
+// INDEX HERO MOBILE FRAME-SCRUB REPAIR — touch-first device path.
+//
+// Physical-device QA found the desktop path above (video.currentTime scrub)
+// seeks robotically on Android Chrome/Edge and does not render the
+// scroll-build interaction reliably at all on iPhone Safari/Chrome, while
+// every OTHER ZEITSPRUNG video system works correctly — isolating the fault
+// to arbitrary-currentTime MP4 seeking specifically, not the hero design, not
+// the creative asset, not infrastructure. Fix: touch-first devices never seek
+// an MP4 for the hero at all. Instead, 96 frames pre-extracted via ffmpeg
+// from the SAME approved web derivative
+// (assets/video/index/intro/zeitsprung_intro_build_v01_web.mp4, itself an
+// untouched derivative of MASTER 03_ASSETS/VIDEO/INDEX/INTRO/
+// zeitsprung_intro_build_v01.mp4 — neither file touched by this task) are
+// drawn to a <canvas> selected by nearest-frame-index from the EXACT SAME
+// ScrollTrigger progress value the desktop path uses (one
+// ScrollTrigger.create() per path, never two competing triggers on the same
+// element) — see makeHeroTextState() above, shared by both paths so hint/
+// identity/title reveal timing is authored exactly once and can never drift
+// between the two rendering strategies.
+//
+// Extraction recipe (for the next regeneration): ffmpeg -i
+// zeitsprung_intro_build_v01_web.mp4 -vf "fps=96/10.04166667,scale=480:854"
+// -frames:v 96 -c:v libwebp -quality 70 -compression_level 6 frame_%03d.webp
+// — 96 frames, 480x854 (native resolution of the web derivative, no upscale/
+// downscale needed), WebP quality 70, 2.4MB total (well inside the <=6MB
+// target, so quality/count were not reduced from the initial attempt).
+// ---------------------------------------------------------------------------
+const HERO_FRAME_COUNT = 96;
+const HERO_FRAME_BASE = "assets/video/index/intro/mobile_frames_v01/";
+function heroFrameUrl(i) {
+  return HERO_FRAME_BASE + "frame_" + String(i).padStart(3, "0") + ".webp";
+}
+
+function initHeroFrameScrub(canvas) {
+  const hero = document.querySelector(".hero");
+  if (!hero) return;
+
+  if (reducedMotion()) return; // poster stays the sole visual, exactly like the video path
+
+  if (typeof gsap === "undefined" || typeof ScrollTrigger === "undefined") {
+    // CDN blocked / plugin failed — leave the poster (the video's own final,
+    // fully-resolved frame) as the sole visual. Unlike the desktop fallback
+    // (which can loop the actual video), a frame sequence has nothing sane
+    // to "autoplay" without scroll driving it, so a static approved frame is
+    // the correct degradation here, not an invented animation.
+    return;
+  }
+
+  const ctx = canvas.getContext("2d", { alpha: false });
+  const images = new Array(HERO_FRAME_COUNT).fill(null);
+  const loading = new Array(HERO_FRAME_COUNT).fill(false);
+  let currentIndex = -1;
+
+  // Bounded-concurrency loader (brief Section 5) — never more than
+  // MAX_CONCURRENT simultaneous frame requests in flight, regardless of how
+  // many indices get queued at once. Priority: frame 0 and the final frame
+  // first (both queued at the front immediately below), then everything
+  // else in plain order; requestFrame()/renderTick() below additionally
+  // re-prioritizes the frames actually near the current scroll position to
+  // the front of the queue on every real progress update.
+  const MAX_CONCURRENT = 4;
+  let activeLoads = 0;
+  const queue = [];
+  function pump() {
+    while (activeLoads < MAX_CONCURRENT && queue.length) {
+      const i = queue.shift();
+      if (images[i] || loading[i]) continue;
+      loading[i] = true;
+      activeLoads++;
+      const img = new Image();
+      img.decoding = "async";
+      img.onload = () => {
+        images[i] = img;
+        loading[i] = false;
+        activeLoads--;
+        if (i === 0) { canvas.classList.add("is-ready"); if (currentIndex < 0) drawFrame(0); }
+        if (i === currentIndex) drawFrame(i);
+        pump();
+      };
+      img.onerror = () => { loading[i] = false; activeLoads--; pump(); }; // images[i] stays null -> drawFrame() below simply keeps the last good frame, never a broken-image icon
+      img.src = heroFrameUrl(i);
+    }
+  }
+  function enqueue(i, front) {
+    if (i < 0 || i >= HERO_FRAME_COUNT || images[i] || loading[i]) return;
+    if (front) queue.unshift(i); else queue.push(i);
+  }
+
+  enqueue(0, true);
+  enqueue(HERO_FRAME_COUNT - 1, true);
+  for (let i = 1; i < HERO_FRAME_COUNT - 1; i++) enqueue(i, false);
+  pump();
+
+  // object-fit:cover-equivalent crop, generalized from js/gallery.js's own
+  // proven single-decoder-canvas-mirror drawMirrorFrame() (which centers at
+  // 50/50) to also support the hero's own tuned object-position (62%, 32%
+  // — css/index.css) instead of a fixed center, so the bridge + Dom towers
+  // stay in frame exactly like the desktop video path.
+  const OBJ_POS_X = 0.62, OBJ_POS_Y = 0.32;
+  function drawFrame(i) {
+    const img = images[i];
+    if (!img) return; // no frame yet at this index -- caller keeps whatever was drawn before (or the poster underneath)
+    const cw = canvas.width, ch = canvas.height;
+    if (!cw || !ch) return;
+    const iw = img.naturalWidth, ih = img.naturalHeight;
+    const canvasAspect = cw / ch, imgAspect = iw / ih;
+    let sx, sy, sw, sh;
+    if (imgAspect > canvasAspect) {
+      sh = ih; sw = ih * canvasAspect; sx = (iw - sw) * OBJ_POS_X; sy = 0;
+    } else {
+      sw = iw; sh = iw / canvasAspect; sx = 0; sy = (ih - sh) * OBJ_POS_Y;
+    }
+    ctx.drawImage(img, sx, sy, sw, sh, 0, 0, cw, ch);
+  }
+
+  function resizeCanvas() {
+    const rect = hero.getBoundingClientRect();
+    const dpr = Math.min(window.devicePixelRatio || 1, 2); // capped -- a hero-sized canvas at 3x DPR is real memory/paint cost for no visible gain over a 480px-native source
+    const w = Math.round(rect.width * dpr), h = Math.round(rect.height * dpr);
+    if (w > 0 && h > 0 && (canvas.width !== w || canvas.height !== h)) {
+      canvas.width = w;
+      canvas.height = h;
+      if (currentIndex >= 0) drawFrame(currentIndex); // resize clears the backing store -- repaint immediately, never a blank frame after rotate/resize
+    }
+  }
+  resizeCanvas();
+  window.addEventListener("resize", resizeCanvas);
+
+  // Light progress smoothing (brief Section 8) — small on purpose. This is
+  // NOT fake video interpolation between frames; it only smooths WHICH
+  // progress value gets fed into the nearest-frame-index selection, so a
+  // noisy burst of scroll-delta events can't cause visible frame chatter.
+  // SMOOTH_FACTOR is deliberately high (snappy) so down/up/stop all still
+  // feel immediate, per the brief's explicit "no long lag" requirement.
+  const SMOOTH_FACTOR = 0.35;
+  let smoothed = 0;
+  let smoothedInit = false;
+  let targetProgress = 0;
+  let rafPending = false;
+  let heroInView = true;
+
+  const applyTextState = makeHeroTextState(hero);
+
+  // Convergence threshold for the smoothing below, in frame-index units:
+  // once `smoothed` is closer to `targetProgress` than this, further
+  // stepping cannot change the ROUNDED frame index anyway, so settling
+  // stops exactly ("quickly", per the brief) rather than chasing an
+  // imperceptible remainder forever.
+  const SETTLE_EPSILON = 1 / (HERO_FRAME_COUNT - 1) / 4;
+
+  function renderTick() {
+    rafPending = false;
+    if (!heroInView) return; // lifecycle (brief Section 13) -- zero draws while genuinely offscreen; resumes naturally from wherever it left off once a real onUpdate fires again
+    if (!smoothedInit) { smoothed = targetProgress; smoothedInit = true; }
+    else smoothed += (targetProgress - smoothed) * SMOOTH_FACTOR;
+    applyTextState(smoothed);
+    const idx = Math.round(smoothed * (HERO_FRAME_COUNT - 1));
+    if (idx !== currentIndex) {
+      currentIndex = idx;
+      // Re-prioritize the frames actually needed right now to the front of
+      // the load queue -- "frames near current scroll position" (brief
+      // Section 5, priority 3) without re-queuing anything already
+      // loaded/in-flight (enqueue() itself is a no-op for those).
+      enqueue(idx, true);
+      enqueue(Math.min(idx + 1, HERO_FRAME_COUNT - 1), true);
+      enqueue(Math.max(idx - 1, 0), true);
+      pump();
+      drawFrame(idx); // no-op (keeps last drawn frame) if this exact index hasn't loaded yet -- never blank
+    }
+    // MEASURED CORRECTION (this task, pre-delivery QA): a single onUpdate
+    // event only scheduled ONE renderTick, which moved `smoothed` just
+    // SMOOTH_FACTOR (35%) of the way toward the real target and then froze
+    // there — fine for a slow, continuous real scroll gesture (which fires
+    // many onUpdate events in quick succession, each converging further),
+    // but confirmed live to leave the hero stuck on the WRONG frame after a
+    // fast/discrete scroll change, directly contradicting the brief's "stop
+    // scroll settles quickly, no long lag" requirement. Fixed by having
+    // renderTick keep re-scheduling ITSELF (still only ever one rAF in
+    // flight at a time, still gated on heroInView, still never runs after
+    // scrolling away) until `smoothed` has actually converged — a short,
+    // self-terminating settle animation, not an unrestricted per-frame loop:
+    // at SMOOTH_FACTOR=0.35 this typically resolves within single-digit
+    // frames of the last real scroll event.
+    if (Math.abs(targetProgress - smoothed) > SETTLE_EPSILON) {
+      rafPending = true;
+      requestAnimationFrame(renderTick);
+    }
+  }
+
+  function requestFrame(rawProgress) {
+    targetProgress = Math.min(Math.max(rawProgress, 0), 1);
+    if (!rafPending) {
+      rafPending = true;
+      requestAnimationFrame(renderTick);
+    }
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+  hero.classList.add("hero--scrub-active");
+
+  ScrollTrigger.create({
+    trigger: hero,
+    start: "top top",
+    end: "+=260%", // identical pinned scroll distance to the desktop path -- same hero, same pin/text/VISION-transition timing, only the visual-frame mechanism differs
+    pin: true,
+    anticipatePin: 1,
+    onUpdate: (self) => requestFrame(self.progress),
+    onRefresh: (self) => requestFrame(self.progress)
+  });
+
+  // Explicit viewport guard in ADDITION to ScrollTrigger's own pin-scoped
+  // onUpdate (which already stops firing once fully scrolled past the pinned
+  // range, matching the desktop path's existing "zero seeks after exit"
+  // behavior) — belt-and-suspenders against a stray rAF from a resize/
+  // refresh firing while genuinely offscreen.
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver((entries) => {
+      entries.forEach((entry) => { heroInView = entry.isIntersecting; });
+    }, { threshold: 0 }).observe(hero);
+  }
+
+  window.addEventListener("pageshow", (e) => {
+    if (e.persisted) ScrollTrigger.refresh();
+  });
+  window.addEventListener("orientationchange", () => {
+    ScrollTrigger.refresh();
+    resizeCanvas();
   });
 }
 

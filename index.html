@@ -21,7 +21,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/index.css">
+<link rel="stylesheet" href="css/index.css?v=20260905">
 </head>
 <body>
 
@@ -44,6 +44,14 @@
   <div class="hero__media" aria-hidden="true">
     <img id="heroPoster" alt="" draggable="false">
     <video id="heroVideo" muted playsinline preload="none"></video>
+    <!-- INDEX HERO MOBILE FRAME-SCRUB REPAIR — touch-first devices render the
+         build sequence here (js/index-main.js's initHeroFrameScrub()) instead
+         of seeking heroVideo's currentTime; non-touch/desktop never even
+         assigns this a src/content and heroVideo's own scrub path is used
+         unchanged. See that function's own header comment for the full
+         rationale (physical-device QA: robotic seeking on Android, unreliable
+         rendering on iPhone Safari/Chrome). -->
+    <canvas id="heroCanvas" aria-hidden="true"></canvas>
   </div>
   <div class="hero__scrim" aria-hidden="true"></div>
   <div class="hero__inner">
@@ -164,6 +172,6 @@
      this page has no other pinned/scrubbed section, so native scroll is
      sufficient and stays within "no new animation libraries." -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
-<script type="module" src="js/index-main.js"></script>
+<script type="module" src="js/index-main.js?v=20260905"></script>
 </body>
 </html>
