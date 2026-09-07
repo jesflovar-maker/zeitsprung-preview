@@ -1831,24 +1831,83 @@ img{ max-width:100%; display:block; }
   margin-bottom: 10px;
 }
 
-/* AI assistant — visual placeholder only, no interaction, no state machine.
-   Same "reserve the shape, don't wire the behavior" spirit as
-   .reel__status-note above.
-   TEMPORARY PUBLICATION FIX (2026-09-07): enlarged from an icon-sized 48px
-   thumbnail to a full, legible museum-guide figure, centered at the end of
-   the module — the character was previously rendered too small to read as
-   an assistant. width:auto/height:auto (no forced square box) preserves the
-   PNG's native aspect ratio, so the transparent artwork is never letterboxed
-   or cropped. */
+/* AI GUIDE — closed interactive demo (owner-approved). Same dark-card/gold
+   language as the rest of this module (var(--z-bg-soft)/var(--z-line)),
+   never a new visual system — no game UI, no cartoon speech bubble, no
+   fake-typing effect: a compact editorial question panel + answer card. */
 .bruckmandl__assistant{
   display: flex; flex-direction: column; align-items: center;
+  gap: 28px;
   margin-top: 36px; padding-top: 28px;
   border-top: 1px solid var(--z-line);
 }
-.bruckmandl__assistant-img{
+.bruckmandl__ai-stage{
+  position: relative; display: flex; justify-content: center; align-items: flex-end;
+  width: 100%;
+}
+/* Soft radial gold glow behind the transparent character PNG. */
+.bruckmandl__ai-stage::before{
+  content: ""; position: absolute; left: 50%; bottom: 8px;
+  width: 60%; aspect-ratio: 1 / 1; transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(212,175,120,0.14) 0%, rgba(212,175,120,0) 72%);
+  pointer-events: none;
+}
+.bruckmandl__ai-img{
+  position: relative; z-index: 1;
   width: clamp(120px, 34vw, 190px); height: auto;
   object-fit: contain;
-  opacity: 0.96;
+  opacity: 1;
+  transition: opacity 0.22s ease;
+}
+.bruckmandl__ai-img.is-fading{ opacity: 0; }
+
+.bruckmandl__ai-panel{
+  width: 100%; max-width: 480px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.bruckmandl__ai-heading{
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.2em;
+  color: var(--z-gold-dim); text-align: center;
+  margin: 0;
+}
+.bruckmandl__ai-questions{
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.bruckmandl__ai-question-btn{
+  font-family: var(--font-sans); font-size: 12.5px; line-height: 1.35; text-align: left;
+  color: var(--z-ink-dim); background: var(--z-bg-soft);
+  border: 1px solid var(--z-line); border-radius: 8px;
+  padding: 10px 12px; cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+.bruckmandl__ai-question-btn:hover, .bruckmandl__ai-question-btn:focus-visible{
+  border-color: var(--z-gold-dim); color: var(--z-ink); outline: none;
+}
+.bruckmandl__ai-question-btn.is-active{
+  border-color: var(--z-gold); color: var(--z-ink);
+  background: rgba(212,175,120,0.08);
+}
+.bruckmandl__ai-answer{
+  border: 1px solid var(--z-line); border-radius: 10px;
+  padding: 16px;
+  background: var(--z-bg-soft);
+}
+.bruckmandl__ai-answer[hidden]{ display: none; }
+.bruckmandl__ai-answer-status{
+  display: flex; gap: 6px; flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.bruckmandl__ai-status-badge{
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em;
+  padding: 3px 7px; border-radius: 3px;
+  border: 1px solid var(--z-line);
+}
+.bruckmandl__ai-status-badge--fact{ color: var(--z-gold); border-color: rgba(212,175,120,0.4); }
+.bruckmandl__ai-status-badge--legend{ color: var(--z-warn); border-color: rgba(232,161,92,0.45); border-style: dashed; }
+.bruckmandl__ai-status-badge--uncertain{ color: var(--z-ink-faint); border-style: dashed; }
+.bruckmandl__ai-answer-text{
+  font-size: 14px; line-height: 1.55; color: var(--z-ink-dim);
+  margin: 0;
 }
 
 @media (min-width: 900px){
@@ -1859,4 +1918,11 @@ img{ max-width:100%; display:block; }
   .bruckmandl__video{ max-width: 420px; }
   .bruckmandl__factcheck{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .bruckmandl__factcheck-column{ margin-bottom: 0; }
+  .bruckmandl__assistant{ flex-direction: row; align-items: center; justify-content: center; gap: 44px; }
+  .bruckmandl__ai-stage{ width: auto; flex: 0 0 auto; }
+  .bruckmandl__ai-heading{ text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .bruckmandl__ai-img{ transition: none; }
 }

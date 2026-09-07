@@ -24,11 +24,19 @@
        own museumApi/kframesApi.refreshLabels()) so a DE/EN/ES language
        switch re-renders this module's text without reloading the page
 
-   WHAT THIS FILE DELIBERATELY DOES NOT DO (this phase)
+   AI GUIDE — CLOSED INTERACTIVE DEMO (this phase)
    -------------------------------------------------------
-     - no chat/AI logic, no state machine, no speech bubble — the AI
-       assistant slot renders exactly one static image
-       (bruckmandl_ai_idle.png) and nothing else
+     - renderAssistant() now renders a small, CLOSED interactive prototype:
+       a WELCOME->IDLE entry sequence, a fixed panel of 8 pre-written
+       questions, and — on selection — a TALK/POINT pose plus one
+       pre-written answer. This is NOT an open chatbot: no external AI API,
+       no free-form generation, no state persisted beyond the current DOM
+       (a language switch fully re-renders and resets it). Every answer is
+       a direct paraphrase of this file's own already-approved i18n content
+       (see js/i18n.js's bruckmandlAiQA) — no new historical claim is
+       introduced, and NEEDS_REVIEW material (current figure's material,
+       heraldic shield identity) is always presented as unresolved, never
+       as fact.
      - no tap-to-enlarge for cutouts/materials — no lightbox component
        exists anywhere in this codebase yet (confirmed by search), and the
        brief explicitly says to leave enlargement out rather than invent one
@@ -316,16 +324,146 @@ function renderSources(container, t, lang, sourcesMap) {
   container.appendChild(panel);
 }
 
+// ---------------------------------------------------------------------------
+// AI GUIDE — CLOSED INTERACTIVE DEMO (owner-approved). NOT an open chatbot:
+// no external API, no free-form generation — a fixed set of 8 questions,
+// each mapped to ONE pre-written answer paraphrased directly from this
+// file's already-approved i18n content (bruckmandlFactPoints/
+// bruckmandlHistory for SUPPORTED claims, bruckmandlLegendText for the
+// registered LEGEND, bruckmandlUncertainPoints for the registered
+// NEEDS_REVIEW material/heraldic-identity points). See js/i18n.js's
+// bruckmandlAiQA array for the exact per-language text.
+//
+// AI_QA_POSE_BY_INDEX / AI_QA_STATUS_BY_INDEX are BEHAVIORAL, not
+// linguistic — same 8 entries in every language, so they live here rather
+// than being repeated 3x in i18n.js. status codes are internal (never
+// user-facing strings) and render as small badges reusing the exact same
+// fact/legend/uncertain color language already established by
+// .bruckmandl__factcheck-column--fact/--legend/--uncertain.
+// ---------------------------------------------------------------------------
+const AI_QA_POSE_BY_INDEX = ["talk", "talk", "point", "talk", "talk", "talk", "talk", "point"];
+const AI_QA_STATUS_BY_INDEX = [
+  ["fact"],
+  ["fact"],
+  ["fact"],
+  ["fact", "legend"],
+  ["legend"],
+  ["fact"],
+  ["fact", "uncertain"],
+  ["uncertain"]
+];
+const AI_STATUS_LABEL_KEY = { fact: "bruckmandlStatusFact", legend: "bruckmandlLegendLabel", uncertain: "bruckmandlStatusUncertain" };
+const AI_POSE_ALT_KEY = { welcome: "bruckmandlAiWelcomeAlt", idle: "bruckmandlAiIdleAlt", point: "bruckmandlAiPointAlt", talk: "bruckmandlAiTalkAlt" };
+
+function prefersReducedMotion() {
+  return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+}
+
+// Pending pose-transition timers (welcome->idle entry sequence, talk/point->
+// idle after an answer). Tracked at module scope and swept at the start of
+// every render() call (language switch rebuilds the whole subtree) so a
+// stale timer from a previous render can never touch a detached <img>.
+let aiPendingTimers = [];
+function aiClearTimers() {
+  aiPendingTimers.forEach((id) => window.clearTimeout(id));
+  aiPendingTimers = [];
+}
+function aiScheduleTimer(fn, ms) {
+  const id = window.setTimeout(fn, ms);
+  aiPendingTimers.push(id);
+  return id;
+}
+
 function renderAssistant(container, assets, t, lang) {
+  const reduced = prefersReducedMotion();
+
+  // Preload all 4 poses once so a later pose switch never shows a blank/
+  // half-loaded frame during the crossfade.
+  ["welcome", "idle", "point", "talk"].forEach((pose) => {
+    const preload = new Image();
+    preload.src = assets.ai[pose];
+  });
+
   const wrap = el("div", "bruckmandl__assistant");
-  const img = el("img", "bruckmandl__assistant-img", { alt: t(lang, "bruckmandlAssistantAlt") || "", draggable: "false" });
-  img.src = assets.ai.idle;
-  wrap.appendChild(img);
+
+  const stage = el("div", "bruckmandl__ai-stage");
+  const img = el("img", "bruckmandl__ai-img", { alt: t(lang, "bruckmandlAiWelcomeAlt") || "", draggable: "false" });
+  img.src = assets.ai.welcome;
+  stage.appendChild(img);
+  wrap.appendChild(stage);
+
+  function setPose(poseKey) {
+    const alt = t(lang, AI_POSE_ALT_KEY[poseKey]) || "";
+    if (reduced) {
+      img.src = assets.ai[poseKey];
+      img.alt = alt;
+      return;
+    }
+    img.classList.add("is-fading");
+    aiScheduleTimer(() => {
+      img.src = assets.ai[poseKey];
+      img.alt = alt;
+      img.classList.remove("is-fading");
+    }, 220);
+  }
+
+  // Entry sequence: WELCOME for a short moment, then settle into IDLE.
+  aiScheduleTimer(() => setPose("idle"), reduced ? 0 : 1600);
+
+  const panel = el("div", "bruckmandl__ai-panel");
+  panel.appendChild(el("p", "bruckmandl__ai-heading")).textContent = t(lang, "bruckmandlAiHeading");
+
+  const qWrap = el("div", "bruckmandl__ai-questions", { role: "group", "aria-label": t(lang, "bruckmandlAiHeading") || "" });
+  const answerWrap = el("div", "bruckmandl__ai-answer", { "aria-live": "polite" });
+  answerWrap.hidden = true;
+  const statusRow = el("div", "bruckmandl__ai-answer-status");
+  const answerText = el("p", "bruckmandl__ai-answer-text");
+  answerWrap.appendChild(statusRow);
+  answerWrap.appendChild(answerText);
+
+  const qa = t(lang, "bruckmandlAiQA") || [];
+  const buttons = [];
+
+  qa.forEach((item, i) => {
+    const btn = el("button", "bruckmandl__ai-question-btn", { type: "button", "aria-pressed": "false" });
+    btn.textContent = item.question;
+    btn.addEventListener("click", () => {
+      buttons.forEach((b) => {
+        const active = b === btn;
+        b.classList.toggle("is-active", active);
+        b.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+
+      const pose = AI_QA_POSE_BY_INDEX[i] || "talk";
+      setPose(pose);
+
+      statusRow.innerHTML = "";
+      (AI_QA_STATUS_BY_INDEX[i] || []).forEach((code) => {
+        const badge = el("span", `bruckmandl__ai-status-badge bruckmandl__ai-status-badge--${code}`);
+        badge.textContent = t(lang, AI_STATUS_LABEL_KEY[code]) || "";
+        statusRow.appendChild(badge);
+      });
+      answerText.textContent = item.answer;
+      answerWrap.hidden = false;
+
+      // Return to IDLE after the answer has had time to be read, while the
+      // answer card itself stays visible — the visitor can pick another
+      // question at any point, this only rests the character's pose.
+      aiScheduleTimer(() => setPose("idle"), 2400);
+    });
+    buttons.push(btn);
+    qWrap.appendChild(btn);
+  });
+
+  panel.appendChild(qWrap);
+  panel.appendChild(answerWrap);
+  wrap.appendChild(panel);
   container.appendChild(wrap);
 }
 
 function render(inner, assets, sourcesMap, t, getLang) {
   const lang = getLang();
+  aiClearTimers();
   inner.innerHTML = "";
   renderIntro(inner, t, lang);
   renderHero(inner, assets);
