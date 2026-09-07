@@ -66,12 +66,13 @@ This file is the human-readable companion to `sources.json` (machine-readable) a
 
 **Title:** Kulturdatenbank – "Bruckmandl"
 **Institution / Author:** Stadt Regensburg
-**Document/File:** UNKNOWN (URL/entry not held locally)
-**Type:** City archive
-**Used for:** Bruckmandl figure interpretation (alternative readings)
-**Evidence level:** SECONDARY
+**Document/File:** https://www.regensburg.de/kultur/kulturdatenbank/eintrag/118949
+**Type:** City archive (official municipal database entry)
+**Used for:** Bruckmandl figure identity, dating, material, sculptor, location/orientation, restoration history, and interpretation (alternative readings)
+**Evidence level:** PRIMARY
 **Project location:** `01_ARCHITECTURE/ZEITSPRUNG_WEB_OPERATING_RULES.md` §29.8
 **Cross-reference:** `SB_SRC_003`
+**Notes:** Directly fetched and read in full on 2026-09-07 (official regensburg.de Kulturdatenbank entry, HTTP 200). Confirms: Jahr/Zeit der Entstehung 1446; Material Kalkstein (Original: Grünsandstein); Künstler — Original: unbekannt, Kopie: Anton Blank (Skulptur), Michael Mauerer (Entwurf der Säule); installed 23 April 1854 as the second successor of the original (destroyed 1579); on the western parapet at the bridge's highest point, ~11m above the river, facing south; meaning not conclusively settled (Südweiser vs. legendary Baumeister); right arm lost 2012 (probable vandalism), reinstalled after restoration 5 June 2018, a placeholder stood in its place 2014–2017. This entry cites its own source: Bauer, Karl — *Regensburg. Aus Kunst-, Kultur- und Sittengeschichte*, Regensburg 1988, S. 436–8 (registered separately as Q008, not directly consulted).
 
 ---
 
@@ -79,12 +80,13 @@ This file is the human-readable companion to `sources.json` (machine-readable) a
 
 **Title:** Ausstellungstafeln / documentación oficial sobre la Steinerne Brücke
 **Institution / Author:** Stadt Regensburg
-**Document/File:** UNKNOWN
-**Type:** Museum source
-**Used for:** Not currently cited by any registered claim — secondary/complementary official source, referenced but not yet directly consulted
-**Evidence level:** NEEDS_REVIEW
+**Document/File:** https://www.regensburg.de/fm/121/steinerne-bruecke-ausstellungstafeln.pdf
+**Type:** Museum source (official municipal exhibition panels, PDF, 23 pages)
+**Used for:** Bruckmandl history, predecessor figures, long pedestal inscription, short Spruchband inscription, legend text, and the legend's chronological implausibility (pp. 5–6)
+**Evidence level:** PRIMARY
 **Project location:** `01_ARCHITECTURE/ZEITSPRUNG_WEB_OPERATING_RULES.md` §29.8
 **Cross-reference:** `SB_SRC_004`
+**Notes:** Directly fetched and read in full on 2026-09-07 (official regensburg.de exhibition-panel PDF, HTTP 200, 23 pages total; Bruckmandl content on pp. 5–6). Confirms the current figure is the third sandstone figure of this name (original destroyed 1579 and lost; second version's torso survives in the Historisches Museum; third version by sculptor Anton Blank, installed 1854); quotes the long pedestal inscription verbatim; quotes the short Spruchband under the left hand verbatim with its St. Emmeram-manuscript translation, stating its interpretation remains unresolved; retells the builder's-wager/devil's-pact legend in full, then explicitly states the two buildings' construction dates make the legend impossible as literally told. Searched all 23 pages for "Wappen"/"Schild"/"Schlüssel"/"Löwe"/"Relief" — zero matches; the panels do not address either heraldic shield on the pedestal. Calls the current figure a "Sandsteinfigur" — conflicts with Q005's "Kalkstein" for the same figure; flagged unresolved, see `CLAIM_SOURCE_MAP.json`'s `bruckmandl_material_current`.
 
 ---
 
@@ -97,6 +99,22 @@ This file is the human-readable companion to `sources.json` (machine-readable) a
 **Used for:** Tower-count-by-period figure (3 towers until 1784, 2 until ~1810, 1 since)
 **Evidence level:** NEEDS_REVIEW — internal planning figure, no independent external primary source registered yet for the exact years
 **Cross-reference:** `SB_SRC_006`
+
+---
+
+### Q008
+
+**Title:** Regensburg. Aus Kunst-, Kultur- und Sittengeschichte
+**Institution / Author:** Karl Bauer
+**Publisher:** UNKNOWN (not held locally)
+**Year:** 1988
+**Document/File:** Not held locally — pp. 436–438 cited by Q005
+**Type:** Published local-history monograph
+**Used for:** Underlying academic source cited by Q005's Kulturdatenbank entry for the Bruckmandl
+**Evidence level:** NEEDS_REVIEW
+**Project location:** Cited via Q005 only
+**Cross-reference:** none
+**Notes:** NOT DIRECTLY CONSULTED. Cited by Q005 (Stadt Regensburg Kulturdatenbank, "Bruckmandl" entry) as: "Bauer, Karl: Regensburg. Aus Kunst-, Kultur- und Sittengeschichte. Regensburg 1988, S. 436-8." Registered here only so the citation chain is traceable — do not treat as independently verified evidence until this book is obtained and read directly.
 
 ---
 

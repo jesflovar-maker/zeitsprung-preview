@@ -101,6 +101,14 @@ export const STEINERNE_SOURCES_URL = CONTENT_ROOT + "Steinerne_Bruecke/SOURCES/s
 // this exact same folder before this file existed.
 export const STEINERNE_WEB_ASSET_BASE = WEB_ROOT + "steinerne-bruecke";
 
+// Bruckmandl submodule — web-optimized derivative tree
+// (ZEITSPRUNG_V2/assets/steinerne-bruecke/bruckmandl/**: hero/ gallery/
+// cutouts/ video/ materials/ ai/). Derived from STEINERNE_WEB_ASSET_BASE
+// rather than WEB_ROOT directly, so it always stays a subfolder of the same
+// Steinerne Brücke web asset tree with zero extra branching. Data-mapping
+// consumer: STEINERNE_BRUECKE/js/bruckmandl.js.
+export const STEINERNE_BRUCKMANDL_ASSET_BASE = STEINERNE_WEB_ASSET_BASE + "/bruckmandl";
+
 // STEINERNE_BRUECKE_V1/routes/regensburg-main-route.json (js/route-map.js).
 export const STEINERNE_ROUTE_JSON_URL = ROUTE_JSON_URL;
 

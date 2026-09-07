@@ -142,6 +142,72 @@ export const DICT = {
     // bruckmandlStatus key (see above) once navTimelineStatus's copy became
     // Timeline-specific — see index.html.
     bruckmandlName: "Brückmandl",
+    // First visible Bruckmandl module preview. Every fact below comes from
+    // 02_CONTENT/Steinerne_Bruecke/SOURCES/CLAIM_SOURCE_MAP.json's SUPPORTED
+    // bruckmandl_* claims (Q005/Q006); legend content is the registered
+    // bruckmandl_legend claim (Q004), always shown under the SAGE label;
+    // interpretation points are the NEEDS_REVIEW bruckmandl_interpretation_*
+    // claims, hedged, never resolved. No historical detail here is invented.
+    bruckmandlEyebrow: "1446–1854",
+    bruckmandlTitle: "Das Bruckmandl",
+    bruckmandlSummary: "Hoch über der Donau, am höchsten Punkt der Steinernen Brücke, sitzt das Bruckmandl — eines der bekanntesten Details Regensburgs. Die heutige Figur stammt aus dem Jahr 1854 und ist bereits die dritte ihrer Art. Was sie wirklich bedeutet, ist bis heute nicht abschließend geklärt.",
+    bruckmandlGalleryLabel: "ANSICHTEN",
+    bruckmandlGalleryFront: "Vorderseite",
+    bruckmandlGalleryBack: "Rückseite",
+    bruckmandlGalleryBlank: "Leere Seitenfläche",
+    bruckmandlGalleryInscription: "Inschriftenseite",
+    bruckmandlVideoLabel: "AUFBAU",
+    bruckmandlHistoryLabel: "GESCHICHTE",
+    bruckmandlHistory: [
+      { year: "1446", text: "Frühestes dokumentiertes Jahr, das mit der Figur in Verbindung gebracht wird." },
+      { year: "1579", text: "Die ursprüngliche Figur aus Grünsandstein wird zerstört; ihr Bildhauer ist unbekannt." },
+      { year: "1854", text: "Die heutige, dritte Figur entsteht — Anton Blank (Skulptur), Michael Mauerer (Säule) — und wird am 23. April aufgestellt." },
+      { year: "SOCKEL", text: "Der Sockel trägt eine lange Versinschrift zum Baubeginn 1135 sowie ein kurzes Spruchband, dessen Bedeutung bis heute ungeklärt ist." },
+      { year: "2012–2018", text: "Nach Vandalismus und Fundamentschäden wird das Bruckmandl saniert und am 5. Juni 2018 wieder aufgestellt." }
+    ],
+    bruckmandlLegendLabel: "SAGE",
+    bruckmandlLegendText: "Der Sage nach soll das Bruckmandl den Baumeister der Steinernen Brücke darstellen, der besorgt zu den Domtürmen hinüberschaut. Er habe mit dem Dombaumeister gewettet und, um zu gewinnen, einen Pakt mit dem Teufel geschlossen — Hilfe beim Brückenbau gegen die Seelen der ersten drei Brückengänger. Mit einer List aus zwei Hähnen und einem Hund entkam die Stadt dem Pakt; aus Wut soll der Teufel die Brücke verbogen und die Donaustrudel verursacht haben.",
+    bruckmandlFactHeading: "HISTORISCH BELEGT",
+    bruckmandlFactPoints: [
+      "1446 — frühestes dokumentiertes Jahr",
+      "1854 — heutige Figur von Anton Blank, Säule von Michael Mauerer",
+      "Ursprüngliches Material: Grünsandstein",
+      "Standort: westliche Brüstung, ca. 11 m über der Donau, Blick nach Süden",
+      "Restaurierung 2012–2018 dokumentiert"
+    ],
+    bruckmandlLegendGroupHeading: "ÜBERLIEFERT · LEGENDE",
+    bruckmandlLegendPoints: [
+      "Wette mit dem Dombaumeister",
+      "Pakt mit dem Teufel",
+      "List mit zwei Hähnen und einem Hund",
+      "Ursprung der Donaustrudel"
+    ],
+    bruckmandlUncertainHeading: "UNSICHER · VARIANTE",
+    bruckmandlUncertainPoints: [
+      "Eigentliche Bedeutung der Figur (Südweiser? Freiheitssymbol?)",
+      "Bedeutung des kurzen Spruchbands",
+      "Material der heutigen Figur",
+      "Identität der zwei Wappenreliefs"
+    ],
+    bruckmandlMaterialsLabel: "MATERIAL — NAHAUFNAHMEN",
+    bruckmandlMaterialLabels: {
+      stone_surface: "Steinoberfläche",
+      weathering: "Verwitterung",
+      inscription_surface: "Inschriftoberfläche",
+      relief_surface: "Reliefoberfläche",
+      column_surface: "Säulenoberfläche"
+    },
+    bruckmandlCutoutsLabel: "BAUTEILE",
+    bruckmandlCutoutLabels: {
+      figure: "Figur",
+      gable_cap: "Giebelaufsatz",
+      shield_panel_keys: "Wappenschild (Schlüssel)",
+      inscription_hand_panel: "Inschrift & Handrelief",
+      shield_panel_lion_with_cap: "Wappenschild (Löwe)",
+      capital_cornice: "Kapitell/Gesims",
+      column_and_base: "Säule & Sockel"
+    },
+    bruckmandlAssistantAlt: "Bruckmandl-Assistent (in Entwicklung)",
     videoChapterTitle: "Der Flug über die Brücke",
     videoChapterText: "Eine FPV-Aufnahme der Steinerne Brücke aus der Vogelperspektive.",
     videoUnavailable: "Video konnte in diesem Browser nicht geladen werden (möglicherweise HEVC-Codec-Einschränkung).",
@@ -283,6 +349,66 @@ export const DICT = {
     reelNote: "Editorial summary — the full story continues above.",
     reelReplayLabel: "Replay video",
     bruckmandlName: "Brückmandl",
+    bruckmandlEyebrow: "1446–1854",
+    bruckmandlTitle: "The Bruckmandl",
+    bruckmandlSummary: "High above the Danube, at the highest point of the Stone Bridge, sits the Bruckmandl — one of Regensburg's most recognizable details. The figure standing there today dates from 1854 and is already the third of its kind. What it actually means has never been fully settled.",
+    bruckmandlGalleryLabel: "VIEWS",
+    bruckmandlGalleryFront: "Front",
+    bruckmandlGalleryBack: "Back",
+    bruckmandlGalleryBlank: "Blank side",
+    bruckmandlGalleryInscription: "Inscription side",
+    bruckmandlVideoLabel: "ASSEMBLY",
+    bruckmandlHistoryLabel: "HISTORY",
+    bruckmandlHistory: [
+      { year: "1446", text: "Earliest year documented in connection with the figure." },
+      { year: "1579", text: "The original figure, made of Grünsandstein, is destroyed; its sculptor is unknown." },
+      { year: "1854", text: "The current, third figure is created — Anton Blank (sculpture), Michael Mauerer (column) — and installed on 23 April." },
+      { year: "PEDESTAL", text: "The pedestal carries a long verse inscription about the 1135 construction start, plus a short banner whose meaning remains unresolved." },
+      { year: "2012–2018", text: "After vandalism and foundation damage, the Bruckmandl is restored and returns to the bridge on 5 June 2018." }
+    ],
+    bruckmandlLegendLabel: "LEGEND",
+    bruckmandlLegendText: "According to legend, the Bruckmandl represents the bridge's master builder, anxiously watching the cathedral towers rise. He is said to have wagered with the cathedral's builder and, to win, struck a pact with the devil — help finishing the bridge for the souls of its first three crossers. A trick with two roosters and a dog let the city escape the bargain; furious, the devil is said to have bent the bridge and stirred up the Danube's whirlpools.",
+    bruckmandlFactHeading: "HISTORICALLY DOCUMENTED",
+    bruckmandlFactPoints: [
+      "1446 — earliest documented year",
+      "1854 — current figure by Anton Blank, column by Michael Mauerer",
+      "Original material: Grünsandstein",
+      "Location: western parapet, ~11 m above the river, facing south",
+      "Restoration 2012–2018 documented"
+    ],
+    bruckmandlLegendGroupHeading: "TRADITION · LEGEND",
+    bruckmandlLegendPoints: [
+      "Wager with the cathedral's builder",
+      "Pact with the devil",
+      "Trick with two roosters and a dog",
+      "Origin of the Danube's whirlpools"
+    ],
+    bruckmandlUncertainHeading: "UNCERTAIN · INTERPRETATION",
+    bruckmandlUncertainPoints: [
+      "The figure's true meaning (Südweiser? civic-freedom symbol?)",
+      "Meaning of the short banner",
+      "Material of the current figure",
+      "Identity of the two heraldic shields"
+    ],
+    bruckmandlMaterialsLabel: "MATERIAL — CLOSE-UPS",
+    bruckmandlMaterialLabels: {
+      stone_surface: "Stone surface",
+      weathering: "Weathering",
+      inscription_surface: "Inscription surface",
+      relief_surface: "Relief surface",
+      column_surface: "Column surface"
+    },
+    bruckmandlCutoutsLabel: "ARCHITECTURAL PARTS",
+    bruckmandlCutoutLabels: {
+      figure: "Figure",
+      gable_cap: "Gable cap",
+      shield_panel_keys: "Heraldic shield (keys)",
+      inscription_hand_panel: "Inscription & hand relief",
+      shield_panel_lion_with_cap: "Heraldic shield (lion)",
+      capital_cornice: "Capital/cornice",
+      column_and_base: "Column & base"
+    },
+    bruckmandlAssistantAlt: "Bruckmandl assistant (in development)",
     videoChapterTitle: "Flying over the bridge",
     videoChapterText: "An FPV aerial shot of the Steinerne Brücke.",
     videoUnavailable: "Video could not load in this browser (possible HEVC codec limitation).",
@@ -420,6 +546,66 @@ export const DICT = {
     reelNote: "Resumen editorial — la historia completa continúa más arriba.",
     reelReplayLabel: "Repetir vídeo",
     bruckmandlName: "Brückmandl",
+    bruckmandlEyebrow: "1446–1854",
+    bruckmandlTitle: "El Bruckmandl",
+    bruckmandlSummary: "En lo alto del Danubio, en el punto más elevado del Puente de Piedra, se sienta el Bruckmandl — uno de los detalles más reconocibles de Ratisbona. La figura que hoy vemos data de 1854 y es ya la tercera de su tipo. Su significado real nunca se ha aclarado del todo.",
+    bruckmandlGalleryLabel: "VISTAS",
+    bruckmandlGalleryFront: "Frontal",
+    bruckmandlGalleryBack: "Posterior",
+    bruckmandlGalleryBlank: "Cara lateral lisa",
+    bruckmandlGalleryInscription: "Cara con inscripción",
+    bruckmandlVideoLabel: "ENSAMBLAJE",
+    bruckmandlHistoryLabel: "HISTORIA",
+    bruckmandlHistory: [
+      { year: "1446", text: "Año documentado más antiguo asociado a la figura." },
+      { year: "1579", text: "La figura original, de Grünsandstein, es destruida; se desconoce su escultor." },
+      { year: "1854", text: "Se crea la figura actual, la tercera — Anton Blank (escultura), Michael Mauerer (columna) — instalada el 23 de abril." },
+      { year: "PEDESTAL", text: "El pedestal lleva un largo verso sobre el inicio de la construcción en 1135 y una breve cinta cuyo significado sigue sin resolverse." },
+      { year: "2012–2018", text: "Tras sufrir vandalismo y daños en su cimentación, el Bruckmandl es restaurado y regresa al puente el 5 de junio de 2018." }
+    ],
+    bruckmandlLegendLabel: "LEYENDA",
+    bruckmandlLegendText: "Según la leyenda, el Bruckmandl representa al maestro constructor del puente, observando con inquietud cómo se alzan las torres de la catedral. Se dice que apostó con el constructor de la catedral y, para ganar, hizo un pacto con el diablo — ayuda para terminar el puente a cambio de las almas de los tres primeros en cruzarlo. Un engaño con dos gallos y un perro libró a la ciudad del pacto; furioso, el diablo habría torcido el puente y provocado los remolinos del Danubio.",
+    bruckmandlFactHeading: "HISTÓRICAMENTE DOCUMENTADO",
+    bruckmandlFactPoints: [
+      "1446 — año documentado más antiguo",
+      "1854 — figura actual de Anton Blank, columna de Michael Mauerer",
+      "Material original: Grünsandstein",
+      "Ubicación: balaustrada occidental, ~11 m sobre el río, mirando al sur",
+      "Restauración 2012–2018 documentada"
+    ],
+    bruckmandlLegendGroupHeading: "TRADICIÓN · LEYENDA",
+    bruckmandlLegendPoints: [
+      "Apuesta con el constructor de la catedral",
+      "Pacto con el diablo",
+      "Engaño con dos gallos y un perro",
+      "Origen de los remolinos del Danubio"
+    ],
+    bruckmandlUncertainHeading: "INCIERTO · INTERPRETACIÓN",
+    bruckmandlUncertainPoints: [
+      "El verdadero significado de la figura (¿Südweiser? ¿símbolo de libertad cívica?)",
+      "Significado de la cinta corta",
+      "Material de la figura actual",
+      "Identidad de los dos escudos heráldicos"
+    ],
+    bruckmandlMaterialsLabel: "MATERIAL — DETALLES",
+    bruckmandlMaterialLabels: {
+      stone_surface: "Superficie de piedra",
+      weathering: "Intemperie",
+      inscription_surface: "Superficie de la inscripción",
+      relief_surface: "Superficie del relieve",
+      column_surface: "Superficie de la columna"
+    },
+    bruckmandlCutoutsLabel: "ELEMENTOS ARQUITECTÓNICOS",
+    bruckmandlCutoutLabels: {
+      figure: "Figura",
+      gable_cap: "Remate del gablete",
+      shield_panel_keys: "Escudo heráldico (llaves)",
+      inscription_hand_panel: "Inscripción y relieve de mano",
+      shield_panel_lion_with_cap: "Escudo heráldico (león)",
+      capital_cornice: "Capitel/cornisa",
+      column_and_base: "Columna y base"
+    },
+    bruckmandlAssistantAlt: "Asistente Bruckmandl (en desarrollo)",
     videoChapterTitle: "Sobrevolando el puente",
     videoChapterText: "Una toma aérea FPV de la Steinerne Brücke.",
     videoUnavailable: "El vídeo no pudo cargarse en este navegador (posible limitación del códec HEVC).",

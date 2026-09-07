@@ -17,6 +17,7 @@ import { DICT, getInitialLang, setLang, applyI18n, t } from "./i18n.js";
 import { buildPortal } from "./portal.js";
 import { initMuseum25D } from "./museum25d.js";
 import { initKframesGallery } from "./kframes-gallery.js";
+import { initBruckmandl } from "./bruckmandl.js";
 import { ZT_AUDIO_BUS } from "../../js/zt-audio.js";
 import { activate, deactivate, getDebugSnapshot } from "../../js/video-playback.js";
 import { STEINERNE_ASSET_BASE, STEINERNE_WEB_ASSET_BASE, ASSET_SWAP_MANIFEST_URL } from "../../js/zt-paths.js";
@@ -488,6 +489,7 @@ function populateLangButtons() {
       renderFacts();
       if (museumApi) museumApi.refreshLabels();
       if (kframesApi) kframesApi.refreshLabels();
+      if (bruckmandlApi) bruckmandlApi.refreshLabels();
       const introStartBtn = document.getElementById("introStartBtn");
       if (introStartBtn) introStartBtn.textContent = t(lang, "introStart");
       applyMuteUI(); // PHASE 2.4A — re-translate both mute controls' labels
@@ -887,7 +889,7 @@ function initLenisAndScroll() {
   // Fix: wireMuseum25D() now returns its init promise; kframes is wired
   // only once that promise settles, so its own ScrollTrigger.create() can
   // never run before the museum's pin-spacer is in the DOM.
-  wireMuseum25D(lenis).then(() => wireKframesGallery(lenis));
+  wireMuseum25D(lenis).then(() => wireKframesGallery(lenis)).then(() => wireBruckmandl(lenis));
   // buildHistoricalReel() / buildVideoChapter() calls removed — CONTENT
   // HOTFIX (both functions themselves also deleted, see their removal note
   // further down this file, right before wireNav()).
@@ -1144,6 +1146,40 @@ function wireKframesGallery(lenis) {
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   initKframesGallery({ section, t, getLang: () => lang, lenis, reducedMotion }).then((api) => {
     kframesApi = api;
+  });
+}
+
+// ---------------------------------------------------------------------------
+// BRUCKMANDL MODULE — first visible local preview (#bruckmandl). Mirrors
+// wireKframesGallery()'s own fire-and-forget async-init pattern above.
+// NOT yet linked from monuments.config.json's featureFlags.brueckmandl and
+// NOT yet wired to museum25d.js's HOTSPOTS extension point — see
+// js/bruckmandl.js's own header for the full scope of this step.
+// ---------------------------------------------------------------------------
+let bruckmandlApi = null;
+
+function wireBruckmandl(lenis) {
+  const section = document.getElementById("bruckmandl");
+  if (!section) return;
+
+  gsap.fromTo(
+    section.querySelector(".bruckmandl__inner"),
+    { autoAlpha: 0, y: 30 },
+    {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.8,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: section,
+        start: "top 78%",
+        toggleActions: "play none none reverse"
+      }
+    }
+  );
+
+  initBruckmandl({ section, t, getLang: () => lang, lenis }).then((api) => {
+    bruckmandlApi = api;
   });
 }
 

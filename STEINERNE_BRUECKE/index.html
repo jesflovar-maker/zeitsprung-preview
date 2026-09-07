@@ -324,41 +324,29 @@
   </section>
 
   <!-- ========================================================== -->
-  <!-- HISTORICAL REEL section — Phase 2.6 TASK 4's editorial        -->
-  <!-- "cinematic summary" video block (title/note/eyebrow + video)  -->
-  <!-- REMOVED per CONTENT HOTFIX (public block removal, owner-      -->
-  <!-- approved): "El puente en cámara rápida" / "Resumen editorial  -->
-  <!-- — la historia completa continúa más arriba." — video/caption/ -->
-  <!-- replay markup deleted, NOT the section itself, because the    -->
-  <!-- Brückmandl status note below (Phase 2.6 TASK 5, explicitly    -->
-  <!-- protected — Brückmandl content/architecture is out of scope   -->
-  <!-- for this hotfix) lives in the same <section>. Master reel     -->
-  <!-- video/i18n strings are untouched on disk — see js/i18n.js's   -->
-  <!-- reelTitle/reelNote/reelEyebrow/reelReplayLabel keys (now      -->
-  <!-- orphaned, kept for low-risk future re-enable) and             -->
-  <!-- 03_ASSETS/Steinerne_Bruecke/VIDEO/REELS/ (untouched). -->
+  <!-- BRUCKMANDL MODULE — first visible local preview.              -->
+  <!-- Replaces the former #historicalReel placeholder note          -->
+  <!-- ("Brückmandl — IN ARBEIT"), which itself replaced Phase 2.6    -->
+  <!-- TASK 4's removed "cinematic summary" video block. That reel    -->
+  <!-- video/i18n strings remain untouched on disk (js/i18n.js's      -->
+  <!-- reelTitle/reelNote/reelEyebrow/reelReplayLabel keys, now       -->
+  <!-- orphaned) and 03_ASSETS/Steinerne_Bruecke/VIDEO/REELS/ is      -->
+  <!-- untouched — only the placeholder note that used to share this  -->
+  <!-- position is gone, not that earlier removal.                    -->
+  <!--                                                                 -->
+  <!-- All structure below is built by js/bruckmandl.js's              -->
+  <!-- initBruckmandl() (hero, assembly video, 4-view gallery,          -->
+  <!-- history, legend, fact/legend/uncertain split, materials,         -->
+  <!-- cutouts, Quellen dialog, AI-assistant visual placeholder) —       -->
+  <!-- the host below is intentionally just the reserved anchor +        -->
+  <!-- inner wrapper, same "empty host, JS-populated" convention as       -->
+  <!-- #museum25d / #kframesGallery. NOT yet linked from                   -->
+  <!-- monuments.config.json's featureFlags.brueckmandl and NOT yet         -->
+  <!-- wired to museum25d.js's HOTSPOTS extension point — local review      -->
+  <!-- only, per the owner-approved implementation order.                    -->
   <!-- ========================================================== -->
-  <section id="historicalReel" class="reel">
-    <!-- Phase 2.6 TASK 5 — Brückmandl status. Reuses the id/label already
-         reserved (but never wired to a real target) in
-         03_ASSETS/Steinerne_Bruecke/2d/ASSET_SWAP_MAP.json's
-         hotspots_registry.bruckmandl entry (status PENDING_DESTINATION: "no
-         real Brückmandl landing page, anchor, or content section exists
-         anywhere in this project"). Name + status only, NO historical copy,
-         NO link, NO click handler — a plain, non-interactive status line,
-         same visual family as .navbar__timeline-badge (Phase 2.5). Reuses
-         navTimelineStatus's already-approved DE/EN/ES copy instead of
-         duplicating the translated string.
-         Phase 2.7C.3 — navTimelineStatus's copy became Timeline-specific
-         ("ZEITLEISTE / IN VISUELLER PRODUKTION", two lines), which no longer
-         fits this unrelated Brückmandl note. Split into its own dedicated key
-         (bruckmandlStatus) carrying navTimelineStatus's OLD, still-accurate
-         "in development" text instead, so this note's meaning is completely
-         unchanged by the Timeline copy update. -->
-    <div class="reel__status-note">
-      <span class="reel__status-name" data-i18n="bruckmandlName">Brückmandl</span>
-      <span class="reel__status-badge" data-i18n="bruckmandlStatus">IN ARBEIT</span>
-    </div>
+  <section id="bruckmandl" class="bruckmandl">
+    <div class="bruckmandl__inner"></div>
   </section>
 
   <!-- ========================================================== -->

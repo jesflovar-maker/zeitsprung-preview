@@ -47,12 +47,26 @@ const CONFIG_URL = "./monuments.config.json";
 const MAP_IMG = "assets/maps/regensburg_interactive_map_v01.png";
 
 // Visually calibrated against the actual artwork (see file header).
+// PIN_LAYOUT also supplies the route line's own vertices (see the SVG
+// polyline below) — it must stay exactly as originally calibrated so the
+// line geometry never shifts. PIN_BADGE_OFFSET (below) is a SEPARATE,
+// display-only correction for the numbered badge alone, used only where a
+// monument has no drawn ring in the artwork to visually anchor it to (only
+// Neupfarrplatz today — DESIGN REVISION, see file header date).
 const PIN_LAYOUT = {
   "steinerne-bruecke": { x: 0.55, y: 0.29 },
   "dom-st-peter": { x: 0.79, y: 0.615 },
   "altes-rathaus": { x: 0.17, y: 0.51 },
   "porta-praetoria": { x: 0.855, y: 0.545 },
   "neupfarrplatz": { x: 0.40, y: 0.685 }
+};
+
+// Badge-only visual correction (does NOT feed the route line/polyline).
+// Neupfarrplatz's excavation site has no drawn ring in the artwork (unlike
+// the other four stops), so its badge needs to sit closer to/just above the
+// site itself to read as "belonging" to it the way 02/03/04 already do.
+const PIN_BADGE_OFFSET = {
+  "neupfarrplatz": { x: 0.41, y: 0.70 }
 };
 
 function el(tag, className, attrs) {
@@ -129,9 +143,10 @@ export async function initRouteMap({ root, getLang, getGalleryHandle, reducedMot
   root.appendChild(svg);
 
   const pinEls = stops.map(({ stop, cfg, pos }) => {
+    const badgePos = PIN_BADGE_OFFSET[cfg.id] || pos;
     const pin = el("button", "route-map__pin", {
       type: "button",
-      style: `left:${(pos.x * 100).toFixed(2)}%; top:${(pos.y * 100).toFixed(2)}%;`,
+      style: `left:${(badgePos.x * 100).toFixed(2)}%; top:${(badgePos.y * 100).toFixed(2)}%;`,
       "data-id": cfg.id,
       "aria-label": pick(cfg.name, getLang())
     });

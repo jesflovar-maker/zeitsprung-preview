@@ -3,7 +3,7 @@
     "monument": "steinerne-bruecke",
     "purpose": "Maps historical claims already present in the Steinerne Brücke experience (fact cards, historical scroll, K-frame captions, 2.5D museum content) to source IDs registered in sources.json. NO_SOURCE -> claim stays explicitly unsupported; a claim is never marked SUPPORTED merely to fill this file in.",
     "status_values": ["SUPPORTED", "DERIVED_FROM_CANONICAL_STRUCTURE", "NEEDS_REVIEW", "UNSUPPORTED"],
-    "last_updated": "2026-09-01"
+    "last_updated": "2026-09-07"
   },
   "claims": {
     "bridge_construction_period": {
@@ -83,6 +83,112 @@
       "claim": "The figure's exact historical meaning is not conclusively settled (interpretations range from a south/weather vane to a legendary depiction of the master builder).",
       "sources": ["Q005"],
       "status": "NEEDS_REVIEW"
+    },
+    "bruckmandl_origin_year_1446": {
+      "claim": "The Bruckmandl figure's documented origin dates to 1446 (Jahr/Zeit der Entstehung).",
+      "sources": ["Q005"],
+      "status": "SUPPORTED"
+    },
+    "bruckmandl_current_installed_1854": {
+      "claim": "The current (third) Bruckmandl figure was installed at its present location on 23 April 1854.",
+      "sources": ["Q005", "Q006"],
+      "status": "SUPPORTED"
+    },
+    "bruckmandl_sculptor_anton_blank": {
+      "claim": "The current figure was created by sculptor Anton Blank; the original (first) figure's sculptor is unknown.",
+      "sources": ["Q005", "Q006"],
+      "status": "SUPPORTED",
+      "notes": "Both independently-verified official sources agree on 'Anton Blank'. An unregistered, unverified secondary claim (via Wikipedia, citing a 2018 academic chapter not yet consulted) names 'Andreas Blank (design) / Adam Poeverlein (execution)' instead — not registered here, not safe for public copy until reconciled against Q008 or another primary source."
+    },
+    "bruckmandl_column_design_michael_mauerer": {
+      "claim": "The column/pedestal supporting the figure was designed by Michael Mauerer.",
+      "sources": ["Q005"],
+      "status": "SUPPORTED"
+    },
+    "bruckmandl_material_original_gruensandstein": {
+      "claim": "The original (first) Bruckmandl figure was made of Grünsandstein (green sandstone).",
+      "sources": ["Q005"],
+      "status": "SUPPORTED"
+    },
+    "bruckmandl_material_current": {
+      "claim": "The material of the current (third) Bruckmandl figure.",
+      "sources": ["Q005", "Q006"],
+      "status": "NEEDS_REVIEW",
+      "notes": "CONFLICT: Q005 states the current figure's material as Kalkstein (limestone). Q006 calls the current figure a 'Sandsteinfigur' (sandstone) — a different rock type. Not resolved; do not state a specific material for the current figure in public copy until reconciled, ideally against Q008 (Bauer 1988, pp. 436-8, not yet directly consulted)."
+    },
+    "bruckmandl_destroyed_1579": {
+      "claim": "The original Bruckmandl figure was destroyed in 1579.",
+      "sources": ["Q005", "Q006"],
+      "status": "SUPPORTED"
+    },
+    "bruckmandl_third_figure_second_successor": {
+      "claim": "The current figure is the third figure of this name overall, i.e. the second successor of the original (destroyed 1579).",
+      "sources": ["Q005", "Q006"],
+      "status": "SUPPORTED"
+    },
+    "bruckmandl_second_figure_torso_museum": {
+      "claim": "The torso of the second Bruckmandl figure (the immediate predecessor of the current, third figure) survives in the Historisches Museum Regensburg.",
+      "sources": ["Q006"],
+      "status": "SUPPORTED"
+    },
+    "bruckmandl_location_orientation_detail": {
+      "claim": "The figure sits on the western stone parapet at the bridge's highest point, approximately 11 metres above the river, facing south.",
+      "sources": ["Q005"],
+      "status": "SUPPORTED",
+      "notes": "Extends the existing bruckmandl_location claim (Q004, Q005) with the western-parapet and ~11m height detail."
+    },
+    "bruckmandl_long_inscription_text": {
+      "claim": "The pedestal carries a long verse inscription, documented verbatim, referencing the bridge's 1135 construction start under Duke Heinrich and its completion after eleven years.",
+      "sources": ["Q006"],
+      "status": "SUPPORTED",
+      "notes": "Exact wording quoted in Q006 (exhibition panel, pp. 5-6): 'Elf hundert drisig fünf im jahr / Die tonaw war schier trocken gar, / Der herzog heinrich mit der stat / Siw bruckn alhle begunen hat. / Das werck gebaut uft vesten grund / Eilf jar danach gantz fertig stund. / Gut gleit furbas uft allen wegen / Geb gots genad u. gotes Segen.' Safe to quote verbatim; do not add interpretation beyond what Q006 itself states."
+    },
+    "bruckmandl_short_spruchband_text": {
+      "claim": "A short Spruchband beneath the figure's left hand carries the words \"Schiuck wie hais …\", documented as an abbreviation of a fuller saying preserved in an old manuscript of Kloster St. Emmeram, translated as \"Ob kalt, ob heiß, zu Regensburg sind selbst die Häuter feist\" (Häuter = emaciated horses).",
+      "sources": ["Q006"],
+      "status": "SUPPORTED",
+      "notes": "Existence and exact wording are SUPPORTED (quoted verbatim in Q006). Interpretation/meaning of the saying is tracked separately — see bruckmandl_short_spruchband_interpretation."
+    },
+    "bruckmandl_short_spruchband_interpretation": {
+      "claim": "The meaning/interpretation of the short Spruchband saying.",
+      "sources": ["Q006"],
+      "status": "NEEDS_REVIEW",
+      "notes": "content_type: INTERPRETATION. The exact wording is documented by the official Stadt Regensburg source, but its meaning remains unresolved."
+    },
+    "bruckmandl_restoration_2012_2018": {
+      "claim": "The figure lost its right arm in 2012 (probable vandalism), was removed in 2014 for structural repair after foundation damage was found, stood as a placeholder until 2017, and was reinstalled restored on 5 June 2018.",
+      "sources": ["Q005", "Q006"],
+      "status": "SUPPORTED"
+    },
+    "bruckmandl_legend_chronologically_implausible": {
+      "claim": "The city's own exhibition panel states that the builder's-wager/devil's-pact legend cannot literally be true, since the bridge (1135-1146) predates the cathedral's construction (begun in the second half of the 13th century) by roughly a century.",
+      "sources": ["Q006"],
+      "status": "SUPPORTED",
+      "notes": "This SUPPORTED status covers only the fact that the city's own source makes this chronological argument — it does not upgrade any part of the underlying legend itself, which remains content_type: LEGEND per the existing bruckmandl_legend claim above."
+    },
+    "bruckmandl_shield_keys_identity": {
+      "claim": "The heraldic identity of the crossed-keys shield relief on the Bruckmandl pedestal.",
+      "sources": [],
+      "status": "UNSUPPORTED",
+      "notes": "Not addressed by any registered source, including Q006, which was searched in full for 'Wappen'/'Schild'/'Schlüssel'/'Löwe'/'Relief' with zero matches. Do not infer this is Regensburg's city arms from visual resemblance alone, even though the city's own well-documented civic arms are two crossed silver keys on red — that is a separate, independently-documented general fact, not a statement about this specific pedestal."
+    },
+    "bruckmandl_shield_lion_identity": {
+      "claim": "The heraldic identity of the lion shield relief on the Bruckmandl pedestal (rear face).",
+      "sources": [],
+      "status": "UNSUPPORTED",
+      "notes": "Not addressed by any registered source. Do not conflate with the separate, differently-located sculpted lion elsewhere on the bridge (eastern balustrade above the 10th arch, marking historic Bavarian territorial authority) — that is a different object, not evidence about this pedestal's shield."
+    },
+    "bruckmandl_interpretation_suedweiser": {
+      "claim": "One documented interpretation holds the figure to be a Südweiser (a figure shielding its eyes while looking south, functioning as a directional/weather indicator).",
+      "sources": ["Q005", "Q006"],
+      "status": "NEEDS_REVIEW",
+      "notes": "content_type: INTERPRETATION — one of (at least) two open, officially-documented readings, per Q005 ('Seine Bedeutung ist bis heute nicht sicher geklärt'). Must never be presented as the settled or certain meaning of the figure."
+    },
+    "bruckmandl_interpretation_civic_freedom": {
+      "claim": "The figure possibly symbolized, in medieval times, the Free Imperial City of Regensburg's freedom rights against the Bishop and the Duke of Bavaria.",
+      "sources": ["Q006"],
+      "status": "NEEDS_REVIEW",
+      "notes": "content_type: INTERPRETATION — Q006 itself hedges this with 'Vermutlich' (presumably). Must never be presented as certain; keep the hedge in every language (e.g. 'vermutlich', 'presumably', 'posiblemente')."
     },
     "dom_gothic_background_rule": {
       "claim": "The Gothic Dom St. Peter must not appear in the background before ~1275; before that, the Romanesque predecessor cathedral applies.",

@@ -1602,3 +1602,261 @@ img{ max-width:100%; display:block; }
   .reel__frame{ max-width: 420px; }
   .reel__title{ font-size: clamp(22px, 2.6vw, 28px); }
 }
+
+/* ---------------------------------------------------------------- */
+/* BRUCKMANDL MODULE — VISUAL FOUNDATION ONLY.                        */
+/* Data layer: js/bruckmandl.js. Not wired into index.html/main.js    */
+/* yet — these rules have no visible effect until a future step adds  */
+/* the real markup to #historicalReel (or its eventual replacement)   */
+/* and calls initBruckmandl(). Reuses existing tokens/patterns only:  */
+/* .reel's eyebrow/title scale, .fact-card's verified/unverified/     */
+/* derived language for the FACT/LEGEND/UNCERTAIN split, and          */
+/* .kf__sources-btn/.kf__sources-panel's dialog pattern verbatim for  */
+/* the Quellen foundation below — no new visual system introduced.    */
+/* ---------------------------------------------------------------- */
+.bruckmandl{
+  position: relative; z-index: 5;
+  background: var(--z-bg);
+  padding: 90px 20px 60px;
+}
+.bruckmandl__inner{ max-width: 640px; margin: 0 auto; }
+.bruckmandl__eyebrow{
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.3em;
+  color: var(--z-gold);
+  margin-bottom: 8px;
+}
+.bruckmandl__title{
+  font-size: clamp(22px, 6vw, 30px); font-weight: 600; line-height: 1.2;
+  color: var(--z-ink);
+  margin-bottom: 12px;
+}
+.bruckmandl__summary{
+  font-size: 14.5px; line-height: 1.55; color: var(--z-ink-dim);
+  max-width: 52ch;
+  margin-bottom: 32px;
+}
+
+/* Hero / master monument image */
+/* TEMPORARY PUBLICATION FIX (2026-09-07): strict 9:16 portrait frame with the
+   full monument centered and never cropped, until final art-directed crops
+   are ready. To restore the previous full-bleed treatment, revert
+   aspect-ratio to 3/4 and .bruckmandl__hero-img's object-fit to cover. */
+.bruckmandl__hero{
+  position: relative; width: 100%; aspect-ratio: 9 / 16;
+  background: var(--z-bg-soft); border: 1px solid var(--z-line);
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+.bruckmandl__hero-img{
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: contain; object-position: center center;
+}
+
+/* Four-view gallery */
+.bruckmandl__gallery{ margin-bottom: 28px; }
+.bruckmandl__gallery-track{
+  display: flex; gap: 12px; overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 4px;
+}
+/* TEMPORARY PUBLICATION FIX (2026-09-07): same strict 9:16 centered-contain
+   treatment as .bruckmandl__hero above — see that comment to restore. */
+.bruckmandl__gallery-card{
+  flex: 0 0 78%; scroll-snap-align: start;
+  aspect-ratio: 9 / 16;
+  border: 1px solid var(--z-line); background: var(--z-bg-soft);
+  overflow: hidden;
+}
+.bruckmandl__gallery-card img{
+  width: 100%; height: 100%; object-fit: contain; object-position: center center;
+}
+
+/* 10-second monument assembly video */
+.bruckmandl__video{
+  position: relative; width: 100%; aspect-ratio: 9 / 16;
+  max-width: 380px; margin: 0 auto 28px;
+  background: #050506; border: 1px solid var(--z-line);
+  overflow: hidden;
+}
+.bruckmandl__video video{
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover;
+}
+
+/* Geschichte — history blocks, same permanent-beat spirit as .kf__caption */
+.bruckmandl__history{ margin-bottom: 28px; }
+.bruckmandl__history-item{
+  border-top: 1px solid var(--z-line);
+  padding: 14px 0;
+}
+.bruckmandl__history-item:first-child{ border-top: none; }
+.bruckmandl__history-item-year{
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+  color: var(--z-gold-dim);
+  margin-bottom: 4px;
+}
+.bruckmandl__history-item-text{
+  font-size: 14px; line-height: 1.5; color: var(--z-ink-dim);
+}
+
+/* Die Legende — visually distinct from documented history, never blended */
+.bruckmandl__legend{
+  border: 1px dashed rgba(232,161,92,0.45);
+  padding: 18px 16px;
+  margin-bottom: 28px;
+}
+.bruckmandl__legend-label{
+  display: inline-block;
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.18em;
+  color: var(--z-warn);
+  border: 1px solid rgba(232,161,92,0.45);
+  padding: 3px 8px;
+  margin-bottom: 10px;
+}
+.bruckmandl__legend-text{
+  font-size: 14px; line-height: 1.55; color: var(--z-ink-dim);
+}
+
+/* Fakt oder Sage? — three-way split, reusing .fact-card's verified/
+   unverified/derived color language rather than inventing a new one. */
+.bruckmandl__factcheck{ margin-bottom: 28px; }
+.bruckmandl__factcheck-column{
+  border: 1px solid var(--z-line);
+  padding: 16px 14px;
+  margin-bottom: 12px;
+}
+.bruckmandl__factcheck-heading{
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.2em;
+  margin-bottom: 10px;
+}
+.bruckmandl__factcheck-list{
+  font-size: 13.5px; line-height: 1.55; color: var(--z-ink-dim);
+}
+.bruckmandl__factcheck-column--fact{ border-color: rgba(212,175,120,0.4); }
+.bruckmandl__factcheck-column--fact .bruckmandl__factcheck-heading{ color: var(--z-gold); }
+.bruckmandl__factcheck-column--legend{
+  border-style: dashed; border-color: rgba(232,161,92,0.5);
+}
+.bruckmandl__factcheck-column--legend .bruckmandl__factcheck-heading{ color: var(--z-warn); }
+.bruckmandl__factcheck-column--uncertain{
+  border-style: dashed; border-color: var(--z-line);
+}
+.bruckmandl__factcheck-column--uncertain .bruckmandl__factcheck-heading{ color: var(--z-ink-faint); }
+
+/* Cutouts / material detail cards */
+.bruckmandl__media-strip{
+  display: flex; gap: 10px; overflow-x: auto;
+  padding-bottom: 4px;
+  margin-bottom: 28px;
+}
+.bruckmandl__media-card{
+  flex: 0 0 120px;
+  border: 1px solid var(--z-line); background: var(--z-bg-soft);
+}
+.bruckmandl__media-card img{
+  display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: contain;
+}
+.bruckmandl__media-card-label{
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em;
+  color: var(--z-ink-faint);
+  padding: 6px 8px;
+}
+
+/* Quellen — identical dialog pattern to .kf__sources-btn/.kf__sources-panel,
+   scoped under .bruckmandl__ so both modules can coexist without collision. */
+.bruckmandl__sources-btn{
+  margin-top: 4px;
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+  color: var(--z-gold); background: transparent;
+  border: 1px solid rgba(212,175,120,0.45); border-radius: 2px;
+  padding: 8px 14px; cursor: pointer;
+}
+.bruckmandl__sources-btn:hover, .bruckmandl__sources-btn:focus-visible{
+  background: rgba(212,175,120,0.1); outline: none;
+}
+.bruckmandl__sources-panel{
+  position: fixed; inset: 0; z-index: 80;
+  display: flex; align-items: flex-end; justify-content: center;
+  background: rgba(8,9,11,0.72);
+}
+.bruckmandl__sources-panel[hidden]{ display: none; }
+.bruckmandl__sources-panel__inner{
+  width: 100%; max-width: 560px; max-height: 78vh;
+  background: #0e0f11; border: 1px solid rgba(212,175,120,0.25);
+  border-bottom: none; border-radius: 10px 10px 0 0;
+  padding: 20px 18px 24px; overflow-y: auto;
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+}
+@media (min-width: 640px){
+  .bruckmandl__sources-panel{ align-items: center; }
+  .bruckmandl__sources-panel__inner{ border-radius: 10px; border-bottom: 1px solid rgba(212,175,120,0.25); max-height: 70vh; }
+}
+.bruckmandl__sources-panel__head{
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 1px solid rgba(244,239,230,0.12);
+}
+.bruckmandl__sources-panel__head h4{
+  font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.16em;
+  color: var(--z-gold); margin: 0;
+}
+.bruckmandl__sources-panel__close{
+  background: none; border: none; color: var(--z-ink-faint);
+  font-size: 22px; line-height: 1; cursor: pointer; padding: 4px 8px;
+}
+.bruckmandl__sources-panel__close:hover{ color: var(--z-ink); }
+.bruckmandl__sources-panel__list{ display: flex; flex-direction: column; gap: 14px; }
+.bruckmandl__source-entry{
+  padding-bottom: 14px; border-bottom: 1px solid rgba(244,239,230,0.08);
+}
+.bruckmandl__source-entry:last-child{ border-bottom: none; padding-bottom: 0; }
+.bruckmandl__source-entry__id{
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em;
+  color: var(--z-gold); margin-bottom: 3px;
+}
+.bruckmandl__source-entry__title{
+  font-size: 14px; color: var(--z-ink); margin: 0 0 3px; line-height: 1.4;
+}
+.bruckmandl__source-entry__institution{
+  font-size: 12px; color: rgba(244,239,230,0.62); margin: 0;
+}
+
+/* Small gold mono subsection label — used above the video, gallery,
+   history, materials and cutouts blocks. Same scale/color as
+   .bruckmandl__history-item-year, factored out since several sections
+   needed it once real rendering (not just the data layer) was added. */
+.bruckmandl__section-label{
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.2em;
+  color: var(--z-gold-dim);
+  margin-bottom: 10px;
+}
+
+/* AI assistant — visual placeholder only, no interaction, no state machine.
+   Same "reserve the shape, don't wire the behavior" spirit as
+   .reel__status-note above.
+   TEMPORARY PUBLICATION FIX (2026-09-07): enlarged from an icon-sized 48px
+   thumbnail to a full, legible museum-guide figure, centered at the end of
+   the module — the character was previously rendered too small to read as
+   an assistant. width:auto/height:auto (no forced square box) preserves the
+   PNG's native aspect ratio, so the transparent artwork is never letterboxed
+   or cropped. */
+.bruckmandl__assistant{
+  display: flex; flex-direction: column; align-items: center;
+  margin-top: 36px; padding-top: 28px;
+  border-top: 1px solid var(--z-line);
+}
+.bruckmandl__assistant-img{
+  width: clamp(120px, 34vw, 190px); height: auto;
+  object-fit: contain;
+  opacity: 0.96;
+}
+
+@media (min-width: 900px){
+  .bruckmandl{ padding: 130px 60px 80px; }
+  .bruckmandl__inner{ max-width: 760px; }
+  .bruckmandl__title{ font-size: clamp(26px, 2.8vw, 32px); }
+  .bruckmandl__gallery-card{ flex: 0 0 260px; }
+  .bruckmandl__video{ max-width: 420px; }
+  .bruckmandl__factcheck{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .bruckmandl__factcheck-column{ margin-bottom: 0; }
+}

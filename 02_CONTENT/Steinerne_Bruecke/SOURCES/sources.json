@@ -5,7 +5,7 @@
     "rule": "Every source here was found in existing ZEITSPRUNG project material (ZEITSPRUNG_ACCURACY_RULES.md, MUSEUM_CONTENT_MAP.json, the project's own OCR working transcript, SOURCE_REGISTRY.md). No internet research was performed for this task and no bibliographic detail was invented. Where a field could not be found in project material, it is null.",
     "id_scheme": "Q001, Q002, ... — stable within this monument's SOURCES folder. This is a NEW, monument-scoped ID space, distinct from (but cross-referenced to) the pre-existing cross-monument SB_SRC_00x IDs already registered in 02_CONTENT/SOURCES/SOURCE_REGISTRY.json — see each entry's `cross_reference` field.",
     "schema_version": "1.0",
-    "last_updated": "2026-09-01"
+    "last_updated": "2026-09-07"
   },
   "sources": [
     {
@@ -83,10 +83,10 @@
       "year": null,
       "type": "city_archive",
       "language": "de",
-      "project_reference": "01_ARCHITECTURE/ZEITSPRUNG_WEB_OPERATING_RULES.md section 29.8",
-      "evidence_level": "SECONDARY",
+      "project_reference": "https://www.regensburg.de/kultur/kulturdatenbank/eintrag/118949 ; also referenced at 01_ARCHITECTURE/ZEITSPRUNG_WEB_OPERATING_RULES.md section 29.8",
+      "evidence_level": "PRIMARY",
       "cross_reference": "SB_SRC_003 in 02_CONTENT/SOURCES/SOURCE_REGISTRY.json",
-      "notes": "Documents alternative interpretations of the Bruckmandl figure (Südweiser vs. legendary Baumeister). Exact URL/entry not held locally."
+      "notes": "Directly fetched and read in full 2026-09-07 (official regensburg.de Kulturdatenbank entry, HTTP 200). Confirms: Jahr/Zeit der Entstehung 1446; Material Kalkstein (Original: Grünsandstein); Künstler — Original: unbekannt, Kopie: Anton Blank (Skulptur), Michael Mauerer (Entwurf der Säule); installed 23 April 1854 as the second successor of the original (destroyed 1579); on the western parapet at the bridge's highest point, ~11m above the river, facing south; meaning not conclusively settled (Südweiser vs. legendary Baumeister); right arm lost 2012 (probable vandalism), reinstalled after restoration 5 June 2018, placeholder stood 2014-2017. Cites its own source: Bauer, Karl — Regensburg. Aus Kunst-, Kultur- und Sittengeschichte, Regensburg 1988, S. 436-8 (registered separately as Q008, not directly consulted)."
     },
     {
       "id": "Q006",
@@ -99,10 +99,10 @@
       "year": null,
       "type": "museum_source",
       "language": "de",
-      "project_reference": "01_ARCHITECTURE/ZEITSPRUNG_WEB_OPERATING_RULES.md section 29.8",
-      "evidence_level": "NEEDS_REVIEW",
+      "project_reference": "https://www.regensburg.de/fm/121/steinerne-bruecke-ausstellungstafeln.pdf ; also referenced at 01_ARCHITECTURE/ZEITSPRUNG_WEB_OPERATING_RULES.md section 29.8",
+      "evidence_level": "PRIMARY",
       "cross_reference": "SB_SRC_004 in 02_CONTENT/SOURCES/SOURCE_REGISTRY.json",
-      "notes": "Secondary/complementary official source, referenced but not yet directly consulted by the web team. No claim currently cites it directly."
+      "notes": "Directly fetched and read in full 2026-09-07 (official regensburg.de exhibition-panel PDF, HTTP 200, 23 pages; Bruckmandl content on pp. 5-6). Confirms the current figure is the third sandstone figure of this name (original destroyed 1579 and lost; second version's torso survives in the Historisches Museum; third version by sculptor Anton Blank, installed 1854); quotes the long pedestal inscription verbatim; quotes the short Spruchband under the left hand verbatim with its St. Emmeram-manuscript translation, stating its interpretation remains unresolved; retells the builder's-wager/devil's-pact legend in full, then explicitly states the two buildings' construction dates make the legend impossible as literally told. Searched all 23 pages for 'Wappen'/'Schild'/'Schlüssel'/'Löwe'/'Relief' — zero matches; the panels do not address either heraldic shield on the pedestal. Calls the current figure a 'Sandsteinfigur' — conflicts with Q005's 'Kalkstein' for the same figure; flagged unresolved, see CLAIM_SOURCE_MAP.json bruckmandl_material_current."
     },
     {
       "id": "Q007",
@@ -119,6 +119,22 @@
       "evidence_level": "NEEDS_REVIEW",
       "cross_reference": "SB_SRC_006 in 02_CONTENT/SOURCES/SOURCE_REGISTRY.json",
       "notes": "Internal production-planning reference for the tower-count-by-period timelapse. No independent external primary source captured yet for the exact tower-count-by-year figures."
+    },
+    {
+      "id": "Q008",
+      "title": "Regensburg. Aus Kunst-, Kultur- und Sittengeschichte",
+      "short_title": "Bauer 1988 — Regensburg Kunst-/Kultur-/Sittengeschichte",
+      "institution": null,
+      "author": "Karl Bauer",
+      "publisher": null,
+      "isbn": null,
+      "year": "1988",
+      "type": "published_monograph",
+      "language": "de",
+      "project_reference": "Cited by Q005 (Stadt Regensburg Kulturdatenbank, \"Bruckmandl\" entry), pp. 436-438",
+      "evidence_level": "NEEDS_REVIEW",
+      "cross_reference": null,
+      "notes": "NOT DIRECTLY CONSULTED. Cited by Q005 as: \"Bauer, Karl: Regensburg. Aus Kunst-, Kultur- und Sittengeschichte. Regensburg 1988, S. 436-8.\" Registered here only so the citation chain is traceable. Do not treat as independently verified evidence until this book is obtained and read directly."
     }
   ]
 }

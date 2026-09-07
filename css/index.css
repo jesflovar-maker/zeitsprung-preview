@@ -235,6 +235,25 @@ img{ max-width:100%; display:block; }
 .route-title-chapter__subtitle{ font-size: clamp(16px, 3.6vw, 22px); font-weight: 500; color: var(--z-ink); margin-bottom: 10px; }
 .route-title-chapter__text{ font-size: 14px; color: var(--z-ink-dim); }
 
+/* MOBILE POLISH (DESIGN REVISION) — the title's clamp(48px, 15vw, 96px)
+   (shared formula with .hero__title, untouched here) sizes each split word
+   faster than the viewport shrinks below the 900px desktop breakpoint used
+   everywhere else in this file, so the longer of the two words ("ROUTE"/
+   "INTERAKTIVE"/"INTERACTIVE"/"INTERACTIVA" depending on language) overflows
+   past the container's right edge instead of staying inside it — the actual
+   cause of the reported "off-center" look (.route-title-chapter__inner's own
+   padding/margin was already verified symmetric). Scoped to this title only
+   — .hero__title and the VISION/MISSION/OBJECTIVE beats keep their original
+   sizing untouched. overflow-wrap is a last-resort safety net (a no-op
+   whenever the word already fits, so normal wrapping is unaffected) in case
+   a future/translated word is still too wide at some width. */
+@media (max-width: 899px){
+  .route-title-chapter__title{
+    font-size: clamp(34px, calc(14.3vw - 6px), 68px);
+    overflow-wrap: anywhere;
+  }
+}
+
 /* ---------------------------------------------------------------- */
 /* INTERACTIVE ROUTE MAP — PHASE 2.7C.1 (js/route-map.js)             */
 /* ---------------------------------------------------------------- */
