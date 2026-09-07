@@ -464,6 +464,61 @@ img{ max-width:100%; display:block; }
 @keyframes ztShiftRight{ from{ transform: translateX(-14px); opacity: 0.6; } to{ transform: translateX(0); opacity: 1; } }
 
 /* ---------------------------------------------------------------- */
+/* AI GUIDE — new INDEX entry card (see index.html for scope note).   */
+/* Same dark-card language as .gallery__panel-media/.route-map__pin-  */
+/* label (var(--z-bg-soft)/var(--z-line)/box-shadow), never a new      */
+/* visual system. Whole card is the link — no separate CTA button.     */
+/* ---------------------------------------------------------------- */
+.ai-guide-section{ padding: 8px 20px 72px; }
+.ai-guide{
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 18px;
+  max-width: 420px; margin: 0 auto;
+  padding: 32px 24px;
+  background: var(--z-bg-soft);
+  border: 1px solid var(--z-line);
+  border-radius: 14px;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.45), 0 4px 14px rgba(0,0,0,0.35);
+  text-decoration: none; color: inherit;
+  transition: border-color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+}
+.ai-guide:hover, .ai-guide:focus-visible{
+  border-color: var(--z-gold-dim);
+  transform: translateY(-3px);
+  box-shadow: 0 22px 60px rgba(0,0,0,0.5), 0 4px 14px rgba(0,0,0,0.4);
+  outline: none;
+}
+.ai-guide__media{
+  position: relative; display: flex; justify-content: center; align-items: flex-end;
+  width: 100%;
+}
+/* Soft radial gold glow behind the transparent character PNG — reads as a
+   "premium digital guide" presentation without any new illustration work. */
+.ai-guide__media::before{
+  content: ""; position: absolute; left: 50%; bottom: 8px;
+  width: 70%; aspect-ratio: 1 / 1; transform: translateX(-50%);
+  background: radial-gradient(circle, rgba(212,175,120,0.16) 0%, rgba(212,175,120,0) 72%);
+  pointer-events: none;
+}
+.ai-guide__img{
+  position: relative; z-index: 1;
+  width: clamp(120px, 34vw, 180px); height: auto;
+  object-fit: contain;
+}
+.ai-guide__eyebrow{
+  font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.28em; color: var(--z-gold);
+  margin: 0 0 8px;
+}
+.ai-guide__name{
+  font-family: var(--font-sans); font-size: clamp(20px, 4.5vw, 26px); font-weight: 700;
+  color: var(--z-ink); margin: 0 0 8px;
+}
+.ai-guide__tagline{
+  font-size: 14px; line-height: 1.5; color: var(--z-ink-dim); max-width: 30ch;
+  margin: 0;
+}
+
+/* ---------------------------------------------------------------- */
 /* FOOTER                                                            */
 /* ---------------------------------------------------------------- */
 .site-footer{ padding: 48px 20px 64px; text-align:center; border-top: 1px solid var(--z-line); }
@@ -503,6 +558,12 @@ img{ max-width:100%; display:block; }
   .gallery__info{ flex: 1 1 380px; }
   .navbar{ padding: 0 32px; }
   .route-map{ max-width: 560px; }
+  .ai-guide{
+    flex-direction: row; text-align: left; align-items: center;
+    max-width: 640px; gap: 32px; padding: 28px 40px;
+  }
+  .ai-guide__media{ width: auto; flex: 0 0 auto; }
+  .ai-guide__tagline{ max-width: 34ch; }
 }
 
 /* ---------------------------------------------------------------- */
@@ -526,6 +587,7 @@ img{ max-width:100%; display:block; }
      crossfade — no staggered delays, no translateY motion. */
   .gallery__field{ transform:none; transition: opacity 0.25s linear; transition-delay: 0s !important; }
   .thesis-media{ display:none; }
+  .ai-guide{ opacity: 1 !important; transform: none !important; }
   .thesis-chapters{ margin-top:0; }
   .thesis-chapter{ min-height:auto; padding: 56px 22px; }
   *{ scroll-behavior: auto !important; }

@@ -48,6 +48,11 @@ export const DICT = {
     galleryCounterLabel: "MONUMENT",
     galleryStatusActive: "VERFÜGBAR",
 
+    aiGuideLabel: "KI-GUIDE",
+    aiGuideName: "BRUCKMANDL",
+    aiGuideTagline: "Dein digitaler Begleiter durch ZEITSPRUNG",
+    aiGuideAlt: "KI-Guide-Charakter Bruckmandl",
+
     footerText: "Weitere Monumente von ZEITSPRUNG folgen in Kürze.",
     footerCity: "REGENSBURG"
   },
@@ -83,6 +88,11 @@ export const DICT = {
     galleryCounterLabel: "MONUMENT",
     galleryStatusActive: "AVAILABLE",
 
+    aiGuideLabel: "AI GUIDE",
+    aiGuideName: "BRUCKMANDL",
+    aiGuideTagline: "Your digital guide through ZEITSPRUNG",
+    aiGuideAlt: "AI Guide character Bruckmandl",
+
     footerText: "More ZEITSPRUNG monuments are coming soon.",
     footerCity: "REGENSBURG"
   },
@@ -117,6 +127,11 @@ export const DICT = {
     galleryText: "Elige un monumento para descubrir su historia.",
     galleryCounterLabel: "MONUMENTO",
     galleryStatusActive: "DISPONIBLE",
+
+    aiGuideLabel: "GUÍA IA",
+    aiGuideName: "BRUCKMANDL",
+    aiGuideTagline: "Tu guía digital por ZEITSPRUNG",
+    aiGuideAlt: "Personaje del guía IA Bruckmandl",
 
     footerText: "Pronto llegarán más monumentos de ZEITSPRUNG.",
     footerCity: "REGENSBURG"

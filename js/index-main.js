@@ -23,6 +23,7 @@ import { createZtTypography } from "../STEINERNE_BRUECKE/js/zt-typography.js";
 import { initGallery } from "./gallery.js?v=20260905";
 import { initRouteMap } from "./route-map.js";
 import { activate, deactivate, register, getDebugSnapshot } from "./video-playback.js?v=20260905";
+import { STEINERNE_BRUCKMANDL_ASSET_BASE } from "./zt-paths.js";
 
 const ZT_SOUND_PREF_KEY = "zeitsprung:soundEnabled"; // shared with STEINERNE_BRUECKE/js/main.js
 
@@ -87,6 +88,8 @@ function applyLang(next) {
   applyMuteUI();
   if (galleryHandle) galleryHandle.refreshLang();
   if (routeMapHandle) routeMapHandle.refreshLang();
+  const aiGuideImg = document.getElementById("aiGuideImg");
+  if (aiGuideImg) aiGuideImg.alt = t(lang, "aiGuideAlt");
 }
 
 function wireLangSwitcher() {
@@ -686,6 +689,47 @@ function buildBeatReveal(containerId, titleId, titleText, lineClass) {
 }
 
 // ---------------------------------------------------------------------------
+// AI GUIDE — new INDEX entry card (see index.html for the full scope note).
+// First version only: sets the character image src (SAME approved PNG the
+// Bruckmandl module itself already uses, via STEINERNE_BRUCKMANDL_ASSET_BASE
+// — no second asset copy) and the localized alt text, then plays a single
+// restrained fade/translate-up reveal on scroll-into-view, mirroring
+// STEINERNE_BRUECKE/js/main.js's own wireBruckmandl()/wireKframesGallery()
+// gsap.fromTo + ScrollTrigger convention exactly (same duration/ease/
+// toggleActions), rather than the heavier per-character zt-typography
+// buildBeatReveal() above, which is unnecessary for a static label+tagline.
+// Navigation itself is a plain <a href> — no click handler, no chatbot, no
+// AI response logic, no backend, no state machine.
+// ---------------------------------------------------------------------------
+function wireAiGuideCard() {
+  const card = document.getElementById("aiGuideCard");
+  const img = document.getElementById("aiGuideImg");
+  if (!card || !img) return;
+
+  img.src = `${STEINERNE_BRUCKMANDL_ASSET_BASE}/ai/bruckmandl_ai_idle.png`;
+  img.alt = t(lang, "aiGuideAlt");
+
+  if (typeof gsap === "undefined" || reducedMotion()) return;
+
+  gsap.registerPlugin(ScrollTrigger); // idempotent — safe alongside the other registerPlugin call sites in this file
+  gsap.fromTo(
+    card,
+    { autoAlpha: 0, y: 30 },
+    {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.8,
+      ease: "power2.out",
+      scrollTrigger: {
+        trigger: card,
+        start: "top 85%",
+        toggleActions: "play none none reverse"
+      }
+    }
+  );
+}
+
+// ---------------------------------------------------------------------------
 // VISION/MISSION/OBJECTIVE background — PHASE 2.7C.1 architecture,
 // PHASE 2.7C.4 media: each chapter has its OWN dedicated background loop,
 // all three genuinely distinct derivatives under
@@ -855,6 +899,7 @@ async function boot() {
   buildBeatReveal("missionBeat", "missionTitle", t(lang, "missionTitle"), "thesis-chapter__title-line");
   buildBeatReveal("objectiveBeat", "objectiveTitle", t(lang, "objectiveTitle"), "thesis-chapter__title-line");
   buildBeatReveal("galleryHeadBeat", "galleryTitle", t(lang, "galleryTitle"), "route-title-chapter__title-line");
+  wireAiGuideCard();
 
   const galleryRoot = document.getElementById("galleryRoot");
   galleryHandle = await initGallery({

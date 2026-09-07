@@ -155,6 +155,31 @@
 </section>
 
 <!-- ============================================================ -->
+<!-- AI GUIDE — new INDEX entry point for the Bruckmandl AI guide     -->
+<!-- character, linking into the Bruckmandl module already published  -->
+<!-- inside the Steinerne Brücke experience (#bruckmandl). First       -->
+<!-- version: a static navigational card only, built from the SAME     -->
+<!-- approved transparent PNG asset the Bruckmandl module itself uses   -->
+<!-- (assets/steinerne-bruecke/bruckmandl/ai/), via the SAME             -->
+<!-- STEINERNE_BRUCKMANDL_ASSET_BASE path constant (js/zt-paths.js) —     -->
+<!-- no second asset copy. No chatbot, no AI response logic, no backend,  -->
+<!-- no state machine — see js/index-main.js wireAiGuideCard() for the     -->
+<!-- full scope note. Does NOT modify the Bruckmandl module itself.        -->
+<!-- ============================================================ -->
+<section class="ai-guide-section" aria-label="ZEITSPRUNG AI Guide">
+  <a class="ai-guide" id="aiGuideCard" href="STEINERNE_BRUECKE/index.html#bruckmandl">
+    <div class="ai-guide__media">
+      <img id="aiGuideImg" class="ai-guide__img" alt="" draggable="false">
+    </div>
+    <div class="ai-guide__text">
+      <p class="ai-guide__eyebrow" data-i18n="aiGuideLabel">KI-GUIDE</p>
+      <h3 class="ai-guide__name" data-i18n="aiGuideName">BRUCKMANDL</h3>
+      <p class="ai-guide__tagline" data-i18n="aiGuideTagline">Dein digitaler Begleiter durch ZEITSPRUNG</p>
+    </div>
+  </a>
+</section>
+
+<!-- ============================================================ -->
 <!-- FOOTER                                                        -->
 <!-- ============================================================ -->
 <footer class="site-footer">
