@@ -187,6 +187,21 @@
   <p class="site-footer__city" data-i18n="footerCity">REGENSBURG</p>
 </footer>
 
+<!-- ============================================================ -->
+<!-- GLOBAL BRUCKMANDL ASSISTANT — persistent, immediately visible   -->
+<!-- on INDEX load (bottom-center, fixed). NOT the same thing as the -->
+<!-- editorial "AI GUIDE · BRUCKMANDL" card above (which stays as an -->
+<!-- introduction and is untouched by this feature) — this bar is    -->
+<!-- the PRIMARY conversational entry point: a real text input,      -->
+<!-- mapped locally (js/bruckmandl-guide-core.js, closed demo, no     -->
+<!-- external AI) to the same 8 canonical topics already answered     -->
+<!-- inside STEINERNE_BRUECKE/#bruckmandl. Empty host, JS-populated —  -->
+<!-- see js/index-main.js wireGlobalBruckmandlAssistant(). Only        -->
+<!-- activated on INDEX for this phase (§13 of the brief) — no other    -->
+<!-- monument page is touched. -->
+<!-- ============================================================ -->
+<div id="bruckmandlBar" class="bruckmandl-bar" hidden></div>
+
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <!-- PHASE — HERO BUILD SCROLL EXPERIENCE (ZEITSPRUNG DESIGN REVISION +
      ZEITSPRUNG MOTION REVISION, owner-approved). ScrollTrigger added to

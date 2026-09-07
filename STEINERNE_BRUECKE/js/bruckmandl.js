@@ -24,19 +24,25 @@
        own museumApi/kframesApi.refreshLabels()) so a DE/EN/ES language
        switch re-renders this module's text without reloading the page
 
-   AI GUIDE — CLOSED INTERACTIVE DEMO (this phase)
+   AI GUIDE — CLOSED INTERACTIVE DEMO, GLOBAL CORE (this phase)
    -------------------------------------------------------
-     - renderAssistant() now renders a small, CLOSED interactive prototype:
-       a WELCOME->IDLE entry sequence, a fixed panel of 8 pre-written
-       questions, and — on selection — a TALK/POINT pose plus one
-       pre-written answer. This is NOT an open chatbot: no external AI API,
-       no free-form generation, no state persisted beyond the current DOM
-       (a language switch fully re-renders and resets it). Every answer is
-       a direct paraphrase of this file's own already-approved i18n content
-       (see js/i18n.js's bruckmandlAiQA) — no new historical claim is
-       introduced, and NEEDS_REVIEW material (current figure's material,
-       heraldic shield identity) is always presented as unresolved, never
-       as fact.
+     - renderAssistant() renders a small, CLOSED interactive prototype: a
+       WELCOME->IDLE entry sequence, a typed free-text input, a fixed panel
+       of 8 pre-written suggestion questions, and — on selection or a typed
+       match — a TALK/POINT pose plus one pre-written answer. This is NOT
+       an open chatbot: no external AI API, no free-form generation, no
+       backend, no state persisted beyond the current DOM (a language
+       switch fully re-renders and resets it).
+     - The QA content itself (question/answer text, topic ids, pose/
+       evidence metadata, the deterministic keyword intent matcher) now
+       lives in the SINGLE canonical ../../js/bruckmandl-guide-core.js,
+       shared verbatim with the INDEX page's persistent global assistant
+       bar (js/index-main.js) — a typed question here and the equivalent
+       typed question on INDEX produce the exact same answer. See that
+       file's header for the full provenance note. No historical claim was
+       altered by this move; NEEDS_REVIEW material (current figure's
+       material, heraldic shield identity) is always presented as
+       unresolved, never as fact.
      - no tap-to-enlarge for cutouts/materials — no lightbox component
        exists anywhere in this codebase yet (confirmed by search), and the
        brief explicitly says to leave enlargement out rather than invent one
@@ -52,6 +58,15 @@
    ============================================================================ */
 
 import { STEINERNE_BRUCKMANDL_ASSET_BASE, STEINERNE_SOURCES_URL } from "../../js/zt-paths.js";
+import {
+  BRUCKMANDL_TOPIC_POSE,
+  BRUCKMANDL_TOPIC_STATUS,
+  BRUCKMANDL_STATUS_LABELS,
+  BRUCKMANDL_UI_LABELS,
+  BRUCKMANDL_FALLBACK,
+  BRUCKMANDL_QA,
+  matchBruckmandlIntent
+} from "../../js/bruckmandl-guide-core.js";
 
 export const BRUCKMANDL_ASSET_BASE = STEINERNE_BRUCKMANDL_ASSET_BASE;
 const SOURCES_URL = STEINERNE_SOURCES_URL;
@@ -324,37 +339,6 @@ function renderSources(container, t, lang, sourcesMap) {
   container.appendChild(panel);
 }
 
-// ---------------------------------------------------------------------------
-// AI GUIDE — CLOSED INTERACTIVE DEMO (owner-approved). NOT an open chatbot:
-// no external API, no free-form generation — a fixed set of 8 questions,
-// each mapped to ONE pre-written answer paraphrased directly from this
-// file's already-approved i18n content (bruckmandlFactPoints/
-// bruckmandlHistory for SUPPORTED claims, bruckmandlLegendText for the
-// registered LEGEND, bruckmandlUncertainPoints for the registered
-// NEEDS_REVIEW material/heraldic-identity points). See js/i18n.js's
-// bruckmandlAiQA array for the exact per-language text.
-//
-// AI_QA_POSE_BY_INDEX / AI_QA_STATUS_BY_INDEX are BEHAVIORAL, not
-// linguistic — same 8 entries in every language, so they live here rather
-// than being repeated 3x in i18n.js. status codes are internal (never
-// user-facing strings) and render as small badges reusing the exact same
-// fact/legend/uncertain color language already established by
-// .bruckmandl__factcheck-column--fact/--legend/--uncertain.
-// ---------------------------------------------------------------------------
-const AI_QA_POSE_BY_INDEX = ["talk", "talk", "point", "talk", "talk", "talk", "talk", "point"];
-const AI_QA_STATUS_BY_INDEX = [
-  ["fact"],
-  ["fact"],
-  ["fact"],
-  ["fact", "legend"],
-  ["legend"],
-  ["fact"],
-  ["fact", "uncertain"],
-  ["uncertain"]
-];
-const AI_STATUS_LABEL_KEY = { fact: "bruckmandlStatusFact", legend: "bruckmandlLegendLabel", uncertain: "bruckmandlStatusUncertain" };
-const AI_POSE_ALT_KEY = { welcome: "bruckmandlAiWelcomeAlt", idle: "bruckmandlAiIdleAlt", point: "bruckmandlAiPointAlt", talk: "bruckmandlAiTalkAlt" };
-
 function prefersReducedMotion() {
   return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 }
@@ -374,8 +358,19 @@ function aiScheduleTimer(fn, ms) {
   return id;
 }
 
+// ---------------------------------------------------------------------------
+// renderAssistant() — CLOSED interactive demo, driven entirely by the
+// canonical core (../../js/bruckmandl-guide-core.js): topic ids, pose/
+// evidence metadata, per-language QA text, the fallback copy and the
+// deterministic keyword matcher all come from there, never duplicated here.
+// A typed question is normalized+matched by matchBruckmandlIntent() (no
+// external AI, no backend); an unmatched question shows BRUCKMANDL_FALLBACK
+// with a neutral "uncertain"-style badge, never a guessed historical claim.
+// ---------------------------------------------------------------------------
 function renderAssistant(container, assets, t, lang) {
   const reduced = prefersReducedMotion();
+  const ui = BRUCKMANDL_UI_LABELS[lang] || BRUCKMANDL_UI_LABELS.en;
+  const statusLabels = BRUCKMANDL_STATUS_LABELS[lang] || BRUCKMANDL_STATUS_LABELS.en;
 
   // Preload all 4 poses once so a later pose switch never shows a blank/
   // half-loaded frame during the crossfade.
@@ -387,13 +382,15 @@ function renderAssistant(container, assets, t, lang) {
   const wrap = el("div", "bruckmandl__assistant");
 
   const stage = el("div", "bruckmandl__ai-stage");
-  const img = el("img", "bruckmandl__ai-img", { alt: t(lang, "bruckmandlAiWelcomeAlt") || "", draggable: "false" });
+  const img = el("img", "bruckmandl__ai-img", { alt: ui.welcomeAlt || "", draggable: "false" });
   img.src = assets.ai.welcome;
   stage.appendChild(img);
   wrap.appendChild(stage);
 
   function setPose(poseKey) {
-    const alt = t(lang, AI_POSE_ALT_KEY[poseKey]) || "";
+    const alt = ui[`${poseKey}Alt`] || "";
+    img.classList.toggle("bruckmandl__ai-img--idle-breathe", poseKey === "idle");
+    img.classList.toggle("bruckmandl__ai-img--talk-active", poseKey === "talk");
     if (reduced) {
       img.src = assets.ai[poseKey];
       img.alt = alt;
@@ -411,9 +408,23 @@ function renderAssistant(container, assets, t, lang) {
   aiScheduleTimer(() => setPose("idle"), reduced ? 0 : 1600);
 
   const panel = el("div", "bruckmandl__ai-panel");
-  panel.appendChild(el("p", "bruckmandl__ai-heading")).textContent = t(lang, "bruckmandlAiHeading");
+  panel.appendChild(el("p", "bruckmandl__ai-heading")).textContent = ui.heading;
 
-  const qWrap = el("div", "bruckmandl__ai-questions", { role: "group", "aria-label": t(lang, "bruckmandlAiHeading") || "" });
+  // Typed free-text input — same engine as the INDEX persistent assistant
+  // bar (js/index-main.js). Enter and the send button both submit.
+  const form = el("form", "bruckmandl__ai-form");
+  const input = el("input", "bruckmandl__ai-input", {
+    type: "text",
+    placeholder: ui.placeholder,
+    "aria-label": ui.inputAriaLabel,
+    autocomplete: "off"
+  });
+  const sendBtn = el("button", "bruckmandl__ai-send", { type: "submit", "aria-label": ui.send });
+  sendBtn.textContent = ui.send;
+  form.appendChild(input);
+  form.appendChild(sendBtn);
+
+  const qWrap = el("div", "bruckmandl__ai-questions", { role: "group", "aria-label": ui.heading });
   const answerWrap = el("div", "bruckmandl__ai-answer", { "aria-live": "polite" });
   answerWrap.hidden = true;
   const statusRow = el("div", "bruckmandl__ai-answer-status");
@@ -421,40 +432,74 @@ function renderAssistant(container, assets, t, lang) {
   answerWrap.appendChild(statusRow);
   answerWrap.appendChild(answerText);
 
-  const qa = t(lang, "bruckmandlAiQA") || [];
+  const qa = BRUCKMANDL_QA[lang] || BRUCKMANDL_QA.en;
   const buttons = [];
 
-  qa.forEach((item, i) => {
-    const btn = el("button", "bruckmandl__ai-question-btn", { type: "button", "aria-pressed": "false" });
-    btn.textContent = item.question;
-    btn.addEventListener("click", () => {
-      buttons.forEach((b) => {
-        const active = b === btn;
-        b.classList.toggle("is-active", active);
-        b.setAttribute("aria-pressed", active ? "true" : "false");
-      });
-
-      const pose = AI_QA_POSE_BY_INDEX[i] || "talk";
-      setPose(pose);
-
-      statusRow.innerHTML = "";
-      (AI_QA_STATUS_BY_INDEX[i] || []).forEach((code) => {
-        const badge = el("span", `bruckmandl__ai-status-badge bruckmandl__ai-status-badge--${code}`);
-        badge.textContent = t(lang, AI_STATUS_LABEL_KEY[code]) || "";
-        statusRow.appendChild(badge);
-      });
-      answerText.textContent = item.answer;
-      answerWrap.hidden = false;
-
-      // Return to IDLE after the answer has had time to be read, while the
-      // answer card itself stays visible — the visitor can pick another
-      // question at any point, this only rests the character's pose.
-      aiScheduleTimer(() => setPose("idle"), 2400);
+  function showAnswer(pose, statusCodes, text, activeBtn) {
+    buttons.forEach((b) => {
+      const active = b === activeBtn;
+      b.classList.toggle("is-active", active);
+      b.setAttribute("aria-pressed", active ? "true" : "false");
     });
+
+    setPose(pose);
+
+    statusRow.innerHTML = "";
+    statusCodes.forEach((code) => {
+      const badge = el("span", `bruckmandl__ai-status-badge bruckmandl__ai-status-badge--${code}`);
+      badge.textContent = statusLabels[code] || "";
+      statusRow.appendChild(badge);
+    });
+    answerText.textContent = text;
+    answerWrap.hidden = false;
+
+    // Return to IDLE after the answer has had time to be read, while the
+    // answer card itself stays visible — the visitor can pick another
+    // question at any point, this only rests the character's pose.
+    aiScheduleTimer(() => setPose("idle"), 2400);
+  }
+
+  function answerTopic(topic, activeBtn) {
+    const entry = qa.find((e) => e.topic === topic);
+    if (!entry) return;
+    showAnswer(BRUCKMANDL_TOPIC_POSE[topic] || "talk", BRUCKMANDL_TOPIC_STATUS[topic] || [], entry.answer, activeBtn);
+  }
+
+  function answerUnknown() {
+    setPose("talk");
+    statusRow.innerHTML = "";
+    const badge = el("span", "bruckmandl__ai-status-badge bruckmandl__ai-status-badge--uncertain");
+    badge.textContent = statusLabels.uncertain || "";
+    statusRow.appendChild(badge);
+    answerText.textContent = BRUCKMANDL_FALLBACK[lang] || BRUCKMANDL_FALLBACK.en;
+    answerWrap.hidden = false;
+    buttons.forEach((b) => { b.classList.remove("is-active"); b.setAttribute("aria-pressed", "false"); });
+    aiScheduleTimer(() => setPose("idle"), 2400);
+  }
+
+  qa.forEach((entry) => {
+    const btn = el("button", "bruckmandl__ai-question-btn", { type: "button", "aria-pressed": "false" });
+    btn.textContent = entry.question;
+    btn.addEventListener("click", () => answerTopic(entry.topic, btn));
     buttons.push(btn);
     qWrap.appendChild(btn);
   });
 
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const raw = input.value;
+    if (!raw || !raw.trim()) return;
+    const topic = matchBruckmandlIntent(raw, lang);
+    if (topic) {
+      const matchingBtn = buttons[qa.findIndex((entry) => entry.topic === topic)] || null;
+      answerTopic(topic, matchingBtn);
+    } else {
+      answerUnknown();
+    }
+    input.value = "";
+  });
+
+  panel.appendChild(form);
   panel.appendChild(qWrap);
   panel.appendChild(answerWrap);
   wrap.appendChild(panel);

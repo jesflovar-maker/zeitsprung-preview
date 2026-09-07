@@ -208,57 +208,12 @@ export const DICT = {
       column_and_base: "Säule & Sockel"
     },
     bruckmandlAssistantAlt: "Bruckmandl-Assistent (in Entwicklung)",
-    // AI GUIDE — CLOSED INTERACTIVE DEMO. Every answer below is a direct
-    // paraphrase of the SUPPORTED bruckmandlFactPoints/bruckmandlHistory
-    // entries, the registered bruckmandlLegendText (LEGEND, always labeled),
-    // or the registered NEEDS_REVIEW bruckmandlUncertainPoints (material of
-    // the CURRENT figure, identity of the heraldic shields) — no new
-    // historical claim is introduced here, and no unsupported shield/
-    // heraldic identity is asserted (Q7/Q8 explicitly flag those as
-    // unresolved). status codes are internal (fact/legend/uncertain), not
-    // user-facing strings — resolved to bruckmandlStatusFact/
-    // bruckmandlLegendLabel/bruckmandlStatusUncertain at render time.
-    bruckmandlAiHeading: "FRAG DAS BRUCKMANDL",
-    bruckmandlStatusFact: "BELEGT",
-    bruckmandlStatusUncertain: "UNGEPRÜFT",
-    bruckmandlAiWelcomeAlt: "Bruckmandl-Assistent begrüßt dich",
-    bruckmandlAiIdleAlt: "Bruckmandl-Assistent, ruhende Haltung",
-    bruckmandlAiPointAlt: "Bruckmandl-Assistent zeigt auf ein Detail",
-    bruckmandlAiTalkAlt: "Bruckmandl-Assistent spricht",
-    bruckmandlAiQA: [
-      {
-        question: "Wer bist du?",
-        answer: "Ich bin das Bruckmandl — eine kleine Steinfigur hoch über der Donau, am höchsten Punkt der Steinernen Brücke. Die Figur, die du hier siehst, stammt aus dem Jahr 1854 und ist bereits die dritte ihrer Art."
-      },
-      {
-        question: "Von wann stammst du?",
-        answer: "Das früheste dokumentierte Jahr ist 1446. Die ursprüngliche Figur aus Grünsandstein wurde 1579 zerstört. Die heutige, dritte Figur wurde 1854 von Anton Blank geschaffen und zwischen 2012 und 2018 saniert."
-      },
-      {
-        question: "Wo bist du auf der Brücke?",
-        answer: "Ich sitze auf der westlichen Brüstung, am höchsten Punkt der Brücke — etwa 11 Meter über der Donau, mit Blick nach Süden."
-      },
-      {
-        question: "Was ist Fakt, was Legende?",
-        answer: "Historisch belegt sind zum Beispiel das Jahr 1854 und mein Standort auf der westlichen Brüstung. Überliefert als Sage sind dagegen die Wette mit dem Dombaumeister und der Pakt mit dem Teufel — das sind Erzählungen, keine belegten Fakten."
-      },
-      {
-        question: "Erzähl mir die Baumeister-Sage.",
-        answer: "Der Sage nach soll das Bruckmandl den Baumeister der Steinernen Brücke darstellen, der besorgt zu den Domtürmen hinüberschaut. Er habe mit dem Dombaumeister gewettet und, um zu gewinnen, einen Pakt mit dem Teufel geschlossen — Hilfe beim Brückenbau gegen die Seelen der ersten drei Brückengänger. Mit einer List aus zwei Hähnen und einem Hund entkam die Stadt dem Pakt; aus Wut soll der Teufel die Brücke verbogen und die Donaustrudel verursacht haben."
-      },
-      {
-        question: "Was geschah mit den früheren Figuren?",
-        answer: "Die ursprüngliche Figur aus Grünsandstein wurde 1579 zerstört; ihr Bildhauer ist unbekannt. Die heutige Figur von 1854 ist bereits die dritte ihrer Art — über eine zweite Figur ist in den validierten Quellen nichts Näheres bekannt."
-      },
-      {
-        question: "Aus welchem Material bist du?",
-        answer: "Die ursprüngliche Figur von 1579 bestand nachweislich aus Grünsandstein. Das Material der heutigen, dritten Figur ist dagegen nicht abschließend geklärt — das gilt in den Quellen als ungeprüft."
-      },
-      {
-        question: "Zeig mir ein wichtiges Detail.",
-        answer: "Ein auffälliges Detail ist das Wappenschild mit den Schlüsseln am Sockel. Was genau dieses Wappen darstellt, ist in den Quellen nicht gesichert — die Identität der beiden Wappenreliefs gilt als ungeklärt."
-      }
-    ],
+    // AI GUIDE QA content (question/answer, heading, status labels, alt
+    // text) now lives in the SINGLE canonical source
+    // ../../js/bruckmandl-guide-core.js — see that file's header. Every
+    // OTHER Bruckmandl string below (title, summary, history, legend,
+    // factcheck, materials, cutouts, Quellen) is unrelated to the QA system
+    // and stays here untouched.
     videoChapterTitle: "Der Flug über die Brücke",
     videoChapterText: "Eine FPV-Aufnahme der Steinerne Brücke aus der Vogelperspektive.",
     videoUnavailable: "Video konnte in diesem Browser nicht geladen werden (möglicherweise HEVC-Codec-Einschränkung).",
@@ -460,47 +415,8 @@ export const DICT = {
       column_and_base: "Column & base"
     },
     bruckmandlAssistantAlt: "Bruckmandl assistant (in development)",
-    bruckmandlAiHeading: "ASK THE BRUCKMANDL",
-    bruckmandlStatusFact: "DOCUMENTED",
-    bruckmandlStatusUncertain: "UNVERIFIED",
-    bruckmandlAiWelcomeAlt: "Bruckmandl assistant welcoming you",
-    bruckmandlAiIdleAlt: "Bruckmandl assistant, resting pose",
-    bruckmandlAiPointAlt: "Bruckmandl assistant pointing at a detail",
-    bruckmandlAiTalkAlt: "Bruckmandl assistant speaking",
-    bruckmandlAiQA: [
-      {
-        question: "Who are you?",
-        answer: "I'm the Bruckmandl — a small stone figure high above the Danube, at the highest point of the Stone Bridge. The figure you see today dates from 1854 and is already the third of its kind."
-      },
-      {
-        question: "When do you date from?",
-        answer: "The earliest documented year is 1446. The original Grünsandstein figure was destroyed in 1579. Today's third figure was created in 1854 by Anton Blank and restored between 2012 and 2018."
-      },
-      {
-        question: "Where are you on the bridge?",
-        answer: "I sit on the western parapet, at the highest point of the bridge — about 11 meters above the Danube, facing south."
-      },
-      {
-        question: "What's fact, what's legend?",
-        answer: "Historically documented, for example, are the year 1854 and my location on the western parapet. Passed down as legend, on the other hand, are the wager with the cathedral's builder and the pact with the devil — those are tales, not documented facts."
-      },
-      {
-        question: "Tell me the builder legend.",
-        answer: "According to legend, the Bruckmandl represents the bridge's master builder, anxiously watching the cathedral towers rise. He is said to have wagered with the cathedral's builder and, to win, struck a pact with the devil — help finishing the bridge for the souls of its first three crossers. A trick with two roosters and a dog let the city escape the bargain; furious, the devil is said to have bent the bridge and stirred up the Danube's whirlpools."
-      },
-      {
-        question: "What happened to the earlier figures?",
-        answer: "The original Grünsandstein figure was destroyed in 1579; its sculptor is unknown. Today's 1854 figure is already the third of its kind — the validated sources record nothing further about a second figure."
-      },
-      {
-        question: "What material are you made from?",
-        answer: "The original 1579 figure was documented as made of Grünsandstein. The material of today's third figure, however, has not been conclusively established — the sources flag this as unverified."
-      },
-      {
-        question: "Show me an important detail.",
-        answer: "One striking detail is the heraldic shield with the keys on the pedestal. What exactly this shield represents is not confirmed in the sources — the identity of the two heraldic reliefs remains unresolved."
-      }
-    ],
+    // AI GUIDE QA content now lives in ../../js/bruckmandl-guide-core.js —
+    // see the DE block's comment above for the full note.
     videoChapterTitle: "Flying over the bridge",
     videoChapterText: "An FPV aerial shot of the Steinerne Brücke.",
     videoUnavailable: "Video could not load in this browser (possible HEVC codec limitation).",
@@ -698,47 +614,8 @@ export const DICT = {
       column_and_base: "Columna y base"
     },
     bruckmandlAssistantAlt: "Asistente Bruckmandl (en desarrollo)",
-    bruckmandlAiHeading: "PREGÚNTALE AL BRUCKMANDL",
-    bruckmandlStatusFact: "DOCUMENTADO",
-    bruckmandlStatusUncertain: "NO VERIFICADO",
-    bruckmandlAiWelcomeAlt: "El asistente Bruckmandl te da la bienvenida",
-    bruckmandlAiIdleAlt: "Asistente Bruckmandl, postura en reposo",
-    bruckmandlAiPointAlt: "Asistente Bruckmandl señalando un detalle",
-    bruckmandlAiTalkAlt: "Asistente Bruckmandl hablando",
-    bruckmandlAiQA: [
-      {
-        question: "¿Quién eres?",
-        answer: "Soy el Bruckmandl — una pequeña figura de piedra en lo alto del Danubio, en el punto más elevado del Puente de Piedra. La figura que ves hoy data de 1854 y es ya la tercera de su tipo."
-      },
-      {
-        question: "¿De cuándo data?",
-        answer: "El año documentado más antiguo es 1446. La figura original de Grünsandstein fue destruida en 1579. La figura actual, la tercera, fue creada en 1854 por Anton Blank y restaurada entre 2012 y 2018."
-      },
-      {
-        question: "¿Dónde estás en el puente?",
-        answer: "Me siento en la balaustrada occidental, en el punto más alto del puente — a unos 11 metros sobre el Danubio, mirando hacia el sur."
-      },
-      {
-        question: "¿Qué es hecho, qué es leyenda?",
-        answer: "Está históricamente documentado, por ejemplo, el año 1854 y mi ubicación en la balaustrada occidental. Transmitida como leyenda, en cambio, está la apuesta con el constructor de la catedral y el pacto con el diablo — son relatos, no hechos documentados."
-      },
-      {
-        question: "Cuéntame la leyenda del maestro.",
-        answer: "Según la leyenda, el Bruckmandl representa al maestro constructor del puente, observando con inquietud cómo se alzan las torres de la catedral. Se dice que apostó con el constructor de la catedral y, para ganar, hizo un pacto con el diablo — ayuda para terminar el puente a cambio de las almas de los tres primeros en cruzarlo. Un engaño con dos gallos y un perro libró a la ciudad del pacto; furioso, el diablo habría torcido el puente y provocado los remolinos del Danubio."
-      },
-      {
-        question: "¿Qué pasó con las figuras anteriores?",
-        answer: "La figura original de Grünsandstein fue destruida en 1579; se desconoce su escultor. La figura actual de 1854 es ya la tercera de su tipo — las fuentes validadas no registran más detalles sobre una segunda figura."
-      },
-      {
-        question: "¿De qué material estás hecho?",
-        answer: "La figura original de 1579 estaba documentada como hecha de Grünsandstein. El material de la figura actual, la tercera, en cambio, no está confirmado de forma concluyente — las fuentes lo marcan como no verificado."
-      },
-      {
-        question: "Muéstrame un detalle importante.",
-        answer: "Un detalle llamativo es el escudo heráldico con las llaves en el pedestal. Lo que representa exactamente ese escudo no está confirmado en las fuentes — la identidad de los dos relieves heráldicos sigue sin resolverse."
-      }
-    ],
+    // AI GUIDE QA content now lives in ../../js/bruckmandl-guide-core.js —
+    // see the DE block's comment above for the full note.
     videoChapterTitle: "Sobrevolando el puente",
     videoChapterText: "Una toma aérea FPV de la Steinerne Brücke.",
     videoUnavailable: "El vídeo no pudo cargarse en este navegador (posible limitación del códec HEVC).",

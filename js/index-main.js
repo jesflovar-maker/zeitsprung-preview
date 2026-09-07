@@ -24,6 +24,15 @@ import { initGallery } from "./gallery.js?v=20260905";
 import { initRouteMap } from "./route-map.js";
 import { activate, deactivate, register, getDebugSnapshot } from "./video-playback.js?v=20260905";
 import { STEINERNE_BRUCKMANDL_ASSET_BASE } from "./zt-paths.js";
+import {
+  BRUCKMANDL_TOPIC_POSE,
+  BRUCKMANDL_TOPIC_STATUS,
+  BRUCKMANDL_STATUS_LABELS,
+  BRUCKMANDL_UI_LABELS,
+  BRUCKMANDL_FALLBACK,
+  BRUCKMANDL_QA,
+  matchBruckmandlIntent
+} from "./bruckmandl-guide-core.js";
 
 const ZT_SOUND_PREF_KEY = "zeitsprung:soundEnabled"; // shared with STEINERNE_BRUECKE/js/main.js
 
@@ -90,6 +99,7 @@ function applyLang(next) {
   if (routeMapHandle) routeMapHandle.refreshLang();
   const aiGuideImg = document.getElementById("aiGuideImg");
   if (aiGuideImg) aiGuideImg.alt = t(lang, "aiGuideAlt");
+  refreshGlobalBruckmandlAssistantLang();
 }
 
 function wireLangSwitcher() {
@@ -730,6 +740,193 @@ function wireAiGuideCard() {
 }
 
 // ---------------------------------------------------------------------------
+// GLOBAL BRUCKMANDL ASSISTANT — persistent, immediately-visible INDEX bar
+// (see index.html for the scope note). CLOSED interactive demo, same rules
+// as STEINERNE_BRUECKE/#bruckmandl's module assistant: no external AI API,
+// no free-form generation, no backend. Everything behavioral/textual comes
+// from the ONE canonical ./bruckmandl-guide-core.js — a typed question here
+// produces the exact same answer as the equivalent typed question inside
+// the Bruckmandl monument module. §13 of the brief: activated on INDEX
+// only for this phase; no other monument page is touched.
+//
+// Distinct from wireAiGuideCard() above (the untouched editorial card) —
+// this bar is the new PRIMARY conversational entry point, fixed at the
+// bottom of the viewport via CSS position:fixed only (see .bruckmandl-bar
+// in css/index.css) so it persists through scroll with zero scroll
+// listeners.
+// ---------------------------------------------------------------------------
+let baPendingTimers = [];
+function baClearTimers() {
+  baPendingTimers.forEach((id) => window.clearTimeout(id));
+  baPendingTimers = [];
+}
+function baScheduleTimer(fn, ms) {
+  const id = window.setTimeout(fn, ms);
+  baPendingTimers.push(id);
+  return id;
+}
+
+let baAssets = null;
+let baImg = null;
+let baAnswerWrap = null;
+let baAnswerStatus = null;
+let baAnswerText = null;
+let baInput = null;
+
+function baSetPose(poseKey) {
+  if (!baImg) return;
+  const ui = BRUCKMANDL_UI_LABELS[lang] || BRUCKMANDL_UI_LABELS.en;
+  const alt = ui[`${poseKey}Alt`] || "";
+  baImg.classList.toggle("bruckmandl-bar__character-img--idle-breathe", poseKey === "idle");
+  baImg.classList.toggle("bruckmandl-bar__character-img--talk-active", poseKey === "talk");
+  if (reducedMotion()) {
+    baImg.src = baAssets[poseKey];
+    baImg.alt = alt;
+    return;
+  }
+  baImg.classList.add("is-fading");
+  baScheduleTimer(() => {
+    baImg.src = baAssets[poseKey];
+    baImg.alt = alt;
+    baImg.classList.remove("is-fading");
+  }, 220);
+}
+
+function baShowAnswer(statusCodes, text) {
+  const statusLabels = BRUCKMANDL_STATUS_LABELS[lang] || BRUCKMANDL_STATUS_LABELS.en;
+  baAnswerStatus.innerHTML = "";
+  statusCodes.forEach((code) => {
+    const badge = document.createElement("span");
+    badge.className = `bruckmandl-bar__status-badge bruckmandl-bar__status-badge--${code}`;
+    badge.textContent = statusLabels[code] || "";
+    baAnswerStatus.appendChild(badge);
+  });
+  baAnswerText.textContent = text;
+  baAnswerWrap.hidden = false;
+}
+
+function baAnswerTopic(topic) {
+  const qa = BRUCKMANDL_QA[lang] || BRUCKMANDL_QA.en;
+  const entry = qa.find((e) => e.topic === topic);
+  if (!entry) return;
+  baSetPose(BRUCKMANDL_TOPIC_POSE[topic] || "talk");
+  baShowAnswer(BRUCKMANDL_TOPIC_STATUS[topic] || [], entry.answer);
+  // Answer stays visible after the pose rests back to IDLE — only an
+  // explicit collapse click or a new answer removes it (§3 of the brief).
+  baScheduleTimer(() => baSetPose("idle"), 2400);
+}
+
+function baAnswerUnknown() {
+  baSetPose("talk");
+  baShowAnswer(["uncertain"], BRUCKMANDL_FALLBACK[lang] || BRUCKMANDL_FALLBACK.en);
+  baScheduleTimer(() => baSetPose("idle"), 2400);
+}
+
+function wireGlobalBruckmandlAssistant() {
+  const root = document.getElementById("bruckmandlBar");
+  if (!root) return;
+
+  baAssets = {
+    welcome: `${STEINERNE_BRUCKMANDL_ASSET_BASE}/ai/bruckmandl_ai_welcome.png`,
+    idle: `${STEINERNE_BRUCKMANDL_ASSET_BASE}/ai/bruckmandl_ai_idle.png`,
+    point: `${STEINERNE_BRUCKMANDL_ASSET_BASE}/ai/bruckmandl_ai_point.png`,
+    talk: `${STEINERNE_BRUCKMANDL_ASSET_BASE}/ai/bruckmandl_ai_talk.png`
+  };
+  // Preload all 4 poses once so a later crossfade never shows a blank frame.
+  Object.values(baAssets).forEach((src) => { const im = new Image(); im.src = src; });
+
+  const ui = BRUCKMANDL_UI_LABELS[lang] || BRUCKMANDL_UI_LABELS.en;
+
+  const barRow = document.createElement("div");
+  barRow.className = "bruckmandl-bar__bar";
+
+  const charWrap = document.createElement("div");
+  charWrap.className = "bruckmandl-bar__character";
+  baImg = document.createElement("img");
+  baImg.className = "bruckmandl-bar__character-img";
+  baImg.alt = ui.welcomeAlt || "";
+  baImg.draggable = false;
+  baImg.src = baAssets.welcome;
+  charWrap.appendChild(baImg);
+
+  const form = document.createElement("form");
+  form.className = "bruckmandl-bar__form";
+  baInput = document.createElement("input");
+  baInput.type = "text";
+  baInput.className = "bruckmandl-bar__input";
+  baInput.placeholder = ui.placeholder;
+  baInput.setAttribute("aria-label", ui.inputAriaLabel);
+  baInput.autocomplete = "off";
+  const sendBtn = document.createElement("button");
+  sendBtn.type = "submit";
+  sendBtn.className = "bruckmandl-bar__send";
+  sendBtn.setAttribute("aria-label", ui.send);
+  sendBtn.textContent = "→";
+  form.appendChild(baInput);
+  form.appendChild(sendBtn);
+
+  barRow.appendChild(charWrap);
+  barRow.appendChild(form);
+
+  baAnswerWrap = document.createElement("div");
+  baAnswerWrap.className = "bruckmandl-bar__answer";
+  baAnswerWrap.hidden = true;
+  baAnswerWrap.setAttribute("aria-live", "polite");
+  const answerHead = document.createElement("div");
+  answerHead.className = "bruckmandl-bar__answer-head";
+  baAnswerStatus = document.createElement("div");
+  baAnswerStatus.className = "bruckmandl-bar__answer-status";
+  const collapseBtn = document.createElement("button");
+  collapseBtn.type = "button";
+  collapseBtn.className = "bruckmandl-bar__answer-collapse";
+  collapseBtn.setAttribute("aria-label", ui.collapse);
+  collapseBtn.textContent = "×";
+  collapseBtn.addEventListener("click", () => { baAnswerWrap.hidden = true; });
+  answerHead.appendChild(baAnswerStatus);
+  answerHead.appendChild(collapseBtn);
+  baAnswerText = document.createElement("p");
+  baAnswerText.className = "bruckmandl-bar__answer-text";
+  baAnswerWrap.appendChild(answerHead);
+  baAnswerWrap.appendChild(baAnswerText);
+
+  root.innerHTML = "";
+  root.appendChild(barRow);
+  root.appendChild(baAnswerWrap);
+  root.hidden = false;
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const raw = baInput.value;
+    if (!raw || !raw.trim()) return;
+    const topic = matchBruckmandlIntent(raw, lang);
+    if (topic) baAnswerTopic(topic); else baAnswerUnknown();
+    baInput.value = "";
+  });
+
+  // Entry sequence: WELCOME immediately visible the moment INDEX loads (no
+  // click/scroll required), settle into IDLE shortly after — skipped/
+  // instant under reduced motion.
+  baScheduleTimer(() => baSetPose("idle"), reducedMotion() ? 0 : 1600);
+}
+
+// Called from applyLang() on every DE/EN/ES switch — re-translates the
+// input placeholder/aria-labels and resets to a clean IDLE state (never
+// leaves a stale-language answer visible after a language switch).
+function refreshGlobalBruckmandlAssistantLang() {
+  if (!baInput) return; // not mounted yet
+  const ui = BRUCKMANDL_UI_LABELS[lang] || BRUCKMANDL_UI_LABELS.en;
+  baInput.placeholder = ui.placeholder;
+  baInput.setAttribute("aria-label", ui.inputAriaLabel);
+  const sendBtn = document.querySelector(".bruckmandl-bar__send");
+  if (sendBtn) sendBtn.setAttribute("aria-label", ui.send);
+  const collapseBtn = document.querySelector(".bruckmandl-bar__answer-collapse");
+  if (collapseBtn) collapseBtn.setAttribute("aria-label", ui.collapse);
+  baClearTimers();
+  if (baAnswerWrap) baAnswerWrap.hidden = true;
+  baSetPose("idle");
+}
+
+// ---------------------------------------------------------------------------
 // VISION/MISSION/OBJECTIVE background — PHASE 2.7C.1 architecture,
 // PHASE 2.7C.4 media: each chapter has its OWN dedicated background loop,
 // all three genuinely distinct derivatives under
@@ -900,6 +1097,7 @@ async function boot() {
   buildBeatReveal("objectiveBeat", "objectiveTitle", t(lang, "objectiveTitle"), "thesis-chapter__title-line");
   buildBeatReveal("galleryHeadBeat", "galleryTitle", t(lang, "galleryTitle"), "route-title-chapter__title-line");
   wireAiGuideCard();
+  wireGlobalBruckmandlAssistant();
 
   const galleryRoot = document.getElementById("galleryRoot");
   galleryHandle = await initGallery({

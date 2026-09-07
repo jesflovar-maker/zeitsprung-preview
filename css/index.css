@@ -567,6 +567,110 @@ img{ max-width:100%; display:block; }
 }
 
 /* ---------------------------------------------------------------- */
+/* GLOBAL BRUCKMANDL ASSISTANT — persistent bottom-center bar          */
+/* (see index.html for the scope note). Fixed positioning only — no    */
+/* scroll listener needed to keep it in place. left/right + auto margin */
+/* gives "nearly full width with safe side margins" on narrow viewports */
+/* and a naturally centered, width-capped bar on wide ones, from ONE     */
+/* rule (no separate mobile/desktop position override needed). Same      */
+/* dark/gold card language as the rest of the page — no chat-bubble,      */
+/* no round launcher, no SaaS-chatbot look.                                */
+/* ---------------------------------------------------------------- */
+.bruckmandl-bar{
+  position: fixed;
+  left: 16px; right: 16px;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  margin: 0 auto;
+  max-width: 460px;
+  z-index: 90;
+  display: flex; flex-direction: column-reverse; gap: 10px;
+}
+.bruckmandl-bar[hidden]{ display: none; }
+
+.bruckmandl-bar__bar{
+  display: flex; align-items: center; gap: 10px;
+  background: rgba(14,15,17,0.92);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border: 1px solid var(--z-line); border-radius: 12px;
+  padding: 7px 8px 7px 6px;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.5);
+}
+.bruckmandl-bar__character{
+  flex: 0 0 auto; height: 48px; width: auto;
+  display: flex; align-items: flex-end;
+}
+.bruckmandl-bar__character-img{
+  height: 100%; width: auto; object-fit: contain;
+  transition: opacity 0.22s ease;
+}
+.bruckmandl-bar__character-img.is-fading{ opacity: 0; }
+.bruckmandl-bar__character-img--idle-breathe{ animation: bruckmandlBarIdleBreathe 4.6s ease-in-out infinite; }
+.bruckmandl-bar__character-img--talk-active{ animation: bruckmandlBarTalkActive 1.1s ease-in-out infinite; }
+@keyframes bruckmandlBarIdleBreathe{ 0%,100%{ transform: translateY(0); } 50%{ transform: translateY(-2px); } }
+@keyframes bruckmandlBarTalkActive{ 0%,100%{ transform: translateY(0) rotate(0deg); } 50%{ transform: translateY(-1px) rotate(0.6deg); } }
+
+.bruckmandl-bar__form{ flex: 1 1 auto; min-width: 0; display: flex; gap: 8px; }
+.bruckmandl-bar__input{
+  flex: 1 1 auto; min-width: 0;
+  font-family: var(--font-sans); font-size: 16px; color: var(--z-ink);
+  background: transparent; border: none;
+  padding: 12px 4px; min-height: 44px;
+}
+.bruckmandl-bar__input::placeholder{ color: var(--z-ink-faint); }
+.bruckmandl-bar__input:focus-visible{ outline: none; }
+.bruckmandl-bar__send{
+  flex: 0 0 auto; min-width: 44px; min-height: 44px;
+  font-size: 17px; color: var(--z-gold);
+  background: rgba(212,175,120,0.1); border: 1px solid rgba(212,175,120,0.4); border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.bruckmandl-bar__send:hover, .bruckmandl-bar__send:focus-visible{
+  background: rgba(212,175,120,0.18); border-color: var(--z-gold); outline: none;
+}
+
+.bruckmandl-bar__answer{
+  background: rgba(14,15,17,0.96);
+  border: 1px solid var(--z-line); border-radius: 12px;
+  padding: 14px 14px 12px;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.5);
+  max-height: min(46vh, 320px);
+  overflow-y: auto;
+  animation: bruckmandlBarAnswerIn 0.28s ease-out both;
+}
+@keyframes bruckmandlBarAnswerIn{ from{ opacity: 0; transform: translateY(6px); } to{ opacity: 1; transform: translateY(0); } }
+.bruckmandl-bar__answer[hidden]{ display: none; }
+.bruckmandl-bar__answer-head{
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 10px;
+  margin-bottom: 8px;
+}
+.bruckmandl-bar__answer-status{ display: flex; gap: 6px; flex-wrap: wrap; }
+.bruckmandl-bar__status-badge{
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em;
+  padding: 3px 7px; border-radius: 3px;
+  border: 1px solid var(--z-line);
+}
+.bruckmandl-bar__status-badge--fact{ color: var(--z-gold); border-color: rgba(212,175,120,0.4); }
+.bruckmandl-bar__status-badge--legend{ color: var(--z-warn); border-color: rgba(232,161,92,0.45); border-style: dashed; }
+.bruckmandl-bar__status-badge--uncertain{ color: var(--z-ink-faint); border-style: dashed; }
+.bruckmandl-bar__answer-collapse{
+  flex: 0 0 auto; width: 26px; height: 26px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; line-height: 1; color: var(--z-ink-faint);
+  background: none; border: none; cursor: pointer;
+}
+.bruckmandl-bar__answer-collapse:hover, .bruckmandl-bar__answer-collapse:focus-visible{ color: var(--z-ink); outline: none; }
+.bruckmandl-bar__answer-text{
+  font-size: 13.5px; line-height: 1.55; color: var(--z-ink-dim);
+  margin: 0;
+}
+
+@media (min-width: 900px){
+  .bruckmandl-bar{ bottom: 20px; }
+  .bruckmandl-bar__character{ height: 54px; }
+}
+
+/* ---------------------------------------------------------------- */
 /* REDUCED MOTION — plain fades only, no lateral shift/blur transition
    variance, no autoplay video, no sticky-background pseudo-parallax. */
 /* ---------------------------------------------------------------- */
@@ -588,6 +692,9 @@ img{ max-width:100%; display:block; }
   .gallery__field{ transform:none; transition: opacity 0.25s linear; transition-delay: 0s !important; }
   .thesis-media{ display:none; }
   .ai-guide{ opacity: 1 !important; transform: none !important; }
+  .bruckmandl-bar__character-img--idle-breathe,
+  .bruckmandl-bar__character-img--talk-active{ animation: none; }
+  .bruckmandl-bar__answer{ animation: none; }
   .thesis-chapters{ margin-top:0; }
   .thesis-chapter{ min-height:auto; padding: 56px 22px; }
   *{ scroll-behavior: auto !important; }
