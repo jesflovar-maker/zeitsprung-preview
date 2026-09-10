@@ -157,48 +157,32 @@ const STATES = [
   {
     key: "today-open",
     // -------------------------------------------------------------------
-    // PHASE 2.6 — TASK 1, ACTIVE. Approved production hero
+    // CONTENT POLISH 01 (this task) — reverted the isCutout/"contain"/
+    // black-backdrop treatment this state briefly had (Phase 2.6 TASK 1).
+    // That framed-diorama presentation broke visual continuity with every
+    // other #stage scene ("before" immediately after it, and every other
+    // chapter) — this is the FIRST scene of the whole #stage sequence
+    // (i18n states[0], "El puente hoy" / "Die Brücke heute" / "HOY"), so a
+    // sudden framed/letterboxed look right at the start read as a
+    // different component, not the opening beat of the same timeline.
+    // Source asset unchanged
     // (03_ASSETS/Steinerne_Bruecke/IMAGES/HERO/sb_hero_current_9x16_v01.png,
-    // 941x1672, ~9:16) replaces the provisional reference render below.
-    // Verified by direct inspection: an aerial DIORAMA render — bridge,
-    // Danube, old-town rooftops, Gothic cathedral spires — sitting on a
-    // BLACK canvas with a generous, deliberate margin (the diorama reads as
-    // a rotated diamond, with black triangular corners top and bottom), NOT
-    // an edge-to-edge photo like the legacy image it replaces. Content is
-    // concentrated in the upper ~90% of the frame; the lowest slice is
-    // black already, which happens to line up well with keeping
-    // .stage__caption's bottom-left safe zone clear.
-    //
-    // Because of that composition, this state is switched to the SAME
-    // isCutout:true / objectFit:"contain" / dark-backdrop treatment already
-    // established for the "piers" state below (an isolated floating cutout
-    // on a near-black backdrop, matching the museum module's own cutout
-    // convention) rather than the plain full-bleed "cover" used by every
-    // other #stage state — "cover" on this asset would either show it
-    // unmodified on a matching-aspect mobile viewport (harmless) or, on a
-    // wide desktop viewport, crop deep into the diorama's edges (bridge/
-    // cathedral) rather than into its black margin. "contain" guarantees
-    // the whole diorama (bridge + cathedral + Danube) is always fully
-    // visible at every breakpoint — the explicit requirement for this task.
-    // Old crop values for a full-bleed photo (objectPosition "center 58%" /
-    // mobile "42% center") were tuned for THAT image's framing and are not
-    // reused here; see fresh values below, tuned for the diorama instead.
+    // 941x1672, ~9:16 aerial diorama render, rotated-diamond composition on
+    // a black canvas) — only the PRESENTATION changes, back to the same
+    // plain full-bleed "cover" every other non-cutout #stage state uses
+    // (see "before" immediately below for the reference treatment this
+    // mirrors). objectPosition is tuned for THIS image's own composition
+    // (cathedral spires + bridge crossing sit above the diagram's vertical
+    // midpoint) rather than reused from any other state's crop values.
     img: `${WEB_ASSET_BASE}/hero/sb_hero_current_9x16_v01.png`,
-    isCutout: true,
-    objectFit: "contain",
-    backgroundColor: "#08090b",
-    // Desktop: generous height, biased slightly above vertical center so
-    // the diorama's lower black margin (not its content) absorbs the space
-    // nearest .stage__caption.
-    objectPosition: "center 34%",
-    backgroundSize: "auto 86vh",
+    objectFit: "cover",
+    objectPosition: "center 38%",
     mobile: {
-      // Mobile: shorter absolute height (mirrors the "piers" mobile
-      // treatment below) so the diorama's visible bottom edge clears the
-      // .stage__caption safe zone (bottom:78px + year/title/text block)
-      // with margin, biased toward the top of the viewport.
-      objectPosition: "center 22%",
-      backgroundSize: "auto 64vh"
+      // Mobile viewports are close enough to this image's own ~9:16
+      // aspect that "cover" already shows nearly the whole diorama with
+      // only minor left/right cropping — no special vertical bias needed,
+      // same as "before"'s own mobile override immediately below.
+      objectPosition: "center center"
     }
   },
   // ---------------------------------------------------------------------

@@ -372,6 +372,20 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
     const reveal = () => {
       if (token !== mediaToken) return;
       panelVideo.classList.add("is-visible");
+      // CONTENT POLISH 01 (this task) — panelImgA/B (the static poster/
+      // visual fallback shown synchronously by applyPanelImage() while the
+      // video is still loading) must be explicitly hidden here once the
+      // video is actually ready, not just left to rely on the video's own
+      // opacity transition painting over them. Both layers previously kept
+      // their own "is-visible" class simultaneously — normally invisible
+      // (the video, later in DOM order, opaquely covers the image), but on
+      // any render path where the video's opacity transition stalls (e.g.
+      // a backgrounded/throttled tab), the still poster stayed the only
+      // thing actually visible, i.e. permanently "a static photo instead
+      // of the video" even though the video element itself was correctly
+      // loaded, ready and marked is-visible.
+      panelImgA.classList.remove("is-visible");
+      panelImgB.classList.remove("is-visible");
       activate(panelVideo, { id: `gallery:${m.id}:panel`, role: "gallery-panel" });
       startCanvasMirror();
       bgCanvas.classList.add("is-visible"); // the immediate drawMirrorFrame() inside startCanvasMirror() already painted a real frame, so this never fades in over a blank/stale canvas
