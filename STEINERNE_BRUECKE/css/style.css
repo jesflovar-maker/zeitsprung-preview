@@ -367,6 +367,30 @@ img{ max-width:100%; display:block; }
 .fact-card--derived{ border-color: var(--z-line); }
 .fact-card--derived .fact-card__value{ color: var(--z-ink); font-size: 34px; }
 .fact-card--derived .fact-card__note{ color: var(--z-ink-faint); }
+/* Hotspot affordance (Phase: bridge knowledge expansion) — applied by
+   js/main.js's wireFactCardHotspots() to the 4 fact-cards now wired to the
+   Bruckmandl hotspot bridge (js/bruckmandl-hotspot-bridge.js). Reuses the
+   EXACT same gold-accent hotspot affordance already approved for
+   .bruckmandl__media-card--hotspot (see that rule below) — no new visual
+   pattern introduced, purely a content/interaction wiring reuse. */
+.fact-card--hotspot{
+  position: relative;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+.fact-card--hotspot:hover,
+.fact-card--hotspot:focus-visible{
+  border-color: var(--z-gold-dim);
+  outline: none;
+}
+.fact-card--hotspot::after{
+  content: "";
+  position: absolute; top: 6px; right: 6px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--z-gold);
+  opacity: 0.85;
+  pointer-events: none;
+}
 .facts__source{
   max-width: 920px; margin: 26px auto 0;
   font-family: var(--font-mono); font-size: 10.5px;
@@ -1636,40 +1660,138 @@ img{ max-width:100%; display:block; }
   margin-bottom: 32px;
 }
 
-/* Hero / master monument image */
-/* TEMPORARY PUBLICATION FIX (2026-09-07): strict 9:16 portrait frame with the
-   full monument centered and never cropped, until final art-directed crops
-   are ready. To restore the previous full-bleed treatment, revert
-   aspect-ratio to 3/4 and .bruckmandl__hero-img's object-fit to cover. */
-.bruckmandl__hero{
+/* ---------------------------------------------------------------- */
+/* SHARED CROSSFADE STAGE — used by BOTH Gallery 01's hero viewer     */
+/* (.bruckmandl__viewer-frame) and Inspection Mode's own stage        */
+/* (.bruckmandl__inspect-frame). Two stacked <img> layers so a view   */
+/* change is a real transition (crossfade + minimal directional move  */
+/* + transitory blur), never an instant src swap. See                 */
+/* createCrossfadeStage() in js/bruckmandl.js.                        */
+/* ---------------------------------------------------------------- */
+.zt-crossfade{ position: absolute; inset: 0; }
+.zt-crossfade__img{
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: contain; object-position: center center;
+  opacity: 0;
+  transform: scale(1.045);
+  filter: blur(6px);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22,0.61,0.36,1), filter 0.5s ease;
+  will-change: opacity, transform;
+}
+.zt-crossfade__img--active{ opacity: 1; transform: scale(1); filter: blur(0); }
+.zt-crossfade__img--enter-left{ opacity: 0; transform: translateX(-3%) scale(1.045); filter: blur(6px); }
+.zt-crossfade__img--enter-right{ opacity: 0; transform: translateX(3%) scale(1.045); filter: blur(6px); }
+.zt-crossfade__img--exit-left{ opacity: 0; transform: translateX(-3%) scale(0.98); filter: blur(4px); }
+.zt-crossfade__img--exit-right{ opacity: 0; transform: translateX(3%) scale(0.98); filter: blur(4px); }
+
+/* ---------------------------------------------------------------- */
+/* GALLERY 01 — CINEMATIC ARTIFACT VIEWER. Replaces the former        */
+/* independent .bruckmandl__hero / .bruckmandl__gallery pair: ONE     */
+/* connected stage + a premium indexed view selector below it. The    */
+/* strict 9:16 centered-contain framing kept from the previous        */
+/* TEMPORARY PUBLICATION FIX (2026-09-07) note — full monument never   */
+/* cropped, restore by widening .bruckmandl__viewer-stage's aspect-    */
+/* ratio once final art-directed crops exist.                         */
+/* ---------------------------------------------------------------- */
+.bruckmandl__viewer{ margin-bottom: 28px; }
+.bruckmandl__viewer-stage{
   position: relative; width: 100%; aspect-ratio: 9 / 16;
   background: var(--z-bg-soft); border: 1px solid var(--z-line);
   overflow: hidden;
-  margin-bottom: 28px;
+  perspective: 900px;
 }
-.bruckmandl__hero-img{
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: contain; object-position: center center;
+.bruckmandl__viewer-tilt{
+  position: absolute; inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.bruckmandl__viewer-hotspots{ position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.bruckmandl__viewer-hotspot{
+  position: absolute; pointer-events: auto;
+  width: 22px; height: 22px; margin: -11px 0 0 -11px;
+  background: transparent; border: none; padding: 0; cursor: pointer;
+}
+.bruckmandl__viewer-hotspot::before{
+  content: ""; position: absolute; inset: 8px;
+  background: var(--z-gold); border-radius: 50%;
+  animation: bruckmandlHotspotPulse 2.6s ease-in-out infinite;
+}
+.bruckmandl__viewer-hotspot:hover::before,
+.bruckmandl__viewer-hotspot:focus-visible::before{
+  inset: 6px;
+}
+.bruckmandl__viewer-hotspot:focus-visible{
+  outline: 2px solid var(--z-gold); outline-offset: 3px; border-radius: 50%;
+}
+@keyframes bruckmandlHotspotPulse{
+  0%, 100%{ box-shadow: 0 0 0 0 rgba(212,175,120,0.5); }
+  50%{ box-shadow: 0 0 0 7px rgba(212,175,120,0); }
+}
+.bruckmandl__viewer-sheen{
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(circle at var(--vpx, 50%) var(--vpy, 50%), rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 45%);
+  opacity: 0; mix-blend-mode: soft-light;
+  transition: opacity 0.4s ease;
+}
+.bruckmandl__viewer-stage:hover .bruckmandl__viewer-sheen{ opacity: 1; }
+@media (hover: none){ .bruckmandl__viewer-sheen{ display: none; } }
+.bruckmandl__viewer-expand{
+  position: absolute; right: 10px; bottom: 10px; z-index: 3;
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(8,9,11,0.55); border: 1px solid rgba(212,175,120,0.4);
+  color: var(--z-gold); font-size: 15px; line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.bruckmandl__viewer-expand:hover, .bruckmandl__viewer-expand:focus-visible{
+  background: rgba(212,175,120,0.18); border-color: var(--z-gold); outline: none;
 }
 
-/* Four-view gallery */
-.bruckmandl__gallery{ margin-bottom: 28px; }
-.bruckmandl__gallery-track{
-  display: flex; gap: 12px; overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom: 4px;
+.bruckmandl__viewer-microtext{
+  margin-top: 12px; padding: 10px 12px;
+  border: 1px solid rgba(212,175,120,0.35); background: rgba(212,175,120,0.06);
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px;
 }
-/* TEMPORARY PUBLICATION FIX (2026-09-07): same strict 9:16 centered-contain
-   treatment as .bruckmandl__hero above — see that comment to restore. */
-.bruckmandl__gallery-card{
-  flex: 0 0 78%; scroll-snap-align: start;
-  aspect-ratio: 9 / 16;
-  border: 1px solid var(--z-line); background: var(--z-bg-soft);
-  overflow: hidden;
+.bruckmandl__viewer-microtext[hidden]{ display: none; }
+.bruckmandl__viewer-microtext-name{ font-size: 13.5px; font-weight: 600; color: var(--z-ink); margin: 0; }
+.bruckmandl__viewer-microtext-category{
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--z-ink-faint); margin: 0;
 }
-.bruckmandl__gallery-card img{
-  width: 100%; height: 100%; object-fit: contain; object-position: center center;
+.bruckmandl__viewer-microtext-badge{
+  margin-left: auto;
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em;
+  color: var(--z-gold); border: 1px solid rgba(212,175,120,0.4); border-radius: 3px;
+  padding: 2px 6px;
 }
+
+.bruckmandl__viewer-selector{
+  display: flex; gap: 6px; margin-top: 14px;
+  overflow-x: auto; padding-bottom: 2px;
+}
+.bruckmandl__viewer-tab{
+  flex: 0 0 auto; display: flex; flex-direction: column; gap: 4px;
+  min-width: 70px; padding: 8px 6px 10px;
+  background: transparent; border: none; border-bottom: 2px solid var(--z-line);
+  cursor: pointer; opacity: 0.55;
+  transition: opacity 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+.bruckmandl__viewer-tab-index{
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--z-gold-dim);
+}
+.bruckmandl__viewer-tab-label{
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--z-ink-dim); white-space: nowrap;
+}
+.bruckmandl__viewer-tab:hover{ opacity: 0.8; }
+.bruckmandl__viewer-tab:focus-visible{ outline: none; opacity: 0.9; }
+.bruckmandl__viewer-tab.is-active{
+  opacity: 1; border-bottom-color: var(--z-gold);
+  transform: translateY(-1px) scale(1.02);
+}
+.bruckmandl__viewer-tab.is-active .bruckmandl__viewer-tab-index,
+.bruckmandl__viewer-tab.is-active .bruckmandl__viewer-tab-label{ color: var(--z-gold); }
 
 /* 10-second monument assembly video */
 .bruckmandl__video{
@@ -1743,23 +1865,79 @@ img{ max-width:100%; display:block; }
 }
 .bruckmandl__factcheck-column--uncertain .bruckmandl__factcheck-heading{ color: var(--z-ink-faint); }
 
-/* Cutouts / material detail cards */
-.bruckmandl__media-strip{
-  display: flex; gap: 10px; overflow-x: auto;
-  padding-bottom: 4px;
+/* ---------------------------------------------------------------- */
+/* GALLERY 02 — EXPLODED INTERACTIVE COLLECTION. Replaces the former   */
+/* uniform .bruckmandl__media-strip grid (used for BOTH materials and  */
+/* cutouts) with an asymmetric editorial layout: base rules below are  */
+/* the MOBILE offset-stack composition; the min-width:900px block      */
+/* further down switches to a dense CSS grid of hero/medium/small      */
+/* pieces. Hover/tilt motion uses --epx/--epy (set via pointermove in  */
+/* js/bruckmandl.js) layered on top of the lift/shadow transition.     */
+/* ---------------------------------------------------------------- */
+.bruckmandl__exploded{
+  display: flex; flex-direction: column; gap: 22px;
   margin-bottom: 28px;
 }
-.bruckmandl__media-card{
-  flex: 0 0 120px;
+.bruckmandl__exploded-piece{
+  position: relative; width: 92%;
+  display: flex; flex-direction: column;
   border: 1px solid var(--z-line); background: var(--z-bg-soft);
+  padding: 10px; cursor: pointer;
+  transform: perspective(800px) rotateX(var(--epy, 0deg)) rotateY(var(--epx, 0deg)) translateY(0);
+  transition: transform 0.35s ease, border-color 0.3s ease, box-shadow 0.35s ease;
 }
-.bruckmandl__media-card img{
-  display: block; width: 100%; aspect-ratio: 1 / 1; object-fit: contain;
+.bruckmandl__exploded-piece:hover,
+.bruckmandl__exploded-piece:focus-visible{
+  transform: perspective(800px) rotateX(var(--epy, 0deg)) rotateY(var(--epx, 0deg)) translateY(-6px);
+  border-color: var(--z-gold-dim);
+  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+  outline: none;
 }
-.bruckmandl__media-card-label{
-  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.1em;
-  color: var(--z-ink-faint);
-  padding: 6px 8px;
+.bruckmandl__exploded-piece--md{ width: 80%; align-self: flex-end; }
+.bruckmandl__exploded-piece--sm{ width: 62%; }
+.bruckmandl__exploded-piece--sm:nth-of-type(odd){ align-self: flex-start; }
+.bruckmandl__exploded-piece--sm:nth-of-type(even){ align-self: flex-end; }
+.bruckmandl__exploded-figure{
+  position: relative; overflow: hidden; aspect-ratio: 3 / 4;
+}
+.bruckmandl__exploded-img{
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: contain;
+  transform: scale(1);
+  transition: transform 0.7s ease;
+}
+.bruckmandl__exploded-piece:hover .bruckmandl__exploded-img,
+.bruckmandl__exploded-piece:focus-visible .bruckmandl__exploded-img{ transform: scale(1.04); }
+.bruckmandl__exploded-caption{
+  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.1em;
+  color: var(--z-ink-faint); opacity: 0.72;
+  padding-top: 8px;
+  transition: opacity 0.3s ease, color 0.3s ease;
+}
+.bruckmandl__exploded-piece:hover .bruckmandl__exploded-caption,
+.bruckmandl__exploded-piece:focus-visible .bruckmandl__exploded-caption{
+  opacity: 1; color: var(--z-ink-dim);
+}
+
+/* Hotspot affordance — ONLY the specific cutout/material pieces wired to
+   the Bruckmandl hotspot bridge (see js/bruckmandl-hotspot-bridge.js) get
+   this treatment. Reuses the same gold accent language as the rest of the
+   module (.bruckmandl__ai-question-btn's hover/active states) rather than
+   introducing a new visual system. */
+.bruckmandl__exploded-piece--hotspot::after{
+  content: "";
+  position: absolute; top: 10px; right: 10px;
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--z-gold);
+  animation: bruckmandlHotspotPulse 2.6s ease-in-out infinite;
+}
+/* Cross-gallery connection — briefly echoes a Gallery 01 hero hotspot tap
+   on its corresponding Gallery 02 piece (highlightExplodedPiece() in
+   js/bruckmandl.js). Border/shadow only, never a looping animation, so it
+   stays inert under prefers-reduced-motion without a separate override. */
+.bruckmandl__exploded-piece--linked{
+  border-color: var(--z-gold);
+  box-shadow: 0 0 0 2px rgba(212,175,120,0.35), 0 18px 40px rgba(0,0,0,0.3);
 }
 
 /* Quellen — identical dialog pattern to .kf__sources-btn/.kf__sources-panel,
@@ -1821,6 +1999,90 @@ img{ max-width:100%; display:block; }
   font-size: 12px; color: rgba(244,239,230,0.62); margin: 0;
 }
 
+/* ---------------------------------------------------------------- */
+/* INSPECTION MODE — shared fullscreen piece viewer for BOTH galleries */
+/* (see openInspection()/closeInspection() in js/bruckmandl.js).       */
+/* Appended to document.body, not scoped under .bruckmandl — a true    */
+/* fullscreen overlay above the whole page (z-index intentionally      */
+/* higher than .bruckmandl__sources-panel's 80).                       */
+/* ---------------------------------------------------------------- */
+.bruckmandl__inspect{
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(6,7,8,0.94);
+  display: flex; flex-direction: column;
+  animation: bruckmandlInspectIn 0.28s ease-out both;
+}
+@keyframes bruckmandlInspectIn{ from{ opacity: 0; } to{ opacity: 1; } }
+.bruckmandl__inspect-stage{
+  position: relative; flex: 1 1 auto; min-height: 0;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px 16px 8px;
+}
+.bruckmandl__inspect-frame{ position: relative; width: 100%; height: 100%; max-width: 640px; }
+.bruckmandl__inspect-close{
+  position: absolute; top: 14px; right: 14px; z-index: 3;
+  width: 40px; height: 40px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(244,239,230,0.25);
+  color: var(--z-ink); font-size: 22px; line-height: 1; cursor: pointer;
+}
+.bruckmandl__inspect-close:hover, .bruckmandl__inspect-close:focus-visible{
+  border-color: var(--z-gold); color: var(--z-gold); outline: none;
+}
+.bruckmandl__inspect-nav{
+  position: absolute; top: 50%; z-index: 3;
+  transform: translateY(-50%);
+  width: 44px; height: 44px; border-radius: 50%;
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(244,239,230,0.25);
+  color: var(--z-ink); font-size: 26px; line-height: 1; cursor: pointer;
+}
+.bruckmandl__inspect-nav--prev{ left: 8px; }
+.bruckmandl__inspect-nav--next{ right: 8px; }
+.bruckmandl__inspect-nav:hover, .bruckmandl__inspect-nav:focus-visible{
+  border-color: var(--z-gold); color: var(--z-gold); outline: none;
+}
+.bruckmandl__inspect-annotation{
+  position: absolute; left: 50%; top: 16%; z-index: 2;
+  transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center;
+  background: none; border: none; padding: 0; cursor: pointer;
+}
+.bruckmandl__inspect-annotation[hidden]{ display: none; }
+.bruckmandl__inspect-annotation-line{
+  display: block; width: 1px; height: 34px; margin-bottom: 6px;
+  background: linear-gradient(to bottom, rgba(212,175,120,0.85), rgba(212,175,120,0));
+}
+.bruckmandl__inspect-annotation-label{
+  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em;
+  color: var(--z-gold);
+  background: rgba(8,9,11,0.7); border: 1px solid rgba(212,175,120,0.4);
+  padding: 3px 8px; white-space: nowrap;
+}
+.bruckmandl__inspect-meta{
+  flex: 0 0 auto; text-align: center;
+  padding: 12px 20px 24px;
+  border-top: 1px solid rgba(244,239,230,0.1);
+}
+.bruckmandl__inspect-index{
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em;
+  color: var(--z-gold-dim); margin: 0 0 6px;
+}
+.bruckmandl__inspect-name{ font-size: 17px; font-weight: 600; color: var(--z-ink); margin: 0 0 4px; }
+.bruckmandl__inspect-category{
+  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--z-ink-faint); margin: 0 0 14px;
+}
+.bruckmandl__inspect-ask-wrap{ display: flex; justify-content: center; }
+.bruckmandl__inspect-ask{
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
+  color: var(--z-gold); background: transparent;
+  border: 1px solid rgba(212,175,120,0.45); border-radius: 20px;
+  padding: 9px 18px; cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.bruckmandl__inspect-ask:hover, .bruckmandl__inspect-ask:focus-visible{
+  background: rgba(212,175,120,0.12); border-color: var(--z-gold); outline: none;
+}
+
 /* Small gold mono subsection label — used above the video, gallery,
    history, materials and cutouts blocks. Same scale/color as
    .bruckmandl__history-item-year, factored out since several sections
@@ -1841,9 +2103,22 @@ img{ max-width:100%; display:block; }
   margin-top: 36px; padding-top: 28px;
   border-top: 1px solid var(--z-line);
 }
+/* AI POSE VISUAL-SCALE NORMALIZATION (2026-09-10) — the stage's width now
+   lives here (moved from .bruckmandl__ai-img below) with a fixed
+   aspect-ratio matching IDLE's own PNG canvas (941x1672, measured via
+   alpha-bbox analysis — see AI_POSE_SCALE in js/bruckmandl.js for the full
+   derivation/rationale). This makes the stage's rendered box IDENTICAL
+   across all 4 poses regardless of which pose image is currently loaded —
+   eliminating the layout shift that existed when the container's height
+   was implicitly derived from whichever image's own aspect ratio was
+   loaded (via height:auto on the img). overflow:visible is required since
+   the talk/welcome scale-up (see .bruckmandl__ai-img below) intentionally
+   renders slightly wider/taller than this nominal box. */
 .bruckmandl__ai-stage{
   position: relative; display: flex; justify-content: center; align-items: flex-end;
-  width: 100%;
+  width: clamp(120px, 34vw, 190px);
+  aspect-ratio: 941 / 1672;
+  overflow: visible;
 }
 /* Soft radial gold glow behind the transparent character PNG. */
 .bruckmandl__ai-stage::before{
@@ -1852,11 +2127,22 @@ img{ max-width:100%; display:block; }
   background: radial-gradient(circle, rgba(212,175,120,0.14) 0%, rgba(212,175,120,0) 72%);
   pointer-events: none;
 }
+/* Absolutely positioned, bottom-anchored within the now-fixed-size stage
+   (see above) so every pose's own natural aspect ratio is preserved
+   (width:100% of stage, height:auto) while its "feet" line up with the
+   stage's bottom edge across all 4 poses. --bruckmandl-ai-scale is set per
+   pose from js/bruckmandl.js's AI_POSE_SCALE lookup (default 1 = idle/
+   reference, no scale) via a bottom-center-pivoted transform: scale() —
+   this is what visually normalizes talk/welcome's rendered character
+   height up to match idle's, without altering the source PNGs or the
+   crossfade mechanism below. */
 .bruckmandl__ai-img{
-  position: relative; z-index: 1;
-  width: clamp(120px, 34vw, 190px); height: auto;
+  position: absolute; left: 0; bottom: 0; z-index: 1;
+  width: 100%; height: auto;
   object-fit: contain;
   opacity: 1;
+  transform: scale(var(--bruckmandl-ai-scale, 1));
+  transform-origin: 50% 100%;
   transition: opacity 0.22s ease;
 }
 .bruckmandl__ai-img.is-fading{ opacity: 0; }
@@ -1866,14 +2152,22 @@ img{ max-width:100%; display:block; }
    marginally more active; POINT deliberately gets no continuous animation
    so the gesture itself reads clearly. Reduced-motion strips all of this
    further down without touching pose-switching logic. */
+/* NOTE: an animated `transform` property replaces the base rule's
+   transform entirely for its duration, so each keyframe below must also
+   re-include scale(var(--bruckmandl-ai-scale, 1)) — otherwise the idle-
+   breathe/talk-active animations would silently reset the pose-scale
+   normalization above back to 1 while playing (harmless for idle itself,
+   but would defeat the whole fix for the "talk" pose, which also gets a
+   continuous animation). transform-origin is untouched by this and stays
+   bottom-center throughout. */
 @keyframes bruckmandlIdleBreathe{
-  0%, 100%{ transform: translateY(0); }
-  50%{ transform: translateY(-3px); }
+  0%, 100%{ transform: translateY(0) scale(var(--bruckmandl-ai-scale, 1)); }
+  50%{ transform: translateY(-3px) scale(var(--bruckmandl-ai-scale, 1)); }
 }
 .bruckmandl__ai-img--idle-breathe{ animation: bruckmandlIdleBreathe 4.6s ease-in-out infinite; }
 @keyframes bruckmandlTalkActive{
-  0%, 100%{ transform: translateY(0) rotate(0deg); }
-  50%{ transform: translateY(-1px) rotate(0.6deg); }
+  0%, 100%{ transform: translateY(0) rotate(0deg) scale(var(--bruckmandl-ai-scale, 1)); }
+  50%{ transform: translateY(-1px) rotate(0.6deg) scale(var(--bruckmandl-ai-scale, 1)); }
 }
 .bruckmandl__ai-img--talk-active{ animation: bruckmandlTalkActive 1.1s ease-in-out infinite; }
 @keyframes bruckmandlAiEnter{
@@ -1881,6 +2175,40 @@ img{ max-width:100%; display:block; }
   to{ opacity: 1; transform: translateY(0); }
 }
 .bruckmandl__ai-stage{ animation: bruckmandlAiEnter 0.6s ease-out both; }
+
+/* ACTIVE GUIDE V1 — two new wrapper elements inserted BETWEEN
+   .bruckmandl__assistant and the existing, untouched .bruckmandl__ai-stage
+   (see js/bruckmandl.js's renderAssistant()/startAssistantMotion() for the
+   full rationale). Each owns exactly one transform source so nothing fights
+   .bruckmandl__ai-stage/.bruckmandl__ai-img's own transforms (opacity
+   crossfade, --bruckmandl-ai-scale, idle-breathe/talk-active keyframes —
+   all completely unchanged above):
+     .bruckmandl__ai-life — slow CSS-only ambient sway/drift (brief §1),
+       always on unless prefers-reduced-motion, independent of pose state.
+     .bruckmandl__ai-tilt — JS-driven pointer/ambient-gaze micro-lean
+       (brief §2/§3), a single rAF loop, inline transform only.
+   Both are plain shrink-to-fit wrappers (display: inline-block) so they
+   never change the stage's own rendered box size, and both share the same
+   bottom-center transform-origin as the pose-scale-normalization fix above
+   so any sway/lean pivots from the character's feet — never a detached
+   float, never crossing outside its own stage footprint (HARD CONSTRAINT
+   11). overflow: visible mirrors .bruckmandl__ai-stage's own rule since
+   talk/welcome intentionally render slightly larger than the nominal box. */
+.bruckmandl__ai-life{
+  display: inline-block; overflow: visible;
+  transform-origin: 50% 100%;
+  animation: bruckmandlLifeSway 9.5s ease-in-out infinite;
+}
+.bruckmandl__ai-tilt{
+  display: inline-block; overflow: visible;
+  transform-origin: 50% 100%;
+}
+@keyframes bruckmandlLifeSway{
+  0%, 100%{ transform: translate(0, 0) rotate(0deg); }
+  25%{ transform: translate(-1.5px, -1px) rotate(-0.4deg); }
+  50%{ transform: translate(0, -2px) rotate(0deg); }
+  75%{ transform: translate(1.5px, -1px) rotate(0.4deg); }
+}
 
 .bruckmandl__ai-panel{
   width: 100%; max-width: 480px;
@@ -1959,12 +2287,40 @@ img{ max-width:100%; display:block; }
   .bruckmandl{ padding: 130px 60px 80px; }
   .bruckmandl__inner{ max-width: 760px; }
   .bruckmandl__title{ font-size: clamp(26px, 2.8vw, 32px); }
-  .bruckmandl__gallery-card{ flex: 0 0 260px; }
+  .bruckmandl__viewer-stage{ max-width: 420px; margin: 0 auto; }
+  .bruckmandl__viewer-selector{ justify-content: center; }
+  /* GALLERY 02 desktop — dense CSS grid of hero/medium/small pieces +
+     negative space, replacing the mobile offset-stack composition above. */
+  .bruckmandl__exploded{
+    display: grid; grid-template-columns: repeat(6, 1fr);
+    grid-auto-rows: 64px; grid-auto-flow: dense; gap: 14px;
+  }
+  .bruckmandl__exploded-piece{
+    width: auto; align-self: auto;
+    grid-column: span 3; grid-row: span 3;
+  }
+  .bruckmandl__exploded-piece--hero{ grid-column: span 4; grid-row: span 6; }
+  .bruckmandl__exploded-piece--md{ grid-column: span 3; grid-row: span 4; width: auto; align-self: auto; }
+  .bruckmandl__exploded-piece--sm{ grid-column: span 2; grid-row: span 3; width: auto; align-self: auto; }
+  .bruckmandl__exploded-figure{ aspect-ratio: auto; height: 100%; }
   .bruckmandl__video{ max-width: 420px; }
   .bruckmandl__factcheck{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .bruckmandl__factcheck-column{ margin-bottom: 0; }
   .bruckmandl__assistant{ flex-direction: row; align-items: center; justify-content: center; gap: 44px; }
-  .bruckmandl__ai-stage{ width: auto; flex: 0 0 auto; }
+  /* width no longer overridden here — .bruckmandl__ai-stage's base rule
+     now owns width: clamp(120px, 34vw, 190px) directly (moved up from the
+     old .bruckmandl__ai-img rule as part of the pose-scale fix above),
+     and that clamp already tops out at 190px well before this 900px
+     breakpoint, so no override is needed; flex:0 0 auto is kept so the
+     row layout below doesn't grow/shrink the now-empty-of-inflow-content
+     stage box. */
+  .bruckmandl__ai-stage{ flex: 0 0 auto; }
+  /* .bruckmandl__ai-life is now the direct flex child of the row layout
+     above (.bruckmandl__ai-stage no longer is, since it sits inside the
+     new .bruckmandl__ai-life/.bruckmandl__ai-tilt wrappers) — this is the
+     real equivalent of the flex:0 0 auto rule just above, added rather
+     than moved so the pre-existing rule is left completely untouched. */
+  .bruckmandl__ai-life{ flex: 0 0 auto; }
   .bruckmandl__ai-heading{ text-align: left; }
 }
 
@@ -1972,4 +2328,30 @@ img{ max-width:100%; display:block; }
   .bruckmandl__ai-img{ transition: none; }
   .bruckmandl__ai-img--idle-breathe, .bruckmandl__ai-img--talk-active{ animation: none; }
   .bruckmandl__ai-stage{ animation: none; }
+  /* ACTIVE GUIDE V1 (brief §8) — ambient sway stops entirely; the pointer/
+     ambient-gaze rAF loop already never starts under reduced motion (see
+     startAssistantMotion()'s own early return in js/bruckmandl.js), so no
+     CSS is needed for .bruckmandl__ai-tilt here. Pose changes themselves
+     (WELCOME/POINT/TALK/IDLE) keep working exactly as before — untouched. */
+  .bruckmandl__ai-life{ animation: none; }
+
+  /* GALLERY 01/02 + INSPECTION MODE — defense-in-depth on top of the JS-side
+     prefersReducedMotion() branches (createCrossfadeStage()'s instant swap,
+     startHeroMotion() never starting its rAF loop, revealOnScroll()'s
+     instant-visible fallback): strip every remaining CSS transition/
+     animation/transform so nothing here can still visibly move. */
+  .zt-crossfade__img{ transition: none; filter: none; transform: none; opacity: 1; }
+  .zt-crossfade__img:not(.zt-crossfade__img--active){ opacity: 0; }
+  .bruckmandl__viewer-tilt{ transform: none !important; }
+  .bruckmandl__viewer-hotspot::before{ animation: none; }
+  .bruckmandl__viewer-sheen{ display: none; }
+  .bruckmandl__viewer-tab{ transition: none; }
+  .bruckmandl__viewer-tab.is-active{ transform: none; }
+  .bruckmandl__exploded-piece{ transition: none; transform: none !important; }
+  .bruckmandl__exploded-piece:hover, .bruckmandl__exploded-piece:focus-visible{ transform: none !important; }
+  .bruckmandl__exploded-img{ transition: none; }
+  .bruckmandl__exploded-piece:hover .bruckmandl__exploded-img,
+  .bruckmandl__exploded-piece:focus-visible .bruckmandl__exploded-img{ transform: none; }
+  .bruckmandl__exploded-piece--hotspot::after{ animation: none; }
+  .bruckmandl__inspect{ animation: none; }
 }

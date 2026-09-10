@@ -261,7 +261,7 @@ const LANGS = ["de", "en", "es"];
 //   hs     : unit time this chapter's hold begins (object settled)
 //   he     : unit time this chapter's hold ends (its exit transition begins)
 // ---------------------------------------------------------------------------
-function buildTimingMap(script) {
+export function buildTimingMap(script) {
   const marks = [];
   let time = 0;
   script.forEach((ch, i) => {
@@ -490,7 +490,16 @@ export function buildMuseumScrollExperience({
   // callback whenever the playhead crosses that instant in EITHER scroll
   // direction, which is intentional here (the caller's own cooldown handles a
   // rapid back-and-forth scrub around the same instant).
-  onSfxBeat
+  onSfxBeat,
+  // PHASE 3.2 (this task) — OPTIONAL, purely-informational raw-progress hook,
+  // fired with the SAME self.progress the master ScrollTrigger already
+  // computes on every tick (piggy-backs on the one existing onUpdate below —
+  // no second ScrollTrigger/rAF loop is created). Registers no tween, reads
+  // no state and therefore cannot violate this file's own determinism rules
+  // (§DETERMINISM). museum25d.js is the only consumer, for its
+  // scroll-scrubbed complete<->exploded video (see SCRUB_ZONE_A/B there) —
+  // this file still authors zero video/media logic itself.
+  onProgress
 }) {
   const script = CHAPTER_SCRIPT;
   const { marks, total } = buildTimingMap(script);
@@ -968,7 +977,10 @@ export function buildMuseumScrollExperience({
       anticipatePin: 1,
       invalidateOnRefresh: true,
       animation: tl,
-      onUpdate: (self) => syncChapter(self.progress, self.direction)
+      onUpdate: (self) => {
+        syncChapter(self.progress, self.direction);
+        if (onProgress) onProgress(self.progress, self.direction);
+      }
     });
   }
 
@@ -1121,6 +1133,7 @@ export function buildMuseumScrollExperience({
   }
 
   syncChapter(0, 1); // initial calm state — forward, matching chapter 01's "no entrance motion" rest state
+  if (onProgress) onProgress(0, 1); // same initial-state parity for the scrub hook
 
   // -------------------------------------------------------------------------
   // PUBLIC API

@@ -18,6 +18,12 @@ import { buildPortal } from "./portal.js";
 import { initMuseum25D } from "./museum25d.js";
 import { initKframesGallery } from "./kframes-gallery.js";
 import { initBruckmandl } from "./bruckmandl.js";
+import { initBruckmandlHotspotBridge } from "./bruckmandl-hotspot-bridge.js";
+// Technical DOM event name only (not QA/provider data) — reused verbatim
+// so the #facts fact-cards dispatch the exact SAME event the Bruckmandl
+// module's own cutout/material hotspot cards already use (see
+// wireFactCardHotspots() below and bruckmandl-hotspot-bridge.js's header).
+import { BRUCKMANDL_HOTSPOT_EVENT } from "../../js/bruckmandl-guide-core.js";
 import { ZT_AUDIO_BUS } from "../../js/zt-audio.js";
 import { activate, deactivate, getDebugSnapshot } from "../../js/video-playback.js";
 import { STEINERNE_ASSET_BASE, STEINERNE_WEB_ASSET_BASE, ASSET_SWAP_MANIFEST_URL } from "../../js/zt-paths.js";
@@ -875,6 +881,7 @@ function initLenisAndScroll() {
 
   buildStageScrollTrigger();
   buildFactsReveal();
+  wireFactCardHotspots();
   // PHASE 2.5 FIX (post-delivery, live-browser verification caught this):
   // wireKframesGallery() used to run independently, in parallel with
   // wireMuseum25D() — both are fire-and-forget async manifest fetches that
@@ -1181,6 +1188,15 @@ function wireBruckmandl(lenis) {
   initBruckmandl({ section, t, getLang: () => lang, lenis }).then((api) => {
     bruckmandlApi = api;
   });
+
+  // Hotspot -> Bruckmandl bridge (see js/bruckmandl-hotspot-bridge.js).
+  // Wired here via plain dependency injection (getApi/getLang closures) —
+  // main.js is the only place that imports BOTH bruckmandl.js and the
+  // bridge, so neither of those two feature modules needs to import the
+  // other. Safe to call immediately: the bridge only registers a document-
+  // level listener and reads bruckmandlApi lazily on every event, so it
+  // does not need to wait for initBruckmandl()'s promise above to settle.
+  initBruckmandlHotspotBridge({ getApi: () => bruckmandlApi, getLang: () => lang });
 }
 
 // ---------------------------------------------------------------------------
@@ -1204,6 +1220,55 @@ function buildFactsReveal() {
         delay: i * 0.08
       }
     );
+  });
+}
+
+// ---------------------------------------------------------------------------
+// Fact-card -> Bruckmandl hotspot bridge (Phase: bridge knowledge
+// expansion). Owner-required pattern: "fact card -> dispatches a context
+// event -> hotspot bridge listens -> provider resolves content." These
+// cards do NOT import BRUCKMANDL_QA or the provider directly — they only
+// dispatch the SAME BRUCKMANDL_HOTSPOT_EVENT the Bruckmandl module's own
+// cutout/material cards already use (see bruckmandl.js's renderMediaStrip()
+// for that existing precedent); STEINERNE_BRUECKE/js/bruckmandl-hotspot-
+// bridge.js listens and resolves the id to a real topic
+// (bridge_overview/arches/piers — see that file's HOTSPOT_TOPIC_MAP for the
+// exact mapping and justification). Purely additive: buildFactsReveal()'s
+// own scroll-reveal animation and the cards' existing content are
+// untouched — this only adds role/tabindex/click+keydown affordances on
+// top of the same DOM nodes.
+// ---------------------------------------------------------------------------
+const FACT_CARD_HOTSPOTS = [
+  { labelId: "factBaubeginnLabel", hotspotId: "fact_baubeginn" },
+  { labelId: "factFertigstellungLabel", hotspotId: "fact_fertigstellung" },
+  { labelId: "factBoegenLabel", hotspotId: "fact_boegen" },
+  { labelId: "factPfeilerLabel", hotspotId: "fact_pfeiler" }
+];
+
+let factCardHotspotsWired = false;
+function wireFactCardHotspots() {
+  if (factCardHotspotsWired) return; // idempotent — initLenisAndScroll() runs once, but never double-wire if it ever ran twice
+  factCardHotspotsWired = true;
+
+  FACT_CARD_HOTSPOTS.forEach(({ labelId, hotspotId }) => {
+    const label = document.getElementById(labelId);
+    const card = label && label.closest(".fact-card");
+    if (!card) return; // defensive — no orphan wiring if the DOM ever changes
+
+    card.classList.add("fact-card--hotspot"); // reuses the already-approved .bruckmandl__media-card--hotspot gold-accent affordance (css/style.css)
+    card.setAttribute("role", "button");
+    card.setAttribute("tabindex", "0");
+
+    const fire = () => {
+      document.dispatchEvent(new CustomEvent(BRUCKMANDL_HOTSPOT_EVENT, { detail: { hotspotId } }));
+    };
+    card.addEventListener("click", fire);
+    card.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+        e.preventDefault();
+        fire();
+      }
+    });
   });
 }
 

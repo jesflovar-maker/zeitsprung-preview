@@ -207,6 +207,14 @@ export const DICT = {
       capital_cornice: "Kapitell/Gesims",
       column_and_base: "Säule & Sockel"
     },
+    // Inspection Mode / Cinematic Artifact Viewer — purely functional UI
+    // microcopy (Dual Premium Interactive Museum Gallery), never historical
+    // content. Added alongside bruckmandlAssistantAlt below, same neutral
+    // "interface label" category as bruckmandlGalleryLabel etc. above.
+    bruckmandlInspectPrev: "Zurück",
+    bruckmandlInspectNext: "Weiter",
+    bruckmandlInspectClose: "Schließen",
+    bruckmandlInspectOpen: "Vergrößern",
     bruckmandlAssistantAlt: "Bruckmandl-Assistent (in Entwicklung)",
     // AI GUIDE QA content (question/answer, heading, status labels, alt
     // text) now lives in the SINGLE canonical source
@@ -414,6 +422,14 @@ export const DICT = {
       capital_cornice: "Capital/cornice",
       column_and_base: "Column & base"
     },
+    // Inspection Mode / Cinematic Artifact Viewer — purely functional UI
+    // microcopy (Dual Premium Interactive Museum Gallery), never historical
+    // content. Added alongside bruckmandlAssistantAlt below, same neutral
+    // "interface label" category as bruckmandlGalleryLabel etc. above.
+    bruckmandlInspectPrev: "Previous",
+    bruckmandlInspectNext: "Next",
+    bruckmandlInspectClose: "Close",
+    bruckmandlInspectOpen: "Enlarge",
     bruckmandlAssistantAlt: "Bruckmandl assistant (in development)",
     // AI GUIDE QA content now lives in ../../js/bruckmandl-guide-core.js —
     // see the DE block's comment above for the full note.
@@ -613,6 +629,14 @@ export const DICT = {
       capital_cornice: "Capitel/cornisa",
       column_and_base: "Columna y base"
     },
+    // Inspection Mode / Cinematic Artifact Viewer — purely functional UI
+    // microcopy (Dual Premium Interactive Museum Gallery), never historical
+    // content. Added alongside bruckmandlAssistantAlt below, same neutral
+    // "interface label" category as bruckmandlGalleryLabel etc. above.
+    bruckmandlInspectPrev: "Anterior",
+    bruckmandlInspectNext: "Siguiente",
+    bruckmandlInspectClose: "Cerrar",
+    bruckmandlInspectOpen: "Ampliar",
     bruckmandlAssistantAlt: "Asistente Bruckmandl (en desarrollo)",
     // AI GUIDE QA content now lives in ../../js/bruckmandl-guide-core.js —
     // see the DE block's comment above for the full note.

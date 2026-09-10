@@ -25,14 +25,16 @@ import { initRouteMap } from "./route-map.js";
 import { activate, deactivate, register, getDebugSnapshot } from "./video-playback.js?v=20260905";
 import { STEINERNE_BRUCKMANDL_ASSET_BASE } from "./zt-paths.js";
 import {
-  BRUCKMANDL_TOPIC_POSE,
-  BRUCKMANDL_TOPIC_STATUS,
   BRUCKMANDL_STATUS_LABELS,
-  BRUCKMANDL_UI_LABELS,
-  BRUCKMANDL_FALLBACK,
-  BRUCKMANDL_QA,
-  matchBruckmandlIntent
+  BRUCKMANDL_UI_LABELS
 } from "./bruckmandl-guide-core.js";
+// Answer resolution goes through the BrueckmandlKnowledgeProvider
+// abstraction (LocalValidatedProvider is V1's only implementation, SAME
+// instance/module STEINERNE_BRUECKE/js/bruckmandl.js's monument-page
+// assistant uses) — this file no longer imports the QA data/matcher
+// directly. See bruckmandl-knowledge-provider.js's header for the interface
+// shape and the NO_SOURCE = NO_HISTORICAL_CLAIM rule it enforces.
+import { LocalValidatedProvider } from "./bruckmandl-knowledge-provider.js";
 
 const ZT_SOUND_PREF_KEY = "zeitsprung:soundEnabled"; // shared with STEINERNE_BRUECKE/js/main.js
 
@@ -806,19 +808,21 @@ function baShowAnswer(statusCodes, text) {
 }
 
 function baAnswerTopic(topic) {
-  const qa = BRUCKMANDL_QA[lang] || BRUCKMANDL_QA.en;
-  const entry = qa.find((e) => e.topic === topic);
-  if (!entry) return;
-  baSetPose(BRUCKMANDL_TOPIC_POSE[topic] || "talk");
-  baShowAnswer(BRUCKMANDL_TOPIC_STATUS[topic] || [], entry.answer);
+  const result = LocalValidatedProvider.answerTopic(topic, lang);
+  baSetPose(result.pose);
+  baShowAnswer(result.statusCodes, result.text);
   // Answer stays visible after the pose rests back to IDLE — only an
   // explicit collapse click or a new answer removes it (§3 of the brief).
   baScheduleTimer(() => baSetPose("idle"), 2400);
 }
 
-function baAnswerUnknown() {
-  baSetPose("talk");
-  baShowAnswer(["uncertain"], BRUCKMANDL_FALLBACK[lang] || BRUCKMANDL_FALLBACK.en);
+// Renders a provider result that is NOT a matched canonical topic — either
+// "couldn't understand the question" or the defensive "no validated content
+// for this topic" state. Text always comes from the provider, never
+// composed here — see bruckmandl-knowledge-provider.js.
+function baAnswerUnknown(result) {
+  baSetPose(result.pose);
+  baShowAnswer(result.statusCodes, result.text);
   baScheduleTimer(() => baSetPose("idle"), 2400);
 }
 
@@ -898,8 +902,8 @@ function wireGlobalBruckmandlAssistant() {
     e.preventDefault();
     const raw = baInput.value;
     if (!raw || !raw.trim()) return;
-    const topic = matchBruckmandlIntent(raw, lang);
-    if (topic) baAnswerTopic(topic); else baAnswerUnknown();
+    const result = LocalValidatedProvider.answerFreeText(raw, lang);
+    if (result.matched && result.topic) baAnswerTopic(result.topic); else baAnswerUnknown(result);
     baInput.value = "";
   });
 

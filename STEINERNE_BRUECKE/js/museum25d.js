@@ -40,7 +40,7 @@
    touching this file.
    ============================================================================ */
 
-import { CHAPTER_SCRIPT, buildMuseumScrollExperience } from "./museum2d-scroll.js";
+import { CHAPTER_SCRIPT, buildMuseumScrollExperience, buildTimingMap } from "./museum2d-scroll.js";
 import { ZT_AUDIO_BUS } from "../../js/zt-audio.js";
 import { STEINERNE_WEB_ASSET_BASE, ASSET_SWAP_MANIFEST_URL, MUSEUM_CONTENT_MAP_URL as CONTENT_MAP_URL_RESOLVED } from "../../js/zt-paths.js";
 
@@ -77,6 +77,71 @@ const TRANSITION_TYPE = "video_transition";
 const TRANSITION_TARGET_PRIMARY = "primary_layer";
 const ROLE_ASSEMBLY = "assembly";
 const ROLE_DISASSEMBLY = "disassembly";
+
+// PHASE 3.2 (this task) — SCROLL-SCRUBBED COMPLETE<->EXPLODED VIDEO ZONES.
+// Derived ONCE, at module load, from the SAME buildTimingMap(CHAPTER_SCRIPT)
+// authority museum2d-scroll.js's own progress->chapter map is built from —
+// no second timing table exists anywhere in this file. Looked up by chapter
+// KEY (not hardcoded index), so a future re-ordering of CHAPTER_SCRIPT cannot
+// silently desync these boundaries, exactly like museum2d-scroll.js's own
+// idxOf() pattern for primaryOutAt/primaryInAt.
+//   ZONE A (disassembly video), RETIMED AGAIN (this task, owner correction
+//     #2 — "SOLO VIDEO EN ESA SECCION"): the previous iteration gave
+//     chapter 03 EXPLODED's own still (explosion_main) a dwell window
+//     before the video took over, so the still was still visible on screen
+//     as a "static cover" for part of that chapter — exactly what the
+//     owner rejected this round: no static image of any kind may be
+//     visible anywhere inside the EXPLODED chapter's own screen time, video
+//     only. Zone A now spans the chapter's ENTIRE span, tStart -> he
+//     (transitionIn AND hold), so the video is the sole visual for chapter
+//     03 from the instant it becomes the active chapter to the instant it
+//     hands off to 'piers'. explosion_main is never shown at all in this
+//     configuration (see the suppression guard below, which now also
+//     forces the PRIMARY layer — bridge_alpha, still finishing its own
+//     chapter-02-exit fade at tStart — to 0 for the same span, so there is
+//     no crossfade overlap at the chapter boundary either: a clean, hard
+//     handoff from bridge_alpha directly to the video's own opening
+//     "complete bridge" frame, which is visually similar enough that this
+//     reads as continuous rather than jarring).
+//   ZONE B (assembly video), RETIMED (this task, "FINAL STAGE CLEANUP" owner
+//     fix): originally spanned chapter 09 REASSEMBLY's own tStart through
+//     chapter 10 COMPLETE's own he (i.e. the ENTIRE span of chapter 10 too),
+//     on the assumption the video's own last frame already conveys "the
+//     resolved complete bridge" so chapter 10 didn't need a separate reveal.
+//     Live-browser QA with REAL incremental scrolling (not jump-based —
+//     jump-based sampling gave false readings here, since GSAP's scrubbed
+//     timeline does not always re-render every intermediate tween state
+//     correctly for a large instantaneous progress jump) found a genuine,
+//     SUSTAINED double-visual: from progress ~0.911 to 1.0 (the back ~40%
+//     of chapter 10's own span), primaryOuter (bridge_alpha, chapter 10's
+//     OWN unsuppressed entrance tween, deliberately left untouched by the
+//     suppression guard below) climbs back to opacity 1 WHILE the assembly
+//     video (still "in zone" under the old boundary) is ALSO at opacity 1 —
+//     exactly the "residual background bridge behind the module" the owner
+//     reported for steps 09/10. Fix: Zone B now ends at chapter 10 COMPLETE's
+//     own `tStart` instead of its `he` — the video is the sole visual for
+//     chapter 09 REASSEMBLY only, handing off cleanly the INSTANT chapter 10
+//     begins, at which point chapter 10's own entrance tween (still
+//     completely unmodified) is free to bring primaryOuter up to its "calm
+//     and bright" resolved state with nothing else on screen — matching the
+//     owner's explicit spec: step 09 = video only, step 10 = image only.
+const SCRUB_TIMING = buildTimingMap(CHAPTER_SCRIPT);
+const SCRUB_CHAPTER_INDEX = (key) => CHAPTER_SCRIPT.findIndex((c) => c.key === key);
+const SCRUB_EXPLODED_IDX = SCRUB_CHAPTER_INDEX("exploded");
+const SCRUB_REASSEMBLY_IDX = SCRUB_CHAPTER_INDEX("reassembly");
+const SCRUB_COMPLETE_IDX = SCRUB_CHAPTER_INDEX("complete");
+const SCRUB_ZONE_A = {
+  start: SCRUB_TIMING.marks[SCRUB_EXPLODED_IDX].tStart / SCRUB_TIMING.total,
+  end: SCRUB_TIMING.marks[SCRUB_EXPLODED_IDX].he / SCRUB_TIMING.total
+};
+const SCRUB_ZONE_B = {
+  start: SCRUB_TIMING.marks[SCRUB_REASSEMBLY_IDX].tStart / SCRUB_TIMING.total,
+  end: SCRUB_TIMING.marks[SCRUB_COMPLETE_IDX].tStart / SCRUB_TIMING.total
+};
+// Seek epsilon — identical threshold to the approved index-page hero scrub
+// (js/index-main.js's initHeroScrub SEEK_EPSILON), avoids reassigning
+// currentTime for negligible scroll deltas.
+const SCRUB_SEEK_EPSILON = 0.02;
 
 // Fallback guide-line geometry, used only if a manifest section sets
 // guides:true but supplies no guide_points. Currently no section enables
@@ -577,17 +642,55 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
         // (piers/arches/deck/complete) has no such field and keeps defaulting
         // to "assembly", so this changes nothing for them.
         forwardRole: ROLE_ASSEMBLY,
-        lastRole: null, gen: 0, activeEl: null
+        lastRole: null, gen: 0, activeEl: null,
+        // PHASE 3.2 (this task) — see ASSET_SWAP_MAP.json's
+        // video_transition_contract.scrub_extension. Set true when ANY slot
+        // of this chapter_key's pair carries playback.scrub === true; once
+        // true, onChapterChange below never calls triggerTransition() for
+        // this chapter_key — the old one-shot autoplay mechanism is fully
+        // bypassed in favour of the continuous scroll-scrub controller.
+        scrub: false
       };
     }
     const entry = transitionChapters[key];
     if (slot.forward_role === ROLE_DISASSEMBLY) entry.forwardRole = ROLE_DISASSEMBLY;
+    const isScrubSlot = !!(slot.playback && slot.playback.scrub === true);
+    if (isScrubSlot) entry.scrub = true;
     const resolved = resolveSlot(registry, slot.slot_id);
     if (!resolved.ok) {
       // PENDING / DISABLED / no file_path for this ONE direction only — the
       // other direction (if resolved) still works; this direction simply has
       // no clip to play and the chapter falls back to its static image for
       // that direction, exactly like any other unresolved slot in this module.
+      entry[slot.pair_role] = null;
+      return;
+    }
+
+    if (isScrubSlot && entry.target === TRANSITION_TARGET_PRIMARY) {
+      // PHASE 3.2 (this task) — a scrub-flagged 'primary_layer' slot
+      // (overview_transition_assembly/disassembly) is intentionally never
+      // instantiated as a DOM element. #museumFlat paints ABOVE #museumPrimary
+      // in this module's existing stacking order (see index.html DOM order +
+      // .museum__primary/.museum__flat both z-index:2, later element wins),
+      // so the scrub-flagged 'flat_layer' sibling slot (exploded_transition_*
+      // — the SAME physical file under a second slot_id) already correctly
+      // occludes #museumPrimary for the whole scrub span with no per-chapter
+      // tween changes needed. A second <video> decoding the identical file
+      // here would add zero compositing benefit and would violate the
+      // single-active-video-decoder discipline this module already enforces
+      // (see pauseAllMotionVideos below) — so it is skipped, exactly like any
+      // other unresolved slot: entry[pair_role] stays null.
+      entry[slot.pair_role] = null;
+      return;
+    }
+
+    if (isScrubSlot && prefersReducedMotion) {
+      // A scrub video IS motion — prefers-reduced-motion visitors keep the
+      // pre-existing opacity-only crossfade between the rigid static image
+      // layers (museum2d-scroll.js's own R/mv()/ms() reduced-motion mode,
+      // completely untouched by this task) with no video element created or
+      // fetched at all, matching the approved index-hero scrub's own
+      // reduced-motion convention (initHeroScrub() early-returns identically).
       entry[slot.pair_role] = null;
       return;
     }
@@ -641,7 +744,39 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     // preload="none" — this clip costs zero bytes until it joins the SAME
     // deferred preload queue every other image/loop uses (see
     // videoPreloadQueue below); it is never a second preload gate.
-    v.preload = "none";
+    // PHASE 3.2 exception, CORRECTED (this task, local-preview QA): a
+    // scrub-driven element needs to be arbitrarily seekable across its
+    // whole duration well before the scroll reaches its zone. "metadata"
+    // was tried first (fetches only the container header, not frame data)
+    // but was found live to break scrubbing completely whenever the dev
+    // server doesn't support byte-range requests (confirmed: this
+    // project's local `python3 -m http.server` never sends Accept-Ranges/
+    // 206 for ANY file) — Chrome's metadata-only preload issues one GET,
+    // reads just enough of the header to learn .duration, then aborts the
+    // connection (net::ERR_ABORTED, confirmed via read_network_requests);
+    // with no Range support the browser has no way to resume for a later
+    // seek, so .currentTime writes silently become permanent no-ops
+    // (readyState stays 4/HAVE_ENOUGH_DATA and .duration reads fine, which
+    // is what made this easy to miss — only .seekable, stuck at [[0,0]],
+    // gives it away). "auto" makes the browser commit to downloading the
+    // whole file up front instead of aborting early, which is heavier but
+    // is the only reliably seekable option on a non-range-serving server;
+    // src is still assigned lazily by the SAME deferred gate as every other
+    // asset, so this is not a second preload gate, only a heavier one for
+    // the two scrub slots specifically.
+    v.preload = isScrubSlot ? "auto" : "none";
+    // Scrub elements skip .museum__transition-video's shared 0.35s opacity
+    // CSS transition — confirmed live as a real (if brief, ~350ms) overlap
+    // source: the suppression guards for primaryOuter/explosionMainEl snap
+    // instantly (matching scroll position exactly, which is the whole point
+    // of a SCROLL-SCRUBBED video), but the ordinary one-shot transition
+    // clips' decorative crossfade means the VIDEO's own hide lags behind by
+    // up to 0.35s after the instant snap — during reverse scroll specifically,
+    // that gap briefly showed the just-restored still AND the still-fading
+    // video at once. Ordinary (non-scrub) transition clips keep the shared
+    // CSS transition unchanged — this override is scoped to scrub elements
+    // only via inline style, which always wins over the stylesheet rule.
+    if (isScrubSlot) v.style.transition = "none";
 
     videoPreloadQueue.push({ el: v, url: resolved.url });
     transitionVideos.push(v);
@@ -796,6 +931,167 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     if (p && typeof p.catch === "function") p.catch(() => {});
   }
 
+  // -------------------------------------------------------------------
+  // PHASE 3.2 (this task) — SCROLL-SCRUBBED COMPLETE<->EXPLODED VIDEO.
+  // Reuses the EXACT scrub technique already approved for the index page's
+  // hero build video (js/index-main.js's initHeroScrub): scroll progress is
+  // mapped DIRECTLY onto video.currentTime, continuously and bidirectionally
+  // (scroll down = disassembles/reassembles forward, scroll up = reverses,
+  // stop = the exact frame holds) — never play()/pause(), never a second
+  // rAF/ScrollTrigger instance (this piggy-backs on the ONE onProgress tick
+  // museum2d-scroll.js's own master ScrollTrigger already emits — see the
+  // `onProgress` hook wired into buildMuseumScrollExperience below).
+  //
+  // Both elements are the 'exploded' chapter_key pair's flat_layer videos
+  // (exploded_transition_disassembly/assembly — the 'primary_layer' sibling
+  // slots for chapter_key 'complete' are intentionally never instantiated,
+  // see the discovery loop's isScrubSlot/TRANSITION_TARGET_PRIMARY guard
+  // above). Because #museumFlat paints above #museumPrimary in this module's
+  // existing DOM/stacking order, showing either video at opacity 1 already
+  // fully occludes whatever museum2d-scroll.js's untouched per-chapter GSAP
+  // tweens are doing underneath — "one visual owner" is achieved by
+  // compositing order, not by disabling/rewriting that choreography.
+  //
+  // At most one of the two zones is ever active at a given scroll position
+  // (SCRUB_ZONE_A/B never overlap — see their derivation above), so at most
+  // one of these two elements is ever shown/scrubbed at a time, and neither
+  // ever calls .play() — both remain in the browser's default paused state
+  // for their entire lifetime, satisfying the single-active-video-decoder
+  // rule the same way the rest of this module already does.
+  // -------------------------------------------------------------------
+  const scrubPair = transitionChapters.exploded || null;
+  const scrubDisassemblyEl = (scrubPair && scrubPair.disassembly && scrubPair.disassembly.el) || null;
+  const scrubAssemblyEl = (scrubPair && scrubPair.assembly && scrubPair.assembly.el) || null;
+  const scrubVideoState = {
+    dis: { el: scrubDisassemblyEl, zone: SCRUB_ZONE_A, lastTarget: -1, visible: false },
+    asm: { el: scrubAssemblyEl, zone: SCRUB_ZONE_B, lastTarget: -1, visible: false }
+  };
+
+  function scrubSetVisible(s, visible) {
+    if (!s.el || s.visible === visible) return;
+    s.visible = visible;
+    if (visible) showTransitionEl(s.el); else hideTransitionEl(s.el);
+  }
+
+  function scrubOne(s, progress) {
+    if (!s.el) return;
+    const inZone = progress >= s.zone.start && progress <= s.zone.end;
+    scrubSetVisible(s, inZone);
+    if (!inZone) return;
+    const duration = s.el.duration;
+    if (!(duration > 0) || !isFinite(duration)) return; // metadata not yet loaded — next tick retries, same guard as initHeroScrub
+    const span = Math.max(s.zone.end - s.zone.start, 0.0001);
+    const local = Math.min(Math.max((progress - s.zone.start) / span, 0), 1);
+    const target = Math.min(local * duration, duration - SCRUB_SEEK_EPSILON);
+    if (Math.abs(target - s.lastTarget) > SCRUB_SEEK_EPSILON) {
+      try { s.el.currentTime = target; s.lastTarget = target; } catch (err) { /* not yet seekable — next tick retries */ }
+    }
+  }
+
+  function hideAllScrubVideos() {
+    scrubSetVisible(scrubVideoState.dis, false);
+    scrubSetVisible(scrubVideoState.asm, false);
+  }
+
+  const hasScrubVideos = !!(scrubDisassemblyEl || scrubAssemblyEl);
+
+  // PHASE 3.2 POST-QA FIX — double-ownership guard, EXTENDED to VIDEO-ONLY
+  // (this task, owner correction #2: "SOLO VIDEO EN ESA SECCION" — no
+  // static image of any kind, including explosion_main, may remain visible
+  // anywhere inside a scrub-video zone's own screen time).
+  //
+  // explosion_main is the flat-layer image SHARED by chapter 03 EXPLODED
+  // and chapter 09 REASSEMBLY; primaryOuter (bridge_alpha's real animated
+  // ancestor, .museum__primary) is chapters 01/02/10's shared layer.
+  // museum2d-scroll.js's UNTOUCHED tweens independently drive both of
+  // these across chapter boundaries that now fall INSIDE Zone A/B (Zone A
+  // is chapter 03's entire tStart->he span, so it overlaps both
+  // primaryOuter's own chapter-02-exit fade at tStart AND explosion_main's
+  // own chapter-03-entrance fade). Live-browser QA on the previous
+  // iteration (video only during the back part of chapter 03's hold)
+  // confirmed explosion_main WAS still visible alone for the front part of
+  // that chapter, exactly the "static cover" the owner rejected this round.
+  // Rather than reworking museum2d-scroll.js's authored timing (out of
+  // scope, and it must stay correct for when NO scrub video is present),
+  // this force-writes BOTH elements' opacity to 0 for exactly the span
+  // EITHER scrub video is visible, leaving them under full, untouched
+  // museum2d-scroll.js control everywhere else (primaryOuter still does its
+  // normal job for chapters 01/02/10 outside Zone A; explosion_main still
+  // does its normal job for chapter 09's own reassembly-entrance outside
+  // Zone B's suppressed span).
+  //
+  // MEASURED CORRECTION (earlier this task, post-implementation QA): the
+  // master timeline is Lenis-scrubbed, so GSAP's OWN ticker re-renders it
+  // on every animation frame independently of when onProgress fires (Lenis
+  // feeds ScrollTrigger continuously via its own rAF loop, not only on
+  // discrete scroll events) — a one-time write inside handleScrubProgress
+  // therefore loses a race against GSAP's next tween render and gets
+  // overwritten back to the tween's own opacity value (confirmed live: the
+  // write landed, then was clobbered back to a fractional GSAP-driven value
+  // within one frame). Fixed by registering on gsap.ticker itself instead:
+  // GSAP invokes ticker callbacks in registration order, and its own
+  // internal tween-rendering is wired in at library load, before this
+  // module runs, so a callback added here via gsap.ticker.add() is
+  // guaranteed to run after GSAP's own render for that frame — every
+  // frame, not just on scroll ticks. The moment progress leaves BOTH zones
+  // this stops writing and museum2d-scroll.js's own tweens (never
+  // modified, still fully reversible) are free to paint their own value
+  // again.
+  //
+  // primaryOuter needs different handling than explosionMainEl, and NOT as
+  // a one-shot "restore on release" (tried first — fragile under fast/
+  // programmatic scroll jumps that can skip the exact release frame,
+  // confirmed live: it left primaryOuter stuck invisible partway back
+  // through a reverse sweep instead of restoring at progress 0). Both of
+  // Zone A's boundaries (opening/piers) border chapters whose relevant
+  // tween for THIS element already completed (opening's own opacity was
+  // set once, at builder init) or never touches it at all (piers, a
+  // flat-kind chapter) — GSAP will not re-render primaryOuter's opacity
+  // again on its own once we're back outside Zone A. So instead of an
+  // edge-triggered restore, this asserts primaryOuter's correct value
+  // EVERY frame, unconditionally, from two cheap, always-current facts:
+  // whether Zone A is active right now, and which side of Zone A the last
+  // known progress sits on:
+  //   - inside Zone A                  -> 0 (suppressed, video only)
+  //   - outside Zone A, before its start -> 1 (chapters overview/opening's
+  //     true resting state — the only place primaryOuter is ever supposed
+  //     to be visible before 'complete')
+  //   - outside Zone A, at/after its end -> left UNTOUCHED. This is
+  //     deliberate, not a gap: chapters piers through reassembly never
+  //     needed this element before this fix existed either, and chapter 10
+  //     COMPLETE's own entrance tween does an absolute gsap.set()/jumpTo()
+  //     on this same element when its own time comes — it will correctly
+  //     overwrite whatever this guard last left here, so asserting "0" all
+  //     the way out to complete would fight that later tween for no
+  //     reason, and Zone B (asm) intentionally does not suppress
+  //     primaryOuter itself (out of scope for this task, untouched from
+  //     the prior approved round).
+  const explosionMainEl = (flatLayers.explosion_main && flatLayers.explosion_main.el) || null;
+  let scrubLastProgress = 0;
+  if ((explosionMainEl || primaryOuter) && window.gsap) {
+    gsap.ticker.add(() => {
+      const suppressShared = scrubVideoState.dis.visible || scrubVideoState.asm.visible;
+      if (explosionMainEl) explosionMainEl.style.opacity = suppressShared ? "0" : "";
+      if (primaryOuter) {
+        if (scrubVideoState.dis.visible) primaryOuter.style.opacity = "0";
+        else if (scrubLastProgress < SCRUB_ZONE_A.start) primaryOuter.style.opacity = "1";
+        // else: leave untouched, see comment above.
+      }
+    });
+  }
+
+  // Passed as `onProgress` to buildMuseumScrollExperience below — fired on
+  // the SAME master-timeline ScrollTrigger tick as syncChapter(), never a
+  // separate observer/rAF loop. Gated on sectionInView/document visibility,
+  // mirroring the ambient-loop/transition-clip play/pause gate just above.
+  function handleScrubProgress(progress) {
+    scrubLastProgress = progress;
+    if (!hasScrubVideos) return;
+    if (!sectionInView || document.hidden) { hideAllScrubVideos(); return; }
+    scrubOne(scrubVideoState.dis, progress);
+    scrubOne(scrubVideoState.asm, progress);
+  }
+
   if (loopVideos.length || transitionVideos.length) {
     if ("IntersectionObserver" in window) {
       // Observes `sticky` (#museumSticky), NOT the outer `section`. The
@@ -812,19 +1108,31 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
       // currently visible".
       new IntersectionObserver((entries) => {
         entries.forEach((entry) => { sectionInView = entry.isIntersecting; });
-        if (!sectionInView) pauseAllMotionVideos(null);
-        else syncLoopPlayback(); // ambient loops resume; a mid-play transition
-                                  // clip intentionally does NOT auto-resume on
-                                  // re-entering the viewport (it already ran
-                                  // once for this chapter/direction — resuming
-                                  // it would be a second, unrequested play).
+        if (!sectionInView) {
+          pauseAllMotionVideos(null);
+          hideAllScrubVideos();
+        } else {
+          syncLoopPlayback(); // ambient loops resume; a mid-play transition
+                               // clip intentionally does NOT auto-resume on
+                               // re-entering the viewport (it already ran
+                               // once for this chapter/direction — resuming
+                               // it would be a second, unrequested play).
+          handleScrubProgress(scrubLastProgress); // PHASE 3.2 — restores the
+                               // scrub video's correct visibility/frame for
+                               // whatever scroll position was last recorded.
+        }
       }, { threshold: 0.15 }).observe(sticky || section);
     } else {
       sectionInView = true;
     }
     document.addEventListener("visibilitychange", () => {
-      if (document.hidden) pauseAllMotionVideos(null);
-      else syncLoopPlayback();
+      if (document.hidden) {
+        pauseAllMotionVideos(null);
+        hideAllScrubVideos();
+      } else {
+        syncLoopPlayback();
+        handleScrubProgress(scrubLastProgress); // PHASE 3.2 — see above
+      }
     });
   }
 
@@ -1034,8 +1342,24 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
       // guard only stops them from being INVOKED at runtime for a chapter that
       // now has a loop. Chapters with no loop (exploded/complete/reassembly as
       // of this phase) are completely unaffected.
-      if (!loopLayers[key]) triggerTransition(key, direction);
+      // PHASE 3.2 — SCRUB GUARD. A chapter_key flagged scrub:true (currently
+      // "complete" and "exploded" — see transitionChapters[key].scrub above)
+      // is now driven entirely by the continuous handleScrubProgress()
+      // controller (wired via `onProgress` below), so its old one-shot
+      // chapter-entry autoplay must never also fire — that would be a second,
+      // conflicting visual owner for the same span. Every OTHER
+      // transition-paired chapter (piers/arches/deck) has no such flag and
+      // keeps its pre-existing one-shot behaviour completely unchanged.
+      const tPair = transitionChapters[key];
+      if (!loopLayers[key] && !(tPair && tPair.scrub)) triggerTransition(key, direction);
     },
+    // PHASE 3.2 (this task) — fired on the SAME master-timeline ScrollTrigger
+    // tick as onChapterChange's own chapter-boundary events (see the
+    // `onProgress` hook added to buildMuseumScrollExperience in
+    // museum2d-scroll.js), continuously, not just on chapter change. Drives
+    // the scroll-scrubbed complete<->exploded video — see
+    // handleScrubProgress()'s own doc comment above for the full mechanism.
+    onProgress: (progress) => handleScrubProgress(progress),
     // PHASE 2.4A — MATERIAL specimen-cycle beat (the only in-chapter beat with
     // no chapter-change/transition-clip event of its own — see the doc
     // comment on this parameter in museum2d-scroll.js). Kept very subtle
@@ -1075,9 +1399,20 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
           target: e.target,
           assemblyResolved: !!(e.assembly && e.assembly.el),
           disassemblyResolved: !!(e.disassembly && e.disassembly.el),
-          lastRole: e.lastRole
+          lastRole: e.lastRole,
+          scrub: !!e.scrub // PHASE 3.2 — true for "complete"/"exploded"
         };
-      })
+      }),
+      // PHASE 3.2 (this task) — scroll-scrub QA snapshot: computed zone
+      // boundaries (same [0,1] progress units the master ScrollTrigger
+      // reports) and whether each direction actually has a live element.
+      scrub: {
+        zoneA: SCRUB_ZONE_A,
+        zoneB: SCRUB_ZONE_B,
+        hasDisassemblyVideo: !!scrubDisassemblyEl,
+        hasAssemblyVideo: !!scrubAssemblyEl,
+        reducedMotion: prefersReducedMotion
+      }
     })
   };
 }
