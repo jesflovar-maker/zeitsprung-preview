@@ -35,7 +35,9 @@
       ],
       "related_topic": "BAU",
       "hotspot_target": "#museum25d",
-      "status": "PENDING_FREIGABE"
+      "status": "PENDING_FREIGABE",
+      "asset_web4k": "sb_k01",
+      "match_confidence_4k": "MEDIUM"
     },
     {
       "id": "k02",
@@ -62,149 +64,269 @@
       ],
       "related_topic": "PFEILER",
       "hotspot_target": "#museum25d",
-      "status": "PENDING_FREIGABE"
+      "status": "PENDING_FREIGABE",
+      "asset_web4k": "sb_k02",
+      "match_confidence_4k": "HIGH"
     },
     {
       "id": "k03",
       "asset": "k03_master.png",
       "order": 3,
-      "date": "1140–1146",
+      "date": null,
       "title": {
-        "de": "Die Bögen entstehen",
-        "en": "The arches take shape",
-        "es": "Los arcos toman forma"
+        "de": "Zustand nicht bestätigt",
+        "en": "Condition not confirmed",
+        "es": "Estado sin confirmar"
       },
       "description": {
-        "de": "Hölzerne Lehrgerüste tragen die Bogensteine, bis der Schlussstein jedes Bogens sitzt. Kräne, Seilwinden und Flaschenzüge heben die Steinquader in Position.",
-        "en": "Wooden centering frames carry the arch stones until each keystone locks into place. Cranes, winches and pulleys hoist the stone blocks into position.",
-        "es": "Cimbras de madera sostienen las dovelas hasta que la clave de cada arco encaja. Grúas, tornos y poleas elevan los bloques de piedra hasta su posición."
+        "de": "",
+        "en": "",
+        "es": ""
       },
-      "evidence_status": "RECONSTRUCTED",
+      "evidence_status": "NEEDS_VALIDATION",
       "sources": [
         "i18n.js states[4]"
       ],
-      "source_ids": [
-        "Q001",
-        "Q002"
-      ],
-      "related_topic": "BÖGEN",
-      "hotspot_target": "#museum25d",
-      "status": "PENDING_FREIGABE"
+      "source_ids": [],
+      "related_topic": null,
+      "hotspot_target": "PENDING_DESTINATION",
+      "status": "PENDING_FREIGABE",
+      "asset_web4k": "sb_k03",
+      "match_confidence_4k": "LOW",
+      "held_original": {
+        "date": "1140–1146",
+        "title": {
+          "de": "Die Bögen entstehen",
+          "en": "The arches take shape",
+          "es": "Los arcos toman forma"
+        },
+        "description": {
+          "de": "Hölzerne Lehrgerüste tragen die Bogensteine, bis der Schlussstein jedes Bogens sitzt. Kräne, Seilwinden und Flaschenzüge heben die Steinquader in Position.",
+          "en": "Wooden centering frames carry the arch stones until each keystone locks into place. Cranes, winches and pulleys hoist the stone blocks into position.",
+          "es": "Cimbras de madera sostienen las dovelas hasta que la clave de cada arco encaja. Grúas, tornos y poleas elevan los bloques de piedra hasta su posición."
+        },
+        "evidence_status": "RECONSTRUCTED",
+        "source_ids": [
+          "Q001",
+          "Q002"
+        ],
+        "related_topic": "BÖGEN",
+        "hotspot_target": "#museum25d"
+      },
+      "held_reason": "4K image shows a finished bridge; validated text describes arch centering/crane work.",
+      "uncertainty_type": "IMAGE_TEXT_MATCH",
+      "flags": [
+        "HELD_TEXT_IMAGE_MISMATCH"
+      ]
     },
     {
       "id": "k04",
       "asset": "k04_master.png",
       "order": 4,
-      "date": "1140–1146",
+      "date": null,
       "title": {
-        "de": "Pfeiler und Bögen wachsen zugleich",
-        "en": "Piers and arches, side by side",
-        "es": "Pilares y arcos, a la par"
+        "de": "Zustand nicht bestätigt",
+        "en": "Condition not confirmed",
+        "es": "Estado sin confirmar"
       },
       "description": {
-        "de": "Ein Pfeiler wird noch mit Weidengeflecht und Steinpackung gegen die Strömung gesichert, während andernorts an der Brücke die Bögen bereits stehen — ein typisches Bild einer mehrjährigen Großbaustelle.",
-        "en": "A pier is still being secured against the current with wattle fencing and stone packing, while elsewhere on the bridge the arches already stand — a typical scene from a multi-year construction site.",
-        "es": "Un pilar todavía se protege de la corriente con cercado de mimbre y relleno de piedra, mientras en otro punto del puente los arcos ya están en pie — una escena típica de una obra de varios años."
+        "de": "",
+        "en": "",
+        "es": ""
       },
-      "evidence_status": "RECONSTRUCTED",
+      "evidence_status": "NEEDS_VALIDATION",
       "sources": [
         "i18n.js states[3]",
         "i18n.js states[4]"
       ],
-      "source_ids": [
-        "Q001",
-        "Q002"
-      ],
-      "related_topic": "PFEILER",
-      "hotspot_target": "#museum25d",
+      "source_ids": [],
+      "related_topic": null,
+      "hotspot_target": "PENDING_DESTINATION",
       "status": "PENDING_FREIGABE",
-      "note": "RE-INSPECTED 2026-09-01 (Phase 2.7C.3): this frame previously carried K03's identical 'The arches take shape' title/description, sharing the same 1140-1146 date range as K03/K05/K06. Direct visual inspection shows a genuinely distinct composition — a pier still under construction/protection (wattle fencing, stone packing, rafts), NOT an arch-lifting scene. Re-titled to reflect what is actually depicted (parallel pier/arch construction, which is historically plausible for a multi-year, multi-span build) while keeping the SAME validated '1140-1146' date range (the project has no narrower validated sub-date, and none is invented here). related_topic changed from BÖGEN to PFEILER to match the visual content. source_ids unchanged (still grounded in the same validated construction-date/materials sources); the specific compositional detail (concurrent pier/arch work) is a plausible construction-sequence reading of the image, not an independently sourced claim beyond that."
+      "note": "RE-INSPECTED 2026-09-01 (Phase 2.7C.3): this frame previously carried K03's identical 'The arches take shape' title/description, sharing the same 1140-1146 date range as K03/K05/K06. Direct visual inspection shows a genuinely distinct composition — a pier still under construction/protection (wattle fencing, stone packing, rafts), NOT an arch-lifting scene. Re-titled to reflect what is actually depicted (parallel pier/arch construction, which is historically plausible for a multi-year, multi-span build) while keeping the SAME validated '1140-1146' date range (the project has no narrower validated sub-date, and none is invented here). related_topic changed from BÖGEN to PFEILER to match the visual content. source_ids unchanged (still grounded in the same validated construction-date/materials sources); the specific compositional detail (concurrent pier/arch work) is a plausible construction-sequence reading of the image, not an independently sourced claim beyond that.",
+      "asset_web4k": "sb_k04",
+      "match_confidence_4k": "LOW",
+      "held_original": {
+        "date": "1140–1146",
+        "title": {
+          "de": "Pfeiler und Bögen wachsen zugleich",
+          "en": "Piers and arches, side by side",
+          "es": "Pilares y arcos, a la par"
+        },
+        "description": {
+          "de": "Ein Pfeiler wird noch mit Weidengeflecht und Steinpackung gegen die Strömung gesichert, während andernorts an der Brücke die Bögen bereits stehen — ein typisches Bild einer mehrjährigen Großbaustelle.",
+          "en": "A pier is still being secured against the current with wattle fencing and stone packing, while elsewhere on the bridge the arches already stand — a typical scene from a multi-year construction site.",
+          "es": "Un pilar todavía se protege de la corriente con cercado de mimbre y relleno de piedra, mientras en otro punto del puente los arcos ya están en pie — una escena típica de una obra de varios años."
+        },
+        "evidence_status": "RECONSTRUCTED",
+        "source_ids": [
+          "Q001",
+          "Q002"
+        ],
+        "related_topic": "PFEILER",
+        "hotspot_target": "#museum25d"
+      },
+      "held_reason": "4K image shows a finished bridge with the Dom under Gothic scaffolding; validated text describes pier/arch work in 1140-1146.",
+      "uncertainty_type": "IMAGE_TEXT_MATCH",
+      "flags": [
+        "HELD_TEXT_IMAGE_MISMATCH"
+      ]
     },
     {
       "id": "k05",
       "asset": "k05_master.png",
       "order": 5,
-      "date": "1140–1146",
+      "date": null,
       "title": {
-        "de": "Verkleidung eines Pfeilerkerns",
-        "en": "Facing a pier's core",
-        "es": "Revistiendo el núcleo de un pilar"
+        "de": "Zustand nicht bestätigt",
+        "en": "Condition not confirmed",
+        "es": "Estado sin confirmar"
       },
       "description": {
-        "de": "Ein Bruchsteinkern wird mit behauenen Kalksteinquadern verkleidet — dieselbe Bautechnik, die auch die übrigen Pfeiler der Brücke trägt.",
-        "en": "A rubble core is faced with dressed limestone ashlar — the same building technique used throughout the bridge's piers.",
-        "es": "Un núcleo de mampostería en bruto se reviste con sillares de caliza labrada — la misma técnica constructiva empleada en el resto de los pilares del puente."
+        "de": "",
+        "en": "",
+        "es": ""
       },
-      "evidence_status": "RECONSTRUCTED",
+      "evidence_status": "NEEDS_VALIDATION",
       "sources": [
         "i18n.js states[3]"
       ],
-      "source_ids": [
-        "Q001",
-        "Q002"
-      ],
-      "related_topic": "PFEILER",
-      "hotspot_target": "#museum25d",
+      "source_ids": [],
+      "related_topic": null,
+      "hotspot_target": "PENDING_DESTINATION",
       "status": "PENDING_FREIGABE",
-      "note": "RE-INSPECTED 2026-09-01 (Phase 2.7C.3): previously shared K03's 'The arches take shape' title/description. Direct visual inspection shows a large square pier with an exposed rubble core being faced with dressed ashlar (masonry/plastering work, workers on rafts) — no arch or arch-lifting is visible in this frame at all. Re-titled and re-described to match; description restates the SB_MATERIALS-adjacent 'rubble core + ashlar facing' construction technique already validated for the piers (see i18n.js states[3] / SB_MATERIALS), applied to this specific frame rather than reusing K03's arch-construction copy verbatim. Date range kept at the same validated '1140-1146' window (no narrower validated sub-date exists, none invented). related_topic changed from (implicit) BÖGEN to PFEILER."
+      "note": "RE-INSPECTED 2026-09-01 (Phase 2.7C.3): previously shared K03's 'The arches take shape' title/description. Direct visual inspection shows a large square pier with an exposed rubble core being faced with dressed ashlar (masonry/plastering work, workers on rafts) — no arch or arch-lifting is visible in this frame at all. Re-titled and re-described to match; description restates the SB_MATERIALS-adjacent 'rubble core + ashlar facing' construction technique already validated for the piers (see i18n.js states[3] / SB_MATERIALS), applied to this specific frame rather than reusing K03's arch-construction copy verbatim. Date range kept at the same validated '1140-1146' window (no narrower validated sub-date exists, none invented). related_topic changed from (implicit) BÖGEN to PFEILER.",
+      "asset_web4k": "sb_k05",
+      "match_confidence_4k": "LOW",
+      "held_original": {
+        "date": "1140–1146",
+        "title": {
+          "de": "Verkleidung eines Pfeilerkerns",
+          "en": "Facing a pier's core",
+          "es": "Revistiendo el núcleo de un pilar"
+        },
+        "description": {
+          "de": "Ein Bruchsteinkern wird mit behauenen Kalksteinquadern verkleidet — dieselbe Bautechnik, die auch die übrigen Pfeiler der Brücke trägt.",
+          "en": "A rubble core is faced with dressed limestone ashlar — the same building technique used throughout the bridge's piers.",
+          "es": "Un núcleo de mampostería en bruto se reviste con sillares de caliza labrada — la misma técnica constructiva empleada en el resto de los pilares del puente."
+        },
+        "evidence_status": "RECONSTRUCTED",
+        "source_ids": [
+          "Q001",
+          "Q002"
+        ],
+        "related_topic": "PFEILER",
+        "hotspot_target": "#museum25d"
+      },
+      "held_reason": "4K image shows a finished bridge with a Gothic Dom; validated text describes pier facing in 1140-1146.",
+      "uncertainty_type": "IMAGE_TEXT_MATCH",
+      "flags": [
+        "HELD_TEXT_IMAGE_MISMATCH"
+      ]
     },
     {
       "id": "k06",
       "asset": "k06_master.png",
       "order": 6,
-      "date": "1140–1146",
+      "date": null,
       "title": {
-        "de": "Die Fahrbahn nimmt Gestalt an",
-        "en": "The roadway takes shape",
-        "es": "La calzada toma forma"
+        "de": "Zustand nicht bestätigt",
+        "en": "Condition not confirmed",
+        "es": "Estado sin confirmar"
       },
       "description": {
-        "de": "Sobald die Bögen tragen, wird die Fahrbahn darüber gepflastert — Kräne und Seilwinden bringen weiterhin Steinquader heran, während im Hintergrund die Stadt sichtbar wird.",
-        "en": "Once the arches can bear weight, the roadway above is paved — cranes and winches keep hauling stone blocks into place as the town comes into view behind.",
-        "es": "Una vez que los arcos soportan peso, se empedra la calzada sobre ellos — grúas y tornos siguen acarreando bloques de piedra mientras la ciudad se despliega al fondo."
+        "de": "",
+        "en": "",
+        "es": ""
       },
-      "evidence_status": "RECONSTRUCTED",
+      "evidence_status": "NEEDS_VALIDATION",
       "sources": [
         "i18n.js states[4]"
       ],
-      "source_ids": [
-        "Q001",
-        "Q002"
-      ],
-      "related_topic": "FAHRBAHN",
-      "hotspot_target": "#museum25d",
+      "source_ids": [],
+      "related_topic": null,
+      "hotspot_target": "PENDING_DESTINATION",
       "status": "PENDING_FREIGABE",
       "flags": [
+        "HELD_TEXT_IMAGE_MISMATCH",
         "VISUAL_REVIEW_REQUIRED"
       ],
-      "note": "RE-INSPECTED 2026-09-01 (Phase 2.7C.3): previously shared K03's 'The arches take shape' title/description; visual shows a wide aerial construction scene with completed arches and deck-paving underway alongside cranes/winches — re-titled/re-described to reflect the deck (FAHRBAHN) focus of THIS frame specifically. The 'roadway is paved once arches can bear weight' sequencing is a plausible, non-invented construction-order inference (no separate validated deck-paving date exists, none invented here); date range kept at the same validated '1140-1146' window. SEPARATE, UNRESOLVED ACCURACY FLAG (not fixed by this text change, and the master image was NOT altered): the background of this frame shows the cathedral with an apparently complete Gothic-style spire, which reads as inconsistent with SB_DOM_GOTHIC_RULE (the Gothic Dom must not appear before ~1275; K07's own text for the correct 1146-1275 window explicitly states the Gothic towers 'do not yet exist' yet). This discrepancy is flagged here and in CLAIM_SOURCE_MAP.json rather than silently resolved or hidden; it is a Visual-Lab asset question (master PNG) outside Web Architect scope to correct without explicit permission. PHASE 2.7C.4 additive: flags:[\"VISUAL_REVIEW_REQUIRED\"] registered above so downstream tooling/QA can programmatically surface this frame without parsing free text; no existing array-based flag convention was found elsewhere in this manifest (status/evidence_status are both scalar), so this is a new additive field, k06-only, nothing else in this file was changed."
+      "note": "RE-INSPECTED 2026-09-01 (Phase 2.7C.3): previously shared K03's 'The arches take shape' title/description; visual shows a wide aerial construction scene with completed arches and deck-paving underway alongside cranes/winches — re-titled/re-described to reflect the deck (FAHRBAHN) focus of THIS frame specifically. The 'roadway is paved once arches can bear weight' sequencing is a plausible, non-invented construction-order inference (no separate validated deck-paving date exists, none invented here); date range kept at the same validated '1140-1146' window. SEPARATE, UNRESOLVED ACCURACY FLAG (not fixed by this text change, and the master image was NOT altered): the background of this frame shows the cathedral with an apparently complete Gothic-style spire, which reads as inconsistent with SB_DOM_GOTHIC_RULE (the Gothic Dom must not appear before ~1275; K07's own text for the correct 1146-1275 window explicitly states the Gothic towers 'do not yet exist' yet). This discrepancy is flagged here and in CLAIM_SOURCE_MAP.json rather than silently resolved or hidden; it is a Visual-Lab asset question (master PNG) outside Web Architect scope to correct without explicit permission. PHASE 2.7C.4 additive: flags:[\"VISUAL_REVIEW_REQUIRED\"] registered above so downstream tooling/QA can programmatically surface this frame without parsing free text; no existing array-based flag convention was found elsewhere in this manifest (status/evidence_status are both scalar), so this is a new additive field, k06-only, nothing else in this file was changed.",
+      "asset_web4k": "sb_k06",
+      "match_confidence_4k": "LOW",
+      "held_original": {
+        "date": "1140–1146",
+        "title": {
+          "de": "Die Fahrbahn nimmt Gestalt an",
+          "en": "The roadway takes shape",
+          "es": "La calzada toma forma"
+        },
+        "description": {
+          "de": "Sobald die Bögen tragen, wird die Fahrbahn darüber gepflastert — Kräne und Seilwinden bringen weiterhin Steinquader heran, während im Hintergrund die Stadt sichtbar wird.",
+          "en": "Once the arches can bear weight, the roadway above is paved — cranes and winches keep hauling stone blocks into place as the town comes into view behind.",
+          "es": "Una vez que los arcos soportan peso, se empedra la calzada sobre ellos — grúas y tornos siguen acarreando bloques de piedra mientras la ciudad se despliega al fondo."
+        },
+        "evidence_status": "RECONSTRUCTED",
+        "source_ids": [
+          "Q001",
+          "Q002"
+        ],
+        "related_topic": "FAHRBAHN",
+        "hotspot_target": "#museum25d"
+      },
+      "held_reason": "4K image shows a finished bridge with a Gothic Dom; validated text describes deck paving in 1140-1146.",
+      "uncertainty_type": "IMAGE_TEXT_MATCH"
     },
     {
       "id": "k07",
       "asset": "k07_master.png",
       "order": 7,
-      "date": "1146–1275",
+      "date": null,
       "title": {
-        "de": "Mittelalterliche Vollendung",
-        "en": "Medieval completion",
-        "es": "Finalización medieval"
+        "de": "Zustand nicht bestätigt",
+        "en": "Condition not confirmed",
+        "es": "Estado sin confirmar"
       },
       "description": {
-        "de": "Die fertige Brücke trägt mehrere Türme; im Hintergrund erhebt sich noch der romanische Vorgängerbau des Doms — die gotischen Türme existieren noch nicht.",
-        "en": "The finished bridge carries several towers; in the background stands the Romanesque predecessor of the cathedral — the Gothic spires do not yet exist.",
-        "es": "El puente terminado luce varias torres; al fondo se alza todavía el predecesor románico de la catedral — las agujas góticas aún no existen."
+        "de": "",
+        "en": "",
+        "es": ""
       },
-      "evidence_status": "RECONSTRUCTED",
+      "evidence_status": "NEEDS_VALIDATION",
       "sources": [
         "i18n.js states[5]"
       ],
-      "source_ids": [
-        "Q001",
-        "Q002"
-      ],
-      "related_topic": "GESAMT",
-      "hotspot_target": "#museum25d",
-      "status": "PENDING_FREIGABE"
+      "source_ids": [],
+      "related_topic": null,
+      "hotspot_target": "PENDING_DESTINATION",
+      "status": "PENDING_FREIGABE",
+      "asset_web4k": "sb_k07",
+      "match_confidence_4k": "LOW",
+      "held_original": {
+        "date": "1146–1275",
+        "title": {
+          "de": "Mittelalterliche Vollendung",
+          "en": "Medieval completion",
+          "es": "Finalización medieval"
+        },
+        "description": {
+          "de": "Die fertige Brücke trägt mehrere Türme; im Hintergrund erhebt sich noch der romanische Vorgängerbau des Doms — die gotischen Türme existieren noch nicht.",
+          "en": "The finished bridge carries several towers; in the background stands the Romanesque predecessor of the cathedral — the Gothic spires do not yet exist.",
+          "es": "El puente terminado luce varias torres; al fondo se alza todavía el predecesor románico de la catedral — las agujas góticas aún no existen."
+        },
+        "evidence_status": "RECONSTRUCTED",
+        "source_ids": [
+          "Q001",
+          "Q002"
+        ],
+        "related_topic": "GESAMT",
+        "hotspot_target": "#museum25d"
+      },
+      "held_reason": "4K image shows a Gothic Dom, which contradicts the validated text (Romanesque predecessor, Gothic towers not yet existing, 1146-1275; SB_DOM_GOTHIC_RULE).",
+      "uncertainty_type": "IMAGE_TEXT_MATCH",
+      "flags": [
+        "HELD_TEXT_IMAGE_MISMATCH"
+      ]
     },
     {
       "id": "k08",
@@ -228,7 +350,9 @@
       "related_topic": null,
       "hotspot_target": "PENDING_DESTINATION",
       "status": "PENDING_FREIGABE",
-      "note": "RE-MAPPED 2026-09-01: k08_master.png is no longer the K03 duplicate (see known_duplicate_note above) — it was replaced with a genuinely new render showing pier repair/maintenance work (visible timber patching on a damaged pier, rubble loaded onto a boat) with the Dom's twin spires shown FULLY COMPLETE in the background (spires completed 1869, so this scene reads as some later repair campaign). No entry in SOURCE_REGISTRY.md/.json documents a specific dated repair campaign matching this exact scene, so — mirroring K09's own convention — the title intentionally states only the evidence status, the description is left empty, and no date/topic is asserted rather than inventing one. Needs a real source before any date or campaign name can be added."
+      "note": "RE-MAPPED 2026-09-01: k08_master.png is no longer the K03 duplicate (see known_duplicate_note above) — it was replaced with a genuinely new render showing pier repair/maintenance work (visible timber patching on a damaged pier, rubble loaded onto a boat) with the Dom's twin spires shown FULLY COMPLETE in the background (spires completed 1869, so this scene reads as some later repair campaign). No entry in SOURCE_REGISTRY.md/.json documents a specific dated repair campaign matching this exact scene, so — mirroring K09's own convention — the title intentionally states only the evidence status, the description is left empty, and no date/topic is asserted rather than inventing one. Needs a real source before any date or campaign name can be added.",
+      "asset_web4k": "sb_k08",
+      "match_confidence_4k": "NONE"
     },
     {
       "id": "k09",
@@ -252,7 +376,9 @@
       "related_topic": null,
       "hotspot_target": "PENDING_DESTINATION",
       "status": "PENDING_FREIGABE",
-      "note": "The image shows the bridge's nearest arch under what reads as repair/damage bracing (orange wood scaffolding) — no validated source or Freigabe covers any specific repair event, date or cause for this. Title deliberately describes only the EVIDENCE STATUS itself (not a historical claim); description is intentionally empty rather than inventing a date, incident or narrative. Do not add descriptive text here without a real source."
+      "note": "The image shows the bridge's nearest arch under what reads as repair/damage bracing (orange wood scaffolding) — no validated source or Freigabe covers any specific repair event, date or cause for this. Title deliberately describes only the EVIDENCE STATUS itself (not a historical claim); description is intentionally empty rather than inventing a date, incident or narrative. Do not add descriptive text here without a real source.",
+      "asset_web4k": "sb_k09",
+      "match_confidence_4k": "NONE"
     },
     {
       "id": "k10",
@@ -279,7 +405,9 @@
       "related_topic": "DOM",
       "hotspot_target": "#stage",
       "status": "PENDING_FREIGABE",
-      "note": "Closest validated era (Gothic tower construction). The image itself shows complete spires plus an electric tram (a later, 19th/early-20th-century-reading scene) — reused verbatim per the brief rather than inventing tram-specific copy; this discrepancy between image and validated date range is flagged, not silently resolved."
+      "note": "Closest validated era (Gothic tower construction). The image itself shows complete spires plus an electric tram (a later, 19th/early-20th-century-reading scene) — reused verbatim per the brief rather than inventing tram-specific copy; this discrepancy between image and validated date range is flagged, not silently resolved.",
+      "asset_web4k": "sb_k10",
+      "match_confidence_4k": "MEDIUM"
     },
     {
       "id": "k11",
@@ -305,7 +433,9 @@
       ],
       "related_topic": "RESTAURIERUNG",
       "hotspot_target": "#museum25d",
-      "status": "PENDING_FREIGABE"
+      "status": "PENDING_FREIGABE",
+      "asset_web4k": "sb_k11",
+      "match_confidence_4k": "MEDIUM"
     },
     {
       "id": "k12",
@@ -332,7 +462,10 @@
       ],
       "related_topic": "HEUTE",
       "hotspot_target": "#stage",
-      "status": "PENDING_FREIGABE"
+      "status": "PENDING_FREIGABE",
+      "asset_web4k": "sb_k12",
+      "match_confidence_4k": "HIGH"
     }
-  ]
+  ],
+  "web4k_note": "2026-10-08 STEINERNE FINAL CLOSURE — runtime now displays the owner's 4K series (OWNER_UPLOAD_2026-10-08, derivatives in 03_ASSETS/Steinerne_Bruecke/2d/KFRAMES_4K_WEB/sb_kNN_{1080,720}_v01.webp via each frame's `asset_web4k`; legacy `asset` PNG kept as error fallback). The 4K series is an aerial urban-evolution series, NOT a re-render of the legacy construction-scene series. Frames whose validated text contradicts the new image (K03-K07) are HELD: date/title/description neutralised to the already-approved NEEDS_VALIDATION wording (identical to K08/K09) and the original validated record preserved under `held_original` for restoration once the owner/ChatGPT approve a 4K-specific text. `match_confidence_4k` records the image-text assessment per frame. No new historical claim was written."
 }

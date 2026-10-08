@@ -658,6 +658,29 @@ img{ max-width:100%; display:block; }
   max-height: var(--fit-max-h, 60vh);
 }
 
+/* full_cover — MATERIAL — TRUE FULL SCREEN (this task). Every fit-mode rule
+   above only ever caps max-width/max-height and leaves .museum__flat-img's
+   own object-fit:contain in charge, so a 9:16 clip always letterboxes inside
+   a wider stage box (the "black side lines" the owner reported). This mode
+   is for a slot that has explicitly asked to fill its box edge-to-edge
+   instead: width/height:100% (not the base rule's auto/auto) plus
+   object-fit:cover, so the video always exactly fills #museumFlat's own
+   padding box on both axes, cropping — never stretching — whatever the
+   source's own aspect ratio can't show at the stage's own aspect ratio.
+   Same breakpoints as every other mode (mobile stage = the real viewport,
+   desktop stage = the shared, already-approved framed .museum__viewport
+   box) — this mode does not change or bypass that shared box, it only fills
+   it completely instead of floating a smaller cutout inside it. No
+   responsive override block needed below: 100%/100%/cover is already the
+   same rule at every breakpoint, unlike the vh-tuned letterboxed modes. */
+.museum__fit--full-cover{
+  width: var(--fit-max-w, 100%);
+  height: var(--fit-max-h, 100%);
+  max-width: var(--fit-max-w, 100%);
+  max-height: var(--fit-max-h, 100%);
+  object-fit: cover;
+}
+
 /* background_mode — independent of preferred_fit sizing above. */
 .museum__bgmode--none{ /* free float, no card — default look */ }
 .museum__bgmode--framed{
@@ -2355,3 +2378,42 @@ img{ max-width:100%; display:block; }
   .bruckmandl__exploded-piece--hotspot::after{ animation: none; }
   .bruckmandl__inspect{ animation: none; }
 }
+
+
+/* ---------------------------------------------------------------- */
+/* MEDIA FEATURES — trailer / timeline film / bridge route            */
+/* (js/media-feature.js). Poster-first portrait 9:16 frame centred in  */
+/* the page column — same dark/gold tokens as the rest of the page.    */
+/* ---------------------------------------------------------------- */
+.mf{ position: relative; background: var(--z-bg); padding: var(--zt-section-space) var(--zt-page-gutter); }
+.mf__inner{ max-width: var(--zt-content-max); margin: 0 auto; text-align: center; }
+.mf__eyebrow{ font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.22em; color: var(--z-gold); margin-bottom: 10px; }
+.mf__title{ font-size: clamp(22px, 5.5vw, 32px); font-weight: 600; margin-bottom: 10px; }
+.mf__text{ font-size: 14px; line-height: 1.6; color: var(--z-ink-dim); max-width: var(--zt-text-max); margin: 0 auto 28px; }
+.mf__frame{
+  position: relative; margin: 0 auto; background: #000;
+  aspect-ratio: 9 / 16;
+  width: min(100%, calc(82vh * 9 / 16)); width: min(100%, calc(82svh * 9 / 16));
+  border: 1px solid var(--z-line); border-radius: 4px; overflow: hidden;
+}
+.mf__video{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: #000; }
+.mf__play{
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(to top, rgba(0,0,0,0.35), rgba(0,0,0,0.05));
+  cursor: pointer;
+}
+.mf__play[hidden]{ display: none; }
+.mf__play-icon{
+  width: 68px; height: 68px; border-radius: 50%;
+  border: 1px solid var(--z-gold); background: rgba(8,9,11,0.55);
+  position: relative; transition: transform .25s ease, background-color .25s ease;
+}
+.mf__play-icon::after{
+  content: ""; position: absolute; left: 27px; top: 21px;
+  border-style: solid; border-width: 12px 0 12px 19px; border-color: transparent transparent transparent var(--z-gold);
+}
+.mf__play:hover .mf__play-icon, .mf__play:focus-visible .mf__play-icon{ transform: scale(1.06); background: rgba(8,9,11,0.75); }
+.mf__play:focus-visible{ outline: 2px solid var(--z-gold); outline-offset: -4px; }
+.mf__recon{ margin-top: 14px; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.18em; color: var(--z-ink-faint); }
+@media (prefers-reduced-motion: reduce){ .mf__play-icon{ transition: none; } }

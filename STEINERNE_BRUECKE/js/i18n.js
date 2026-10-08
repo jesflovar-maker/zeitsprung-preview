@@ -105,6 +105,18 @@ export const DICT = {
     // #stage and #museum25d. Section chrome copy only — every per-frame
     // date/title/description comes from KFRAMES_STORY_MAP.json (itself a
     // verbatim re-citation of the states[] array above).
+    // 2026-10-08 FINAL CLOSURE — reusable media-feature copy (trailer / timeline film / route)
+    mfPlay: "ABSPIELEN",
+    mfRecon: "VISUELLE REKONSTRUKTION",
+    mfTrailerEyebrow: "TRAILER",
+    mfTrailerTitle: "Visuelle Zeitreise",
+    mfTrailerText: "Der Trailer zur Steinernen Brücke — ein kurzer Einblick in die Reise durch die Zeit.",
+    mfTimelineEyebrow: "ZEITLEISTE",
+    mfTimelineTitle: "Die Zeitleiste im Film",
+    mfTimelineText: "Die Brücke und ihre Stadt im Wandel der Zeit — als filmische Ergänzung zu den zwölf Bildmomenten.",
+    mfRouteEyebrow: "RUNDGANG",
+    mfRouteTitle: "Der Weg über die Brücke",
+    mfRouteText: "Ein Blick aus der Luft auf die Brücke und die Altstadt von Regensburg.",
     kframesTitle: "Die Baustelle im Bild",
     kframesText: "Zwölf Bildmomente der Bauzeit, chronologisch geordnet — von der Fundamentierung bis heute.",
     kframesCounterLabel: "BILD",
@@ -349,6 +361,18 @@ export const DICT = {
         text: "The Steinerne Brücke today carries pedestrians and cyclists — an almost 900-year-old structure, woven into everyday life in Regensburg."
       }
     ],
+    // 2026-10-08 FINAL CLOSURE — reusable media-feature copy (trailer / timeline film / route)
+    mfPlay: "PLAY",
+    mfRecon: "VISUAL RECONSTRUCTION",
+    mfTrailerEyebrow: "TRAILER",
+    mfTrailerTitle: "Visual time travel",
+    mfTrailerText: "The Steinerne Brücke trailer — a short glimpse of the journey through time.",
+    mfTimelineEyebrow: "TIMELINE",
+    mfTimelineTitle: "The timeline on film",
+    mfTimelineText: "The bridge and its city through the ages — a cinematic companion to the twelve visual moments.",
+    mfRouteEyebrow: "ROUTE",
+    mfRouteTitle: "The route across the bridge",
+    mfRouteText: "An aerial view of the bridge and Regensburg's old town.",
     kframesTitle: "The construction site in pictures",
     kframesText: "Twelve visual moments from the construction period, in chronological order — from the foundations to today.",
     kframesCounterLabel: "FRAME",
@@ -556,6 +580,18 @@ export const DICT = {
         text: "La Steinerne Brücke sostiene hoy a peatones y ciclistas — una estructura de casi 900 años, tejida en la vida cotidiana de Regensburg."
       }
     ],
+    // 2026-10-08 FINAL CLOSURE — reusable media-feature copy (trailer / timeline film / route)
+    mfPlay: "REPRODUCIR",
+    mfRecon: "RECONSTRUCCIÓN VISUAL",
+    mfTrailerEyebrow: "TRÁILER",
+    mfTrailerTitle: "Viaje visual en el tiempo",
+    mfTrailerText: "El tráiler del Steinerne Brücke — un breve vistazo al viaje a través del tiempo.",
+    mfTimelineEyebrow: "LÍNEA DE TIEMPO",
+    mfTimelineTitle: "La línea de tiempo en película",
+    mfTimelineText: "El puente y su ciudad a lo largo de los siglos — un complemento cinematográfico de los doce momentos visuales.",
+    mfRouteEyebrow: "RECORRIDO",
+    mfRouteTitle: "El recorrido por el puente",
+    mfRouteText: "Una vista aérea del puente y del casco antiguo de Regensburg.",
     kframesTitle: "La obra en imágenes",
     kframesText: "Doce momentos visuales de la fase de construcción, en orden cronológico — desde la cimentación hasta hoy.",
     kframesCounterLabel: "IMAGEN",

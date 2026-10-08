@@ -5,8 +5,19 @@
    WHAT THIS FILE IS
    -----------------
    The CHOREOGRAPHY layer. It owns:
-     - the 10-chapter narrative script (dwell/transition timing in abstract
-       "scroll units")
+     - the 9-chapter narrative script (dwell/transition timing in abstract
+       "scroll units") — GROUP B VISUAL CONTINUITY FIX (this task): the former
+       chapter 01 "overview" (a standalone still card with no motion, shown
+       before any transformation begins) was removed from the script per
+       owner request, so the sequence now opens directly on "opening"
+       (STRUKTUR). The bridge_alpha asset itself is untouched and still in
+       active use by the "opening" and "complete" chapters (both kind:
+       "primary", same shared layer) — only its own dedicated intro beat was
+       removed. Every chapter/zone boundary in this file and in
+       museum25d.js's SCRUB_ZONE_A/B is looked up by chapter KEY via
+       buildTimingMap()/findIndex(), never by array position, so this
+       removal needed no other code change (see museum25d.js's own comment
+       at SCRUB_CHAPTER_INDEX for the same design guarantee).
      - ONE authored GSAP master timeline driven by ONE pinned ScrollTrigger
      - the coordinated typography (caption beats) animated on that same
        timeline
@@ -89,12 +100,12 @@ import { createZtTypography, ztVisualLength, ZT_TYPO } from "./zt-typography.js"
 // ---------------------------------------------------------------------------
 const UNIT_VH = 55;
 
-// Must match .museum__flat-img's CSS drop-shadow so the one blur tween below
-// can animate `filter` without silently deleting the shadow.
-const FLAT_SHADOW = "drop-shadow(0 22px 40px rgba(0,0,0,0.55))";
+// GROUP B FINAL CONTENT FLOW CORRECTION (this task): FLAT_SHADOW (matched the
+// CSS drop-shadow for a blur tween on chapter exit) removed — its only
+// consumer was the now-removed "complete" chapter's own closing tween.
 
 // ---------------------------------------------------------------------------
-// THE 10-CHAPTER SCRIPT
+// THE 7-CHAPTER SCRIPT
 //   transitionIn : scroll units spent transitioning INTO this chapter
 //   hold         : scroll units this chapter dwells (time to read / inspect)
 //   layer        : "primary" (the rigid bridge_alpha layer) | "flat" + slot
@@ -117,22 +128,29 @@ const FLAT_SHADOW = "drop-shadow(0 22px 40px rgba(0,0,0,0.55))";
 // ---------------------------------------------------------------------------
 export const CHAPTER_SCRIPT = [
   {
-    key: "overview", transitionIn: 0, hold: 1.9,
-    layer: { kind: "primary" },
-    labelKey: "museumModeOverview", subKey: "museumSubOverview",
-    text: { primary: "bridge_overview_structure" }
-  },
-  {
-    // "OPENING" — no dedicated content entry exists and none is invented.
-    // Reuses the already-approved STRUKTUR label/sub, which is exactly what
-    // this beat shows: the bridge opening up into its structural geometry.
-    key: "opening", transitionIn: 1.2, hold: 0.9,
-    layer: { kind: "primary" },
-    labelKey: "museumModeStructure", subKey: "museumSubStructure",
-    text: { textless: true }
-  },
-  {
-    key: "exploded", transitionIn: 1.2, hold: 1.4,
+    // "EXPLODED" — GROUP B FINAL CONTENT FLOW CORRECTION (this task): this is
+    // now the FIRST chapter of the sequence. The former chapter 01 "opening"
+    // (STRUKTUR — itself already a replacement for the earlier-removed
+    // "overview" beat, see the file header history) was ALSO removed per
+    // owner request: the owner does not want any standalone captioned static
+    // bridge beat before the transformation starts — the approved COMPLETE
+    // bridge state must be the silent, uncaptioned first frame the
+    // transformation video itself opens on, not its own separate "card".
+    // This chapter's own i===0 handling in the object choreography below
+    // (the "calm start" branch) already applies generically to whichever
+    // chapter sits at index 0, so no code change was needed for the object
+    // motion itself. What DOES change here: this chapter's own dedicated
+    // entrance-tween branch (`else if (ch.key === "exploded")`, further
+    // down) is now PERMANENTLY unreachable for the same reason "opening"'s
+    // was in the prior task (the i===0 branch always wins first in the
+    // if/else-if chain) — removed below rather than left as dead code, see
+    // that branch's own removal note. museum25d.js's SCRUB_ZONE_A already
+    // spans this chapter's own ENTIRE tStart->he span (unchanged, chapter-key
+    // driven, not index driven), so the disassembly transition video takes
+    // over as the sole visible layer within roughly one scroll tick of the
+    // pinned section engaging — the calm-start bridge_alpha/explosion_main
+    // frame set here is a near-instantaneous backdrop, not a dwelled beat.
+    key: "exploded", transitionIn: 0, hold: 1.4,
     layer: { kind: "flat", slot: "explosion_main" },
     labelKey: "museumModeExploded", subKey: "museumSubExploded",
     text: { textless: true } // explosion_main has content_ids: [] — visual only
@@ -184,17 +202,34 @@ export const CHAPTER_SCRIPT = [
     // between the isolated components and the finished bridge. Same rigid
     // image, re-entering from a WIDER framing so it reads as parts converging
     // inward rather than a new picture appearing.
+    //
+    // GROUP B FINAL CONTENT FLOW CORRECTION (this task): this is now the
+    // LAST chapter of the sequence — the former closing chapter "complete"
+    // (bridge_alpha, primary layer, its own captioned "COMPLETADO / El
+    // Puente de Piedra" beat) was removed per owner request: it only ever
+    // showed the same approved complete-bridge identity a SECOND time, right
+    // after the reassembly video's own final frame already held on that
+    // exact bridge (the assembly clip's last frame IS the fully reassembled
+    // bridge — see museum25d.js's SCRUB_ZONE_B, which now spans this
+    // chapter's own ENTIRE tStart->he span for the same "video is the sole
+    // visual, no redundant static panel" reason SCRUB_ZONE_A already applies
+    // to the 'exploded' chapter above). This chapter's own explosion_main
+    // convergence tween below still runs (harmless, correctly tracked state)
+    // but is visually superseded/suppressed by the video for its whole
+    // duration, exactly like 'exploded' chapter's own tween logic used to be
+    // before it was removed as dead code — the difference is this branch
+    // still legitimately executes (ch.key==='reassembly' still matches,
+    // since this chapter is not at index 0), it just never becomes visible.
+    // Being the new LAST chapter needs no special-casing: the generic
+    // `i < script.length - 1` exit-text guard further down already keeps
+    // this chapter's own caption visible with no exit tween once revealed,
+    // and buildTimingMap()'s `total` already reflects this chapter's own
+    // `he` as the whole timeline's end — both automatic, index-driven, nothing
+    // to change here.
     key: "reassembly", transitionIn: 1.2, hold: 1.0,
     layer: { kind: "flat", slot: "explosion_main" },
     labelKey: "museumModeReassembly", subKey: "museumSubReassembly",
     text: { textless: true }
-  },
-  {
-    key: "complete", transitionIn: 1.4, hold: 3.4,
-    layer: { kind: "primary" },
-    labelKey: "museumModeComplete", subKey: "museumSubComplete",
-    // No dim here on purpose: the closing state must resolve calm and bright.
-    text: { primary: "bridge_overview_structure", detailExtended: true }
   }
 ];
 
@@ -510,7 +545,8 @@ export function buildMuseumScrollExperience({
   const R = !!reducedMotion;
   const mv = (v) => (R ? 0 : v); // translation / rotation offsets
   const ms = (v) => (R ? 1 : v); // scale factors
-  const canBlur = !R && window.matchMedia("(min-width: 900px)").matches;
+  // GROUP B FINAL CONTENT FLOW CORRECTION (this task): canBlur removed —
+  // its only consumer was the now-removed "complete" chapter's own tween.
 
   // -- typography ----------------------------------------------------------
   // The ZT typography system is handed THIS file's own deterministic
@@ -701,51 +737,22 @@ export function buildMuseumScrollExperience({
     // ---------- OBJECT ----------
     if (i === 0) {
       // Calm start — no entrance motion at all (state set above).
-    } else if (ch.key === "opening") {
-      // T1 — the bridge itself pushes forward in depth. Same rigid layer,
-      // reframed as a whole (scale / translate / tilt), never warped.
-      tw(layer, m.tStart, m.tin, { scale: ms(1.18), y: mv(-14), rotateX: mv(3) }, "power1.inOut");
-
-      // PHASE 2.1 — OPENING is the chapter with the most unused stage: the
-      // panoramic bridge is a shallow ~7:1 band, so most of the portrait
-      // mobile stage is empty while the visitor waits for chapter 03. Rather
-      // than leaving that space blank, the exploded structure PRE-ENTERS here
-      // at low opacity from deep in the stage, spatially overlapping the still
-      // complete bridge — the structure visibly beginning to separate instead
-      // of a held pause. Strictly opacity/scale/translate on the WHOLE rigid
-      // image, consistent with every other transition in this module: no
-      // particles, no per-component motion, no split geometry.
-      // It is a fromTo() like every other tween, with its own non-overlapping
-      // time window, so it reverses exactly, and the jumpTo() below is legal
-      // because the layer is still at opacity 0 at this point (rule 4).
-      const emerging = chapterEls[i + 1];
-      if (emerging && emerging !== layer) {
-        jumpTo(emerging, { opacity: 0, scale: ms(0.58), y: mv(56), rotateX: 0, rotateY: 0 });
-        tw(
-          emerging,
-          m.tStart + m.tin * 0.55,
-          m.tin * 0.45 + ch.hold * 0.9,
-          { opacity: 0.16, scale: ms(0.72), y: mv(38) },
-          "power1.out"
-        );
-      }
-    } else if (ch.key === "exploded") {
-      // T2 — "the bridge opens": the camera keeps pushing until it passes
-      // THROUGH the bridge, and the component study emerges from inside it.
-      tw(prevLayer, m.tStart, m.tin * 0.72, {
-        opacity: 0, scale: ms(1.62), y: mv(-40), rotateX: mv(6)
-      }, "power2.in");
-      // PHASE 2.1 — this layer is no longer invisible when the chapter begins:
-      // OPENING already brought it in at opacity 0.16 / scale 0.72 / y 38, so
-      // the previous jumpTo() here would now be an ILLEGAL discontinuous reset
-      // on a VISIBLE element (rule 4) and would flicker. Replaced by a
-      // continuous first leg that tweens from the pre-entry state to exactly
-      // the values the old jumpTo() used to establish. Endpoints, timing and
-      // the resulting motion of the second leg are unchanged, so the settled
-      // chapter-03 state (opacity 1 / scale 1 / y 0 at tStart + tin) is
-      // byte-identical to before.
-      tw(layer, m.tStart, m.tin * 0.34, { opacity: 0.34, scale: ms(0.80), y: mv(28) }, "power1.inOut");
-      tw(layer, m.tStart + m.tin * 0.34, m.tin * 0.66, { opacity: 1, scale: 1, y: 0 }, "power2.out");
+      // GROUP B FINAL CONTENT FLOW CORRECTION (this task): this branch now
+      // covers "exploded" (formerly index 1 "opening", itself formerly index
+      // 1 after "overview" was removed in an earlier task — see the file
+      // header history for the full chain). Both of "exploded"'s own former
+      // dedicated tweens here (its T2 depth-push entrance, and the separate
+      // "opening"-authored pre-entry effect from two tasks ago) are gone for
+      // the same structural reason each time: buildTimingMap() forces tin=0
+      // at i===0 regardless of the chapter's own authored transitionIn, so
+      // there is no incoming-transition window left to author any entrance
+      // motion into — the calm/static first frame this branch already
+      // renders (explosion_main's own layer, per this chapter's `layer`
+      // definition) is a near-instantaneous backdrop: museum25d.js's
+      // SCRUB_ZONE_A spans this chapter's ENTIRE tStart->he span, so the
+      // disassembly transition video takes over as the sole visible layer
+      // within about one scroll tick of the pinned section engaging — this
+      // static frame is never a dwelled beat a visitor actually reads.
     } else if (ch.key === "reassembly") {
       // T8 — parts begin to converge: BAU recedes, the structural study
       // returns from a WIDER framing (components moving inward, not outward).
@@ -756,48 +763,21 @@ export function buildMuseumScrollExperience({
       tw(layer, m.tStart + m.tin * 0.35, m.tin * 0.65, {
         opacity: 1, scale: 1, y: 0, rotateY: 0
       }, "power2.out");
-    } else if (ch.key === "complete") {
-      // T9 — the resolve. The component study collapses inward and softens
-      // while the whole bridge arrives from depth and settles.
-      // PHASE 2.3B — scale-continuity fix: this chapter is now preceded (when
-      // overview_transition_assembly/disassembly resolve, see museum25d.js) by
-      // a large, dominant 9:16 assembly video occupying most of the stage.
-      // Settling all the way down to the chapter-01 rest scale (1) on its own
-      // final frame produced a visible size cut. COMPLETE_SETTLE_SCALE lands
-      // the bridge modestly larger than chapter 1 instead — closer to
-      // continuous with the video's presence — while staying inside the
-      // measured safe margin: bridge_alpha's bounding box already sits only
-      // ~1.11%/3.13% (left/right) of transparent PNG margin inside its own
-      // canvas (Phase 1B alpha-bbox decode) before the VISIBLE bridge
-      // geometry itself begins — worked out algebraically (center-preserving
-      // scale around the existing translateX(1.01%)-corrected optical
-      // centre) at BOTH 375px mobile and 1440px desktop, the real ceiling
-      // before the visible arches/towers start clipping is ~1.044-1.047x,
-      // consistent across breakpoints because it is a percentage-of-own-size
-      // constraint, not an absolute-pixel one. 1.035 stays safely under that
-      // with a real margin, verified with no visible clipping at
-      // 375/430/1440/1920. This is a small, geometrically-honest increase —
-      // bridge_alpha was already scaled to near its own ceiling in Phase 2.1,
-      // so there is little room left; the rest of the "video → static"
-      // continuity fix relies on the settle tween's timing/easing, not a
-      // dramatic size jump this asset cannot make without clipping.
-      // Chapter 1 (overview) is deliberately NOT touched — it has no
-      // preceding video and its scale-1 rest state remains the baseline.
-      const COMPLETE_SETTLE_SCALE = 1.035;
-      const outTo = { opacity: 0, scale: ms(0.92), y: mv(-8) };
-      if (canBlur && prevLayer) {
-        // Seed the filter state with the value the CSS already renders, so the
-        // tween's "from" is visually identical to the current appearance and
-        // the CSS drop-shadow is preserved through the blur.
-        jumpTo(prevLayer, { filter: `${FLAT_SHADOW} blur(0px)` });
-        outTo.filter = `${FLAT_SHADOW} blur(6px)`;
-      }
-      tw(prevLayer, m.tStart, m.tin * 0.66, outTo, "power1.inOut");
-      jumpTo(layer, { opacity: 0, scale: ms(1.34), y: mv(18), rotateX: mv(4), rotateY: 0 });
-      tw(layer, m.tStart + m.tin * 0.30, m.tin * 0.70, {
-        opacity: 1, scale: ms(COMPLETE_SETTLE_SCALE), y: 0, rotateX: 0
-      }, "power2.out");
     } else {
+      // GROUP B FINAL CONTENT FLOW CORRECTION (this task): the former
+      // closing chapter "complete" (bridge_alpha's own T9 "resolve" tween —
+      // the component study collapsing inward while the whole bridge arrived
+      // from depth and settled at a COMPLETE_SETTLE_SCALE of 1.035, tuned in
+      // an earlier phase for continuity with the then-preceding assembly
+      // video) was removed from CHAPTER_SCRIPT per owner request: the
+      // reassembly video's own held final frame now IS the closing complete-
+      // bridge state (see museum25d.js's SCRUB_ZONE_B, which now spans the
+      // 'reassembly' chapter's entire span), so a second, separate
+      // bridge_alpha "arrival" immediately afterward was a redundant, visibly
+      // duplicate panel. That branch's full reasoning (the settle-scale
+      // math, the blur-continuity handling) is preserved in this file's git
+      // history rather than deleted silently, in case a future task
+      // reintroduces a distinct closing chapter.
       depthTransition(prevLayer, layer, m.tStart, m.tin);
     }
 

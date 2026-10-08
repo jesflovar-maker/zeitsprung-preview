@@ -45,7 +45,7 @@
    ============================================================================ */
 
 import { createZtTypography, ztVisualLength } from "./zt-typography.js";
-import { KFRAMES_MANIFEST_URL, KFRAMES_DEFAULT_ASSET_BASE, STEINERNE_SOURCES_URL } from "../../js/zt-paths.js";
+import { KFRAMES_MANIFEST_URL, KFRAMES_DEFAULT_ASSET_BASE, KFRAMES_4K_WEB_BASE, STEINERNE_SOURCES_URL } from "../../js/zt-paths.js";
 
 const MANIFEST_URL = KFRAMES_MANIFEST_URL;
 // Phase 2.7C.3, Section 3 — monument-scoped source registry (mirrors
@@ -206,7 +206,15 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
   // `null`, see KFRAMES_STORY_MAP.json's asset_base_note) so this line does
   // not become a second, competing path authority.
   const assetBase = (KFRAMES_DEFAULT_ASSET_BASE || manifest.asset_base).replace(/\/$/, "");
-  const resolveUrl = (frame) => encodeURI(`${assetBase}/${frame.asset}`);
+  const legacyUrl = (frame) => encodeURI(`${assetBase}/${frame.asset}`);
+  // 4K series: pick ONE derivative width per session from the physical pixel
+  // width (720w for phones at 1x/2x, 1080w otherwise) so the preload cache and
+  // the visible <img> always share the exact same URL. Frames without an
+  // `asset_web4k` (or if that file 404s, see imgError below) use the legacy PNG.
+  const web4kWidth = (Math.max(window.innerWidth, 1) * (window.devicePixelRatio || 1) > 900 && window.innerWidth >= 700) ? 1080 : 720;
+  const resolveUrl = (frame) => frame.asset_web4k
+    ? encodeURI(`${KFRAMES_4K_WEB_BASE}/${frame.asset_web4k}_${web4kWidth}_v01.webp`)
+    : legacyUrl(frame);
 
   const sticky = document.getElementById("kfSticky");
   const imgA = document.getElementById("kfImgA");
@@ -236,7 +244,12 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
     k12: "center 50%"
   };
 
-  frames.forEach((f) => { f.__url = resolveUrl(f); f.__position = FRAME_POSITION[f.id] || "center 52%"; });
+  frames.forEach((f) => { f.__url = resolveUrl(f); f.__position = f.asset_web4k ? "center 60%" : (FRAME_POSITION[f.id] || "center 52%"); });
+  // Any 4K derivative that fails to load falls back to the legacy asset once.
+  [imgA, imgB].forEach((im) => im.addEventListener("error", () => {
+    const f = frames.find((x) => x.__url === im.getAttribute("src") || encodeURI(x.__url) === im.getAttribute("src"));
+    if (f && f.asset_web4k) { f.__url = legacyUrl(f); f.__position = FRAME_POSITION[f.id] || "center 52%"; im.src = f.__url; im.style.objectPosition = f.__position; }
+  }));
 
   // -- lazy image cache: current + previous + next ONLY -------------------
   // No <img> ever gets a src the visitor is not within one frame of. Moving
@@ -420,7 +433,7 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
     dotsWrap.querySelectorAll(".kf__dot").forEach((d) => {
       d.classList.toggle("is-active", Number(d.dataset.index) === idx);
     });
-    counterEl.textContent = `K${String(frames[idx].order).padStart(2, "0")} / ${frames.length}`;
+    counterEl.textContent = `${String(frames[idx].order).padStart(2, "0")} / ${String(frames.length).padStart(2, "0")}`;
   }
 
   // -------------------------------------------------------------------

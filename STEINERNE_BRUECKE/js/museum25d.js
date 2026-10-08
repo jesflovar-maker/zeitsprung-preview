@@ -103,45 +103,54 @@ const ROLE_DISASSEMBLY = "disassembly";
 //     handoff from bridge_alpha directly to the video's own opening
 //     "complete bridge" frame, which is visually similar enough that this
 //     reads as continuous rather than jarring).
-//   ZONE B (assembly video), RETIMED (this task, "FINAL STAGE CLEANUP" owner
-//     fix): originally spanned chapter 09 REASSEMBLY's own tStart through
-//     chapter 10 COMPLETE's own he (i.e. the ENTIRE span of chapter 10 too),
-//     on the assumption the video's own last frame already conveys "the
-//     resolved complete bridge" so chapter 10 didn't need a separate reveal.
-//     Live-browser QA with REAL incremental scrolling (not jump-based —
-//     jump-based sampling gave false readings here, since GSAP's scrubbed
-//     timeline does not always re-render every intermediate tween state
-//     correctly for a large instantaneous progress jump) found a genuine,
-//     SUSTAINED double-visual: from progress ~0.911 to 1.0 (the back ~40%
-//     of chapter 10's own span), primaryOuter (bridge_alpha, chapter 10's
-//     OWN unsuppressed entrance tween, deliberately left untouched by the
-//     suppression guard below) climbs back to opacity 1 WHILE the assembly
-//     video (still "in zone" under the old boundary) is ALSO at opacity 1 —
-//     exactly the "residual background bridge behind the module" the owner
-//     reported for steps 09/10. Fix: Zone B now ends at chapter 10 COMPLETE's
-//     own `tStart` instead of its `he` — the video is the sole visual for
-//     chapter 09 REASSEMBLY only, handing off cleanly the INSTANT chapter 10
-//     begins, at which point chapter 10's own entrance tween (still
-//     completely unmodified) is free to bring primaryOuter up to its "calm
-//     and bright" resolved state with nothing else on screen — matching the
-//     owner's explicit spec: step 09 = video only, step 10 = image only.
+//   ZONE B (assembly video), RETIMED AGAIN (GROUP B FINAL CONTENT FLOW
+//     CORRECTION, this task): previously spanned chapter 09 REASSEMBLY's own
+//     tStart through chapter 10 COMPLETE's own tStart, handing off cleanly to
+//     chapter 10's separate bridge_alpha "arrival" tween the instant chapter
+//     10 began (see the git history of this comment for that fix's own
+//     reasoning). Chapter 10 "complete" has now been REMOVED from
+//     CHAPTER_SCRIPT entirely per owner request: showing bridge_alpha arrive
+//     a second time, right after the assembly video's own last frame already
+//     held on that exact same complete bridge, was a redundant duplicate
+//     panel. 'reassembly' is now the LAST chapter, so Zone B is redefined to
+//     span 'reassembly'.tStart -> 'reassembly'.he (its own ENTIRE span,
+//     mirroring exactly how Zone A already spans 'exploded's entire span) —
+//     the video is the sole visual for the whole reassembly chapter, and
+//     since 'reassembly'.he now equals the timeline's own `total` (it is the
+//     final chapter), Zone B's end is simultaneously "the end of this
+//     chapter" and "the end of the whole pinned sequence": the video plays
+//     through and, on 'ended', simply holds its own last frame (default
+//     <video> behaviour, no code needed) for as long as the visitor remains
+//     within the pin — which is what now visually closes the module, with no
+//     separate closing chapter/panel required.
 const SCRUB_TIMING = buildTimingMap(CHAPTER_SCRIPT);
 const SCRUB_CHAPTER_INDEX = (key) => CHAPTER_SCRIPT.findIndex((c) => c.key === key);
 const SCRUB_EXPLODED_IDX = SCRUB_CHAPTER_INDEX("exploded");
 const SCRUB_REASSEMBLY_IDX = SCRUB_CHAPTER_INDEX("reassembly");
-const SCRUB_COMPLETE_IDX = SCRUB_CHAPTER_INDEX("complete");
+// FINAL PRODUCTION CLOSURE (2026-10-08) — BLACK-GAP FIX. The disassembly video
+// used to be hidden the instant Zone A ended, while the next chapter's layer
+// (piers) only starts fading in 40% into its own transitionIn window and is
+// opaque at 100% — leaving ~200px of scroll with NO visible media (confirmed by
+// a per-50px visibility scan). `holdUntil` keeps the disassembly clip's last
+// frame on screen until the piers layer is ~96% opaque (tStart + 0.85*tin,
+// power2.out). Pure visibility window: playback/zone-entry logic is untouched.
+const SCRUB_PIERS_IDX = SCRUB_CHAPTER_INDEX("piers");
 const SCRUB_ZONE_A = {
   start: SCRUB_TIMING.marks[SCRUB_EXPLODED_IDX].tStart / SCRUB_TIMING.total,
-  end: SCRUB_TIMING.marks[SCRUB_EXPLODED_IDX].he / SCRUB_TIMING.total
+  end: SCRUB_TIMING.marks[SCRUB_EXPLODED_IDX].he / SCRUB_TIMING.total,
+  holdUntil: SCRUB_PIERS_IDX > 0
+    ? (SCRUB_TIMING.marks[SCRUB_PIERS_IDX].tStart + SCRUB_TIMING.marks[SCRUB_PIERS_IDX].tin * 0.85) / SCRUB_TIMING.total
+    : null
 };
 const SCRUB_ZONE_B = {
   start: SCRUB_TIMING.marks[SCRUB_REASSEMBLY_IDX].tStart / SCRUB_TIMING.total,
-  end: SCRUB_TIMING.marks[SCRUB_COMPLETE_IDX].tStart / SCRUB_TIMING.total
+  end: SCRUB_TIMING.marks[SCRUB_REASSEMBLY_IDX].he / SCRUB_TIMING.total
 };
-// Seek epsilon — identical threshold to the approved index-page hero scrub
-// (js/index-main.js's initHeroScrub SEEK_EPSILON), avoids reassigning
-// currentTime for negligible scroll deltas.
-const SCRUB_SEEK_EPSILON = 0.02;
+// GROUP B CONTENT EDIT — SHORT VERSION (this task): SCRUB_SEEK_EPSILON
+// (formerly used to avoid reassigning video.currentTime for negligible
+// scroll deltas) removed — zonePlayOne() no longer writes currentTime on
+// every tick, it plays the clip through once per zone-entry (see that
+// function's own comment), so no seek-dedup threshold is needed any more.
 
 // Fallback guide-line geometry, used only if a manifest section sets
 // guides:true but supplies no guide_points. Currently no section enables
@@ -202,12 +211,20 @@ const LOOP_CHAPTER_SFX = {
   deck: { move: "STONE_SLIDE", settle: "ASSEMBLY_LOCK", settleDelayMs: 800 }
 };
 
-// Transition-clip hooks (PHASE 2.3's playTransitionClip / settle). Only
-// "exploded" and "complete" currently resolve to a real transition clip at
-// runtime (piers/arches/deck/materials/construction all have a READY loop
-// instead, and the PHASE 2.3A loop-priority guard in onChapterChange below
-// already prevents triggerTransition() from ever being called for those —
-// see LOOP_CHAPTER_SFX above for their audio instead). `forward`/`reverse`
+// Transition-clip hooks (PHASE 2.3's playTransitionClip / settle). Neither
+// "exploded" nor "complete" is actually reachable through this ordinary
+// chapter-entry path today: both are scrub-flagged (see SCRUB_ZONE_A/B
+// above), so onChapterChange's own guard skips triggerTransition() for them
+// entirely — "exploded"'s clips run via zonePlayOne() instead, and
+// "complete" (the manifest's still-registered, still-dormant
+// overview_transition_assembly/disassembly primary_layer pair) never
+// resolves to a DOM element at all (see the discovery loop's
+// TRANSITION_TARGET_PRIMARY guard below). This map/registration is kept for
+// schema completeness and for any FUTURE non-scrub transition-paired chapter
+// (piers/arches/deck/materials/construction all have a READY loop instead,
+// and the PHASE 2.3A loop-priority guard in onChapterChange below already
+// prevents triggerTransition() from ever being called for those too — see
+// LOOP_CHAPTER_SFX above for their audio instead). `forward`/`reverse`
 // map to entry.forwardRole vs the opposite role (see playTransitionClip
 // call site below) — reverse gets the softer REVEAL_SOFT cue per the spec's
 // "reverse scroll may use a softer sound" option, rather than suppressing it
@@ -382,7 +399,17 @@ const FIT_DEFAULTS = {
   portrait_focus: { alignX: "center", alignY: "center", backgroundMode: "none" },
   contain_tall: { alignX: "center", alignY: "center", backgroundMode: "none" },
   contain_wide: { alignX: "center", alignY: "center", backgroundMode: "framed" },
-  detail_card: { alignX: "center", alignY: "center", backgroundMode: "framed" }
+  detail_card: { alignX: "center", alignY: "center", backgroundMode: "framed" },
+  // MATERIAL — TRUE FULL SCREEN (this task) — new mode, generic like every
+  // other one above (branches on the mode NAME only, never on slot_id).
+  // Every mode above only ever caps max-width/max-height and leaves the
+  // shared `.museum__flat-img{object-fit:contain}` base rule in charge, so a
+  // 9:16 clip always letterboxes inside a wider stage box. full_cover is for
+  // a slot that has explicitly asked to fill its box edge-to-edge instead,
+  // cropping rather than letterboxing — see the matching
+  // `.museum__fit--full-cover` CSS rule (sets width/height:100% and
+  // object-fit:cover, unlike every other fit-mode rule).
+  full_cover: { alignX: "center", alignY: "center", backgroundMode: "none" }
 };
 const FIT_MODES = Object.keys(FIT_DEFAULTS);
 const BG_MODES = ["none", "soft-glow", "framed"];
@@ -550,15 +577,23 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
   const loopLayers = {};        // chapterKey -> { el, resolved, target }
   const loopVideos = [];        // every created <video>, for the play/pause gate
   const videoPreloadQueue = []; // { el, url } — src assigned in ensureAssets()
+  // MATERIAL PING-PONG (this task) — every loop slot whose playback.ping_pong
+  // is true (currently only materials_loop; generic, not slot_id-gated) gets
+  // pushed here instead of relying on native `loop`. See the dedicated
+  // ticker below (search "PING-PONG DRIVER") for the playback mechanism.
+  const pingPongLoops = []; // { el, chapterKey, direction: 1|-1 }
 
   (registry.manifest.slots || []).forEach((slot) => {
     if (!slot || slot.type !== LOOP_TYPE || !slot.chapter_key) return;
     const resolved = resolveSlot(registry, slot.slot_id);
     if (!resolved.ok) return; // PENDING / DISABLED / no file_path -> still image
     const target = slot.render_target || "flat_layer";
+    const isPingPong = !!(slot.playback && slot.playback.ping_pong === true);
 
     if (target === LOOP_TARGET_PENDING) {
-      // bau_loop_01's proven path, preserved exactly.
+      // bau_loop_01's proven path, preserved exactly. ping_pong is not
+      // supported on the pending_layer target (no slot has requested it);
+      // BAU keeps its native loop=true unconditionally, as before.
       if (!pendingVideo || !pendingLayer) return;
       pendingVideo.hidden = false;
       pendingLayer.classList.add("museum__pending--video-ready");
@@ -573,12 +608,18 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     v.className = "museum__flat-img museum__loop-video";
     v.setAttribute("data-slot", slot.slot_id);
     v.setAttribute("aria-hidden", "true");
-    v.muted = true; v.loop = true; v.controls = false;
+    // MATERIAL PING-PONG (this task): native `loop` stays true for every
+    // OTHER slot (pfeiler/boegen/fahrbahn/bau), unchanged. A ping_pong slot
+    // gets loop=false instead — with loop=true a looping video's `ended`
+    // event never fires at all (the browser seeks back to 0 and keeps
+    // playing before JS ever sees it), which would make the forward-end
+    // detection the ticker below relies on impossible to observe.
+    v.muted = true; v.loop = !isPingPong; v.controls = false;
     v.playsInline = true;
     // Attributes as well as properties: iOS/Safari inline autoplay needs the
     // literal attributes present in the markup, not only the DOM properties.
     v.setAttribute("muted", "");
-    v.setAttribute("loop", "");
+    if (!isPingPong) v.setAttribute("loop", ""); // matches the loop PROPERTY above
     v.setAttribute("playsinline", "");
     v.setAttribute("webkit-playsinline", "");
     v.setAttribute("disablepictureinpicture", "");
@@ -590,6 +631,7 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     videoPreloadQueue.push({ el: v, url: resolved.url });
     loopVideos.push(v);
     loopLayers[slot.chapter_key] = { el: v, video: v, resolved, target };
+    if (isPingPong) pingPongLoops.push({ el: v, chapterKey: slot.chapter_key, direction: 1 });
   });
 
   // Play/pause gate. TWO conditions must both hold for a loop to run:
@@ -932,6 +974,77 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
   }
 
   // -------------------------------------------------------------------
+  // MATERIAL PING-PONG DRIVER (this task) — generic, drives every entry in
+  // pingPongLoops (currently only materials_loop; nothing here is gated on
+  // slot_id). No browser reliably supports negative video.playbackRate, so
+  // "play backward" is simulated the standard way: let the clip play FORWARD
+  // natively to its own end, then take over and manually step currentTime
+  // BACKWARD in real time until 0, then hand back to native forward
+  // playback — repeating indefinitely, with no pause inserted at either
+  // turnaround (the direction flip happens within the same tick that
+  // detects it).
+  //
+  // Runs as its own gsap.ticker callback, exactly like the suppression guard
+  // above and for the same reason: it needs to reassert its own state every
+  // single frame, independently of scroll events, because syncLoopPlayback()
+  // — unrelated, untouched, still governing pfeiler/boegen/fahrbahn/bau
+  // exactly as before — calls pauseAllMotionVideos(null) then play() on
+  // every chapter change and viewport-visibility toggle. That is harmless
+  // during the FORWARD phase (a stray play() on an already-playing/about-to-
+  // play element is a no-op), but during the REVERSE phase a stray play()
+  // would resume NATIVE forward playback from wherever currentTime happens
+  // to be mid-reverse, breaking the illusion. Rather than special-casing
+  // syncLoopPlayback() itself (shared code, used by every other loop
+  // chapter), this driver simply re-pauses on the very next frame if it
+  // finds itself un-paused while it owns the reverse phase — the same
+  // self-healing pattern already used for the bridge's own zonePlayOne().
+  if (pingPongLoops.length && window.gsap) {
+    gsap.ticker.add((time, deltaTime) => {
+      const dtSec = Math.min(Math.max((deltaTime || 16.7) / 1000, 0), 0.25); // clamp a
+                                                                              // tab-backgrounding
+                                                                              // stall to 250ms of
+                                                                              // simulated reverse
+                                                                              // motion, never a jump
+      pingPongLoops.forEach((s) => {
+        const shouldRun = sectionInView && activeChapterKey === s.chapterKey;
+        if (!shouldRun) {
+          if (!s.el.paused) { try { s.el.pause(); } catch (err) {} }
+          return;
+        }
+        if (s.direction === 1) {
+          // FORWARD — native playback owns the clip. Self-heal: resume if
+          // something else (syncLoopPlayback, a tab-visibility pause) left
+          // it paused mid-forward.
+          if (s.el.paused && !s.el.ended) {
+            const p = s.el.play();
+            if (p && typeof p.catch === "function") p.catch(() => {});
+          }
+          const dur = s.el.duration;
+          const atEnd = s.el.ended || (dur > 0 && isFinite(dur) && s.el.currentTime >= dur - 0.05);
+          if (atEnd) {
+            s.direction = -1;
+            try { s.el.pause(); } catch (err) {}
+          }
+        } else {
+          // REVERSE — this driver owns currentTime directly; native playback
+          // must stay paused for the whole phase (self-heal every tick).
+          if (!s.el.paused) { try { s.el.pause(); } catch (err) {} }
+          let next = s.el.currentTime - dtSec;
+          if (next <= 0) {
+            next = 0;
+            s.direction = 1;
+          }
+          try { s.el.currentTime = next; } catch (err) { /* not yet seekable — retried next tick */ }
+          if (s.direction === 1) {
+            const p = s.el.play();
+            if (p && typeof p.catch === "function") p.catch(() => {});
+          }
+        }
+      });
+    });
+  }
+
+  // -------------------------------------------------------------------
   // PHASE 3.2 (this task) — SCROLL-SCRUBBED COMPLETE<->EXPLODED VIDEO.
   // Reuses the EXACT scrub technique already approved for the index page's
   // hero build video (js/index-main.js's initHeroScrub): scroll progress is
@@ -963,8 +1076,8 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
   const scrubDisassemblyEl = (scrubPair && scrubPair.disassembly && scrubPair.disassembly.el) || null;
   const scrubAssemblyEl = (scrubPair && scrubPair.assembly && scrubPair.assembly.el) || null;
   const scrubVideoState = {
-    dis: { el: scrubDisassemblyEl, zone: SCRUB_ZONE_A, lastTarget: -1, visible: false },
-    asm: { el: scrubAssemblyEl, zone: SCRUB_ZONE_B, lastTarget: -1, visible: false }
+    dis: { el: scrubDisassemblyEl, zone: SCRUB_ZONE_A, visible: false },
+    asm: { el: scrubAssemblyEl, zone: SCRUB_ZONE_B, visible: false }
   };
 
   function scrubSetVisible(s, visible) {
@@ -973,24 +1086,82 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     if (visible) showTransitionEl(s.el); else hideTransitionEl(s.el);
   }
 
-  function scrubOne(s, progress) {
+  // GROUP B CONTENT EDIT — SHORT VERSION (this task): renamed from scrubOne().
+  // Zone detection (SCRUB_ZONE_A/B, computed above) is UNCHANGED — this still
+  // decides WHEN each element should be the visible/active one for its
+  // direction. What changed is what happens once inside the zone: instead of
+  // mapping scroll progress directly onto video.currentTime every tick (the
+  // PHASE 3.2 behaviour), this now plays the clip through ONCE at its own
+  // natural rate, per the owner's explicit instruction that this section must
+  // "reproducirse automáticamente de principio a fin... sin frenarse con el
+  // scroll". The element is shown and v.play() is called exactly once, the
+  // first tick progress enters the zone (transition false->true); nothing
+  // else is written to it on subsequent in-zone ticks — the browser's own
+  // playback clock owns it from there. If it reaches its natural 'ended'
+  // state while progress is still inside the zone, this function does
+  // nothing further: a <video> holds its last decoded frame by default once
+  // playback stops, which is exactly what keeps the section "showing" its
+  // resolved state (for the assembly clip, the fully reassembled bridge —
+  // see ASSET_SWAP_MAP.json's note on this slot) instead of cutting back to a
+  // static image mid-scroll. Only when progress actually LEAVES the zone
+  // (transition true->false, either direction) is the element paused and
+  // hidden, hand-off to that boundary chapter's own normal presentation —
+  // the same hand-off every other one-shot transition pair in this module
+  // already performs on a chapter change (see settleOtherTransitions above).
+  function zonePlayOne(s, progress) {
     if (!s.el) return;
     const inZone = progress >= s.zone.start && progress <= s.zone.end;
-    scrubSetVisible(s, inZone);
-    if (!inZone) return;
-    const duration = s.el.duration;
-    if (!(duration > 0) || !isFinite(duration)) return; // metadata not yet loaded — next tick retries, same guard as initHeroScrub
-    const span = Math.max(s.zone.end - s.zone.start, 0.0001);
-    const local = Math.min(Math.max((progress - s.zone.start) / span, 0), 1);
-    const target = Math.min(local * duration, duration - SCRUB_SEEK_EPSILON);
-    if (Math.abs(target - s.lastTarget) > SCRUB_SEEK_EPSILON) {
-      try { s.el.currentTime = target; s.lastTarget = target; } catch (err) { /* not yet seekable — next tick retries */ }
+    // Held-last-frame band after the zone (see SCRUB_ZONE_A.holdUntil).
+    const inHold = !inZone && s.zone.holdUntil != null && progress > s.zone.end && progress <= s.zone.holdUntil;
+    if (inHold) {
+      if (!s.visible) {
+        // Re-entering the band while scrolling BACK: show the clip parked on its final frame.
+        scrubSetVisible(s, true);
+        try { s.el.pause(); if (isFinite(s.el.duration)) s.el.currentTime = Math.max(0, s.el.duration - 0.04); } catch (err) {}
+      }
+      return;
     }
+    if (inZone && !s.visible) {
+      scrubSetVisible(s, true);
+      pauseAllMotionVideos(s.el); // single-active-video-decoder rule, same
+                                   // guarantee playTransitionClip() gives the
+                                   // ordinary one-shot pairs.
+      try { s.el.currentTime = 0; } catch (err) { /* not yet seekable — plays from wherever it lands */ }
+      const p = s.el.play();
+      if (p && typeof p.catch === "function") p.catch(() => {}); // autoplay/decoding
+                                                                   // failure -> stays
+                                                                   // on its first frame,
+                                                                   // never a stuck blank video
+    } else if (!inZone && s.visible) {
+      scrubSetVisible(s, false);
+      try { s.el.pause(); } catch (err) {}
+    } else if (inZone && s.visible && s.el.paused && !s.el.ended) {
+      // SELF-HEALING RESUME (live-QA fix, this task): syncLoopPlayback()
+      // calls pauseAllMotionVideos(null) — pausing EVERY motion video,
+      // unconditionally — on every single onChapterChange event, including
+      // one that lands INSIDE this element's own zone (e.g. the chapter
+      // boundary the zone starts at). That pre-existing, unrelated behavior
+      // is correct and untouched for every other chapter; it simply used to
+      // be harmless for THIS pair because the old scrub mechanism never
+      // called .play() at all. Confirmed live: without this branch, a
+      // chapter-change tick landing mid-zone could pause this element right
+      // after it started and it would never resume, holding a random early
+      // frame instead of playing through. Resuming in place (not
+      // restarting, not touched if already .ended) makes the one-shot
+      // playthrough robust to that interaction without changing
+      // syncLoopPlayback()/pauseAllMotionVideos() themselves.
+      const p = s.el.play();
+      if (p && typeof p.catch === "function") p.catch(() => {});
+    }
+    // else: either still inside the zone and already playing/settled (left
+    // alone, no restart) or still outside it (nothing to do).
   }
 
   function hideAllScrubVideos() {
     scrubSetVisible(scrubVideoState.dis, false);
     scrubSetVisible(scrubVideoState.asm, false);
+    try { if (scrubVideoState.dis.el) scrubVideoState.dis.el.pause(); } catch (err) {}
+    try { if (scrubVideoState.asm.el) scrubVideoState.asm.el.pause(); } catch (err) {}
   }
 
   const hasScrubVideos = !!(scrubDisassemblyEl || scrubAssemblyEl);
@@ -1053,25 +1224,85 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
   // whether Zone A is active right now, and which side of Zone A the last
   // known progress sits on:
   //   - inside Zone A                  -> 0 (suppressed, video only)
-  //   - outside Zone A, before its start -> 1 (chapters overview/opening's
-  //     true resting state — the only place primaryOuter is ever supposed
-  //     to be visible before 'complete')
-  //   - outside Zone A, at/after its end -> left UNTOUCHED. This is
-  //     deliberate, not a gap: chapters piers through reassembly never
-  //     needed this element before this fix existed either, and chapter 10
-  //     COMPLETE's own entrance tween does an absolute gsap.set()/jumpTo()
-  //     on this same element when its own time comes — it will correctly
-  //     overwrite whatever this guard last left here, so asserting "0" all
-  //     the way out to complete would fight that later tween for no
-  //     reason, and Zone B (asm) intentionally does not suppress
-  //     primaryOuter itself (out of scope for this task, untouched from
-  //     the prior approved round).
+  //   - outside Zone A, before its start -> 1 (GROUP B FINAL CONTENT FLOW
+  //     CORRECTION, this task: with 'exploded' now chapter 0, Zone A's own
+  //     start is exactly 0 — this branch is therefore now permanently
+  //     unreachable, progress can never be < 0 — kept only because it is
+  //     still correct/harmless and removing it would add risk for no
+  //     benefit; primaryOuter has no "before Zone A" resting state left to
+  //     assert since there is no chapter before 'exploded' any more)
+  //   - outside Zone A, at/after its end -> left UNTOUCHED. GROUP B FINAL
+  //     CONTENT FLOW CORRECTION (this task): chapter 10 "complete" — whose
+  //     own entrance tween used to bring primaryOuter back for the closing
+  //     beat, which is what this branch originally deferred to — has been
+  //     REMOVED from CHAPTER_SCRIPT. No chapter is `kind:"primary"` any
+  //     more, so primaryOuter no longer appears in chapterEls/uniqueEls at
+  //     all and nothing in museum2d-scroll.js ever touches its opacity
+  //     again after this guard first suppresses it entering Zone A — it
+  //     simply stays at 0 for the rest of the module's lifetime, which is
+  //     correct: the closing "complete bridge" state is now the assembly
+  //     video's own held last frame (Zone B), not a second bridge_alpha
+  //     arrival. Zone B (asm) still intentionally does not suppress
+  //     primaryOuter itself — it has nothing left to suppress by that point.
+  // GROUP B FINAL CONTENT FLOW CORRECTION (this task) — third suppression
+  // target added: `pendingLayer` (#museumPending / .museum__pending, the
+  // element the CONSTRUCTION chapter's bau_loop_01 video tweens directly,
+  // since its render_target is "pending_layer" rather than "flat_layer").
+  // Zone B now starts exactly at 'reassembly'.tStart, same boundary as
+  // before this task — but the caption/chapter-active window used by
+  // museum2d-scroll.js's own chapterAt() is intentionally WIDER than a raw
+  // chapter's tStart->he span (it extends half of the NEXT chapter's own
+  // transitionIn past `he`, so captions overlap-crossfade instead of
+  // cutting). That means CONSTRUCTION's own exit fade (driven by its
+  // pendingLayer opacity tween) is still legitimately mid-transition for a
+  // short span AFTER Zone B has already started showing the assembly video.
+  // Live QA (this task) caught it directly: at a held scroll position
+  // inside that overlap, `.museum__pending` measured opacity 0.4471 while
+  // the assembly video was simultaneously opacity 1 — and because
+  // `.museum__pending` shares #museumFlat's own z-index (2) and comes AFTER
+  // it in the DOM, the partially-faded BAU/crane scene painted OVER the
+  // video, not under it, reading as a genuine double-visual/wrong-content
+  // glitch rather than a normal brief crossfade. Same fix pattern as
+  // explosionMainEl below: force it to 0 for exactly the span Zone B's
+  // video is visible, leave it under construction's own untouched tween
+  // control everywhere else (its normal entrance/exit for chapters
+  // materials<->construction<->reassembly, none of which are inside Zone
+  // B). Zone A has no equivalent risk — BAU/pending is nowhere near the
+  // exploded chapter — so this is gated on `asm.visible` only, not
+  // `suppressShared`.
   const explosionMainEl = (flatLayers.explosion_main && flatLayers.explosion_main.el) || null;
   let scrubLastProgress = 0;
-  if ((explosionMainEl || primaryOuter) && window.gsap) {
+  if ((explosionMainEl || primaryOuter || pendingLayer) && window.gsap) {
     gsap.ticker.add(() => {
       const suppressShared = scrubVideoState.dis.visible || scrubVideoState.asm.visible;
       if (explosionMainEl) explosionMainEl.style.opacity = suppressShared ? "0" : "";
+      // CONTENT FIX — RESTORE MATERIAL + BAU ONLY (this task): the "" release
+      // pattern used below for explosionMainEl is WRONG for pendingLayer and
+      // was the actual regression the owner reported ("La obra: cimbra y
+      // grúa" showing text/background only, no video). Root cause, confirmed
+      // live: `.museum__pending`'s own CSS default is `opacity: 0` (see
+      // style.css) — GSAP's construction-chapter tween writes a real inline
+      // opacity (e.g. 1) directly to this SAME element every frame it is
+      // scrubbing, but this ticker callback runs AFTER that render (by
+      // design, see the comment block above) and, when NOT suppressing,
+      // immediately ERASED that inline style back to "" — which does not
+      // mean "let GSAP's value show", it means "fall back to the CSS
+      // default", i.e. invisible, EVERY single frame, permanently, any time
+      // construction was the active chapter. explosionMainEl/primaryOuter do
+      // not exhibit this because their own "on" chapters ('exploded'/
+      // 'reassembly'/'complete') are ENTIRELY covered by Zone A/B suppression
+      // by design already (video-only, no static image ever) — their real
+      // GSAP-driven opacity is never actually needed to reach a visible value
+      // anywhere, so the same "" pattern never had a visible chapter to
+      // break. CONSTRUCTION is not covered by any zone, so its own tweened
+      // opacity genuinely needs to reach the DOM. Fix: only ever WRITE "0"
+      // while Zone B's assembly video is actually visible (the brief,
+      // legitimate crossfade-overlap window at the construction->reassembly
+      // boundary this guard exists for); do nothing at every other tick, so
+      // GSAP's own tween is never fought outside that narrow window. Bridge
+      // Zone A/B behavior itself (dis/asm triggering, autoplay, held end
+      // frame) is untouched by this one-line change.
+      if (pendingLayer && scrubVideoState.asm.visible) pendingLayer.style.opacity = "0";
       if (primaryOuter) {
         if (scrubVideoState.dis.visible) primaryOuter.style.opacity = "0";
         else if (scrubLastProgress < SCRUB_ZONE_A.start) primaryOuter.style.opacity = "1";
@@ -1088,8 +1319,8 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     scrubLastProgress = progress;
     if (!hasScrubVideos) return;
     if (!sectionInView || document.hidden) { hideAllScrubVideos(); return; }
-    scrubOne(scrubVideoState.dis, progress);
-    scrubOne(scrubVideoState.asm, progress);
+    zonePlayOne(scrubVideoState.dis, progress);
+    zonePlayOne(scrubVideoState.asm, progress);
   }
 
   if (loopVideos.length || transitionVideos.length) {

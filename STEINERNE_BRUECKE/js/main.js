@@ -17,6 +17,8 @@ import { DICT, getInitialLang, setLang, applyI18n, t } from "./i18n.js";
 import { buildPortal } from "./portal.js";
 import { initMuseum25D } from "./museum25d.js";
 import { initKframesGallery } from "./kframes-gallery.js";
+import { initMediaFeatures } from "../../js/media-feature.js";
+import { STEINERNE_VIDEO_WEB4_BASE } from "../../js/zt-paths.js";
 import { initBruckmandl } from "./bruckmandl.js";
 import { initBruckmandlHotspotBridge } from "./bruckmandl-hotspot-bridge.js";
 // Technical DOM event name only (not QA/provider data) — reused verbatim
@@ -479,6 +481,7 @@ function populateLangButtons() {
       renderFacts();
       if (museumApi) museumApi.refreshLabels();
       if (kframesApi) kframesApi.refreshLabels();
+      if (mediaFeatureApi) mediaFeatureApi.refreshLabels();
       if (bruckmandlApi) bruckmandlApi.refreshLabels();
       const introStartBtn = document.getElementById("introStartBtn");
       if (introStartBtn) introStartBtn.textContent = t(lang, "introStart");
@@ -880,6 +883,7 @@ function initLenisAndScroll() {
   // Fix: wireMuseum25D() now returns its init promise; kframes is wired
   // only once that promise settles, so its own ScrollTrigger.create() can
   // never run before the museum's pin-spacer is in the DOM.
+  wireMediaFeatures();
   wireMuseum25D(lenis).then(() => wireKframesGallery(lenis)).then(() => wireBruckmandl(lenis));
   // buildHistoricalReel() / buildVideoChapter() calls removed — CONTENT
   // HOTFIX (both functions themselves also deleted, see their removal note
@@ -1113,6 +1117,19 @@ function wireMuseum25D(lenis) {
 // before the visitor scrolls this far down the page).
 // ---------------------------------------------------------------------------
 let kframesApi = null;
+let mediaFeatureApi = null;
+
+// 2026-10-08 — trailer / timeline film / bridge route. Poster-first, lazy
+// video (see js/media-feature.js). No scroll listeners, no RAF.
+function wireMediaFeatures() {
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  mediaFeatureApi = initMediaFeatures({
+    root: document,
+    base: STEINERNE_VIDEO_WEB4_BASE,
+    playLabel: () => t(lang, "mfPlay"),
+    reducedMotion
+  });
+}
 
 function wireKframesGallery(lenis) {
   const section = document.getElementById("kframesGallery");

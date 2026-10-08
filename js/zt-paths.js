@@ -88,6 +88,10 @@ export const SFX_ROOT = WEB_ROOT + "audio/sfx";
 export const STEINERNE_ASSET_BASE = ASSETS_ROOT + "Steinerne_Bruecke";
 export const KFRAMES_MANIFEST_URL = STEINERNE_ASSET_BASE + "/2d/KFRAMES_STORY_MAP.json";
 export const KFRAMES_DEFAULT_ASSET_BASE = STEINERNE_ASSET_BASE + "/2d/KFRAMES";
+// Web-optimized WebP derivatives of the owner 4K K-Frame series (sb_kNN_{1080,720}_v01.webp). Source masters stay in 00_GLOBAL_INBOX/OWNER_UPLOAD_*.
+export const KFRAMES_4K_WEB_BASE = STEINERNE_ASSET_BASE + "/2d/KFRAMES_4K_WEB";
+// Web derivatives (H.264/yuv420p/faststart + posters) of the owner trailer / timeline film / bridge route videos.
+export const STEINERNE_VIDEO_WEB4_BASE = STEINERNE_ASSET_BASE + "/VIDEO/WEB4";
 export const ASSET_SWAP_MANIFEST_URL = STEINERNE_ASSET_BASE + "/2d/ASSET_SWAP_MAP.json";
 export const MUSEUM_CONTENT_MAP_URL = STEINERNE_ASSET_BASE + "/2d/MUSEUM_CONTENT_MAP.json";
 export const STEINERNE_GLB_URL = STEINERNE_ASSET_BASE + "/3D_GLB/STEINERNE_BRUECKE_EXPLODED_MASTER_v1.glb";
