@@ -46,6 +46,21 @@ function pick(obj, lang) {
 }
 
 import { activate, deactivate } from "./video-playback.js?v=20260905";
+import { ZT_PATHS } from "./zt-paths.js";
+
+// INTERACTIVE ROUTE TRAILER (2026-10-09). Generic, config-driven: a monument may
+// carry `interactive_route: { media_type:"trailer", trailer_src, poster_src, base,
+// aspect_ratio, preload, autoplay, muted, loop, playsinline }` in
+// monuments.config.json. With an approved trailer the route panel shows its
+// poster + an intentional play button (audio, user-initiated); WITHOUT one
+// (null/absent) the panel keeps the static poster/hero — never an empty player.
+const ROUTE_PLAY_LABEL = { de: "Trailer abspielen", en: "Play trailer", es: "Reproducir tráiler" };
+function routeMedia(m) {
+  const ir = m && m.interactive_route;
+  if (!ir || ir.media_type !== "trailer" || !ir.trailer_src) return null;
+  const base = ir.base === "assets_root" ? ZT_PATHS.assetsRoot : (ir.base === "web_root" ? ZT_PATHS.webRoot : "");
+  return { ir, trailer: base + ir.trailer_src, poster: ir.poster_src ? base + ir.poster_src : null };
+}
 
 export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   if (!root) return null;
@@ -97,6 +112,10 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   panelMedia.appendChild(panelImgA);
   panelMedia.appendChild(panelImgB);
   panelMedia.appendChild(panelVideo);
+  const routePlay = el("button", "gallery__route-play", { type: "button" });
+  routePlay.hidden = true;
+  routePlay.appendChild(el("span", "gallery__route-play-icon", { "aria-hidden": "true" }));
+  panelMedia.appendChild(routePlay);
 
   const info = el("div", "gallery__info");
   const counter = el("p", "gallery__counter gallery__field");
@@ -157,7 +176,8 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
   // still, and must stay identical for every monument regardless of
   // video_mode.
   function stillFor(m) {
-    return (m && (m.poster || m.visual)) || null;
+    const rm = routeMedia(m);
+    return (rm && rm.poster) || (m && (m.poster || m.visual)) || null;
   }
 
   // -- image cache: current + next ONLY assigned a real src eagerly --------
@@ -358,6 +378,7 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
     bgCanvas.classList.remove("is-visible");
     bgCtx.clearRect(0, 0, CANVAS_W, CANVAS_H); // never let a stale monument's frame linger under the next reveal
     panelVideo.loop = false;
+    resetTrailerState();
     panelVideo.removeAttribute("src");
     try { panelVideo.load(); } catch (err) { /* ignore */ }
     panelVideo.classList.remove("is-visible");
@@ -407,9 +428,73 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
     }
   }
 
+  // ---- interactive-route trailer (user-initiated, audio) -------------------
+  function resetTrailerState() {
+    if (!panelVideo.classList.contains("is-trailer")) return;
+    panelVideo.classList.remove("is-trailer");
+    panelVideo.controls = false;
+    panelVideo.muted = true;
+    panelVideo.setAttribute("muted", "");
+    panelVideo.setAttribute("aria-hidden", "true");
+    panelVideo.setAttribute("tabindex", "-1");
+    panelVideo.preload = "metadata";
+    routePlay.hidden = true;
+  }
+  function pauseTrailerToPoster() {
+    // leaving the viewport / hiding the tab: stop invisible playback + audio,
+    // return to the poster state with the play button available again.
+    if (!panelVideo.classList.contains("is-trailer")) return;
+    try { panelVideo.pause(); } catch (err) { /* ignore */ }
+    const m = monuments[activeIdx];
+    if (m) { syncMedia(m); applyPanelImage(stillFor(m)); } // restore the poster the trailer had hidden
+  }
+  function playTrailer(m) {
+    const rm = routeMedia(m);
+    if (!rm) return;
+    stopMedia();
+    const token = mediaToken;
+    routePlay.hidden = true;
+    panelVideo.classList.add("is-trailer");
+    panelVideo.muted = !!rm.ir.muted;
+    if (!rm.ir.muted) panelVideo.removeAttribute("muted");
+    panelVideo.loop = !!rm.ir.loop;
+    panelVideo.controls = true;
+    panelVideo.setAttribute("aria-hidden", "false");
+    panelVideo.removeAttribute("tabindex");
+    panelVideo.setAttribute("aria-label", pick(m.name, getLang()) + " — Trailer");
+    panelVideo.preload = "auto";
+    panelVideo.src = rm.trailer;
+    const reveal = () => {
+      if (token !== mediaToken) return;
+      panelVideo.classList.add("is-visible");
+      panelImgA.classList.remove("is-visible");
+      panelImgB.classList.remove("is-visible");
+    };
+    panelVideo.addEventListener("canplay", reveal, { once: true });
+    panelVideo.addEventListener("ended", () => { if (token === mediaToken) pauseTrailerToPoster(); }, { once: true });
+    const p = panelVideo.play(); // inside the click gesture -> audible playback allowed
+    if (p && p.catch) p.catch(() => { if (token === mediaToken) { panelVideo.controls = true; panelVideo.classList.add("is-visible"); } });
+  }
+  routePlay.addEventListener("click", () => { const m = monuments[activeIdx]; if (m) playTrailer(m); });
+  // No orphan playback: scrolled away / tab hidden -> back to poster.
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver((entries) => {
+      entries.forEach((e) => { if (!e.isIntersecting) pauseTrailerToPoster(); });
+    }, { threshold: 0.15 }).observe(panelMedia);
+  }
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") pauseTrailerToPoster(); });
+
   function syncMedia(m) {
     stopMedia();
     const token = mediaToken;
+    const rm = routeMedia(m);
+    if (rm) {
+      // Interactive-route trailer entry: poster + play button, NO eager media.
+      routePlay.hidden = false;
+      routePlay.setAttribute("aria-label", ROUTE_PLAY_LABEL[getLang()] || ROUTE_PLAY_LABEL.de);
+      return;
+    }
+    routePlay.hidden = true;
     if (reducedMotion() || !m.video || m.video_mode === "static") return;
     playClip(m, m.video, token);
   }
@@ -426,6 +511,7 @@ export async function initGallery({ root, getLang, reducedMotion, onSelect }) {
       stage.classList.remove("is-shift-left", "is-shift-right");
     }
 
+    if (!routePlay.hidden) routePlay.setAttribute("aria-label", ROUTE_PLAY_LABEL[lang] || ROUTE_PLAY_LABEL.de);
     const still = stillFor(m);
     applyBg(still);
     applyPanelImage(still);

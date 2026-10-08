@@ -699,3 +699,35 @@ img{ max-width:100%; display:block; }
   .thesis-chapter{ min-height:auto; padding: 56px 22px; }
   *{ scroll-behavior: auto !important; }
 }
+
+
+/* ---------------------------------------------------------------- */
+/* INTERACTIVE ROUTE TRAILER (2026-10-09) — poster-first play control  */
+/* on the 9:16 panel media (js/gallery.js, monuments.config.json       */
+/* `interactive_route`). Same gold/dark language as .mf__play.         */
+/* ---------------------------------------------------------------- */
+.gallery__route-play{
+  position:absolute; inset:0; z-index:3; width:100%; height:100%;
+  display:flex; align-items:center; justify-content:center;
+  background: linear-gradient(to top, rgba(0,0,0,0.35), rgba(0,0,0,0.05));
+  cursor:pointer;
+}
+.gallery__route-play[hidden]{ display:none; }
+.gallery__route-play-icon{
+  position:relative; width:68px; height:68px; border-radius:50%;
+  border:1px solid var(--z-gold); background: rgba(8,9,11,0.55);
+  transition: transform .25s ease, background-color .25s ease;
+}
+.gallery__route-play-icon::after{
+  content:""; position:absolute; left:27px; top:21px;
+  border-style:solid; border-width:12px 0 12px 19px; border-color: transparent transparent transparent var(--z-gold);
+}
+.gallery__route-play:hover .gallery__route-play-icon,
+.gallery__route-play:focus-visible .gallery__route-play-icon{ transform: scale(1.06); background: rgba(8,9,11,0.75); }
+.gallery__route-play:focus-visible{ outline:2px solid var(--z-gold); outline-offset:-4px; }
+.gallery__panel-video.is-trailer{ object-position: center center; }
+@media (prefers-reduced-motion: reduce){
+  /* user-initiated trailer stays usable; ambient video remains hidden */
+  .gallery__panel-video.is-trailer{ display:block; }
+  .gallery__route-play-icon{ transition:none; }
+}
