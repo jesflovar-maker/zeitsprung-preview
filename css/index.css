@@ -554,7 +554,8 @@ img{ max-width:100%; display:block; }
      (top row, then the centered CTA row below), per the locked spec. */
   .gallery__panel{ max-width: 900px; }
   .gallery__top{ flex-direction: row; align-items: center; gap: 48px; }
-  .gallery__panel-media{ width: 340px; flex: 0 0 340px; margin: 0; }
+  /* 2026-10-09 premium desktop: portrait panel scales with the viewport (9:16, max ~76dvh tall) */
+  .gallery__panel-media{ width: clamp(340px, min(26vw, calc(76dvh * 9 / 16)), 460px); flex: 0 0 auto; margin: 0; }
   .gallery__info{ flex: 1 1 380px; }
   .navbar{ padding: 0 32px; }
   .route-map{ max-width: 560px; }

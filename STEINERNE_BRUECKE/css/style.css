@@ -2446,3 +2446,113 @@ img{ max-width:100%; display:block; }
   .kf__cap-eyebrow{ font-size: 11px; }
   .kf__cap-evidence{ font-size: 9.5px; }
 }
+
+.kf__stage{ position: absolute; inset: 0; } /* < 1100px: the stage IS the 9:16 viewport box (approved mobile/tablet geometry) */
+
+/* ================================================================ */
+/* PREMIUM DESKTOP MUSEUM SHELL (2026-10-09)                          */
+/* >= 1100px: left information rail + centered 9:16 cinematic stage   */
+/* + right editorial rail. Mobile (< 1100px) is the approved overlay   */
+/* experience and is NOT changed; tablet keeps the centered 9:16      */
+/* panel + overlay captions. Generic classes (.kf__*, .mf__*): no      */
+/* monument-specific values, reusable for every monument.              */
+/* ================================================================ */
+@media (min-width: 1100px){
+  :root{ --zt-desktop-max: 1560px; /* stage never slides under the fixed navbar; ~91-92dvh on common desktops */ --zt-stage-h: min(calc(100dvh - var(--nav-h) - 24px), 1180px); }
+
+  /* K-FRAME MUSEUM STAGE */
+  .kf__sticky{
+    background:
+      radial-gradient(120% 90% at 50% 45%, #101216 0%, #08090b 70%);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .kf__viewport{
+    display: grid;
+    grid-template-columns: minmax(180px, 1fr) auto minmax(280px, 1fr);
+    column-gap: clamp(40px, 5vw, 110px);
+    align-items: center;
+    inline-size: 100%; max-inline-size: var(--zt-desktop-max);
+    block-size: 100%;
+    padding-inline: clamp(32px, 4vw, 80px);
+    padding-block-start: var(--nav-h);
+    overflow: visible;
+  }
+  .kf__stage{
+    grid-column: 2; grid-row: 1;
+    position: relative; overflow: hidden;
+    block-size: var(--zt-stage-h); aspect-ratio: 9 / 16; inline-size: auto;
+    border: 1px solid rgba(244,239,230,0.10);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.55), 0 6px 22px rgba(0,0,0,0.4);
+  }
+  .kf__vignette{ background: linear-gradient(to top, rgba(0,0,0,0.30) 0%, rgba(0,0,0,0) 38%); }
+
+  /* LEFT RAIL — progress */
+  .kf__nav{
+    grid-column: 1; grid-row: 1; justify-self: end; align-self: center;
+    position: static; transform: none; inset: auto;
+    align-items: flex-start; gap: 22px; padding-inline-end: 6px;
+  }
+  .kf__counter{ font-size: clamp(30px, 2.6vw, 44px); letter-spacing: 0.08em; color: var(--z-ink); font-weight: 300; }
+  .kf__dots{ gap: 4px; border-inline-start: 1px solid var(--z-line); padding-inline-start: 14px; }
+  .kf__dot{
+    display: flex; align-items: center; gap: 12px; inline-size: auto; block-size: auto;
+    padding: 5px 0; border-radius: 0; background: none; transform: none; cursor: pointer;
+    font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.16em; color: var(--z-ink-faint);
+    position: relative;
+  }
+  .kf__dot::before{
+    content: ""; flex: 0 0 auto; inline-size: 7px; block-size: 7px; border-radius: 50%;
+    background: rgba(244,239,230,0.22); margin-inline-start: -18px;
+    transition: background-color .3s ease, transform .3s ease;
+  }
+  .kf__dot::after{ content: attr(data-label); white-space: pre; transition: color .3s ease; }
+  .kf__dot.is-active{ background: none; transform: none; color: var(--z-gold); }
+  .kf__dot.is-active::before{ background: var(--z-gold); transform: scale(1.5); }
+  .kf__dot:hover::after, .kf__dot:focus-visible::after{ color: var(--z-ink); }
+
+  /* RIGHT RAIL — editorial copy (moved off the photograph) */
+  .kf__caption{
+    grid-column: 3; grid-row: 1; position: relative; inset: auto;
+    align-self: stretch; block-size: var(--zt-stage-h); max-inline-size: 540px;
+  }
+  .kf__cap{
+    position: absolute; inset: 0; left: 0; right: 0; top: 0; bottom: 0; max-width: none;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .kf__cap-eyebrow{ font-size: 12px; margin-bottom: 18px; }
+  .kf__cap-title{ max-width: none; margin-bottom: 18px; }
+  .kf__cap-line{ font-size: clamp(34px, 3vw, 52px); line-height: 1.08; font-weight: 500; letter-spacing: -0.01em; }
+  .kf__cap-lead{ font-size: clamp(16px, 1.15vw, 18px); line-height: 1.7; max-width: 46ch; color: var(--z-ink-dim); }
+  .kf__cap-needs-validation{ font-size: 14px; max-width: 46ch; }
+  .kf__cap-source{ margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--z-line); max-width: 46ch; }
+
+  /* MEDIA FEATURES (trailer / timeline / route): editorial split */
+  .mf{ padding-block: clamp(80px, 12vh, 140px); }
+  .mf__inner{
+    max-inline-size: var(--zt-desktop-max);
+    display: grid; grid-template-columns: fit-content(420px) auto; justify-content: center;
+    column-gap: clamp(48px, 5.5vw, 110px); align-items: center; text-align: left;
+    grid-template-rows: 1fr auto auto auto auto 1fr;
+    grid-template-areas: ". frame" "eyebrow frame" "title frame" "text frame" "recon frame" ". frame";
+  }
+  .mf__eyebrow{ grid-area: eyebrow; align-self: end; }
+  .mf__title{ grid-area: title; font-size: clamp(32px, 3.2vw, 56px); line-height: 1.08; margin-bottom: 20px; }
+  .mf__text{ grid-area: text; font-size: clamp(16px, 1.15vw, 18px); max-width: 44ch; margin: 0 0 28px; }
+  .mf__recon{ grid-area: recon; align-self: start; margin-top: 0; }
+  .mf__frame{
+    grid-area: frame;
+    inline-size: min(calc(var(--zt-stage-h) * 0.92 * 9 / 16), 34vw);
+    box-shadow: 0 30px 90px rgba(0,0,0,0.55), 0 6px 22px rgba(0,0,0,0.4);
+    border-radius: 2px;
+  }
+  /* rhythm: trailer = media left, timeline film = media right, route = media left */
+  .mf--trailer .mf__inner, .mf--route .mf__inner{
+    grid-template-columns: auto fit-content(420px);
+    grid-template-areas: "frame ." "frame eyebrow" "frame title" "frame text" "frame recon" "frame .";
+  }
+  /* page-level centering of narrow desktop content */
+  .kf__inner{ max-width: 720px; }
+}
+@media (min-width: 1100px) and (min-aspect-ratio: 21/9){
+  :root{ --zt-desktop-max: 1760px; }
+}

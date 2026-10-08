@@ -437,6 +437,8 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
     dot.setAttribute("role", "button");
     dot.setAttribute("tabindex", "0");
     dot.setAttribute("aria-label", `K${String(f.order).padStart(2, "0")}`);
+    // desktop left rail: "01 · 1135" label (CSS ::after; hidden on mobile)
+    dot.dataset.label = String(f.order).padStart(2, "0") + (f.date ? "  ·  " + String(f.date).slice(0, 4) : "");
     dot.addEventListener("click", () => jumpToFrame(i));
     dotsWrap.appendChild(dot);
   });

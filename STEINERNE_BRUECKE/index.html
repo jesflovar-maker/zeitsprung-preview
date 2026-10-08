@@ -333,9 +333,13 @@
 
     <div class="kf__sticky" id="kfSticky">
       <div class="kf__viewport" id="kfViewport">
-        <img id="kfImgA" class="kf__img kf__img--a" alt="" draggable="false">
-        <img id="kfImgB" class="kf__img kf__img--b" alt="" draggable="false">
-        <div class="kf__vignette" aria-hidden="true"></div>
+        <!-- .kf__stage = the 9:16 image stage (mobile: fills the viewport box;
+             desktop >=1100px: the centered museum panel between the rails). -->
+        <div class="kf__stage">
+          <img id="kfImgA" class="kf__img kf__img--a" alt="" draggable="false">
+          <img id="kfImgB" class="kf__img kf__img--b" alt="" draggable="false">
+          <div class="kf__vignette" aria-hidden="true"></div>
+        </div>
 
         <!-- Caption host. kframes-gallery.js builds ONE permanent caption
              beat per K-frame here (eyebrow/date, evidence chip, title,
