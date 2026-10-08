@@ -37,7 +37,11 @@
       "hotspot_target": "#museum25d",
       "status": "PENDING_FREIGABE",
       "asset_web4k": "sb_k01",
-      "match_confidence_4k": "MEDIUM"
+      "match_confidence_4k": "MEDIUM",
+      "focus": {
+        "x": 50,
+        "y": 50
+      }
     },
     {
       "id": "k02",
@@ -66,7 +70,11 @@
       "hotspot_target": "#museum25d",
       "status": "PENDING_FREIGABE",
       "asset_web4k": "sb_k02",
-      "match_confidence_4k": "HIGH"
+      "match_confidence_4k": "HIGH",
+      "focus": {
+        "x": 38,
+        "y": 50
+      }
     },
     {
       "id": "k03",
@@ -117,7 +125,11 @@
       "uncertainty_type": "IMAGE_TEXT_MATCH",
       "flags": [
         "HELD_TEXT_IMAGE_MISMATCH"
-      ]
+      ],
+      "focus": {
+        "x": 54,
+        "y": 50
+      }
     },
     {
       "id": "k04",
@@ -170,7 +182,11 @@
       "uncertainty_type": "IMAGE_TEXT_MATCH",
       "flags": [
         "HELD_TEXT_IMAGE_MISMATCH"
-      ]
+      ],
+      "focus": {
+        "x": 56,
+        "y": 50
+      }
     },
     {
       "id": "k05",
@@ -222,7 +238,11 @@
       "uncertainty_type": "IMAGE_TEXT_MATCH",
       "flags": [
         "HELD_TEXT_IMAGE_MISMATCH"
-      ]
+      ],
+      "focus": {
+        "x": 56,
+        "y": 50
+      }
     },
     {
       "id": "k06",
@@ -275,7 +295,11 @@
         "hotspot_target": "#museum25d"
       },
       "held_reason": "4K image shows a finished bridge with a Gothic Dom; validated text describes deck paving in 1140-1146.",
-      "uncertainty_type": "IMAGE_TEXT_MATCH"
+      "uncertainty_type": "IMAGE_TEXT_MATCH",
+      "focus": {
+        "x": 56,
+        "y": 50
+      }
     },
     {
       "id": "k07",
@@ -326,7 +350,11 @@
       "uncertainty_type": "IMAGE_TEXT_MATCH",
       "flags": [
         "HELD_TEXT_IMAGE_MISMATCH"
-      ]
+      ],
+      "focus": {
+        "x": 56,
+        "y": 50
+      }
     },
     {
       "id": "k08",
@@ -352,7 +380,11 @@
       "status": "PENDING_FREIGABE",
       "note": "RE-MAPPED 2026-09-01: k08_master.png is no longer the K03 duplicate (see known_duplicate_note above) — it was replaced with a genuinely new render showing pier repair/maintenance work (visible timber patching on a damaged pier, rubble loaded onto a boat) with the Dom's twin spires shown FULLY COMPLETE in the background (spires completed 1869, so this scene reads as some later repair campaign). No entry in SOURCE_REGISTRY.md/.json documents a specific dated repair campaign matching this exact scene, so — mirroring K09's own convention — the title intentionally states only the evidence status, the description is left empty, and no date/topic is asserted rather than inventing one. Needs a real source before any date or campaign name can be added.",
       "asset_web4k": "sb_k08",
-      "match_confidence_4k": "NONE"
+      "match_confidence_4k": "NONE",
+      "focus": {
+        "x": 56,
+        "y": 50
+      }
     },
     {
       "id": "k09",
@@ -378,7 +410,11 @@
       "status": "PENDING_FREIGABE",
       "note": "The image shows the bridge's nearest arch under what reads as repair/damage bracing (orange wood scaffolding) — no validated source or Freigabe covers any specific repair event, date or cause for this. Title deliberately describes only the EVIDENCE STATUS itself (not a historical claim); description is intentionally empty rather than inventing a date, incident or narrative. Do not add descriptive text here without a real source.",
       "asset_web4k": "sb_k09",
-      "match_confidence_4k": "NONE"
+      "match_confidence_4k": "NONE",
+      "focus": {
+        "x": 56,
+        "y": 50
+      }
     },
     {
       "id": "k10",
@@ -407,7 +443,11 @@
       "status": "PENDING_FREIGABE",
       "note": "Closest validated era (Gothic tower construction). The image itself shows complete spires plus an electric tram (a later, 19th/early-20th-century-reading scene) — reused verbatim per the brief rather than inventing tram-specific copy; this discrepancy between image and validated date range is flagged, not silently resolved.",
       "asset_web4k": "sb_k10",
-      "match_confidence_4k": "MEDIUM"
+      "match_confidence_4k": "MEDIUM",
+      "focus": {
+        "x": 56,
+        "y": 50
+      }
     },
     {
       "id": "k11",
@@ -435,7 +475,11 @@
       "hotspot_target": "#museum25d",
       "status": "PENDING_FREIGABE",
       "asset_web4k": "sb_k11",
-      "match_confidence_4k": "MEDIUM"
+      "match_confidence_4k": "MEDIUM",
+      "focus": {
+        "x": 56,
+        "y": 50
+      }
     },
     {
       "id": "k12",
@@ -464,8 +508,13 @@
       "hotspot_target": "#stage",
       "status": "PENDING_FREIGABE",
       "asset_web4k": "sb_k12",
-      "match_confidence_4k": "HIGH"
+      "match_confidence_4k": "HIGH",
+      "focus": {
+        "x": 56,
+        "y": 50
+      }
     }
   ],
-  "web4k_note": "2026-10-08 STEINERNE FINAL CLOSURE — runtime now displays the owner's 4K series (OWNER_UPLOAD_2026-10-08, derivatives in 03_ASSETS/Steinerne_Bruecke/2d/KFRAMES_4K_WEB/sb_kNN_{1080,720}_v01.webp via each frame's `asset_web4k`; legacy `asset` PNG kept as error fallback). The 4K series is an aerial urban-evolution series, NOT a re-render of the legacy construction-scene series. Frames whose validated text contradicts the new image (K03-K07) are HELD: date/title/description neutralised to the already-approved NEEDS_VALIDATION wording (identical to K08/K09) and the original validated record preserved under `held_original` for restoration once the owner/ChatGPT approve a 4K-specific text. `match_confidence_4k` records the image-text assessment per frame. No new historical claim was written."
+  "web4k_note": "2026-10-08 STEINERNE FINAL CLOSURE — runtime now displays the owner's 4K series (OWNER_UPLOAD_2026-10-08, derivatives in 03_ASSETS/Steinerne_Bruecke/2d/KFRAMES_4K_WEB/sb_kNN_{1080,720}_v01.webp via each frame's `asset_web4k`; legacy `asset` PNG kept as error fallback). The 4K series is an aerial urban-evolution series, NOT a re-render of the legacy construction-scene series. Frames whose validated text contradicts the new image (K03-K07) are HELD: date/title/description neutralised to the already-approved NEEDS_VALIDATION wording (identical to K08/K09) and the original validated record preserved under `held_original` for restoration once the owner/ChatGPT approve a 4K-specific text. `match_confidence_4k` records the image-text assessment per frame. No new historical claim was written.",
+  "focus_note": "Mobile focal points (percent object-position) for the 4K series; the stage is ~9:16 so only the X axis crops on phones (viewport narrower than 9:16). K02 is shifted left to keep the timber crane/barges in frame; K04-K12 are shifted slightly right to keep the Dom on the right edge in frame while the bridge entering from the left stays visible."
 }

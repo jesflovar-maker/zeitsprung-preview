@@ -1405,22 +1405,35 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
   // Nothing is ever created/destroyed per scroll tick.
   // -------------------------------------------------------------------
   let assetsRequested = false;
-  function ensureAssets() {
-    if (assetsRequested) return;
-    assetsRequested = true;
-    const decodes = preloadQueue.map(({ el, url }) => {
-      el.src = url;
-      if (typeof el.decode === "function") return el.decode().catch(() => {});
-      return Promise.resolve();
-    });
+  let videosRequested = false;
+  // MOBILE-FIRST (2026-10-09): the museum's transition/loop videos total ~30+ MB
+  // (zone A/B clips alone ~30 MB). On touch/narrow viewports they are NO LONGER
+  // attached by the idle fallback — only by the proximity trigger (visitor within
+  // ~2 viewports of the section). Images (WebP, <1 MB each now) still use the
+  // idle fallback everywhere; desktop keeps the idle video warm-up.
+  const isDesktopLike = window.matchMedia("(min-width: 900px) and (pointer: fine)").matches;
+  function ensureVideos() {
+    if (videosRequested) return;
+    videosRequested = true;
     // Loop videos join the same deferred gate, but only get their src — with
     // preload="none" that still costs zero bytes until the chapter is reached,
     // and it is deliberately NOT awaited, so a video can never delay the
     // ScrollTrigger.refresh() that the images' decode gate performs.
     videoPreloadQueue.forEach(({ el, url }) => { el.src = url; });
-    Promise.all(decodes).then(() => {
-      if (window.ScrollTrigger) ScrollTrigger.refresh();
-    });
+  }
+  function ensureAssets(fromProximity) {
+    if (!assetsRequested) {
+      assetsRequested = true;
+      const decodes = preloadQueue.map(({ el, url }) => {
+        el.src = url;
+        if (typeof el.decode === "function") return el.decode().catch(() => {});
+        return Promise.resolve();
+      });
+      Promise.all(decodes).then(() => {
+        if (window.ScrollTrigger) ScrollTrigger.refresh();
+      });
+    }
+    if (fromProximity === true || isDesktopLike) ensureVideos();
   }
 
   if (window.ScrollTrigger) {
@@ -1428,11 +1441,11 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
       trigger: section,
       start: "top bottom+=100%",
       once: true,
-      onEnter: ensureAssets
+      onEnter: () => ensureAssets(true)
     });
   }
-  if ("requestIdleCallback" in window) window.requestIdleCallback(ensureAssets, { timeout: 6000 });
-  else setTimeout(ensureAssets, 4000);
+  if ("requestIdleCallback" in window) window.requestIdleCallback(() => ensureAssets(false), { timeout: 6000 });
+  else setTimeout(() => ensureAssets(false), 4000);
 
   // -------------------------------------------------------------------
   // Pointer parallax (desktop) + touch drag (mobile) — rigid layer only, and

@@ -244,11 +244,23 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
     k12: "center 50%"
   };
 
-  frames.forEach((f) => { f.__url = resolveUrl(f); f.__position = f.asset_web4k ? "center 60%" : (FRAME_POSITION[f.id] || "center 52%"); });
+  // Focal point system: story map `focus: {x, y}` (percent) -> CSS custom
+  // properties --zt-focus-x/-y consumed by `.kf__img { object-position }`.
+  // Legacy-asset fallback keeps the old FRAME_POSITION table ("center NN%").
+  const legacyFocus = (id) => { const m = /(\d+)%/.exec(FRAME_POSITION[id] || "center 52%"); return { x: 50, y: m ? Number(m[1]) : 52 }; };
+  const focusOf = (f, legacy) => (!legacy && f.focus) ? f.focus : (f.asset_web4k && !legacy ? { x: 50, y: 50 } : legacyFocus(f.id));
+  function applyFocus(im, f, legacy) {
+    const fo = focusOf(f, legacy);
+    im.style.setProperty("--zt-focus-x", fo.x + "%");
+    im.style.setProperty("--zt-focus-y", fo.y + "%");
+  }
+  const altFor = (f) => `${String(f.order).padStart(2, "0")} / ${String(frames.length).padStart(2, "0")} — ${pick(f.title, getLang())}${f.date ? ", " + f.date : ""}`;
+  function setLayer(im, f) { im.src = f.__url; applyFocus(im, f, !!f.__legacy); im.alt = altFor(f); }
+  frames.forEach((f) => { f.__url = resolveUrl(f); });
   // Any 4K derivative that fails to load falls back to the legacy asset once.
   [imgA, imgB].forEach((im) => im.addEventListener("error", () => {
     const f = frames.find((x) => x.__url === im.getAttribute("src") || encodeURI(x.__url) === im.getAttribute("src"));
-    if (f && f.asset_web4k) { f.__url = legacyUrl(f); f.__position = FRAME_POSITION[f.id] || "center 52%"; im.src = f.__url; im.style.objectPosition = f.__position; }
+    if (f && f.asset_web4k) { f.__url = legacyUrl(f); f.__legacy = true; setLayer(im, f); }
   }));
 
   // -- lazy image cache: current + previous + next ONLY -------------------
@@ -441,11 +453,9 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
   // -------------------------------------------------------------------
   let layerAIdx = 0;
   let layerBIdx = Math.min(1, frames.length - 1);
-  imgA.src = frames[layerAIdx].__url;
-  imgA.style.objectPosition = frames[layerAIdx].__position;
+  setLayer(imgA, frames[layerAIdx]);
   imgA.style.opacity = "1";
-  imgB.src = frames[layerBIdx].__url;
-  imgB.style.objectPosition = frames[layerBIdx].__position;
+  setLayer(imgB, frames[layerBIdx]);
   imgB.style.opacity = "0";
   preloadWindow(0);
 
@@ -570,8 +580,7 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
         const toIdxChanged = toIsA ? layerAIdx !== nextIdx : layerBIdx !== nextIdx;
         if (toIdxChanged) {
           ensurePreloaded(nextIdx);
-          toLayer.src = frames[nextIdx].__url;
-          toLayer.style.objectPosition = frames[nextIdx].__position;
+          setLayer(toLayer, frames[nextIdx]);
           if (toIsA) layerAIdx = nextIdx; else layerBIdx = nextIdx;
         }
         // PHASE 2.5 FIX (post-delivery, live-browser verification caught
@@ -591,8 +600,7 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
         const fromIdxChanged = fromIsA ? layerAIdx !== idx : layerBIdx !== idx;
         if (fromIdxChanged) {
           ensurePreloaded(idx);
-          fromLayer.src = frames[idx].__url;
-          fromLayer.style.objectPosition = frames[idx].__position;
+          setLayer(fromLayer, frames[idx]);
           if (fromIsA) layerAIdx = idx; else layerBIdx = idx;
         }
 
@@ -650,6 +658,7 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
   return {
     refreshLabels: () => {
       fillCaptionText(getLang());
+      [[imgA, layerAIdx], [imgB, layerBIdx]].forEach(([im, i]) => { im.alt = altFor(frames[i]); });
       renderSourcesPanel(getLang());
       // PHASE 2.5 FIX — see the invalidateOnRefresh comment above. Forces
       // this trigger to recompute start/end against the post-switch layout

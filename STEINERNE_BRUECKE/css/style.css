@@ -1340,10 +1340,24 @@ img{ max-width:100%; display:block; }
   overflow: hidden;
   background: #000;
 }
+/* MOBILE-FIRST STAGE (2026-10-09). ONE stage geometry for all 12 K-Frames:
+   full width on phones (<= 9:16 viewports), and a centred true-9:16 panel on
+   wider screens (inline-size capped by height) instead of a stretched
+   landscape crop. Images/captions/nav are positioned against THIS box. */
+.kf__viewport{
+  position: relative;
+  inline-size: 100%;
+  max-inline-size: calc(100svh * 9 / 16);
+  block-size: 100%;
+  margin-inline: auto;
+  overflow: hidden;
+}
 .kf__img{
   position:absolute; inset:0;
   width:100%; height:100%;
   object-fit: cover;
+  /* per-frame focal point (KFRAMES_STORY_MAP.json -> focus{x,y}) set by JS */
+  object-position: var(--zt-focus-x, 50%) var(--zt-focus-y, 50%);
   will-change: opacity;
 }
 .kf__img--a{ opacity:1; z-index:1; }
@@ -1374,6 +1388,8 @@ img{ max-width:100%; display:block; }
      bottom-anchored growing upward, unlike every other caption in this
      product (.museum__cap-beat, .stage__caption). */
   top: auto;
+  left: max(18px, env(safe-area-inset-left, 0px));
+  right: max(34px, calc(env(safe-area-inset-right, 0px) + 18px));
   bottom: calc(84px + env(safe-area-inset-bottom, 0px));
 }
 .kf__cap-eyebrow{
@@ -1529,11 +1545,7 @@ img{ max-width:100%; display:block; }
 
 @media (min-width: 900px){
   .kf__inner{ max-width: 640px; padding: 84px 96px 32px; }
-  .kf__cap-beat,
-  .kf__cap{ left: 96px; right: auto; max-width: 620px; bottom: 96px; }
-  .kf__cap-title{ font-size: clamp(30px, 3.4vw, 42px); }
-  .kf__cap-lead{ font-size: 15px; max-width: 540px; }
-  .kf__nav{ right: 48px; }
+  /* caption/nav now live inside the centred 9:16 panel -> the mobile layout applies */
 }
 
 @media (max-width: 899px){
@@ -2417,3 +2429,20 @@ img{ max-width:100%; display:block; }
 .mf__play:focus-visible{ outline: 2px solid var(--z-gold); outline-offset: -4px; }
 .mf__recon{ margin-top: 14px; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.18em; color: var(--z-ink-faint); }
 @media (prefers-reduced-motion: reduce){ .mf__play-icon{ transition: none; } }
+
+/* ---------------------------------------------------------------- */
+/* MOBILE-FIRST TOUCH + TYPE FLOORS (2026-10-09)                      */
+/* Visuals unchanged: hit areas are enlarged with an invisible        */
+/* pseudo-element so small chrome controls reach a >= 44x44 target;   */
+/* micro-typography gets a readable floor on touch screens.           */
+/* ---------------------------------------------------------------- */
+.navbar__brand, .navbar__lang button, .kf__dot{ position: relative; }
+.navbar__brand::after, .navbar__lang button::after{
+  content: ""; position: absolute; inset: -9px -6px;
+}
+@media (pointer: coarse){
+  .kf__sources-btn{ min-block-size: 44px; }
+  .kf__counter, .mf__recon{ font-size: 11px; }
+  .kf__cap-eyebrow{ font-size: 11px; }
+  .kf__cap-evidence{ font-size: 9.5px; }
+}

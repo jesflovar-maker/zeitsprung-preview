@@ -160,7 +160,7 @@ function el(tag, className, attrs) {
 // ---------------------------------------------------------------------------
 const HERO_ASSET = {
   id: "master_front",
-  file: "bruckmandl_monument_master_front.png"
+  file: "bruckmandl_monument_master_front.webp"
 };
 
 // ---------------------------------------------------------------------------
@@ -168,10 +168,10 @@ const HERO_ASSET = {
 // labelKey points at the matching js/i18n.js key for each view's caption.
 // ---------------------------------------------------------------------------
 const GALLERY_ASSETS = [
-  { id: "front", file: "bruckmandl_gallery_01_front.png", labelKey: "bruckmandlGalleryFront" },
-  { id: "back", file: "bruckmandl_gallery_02_back.png", labelKey: "bruckmandlGalleryBack" },
-  { id: "side_blank", file: "bruckmandl_gallery_03_side_blank.png", labelKey: "bruckmandlGalleryBlank" },
-  { id: "inscription", file: "bruckmandl_gallery_04_inscription.png", labelKey: "bruckmandlGalleryInscription" }
+  { id: "front", file: "bruckmandl_gallery_01_front.webp", labelKey: "bruckmandlGalleryFront" },
+  { id: "back", file: "bruckmandl_gallery_02_back.webp", labelKey: "bruckmandlGalleryBack" },
+  { id: "side_blank", file: "bruckmandl_gallery_03_side_blank.webp", labelKey: "bruckmandlGalleryBlank" },
+  { id: "inscription", file: "bruckmandl_gallery_04_inscription.webp", labelKey: "bruckmandlGalleryInscription" }
 ];
 
 // ---------------------------------------------------------------------------
@@ -182,13 +182,13 @@ const GALLERY_ASSETS = [
 // t(lang, "bruckmandlCutoutLabels")[id] at render time.
 // ---------------------------------------------------------------------------
 const CUTOUT_ASSETS = [
-  { id: "figure", file: "bruckmandl_cutout_01_figure.png" },
-  { id: "gable_cap", file: "bruckmandl_cutout_02_gable_cap.png" },
-  { id: "shield_panel_keys", file: "bruckmandl_cutout_03_shield_panel_keys.png" },
-  { id: "inscription_hand_panel", file: "bruckmandl_cutout_04_inscription_hand_panel.png" },
-  { id: "shield_panel_lion_with_cap", file: "bruckmandl_cutout_05_shield_panel_lion_with_cap.png" },
-  { id: "capital_cornice", file: "bruckmandl_cutout_06_capital_cornice.png" },
-  { id: "column_and_base", file: "bruckmandl_cutout_07_column_and_base.png" }
+  { id: "figure", file: "bruckmandl_cutout_01_figure.webp" },
+  { id: "gable_cap", file: "bruckmandl_cutout_02_gable_cap.webp" },
+  { id: "shield_panel_keys", file: "bruckmandl_cutout_03_shield_panel_keys.webp" },
+  { id: "inscription_hand_panel", file: "bruckmandl_cutout_04_inscription_hand_panel.webp" },
+  { id: "shield_panel_lion_with_cap", file: "bruckmandl_cutout_05_shield_panel_lion_with_cap.webp" },
+  { id: "capital_cornice", file: "bruckmandl_cutout_06_capital_cornice.webp" },
+  { id: "column_and_base", file: "bruckmandl_cutout_07_column_and_base.webp" }
 ];
 
 // ---------------------------------------------------------------------------
@@ -199,11 +199,11 @@ const CUTOUT_ASSETS = [
 // t(lang, "bruckmandlMaterialLabels")[id] at render time.
 // ---------------------------------------------------------------------------
 const MATERIAL_ASSETS = [
-  { id: "stone_surface", file: "bruckmandl_material_01_stone_surface.png" },
-  { id: "weathering", file: "bruckmandl_material_02_weathering.png" },
-  { id: "inscription_surface", file: "bruckmandl_material_03_inscription_surface.png" },
-  { id: "relief_surface", file: "bruckmandl_material_04_relief_surface.png" },
-  { id: "column_surface", file: "bruckmandl_material_05_column_surface.png" }
+  { id: "stone_surface", file: "bruckmandl_material_01_stone_surface.webp" },
+  { id: "weathering", file: "bruckmandl_material_02_weathering.webp" },
+  { id: "inscription_surface", file: "bruckmandl_material_03_inscription_surface.webp" },
+  { id: "relief_surface", file: "bruckmandl_material_04_relief_surface.webp" },
+  { id: "column_surface", file: "bruckmandl_material_05_column_surface.webp" }
 ];
 
 // ---------------------------------------------------------------------------
@@ -267,14 +267,14 @@ const HERO_VIEW_HOTSPOTS = {
 // (see renderAssistant() below) — no state machine, no pose switching yet.
 // ---------------------------------------------------------------------------
 const AI_POSES = {
-  master: "bruckmandl_ai_master.png",
-  idle: "bruckmandl_ai_idle.png",
-  welcome: "bruckmandl_ai_welcome.png",
-  point: "bruckmandl_ai_point.png",
-  talk: "bruckmandl_ai_talk.png",
-  expression_01_neutral: "bruckmandl_ai_expression_01_neutral.png",
-  expression_02_friendly: "bruckmandl_ai_expression_02_friendly.png",
-  expression_03_explain: "bruckmandl_ai_expression_03_explain.png"
+  master: "bruckmandl_ai_master.webp",
+  idle: "bruckmandl_ai_idle.webp",
+  welcome: "bruckmandl_ai_welcome.webp",
+  point: "bruckmandl_ai_point.webp",
+  talk: "bruckmandl_ai_talk.webp",
+  expression_01_neutral: "bruckmandl_ai_expression_01_neutral.webp",
+  expression_02_friendly: "bruckmandl_ai_expression_02_friendly.webp",
+  expression_03_explain: "bruckmandl_ai_expression_03_explain.webp"
 };
 
 // ---------------------------------------------------------------------------

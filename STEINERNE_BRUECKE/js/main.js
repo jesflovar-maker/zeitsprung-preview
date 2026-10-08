@@ -176,7 +176,7 @@ const STATES = [
     // mirrors). objectPosition is tuned for THIS image's own composition
     // (cathedral spires + bridge crossing sit above the diagram's vertical
     // midpoint) rather than reused from any other state's crop values.
-    img: `${WEB_ASSET_BASE}/hero/sb_hero_current_9x16_v01.png`,
+    img: `${WEB_ASSET_BASE}/hero/sb_hero_current_9x16_v01.webp`,
     objectFit: "cover",
     objectPosition: "center 38%",
     mobile: {
@@ -198,7 +198,7 @@ const STATES = [
   // ---------------------------------------------------------------------
   {
     key: "before",
-    img: `${ASSET_BASE}/IMAGES/REFERENCE/ChatGPT Image 16. Aug. 2026, 23_59_15 (1).png`,
+    img: `${WEB_ASSET_BASE}/stage/sb_stage_1620262359151.webp`,
     // Pre-bridge river/hamlet diorama: content fills the frame edge-to-edge
     // (walled settlement top-left, riverside construction/boats bottom),
     // no single dominant horizontal focal point — near-default framing is
@@ -209,7 +209,7 @@ const STATES = [
   },
   {
     key: "foundation",
-    img: `${ASSET_BASE}/IMAGES/MASTER/ChatGPT Image 16. Aug. 2026, 22_26_31 (4).png`,
+    img: `${WEB_ASSET_BASE}/stage/sb_stage_1620262226314.webp`,
     // Isolated pier cutaway diorama on a plain gradient backdrop, single
     // object already horizontally centered; vertically the object's mass
     // sits slightly below the frame's midline.
@@ -228,7 +228,7 @@ const STATES = [
     // rule — this chapter must never render empty). isCutout:true switches
     // this state to the contain/transparent-cutout rendering path in
     // applyStageLayerStyle() instead of the standard cover treatment.
-    img: `${ASSET_BASE}/IMAGES/MASTER/ChatGPT Image 17. Aug. 2026, 00_00_04 (1).png`,
+    img: `${WEB_ASSET_BASE}/stage/sb_stage_1720260000041.webp`,
     isCutout: true,
     objectFit: "contain",
     backgroundColor: "#050506",
@@ -248,7 +248,7 @@ const STATES = [
   },
   {
     key: "arches",
-    img: `${ASSET_BASE}/IMAGES/REFERENCE/ChatGPT Image 16. Aug. 2026, 22_26_33 (8).png`,
+    img: `${WEB_ASSET_BASE}/stage/sb_stage_1620262226338.webp`,
     // Bird's-eye construction diorama: town top-left, the era-defining
     // detail (timber arch-centering wheels + crane) sits center-right,
     // lower-mid frame. Framed to keep that cluster in view rather than the
@@ -260,7 +260,7 @@ const STATES = [
   },
   {
     key: "medieval",
-    img: `${ASSET_BASE}/IMAGES/REFERENCE/ChatGPT Image 16. Aug. 2026, 22_26_31 (3).png`,
+    img: `${WEB_ASSET_BASE}/stage/sb_stage_1620262226313.webp`,
     // CLASSIFICATION: NEEDS_REPLACEMENT (user-confirmed, 2026-08-29) — this
     // foggy/stylized bridge render is NOT an approved final asset for the
     // "1146–1275 / Mittelalterliche Vollendung" chapter. Kept displaying
@@ -274,7 +274,7 @@ const STATES = [
   },
   {
     key: "transform19c",
-    img: `${ASSET_BASE}/IMAGES/REFERENCE/ChatGPT Image 16. Aug. 2026, 23_59_16 (4).png`,
+    img: `${WEB_ASSET_BASE}/stage/sb_stage_1620262359164.webp`,
     // Same overall composition family as "today-open" (cathedral + bridge),
     // but the era-defining detail here is the scaffolding on the spire, so
     // framed slightly higher than today-open to keep more of it visible.
@@ -284,7 +284,7 @@ const STATES = [
   },
   {
     key: "restoration",
-    img: `${ASSET_BASE}/IMAGES/REFERENCE/ChatGPT Image 16. Aug. 2026, 23_59_18 (8).png`,
+    img: `${WEB_ASSET_BASE}/stage/sb_stage_1620262359188.webp`,
     // Post-restoration-era view: scaffolding/work detail sits on the bridge
     // deck itself (lower half of frame) rather than on the spire.
     // CLASSIFICATION: KEEP.
@@ -322,13 +322,13 @@ const STATES = [
 // in this task.
 // ---------------------------------------------------------------------------
 const FUTURE_STAGE_CUTOUT_MAPPINGS_NOT_APPLIED = {
-  piers: "pfeiler_detail_cutout.png", // APPLIED (this task) — see "piers" STATES entry above
-  arches: "boegen_detail_cutout.png", // NOT APPLIED — future candidate for the "arches" chapter
+  piers: "pfeiler_detail_cutout.webp", // APPLIED (this task) — see "piers" STATES entry above
+  arches: "boegen_detail_cutout.webp", // NOT APPLIED — future candidate for the "arches" chapter
   // "FAHRBAHN"/deck has no equivalent #stage chapter today (fahrbahn is a
   // #museum25d chapter only) — named here only because the user referenced
   // it alongside the others; not a #stage state key.
-  fahrbahn: "fahrbahn_main_cutout.png", // NOT APPLIED — reference only, no matching #stage state
-  construction: "bau_construction_cutout.png" // NOT APPLIED — no matching #stage state today
+  fahrbahn: "fahrbahn_main_cutout.webp", // NOT APPLIED — reference only, no matching #stage state
+  construction: "bau_construction_cutout.webp" // NOT APPLIED — no matching #stage state today
 };
 
 // VIDEO_PATH (former FPV source constant, ".../VIDEO/FLYOVER/sb_flyover_city_8s_v01_web.mp4")
@@ -635,7 +635,7 @@ function buildIntroMedia() {
   // intro-gate's fallback state and the #stage's first state are visually
   // the same image, which reads as one coherent opening beat rather than
   // two different pictures.
-  poster.src = encodeURI(`${WEB_ASSET_BASE}/hero/sb_hero_current_9x16_v01.png`);
+  poster.src = encodeURI(`${WEB_ASSET_BASE}/hero/sb_hero_current_9x16_v01.webp`);
 
   if (!video) return;
 
