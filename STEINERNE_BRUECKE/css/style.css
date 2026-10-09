@@ -2599,3 +2599,51 @@ img{ max-width:100%; display:block; }
 @media (min-width: 2200px){
   :root{ --zt-desktop-max: 2240px; --zt-stage-h: min(calc(100dvh - var(--nav-h) - 24px), 1360px); }
 }
+
+/* ================================================================ */
+/* DESKTOP MEDIA NORMALIZATION V1 (2026-10-09) — >= 1100px only.      */
+/* Legacy full-bleed / full-cover portrait media becomes a centered,   */
+/* source-quality-aware 9:16 exhibit stage (no cover crop, no 2-3x     */
+/* upscale). Mobile/tablet and all scroll/GSAP mechanics are unchanged.*/
+/* ================================================================ */
+@media (min-width: 1100px){
+  /* HERO JOURNEY (#stage: Vor dem Bau, Fundamentierung, Pfeiler, ...) */
+  .stage__bg-layer{
+    inset: 0; margin-inline: auto;
+    width: min(calc(100svh * 9 / 16), 100%);
+    background-size: contain !important;
+    background-position: 50% 50% !important;
+    background-repeat: no-repeat !important;
+    background-color: #050506;
+  }
+  .stage__sticky{ background: radial-gradient(120% 90% at 50% 45%, #101216 0%, #08090b 70%); }
+  .stage__caption{
+    left: calc(50% + (100svh * 9 / 32) + clamp(40px, 4vw, 88px));
+    right: clamp(84px, 6vw, 140px);
+    max-width: none;
+  }
+  .stage__title, .stage__text{ max-width: 100%; }
+
+  /* GROUP B — MATERIAL (full-cover loop) and BAU (pending-layer video):
+     portrait exhibit inside the object zone, height-capped by source quality */
+  .museum__fit--full-cover{
+    width: auto; height: min(calc(100% - 60px), 1000px);
+    max-width: 58%; max-height: min(calc(100% - 60px), 1000px);
+    object-fit: contain;
+  }
+  .museum__pending-video{
+    inset: auto;
+    /* centre of the object zone = caption column reserve .. right inset */
+    left: calc((54px + min(400px, 30%) + 44px + (100% - clamp(32px, 3vw, 56px))) / 2);
+    top: 50%; transform: translate(-50%, -50%);
+    width: auto; height: min(calc(100% - 60px), 1000px);
+    max-width: 58%; max-height: min(calc(100% - 60px), 1000px);
+    object-fit: contain;
+  }
+  /* INTRO GATE — 480x854 cinematic intro shown as the complete 9:16 frame
+     (was a 3x full-bleed cover enlargement) */
+  .intro-gate__media, .intro-gate__scrim{
+    inset: 0; margin-inline: auto; width: min(calc(100svh * 9 / 16), 100%);
+  }
+  .intro-gate__media-poster, .intro-gate__media-video{ object-fit: contain; }
+}
