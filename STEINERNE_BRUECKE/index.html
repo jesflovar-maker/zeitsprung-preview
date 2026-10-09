@@ -110,7 +110,7 @@
     <a href="../index.html" class="navbar__brand" aria-label="ZEITSPRUNG — zur Startseite / back to start / volver al inicio">ZEITSPRUNG</a>
     <div class="navbar__links">
       <button type="button" data-scroll-to="#stage" data-i18n="navRoute">ROUTE</button>
-      <button type="button" data-scroll-to="#facts" class="navbar__timeline-btn">
+      <button type="button" data-scroll-to="#timelineFilm" class="navbar__timeline-btn">
         <span data-i18n="navTimeline">ZEITLEISTE</span>
         <!-- Phase 2.5 — the full interactive timeline is not built yet; this
              badge marks that ambition as in-progress without disabling the
@@ -139,19 +139,16 @@
 
   <p class="scroll-hint" data-i18n="scrollHint">SCROLLEN, UM DURCH DIE ZEIT ZU REISEN</p>
 
-  <!-- MEDIA FEATURE (trailer) — poster-first, lazy video; see js/media-feature.js -->
-  <section id="trailer" class="mf mf--trailer" data-mf data-mf-mode="click" data-mf-video="sb_trailer_720_v01_web.mp4" data-mf-poster="sb_trailer_poster_v01.jpg" aria-labelledby="trailerTitle">
-    <div class="mf__inner">
-      <p class="mf__eyebrow" data-i18n="mfTrailerEyebrow">TRAILER</p>
-      <h3 class="mf__title" id="trailerTitle" data-i18n="mfTrailerTitle"></h3>
-      <p class="mf__text" data-i18n="mfTrailerText"></p>
-      <div class="mf__frame">
-        <video class="mf__video" playsinline preload="none" disablepictureinpicture controlslist="nodownload"></video>
-        <button type="button" class="mf__play" aria-label="Play"><span class="mf__play-icon" aria-hidden="true"></span></button>
-      </div>
-      <p class="mf__recon" data-i18n="mfRecon">VISUELLE REKONSTRUKTION</p>
-    </div>
-  </section>
+  <!-- ========================================================== -->
+  <!-- STORY ORDER (2026-10-09): HERO/INTRO + stage > facts > GROUP B -->
+  <!-- (#museum25d, first major interactive experience) > K01-K12 >   -->
+  <!-- supporting content (Brückmandl, 3D) > TIMELINE film > BRIDGE   -->
+  <!-- ROUTE/FPV (closing flight) > footer. The official TRAILER has  -->
+  <!-- no standalone section here: its role is INDEX > INTERAKTIVE    -->
+  <!-- ROUTE > STEINERNE (gallery.js). Sections were REORDERED, not   -->
+  <!-- cloned (single instance of every module).                      -->
+  <!-- ========================================================== -->
+
 
   <!-- ========================================================== -->
   <!-- STAGE — 9-state scrubbed historical journey                -->
@@ -206,20 +203,6 @@
       </div>
     </div>
     <p id="factSourceNote" class="facts__source">QUELLE — Tiefbauamt Regensburg · Die Steinerne Brücke – 2010 bis 2018</p>
-  </section>
-
-  <!-- MEDIA FEATURE (timeline) — poster-first, lazy video; see js/media-feature.js -->
-  <section id="timelineFilm" class="mf mf--timeline" data-mf data-mf-mode="click" data-mf-video="sb_timeline_720_v01_web.mp4" data-mf-poster="sb_timeline_poster_v01.jpg" aria-labelledby="timelineFilmTitle">
-    <div class="mf__inner">
-      <p class="mf__eyebrow" data-i18n="mfTimelineEyebrow">TIMELINE</p>
-      <h3 class="mf__title" id="timelineFilmTitle" data-i18n="mfTimelineTitle"></h3>
-      <p class="mf__text" data-i18n="mfTimelineText"></p>
-      <div class="mf__frame">
-        <video class="mf__video" playsinline preload="none" disablepictureinpicture controlslist="nodownload"></video>
-        <button type="button" class="mf__play" aria-label="Play"><span class="mf__play-icon" aria-hidden="true"></span></button>
-      </div>
-      <p class="mf__recon" data-i18n="mfRecon">VISUELLE REKONSTRUKTION</p>
-    </div>
   </section>
 
 
@@ -356,20 +339,6 @@
     </div>
   </section>
 
-  <!-- MEDIA FEATURE (route) — poster-first, lazy video; see js/media-feature.js -->
-  <section id="bridgeRoute" class="mf mf--route" data-mf data-mf-mode="ambient" data-mf-video="sb_bridge_route_496_v01_web.mp4" data-mf-poster="sb_bridge_route_poster_v01.jpg" aria-labelledby="bridgeRouteTitle">
-    <div class="mf__inner">
-      <p class="mf__eyebrow" data-i18n="mfRouteEyebrow">ROUTE</p>
-      <h3 class="mf__title" id="bridgeRouteTitle" data-i18n="mfRouteTitle"></h3>
-      <p class="mf__text" data-i18n="mfRouteText"></p>
-      <div class="mf__frame">
-        <video class="mf__video" playsinline preload="none" disablepictureinpicture controlslist="nodownload"></video>
-        <button type="button" class="mf__play" aria-label="Play"><span class="mf__play-icon" aria-hidden="true"></span></button>
-      </div>
-      <p class="mf__recon" data-i18n="mfRecon">VISUELLE REKONSTRUKTION</p>
-    </div>
-  </section>
-
 
   <!-- ========================================================== -->
   <!-- BRUCKMANDL MODULE — first visible local preview.              -->
@@ -437,6 +406,34 @@
       <p class="threed-chapter__note" data-i18n="threeDStateNote">
         Hinweis: Dieses Master-GLB liegt bereits in einem teil-explodierten Zustand vor.
       </p>
+    </div>
+  </section>
+
+  <!-- MEDIA FEATURE (timeline) — poster-first, lazy video; see js/media-feature.js -->
+  <section id="timelineFilm" class="mf mf--timeline" data-mf data-mf-mode="click" data-mf-video="sb_timeline_720_v01_web.mp4" data-mf-poster="sb_timeline_poster_v01.jpg" aria-labelledby="timelineFilmTitle">
+    <div class="mf__inner">
+      <p class="mf__eyebrow" data-i18n="mfTimelineEyebrow">TIMELINE</p>
+      <h3 class="mf__title" id="timelineFilmTitle" data-i18n="mfTimelineTitle"></h3>
+      <p class="mf__text" data-i18n="mfTimelineText"></p>
+      <div class="mf__frame">
+        <video class="mf__video" playsinline preload="none" disablepictureinpicture controlslist="nodownload"></video>
+        <button type="button" class="mf__play" aria-label="Play"><span class="mf__play-icon" aria-hidden="true"></span></button>
+      </div>
+      <p class="mf__recon" data-i18n="mfRecon">VISUELLE REKONSTRUKTION</p>
+    </div>
+  </section>
+
+  <!-- MEDIA FEATURE (route) — poster-first, lazy video; see js/media-feature.js -->
+  <section id="bridgeRoute" class="mf mf--route" data-mf data-mf-mode="ambient" data-mf-video="sb_bridge_route_496_v01_web.mp4" data-mf-poster="sb_bridge_route_poster_v01.jpg" aria-labelledby="bridgeRouteTitle">
+    <div class="mf__inner">
+      <p class="mf__eyebrow" data-i18n="mfRouteEyebrow">ROUTE</p>
+      <h3 class="mf__title" id="bridgeRouteTitle" data-i18n="mfRouteTitle"></h3>
+      <p class="mf__text" data-i18n="mfRouteText"></p>
+      <div class="mf__frame">
+        <video class="mf__video" playsinline preload="none" disablepictureinpicture controlslist="nodownload"></video>
+        <button type="button" class="mf__play" aria-label="Play"><span class="mf__play-icon" aria-hidden="true"></span></button>
+      </div>
+      <p class="mf__recon" data-i18n="mfRecon">VISUELLE REKONSTRUKTION</p>
     </div>
   </section>
 
