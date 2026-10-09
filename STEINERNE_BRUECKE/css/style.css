@@ -2647,3 +2647,50 @@ img{ max-width:100%; display:block; }
   }
   .intro-gate__media-poster, .intro-gate__media-video{ object-fit: contain; }
 }
+
+/* ================================================================ */
+/* COMMON MEDIA VIEWER (zs-media-viewer.js) + timeline expand button   */
+/* (2026-10-09). Dark museum overlay, contain, nearly full safe area.  */
+/* ================================================================ */
+.mf__expand{
+  position: absolute; top: 10px; right: 10px; z-index: 3;
+  inline-size: 44px; block-size: 44px; border-radius: 50%;
+  display: grid; place-items: center; color: var(--z-ink);
+  background: rgba(8,9,11,0.55); border: 1px solid rgba(244,239,230,0.25);
+  cursor: pointer; -webkit-tap-highlight-color: transparent;
+}
+.mf__expand:hover, .mf__expand:focus-visible{ background: rgba(8,9,11,0.8); outline: 2px solid var(--z-gold); outline-offset: 2px; }
+.zs-viewer-open{ overflow: hidden; }
+.zs-viewer{
+  position: fixed; inset: 0; z-index: 900;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(5,5,6,0.96);
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+}
+.zs-viewer__stage{ display: flex; align-items: center; justify-content: center; max-inline-size: 100%; max-block-size: 100%; }
+.zs-viewer__photo{ display: block; max-inline-size: calc(100vw - 24px); max-block-size: calc(100svh - 24px); inline-size: auto; block-size: auto; object-fit: contain; touch-action: pinch-zoom; }
+.zs-viewer .mf__frame{
+  inline-size: min(calc(100vw - 24px), calc((100svh - 72px) * 9 / 16));
+  max-inline-size: none; margin: 0; border: 0; border-radius: 0;
+}
+.zs-viewer .mf__expand{ display: none; }
+.zs-viewer__close{
+  position: absolute; top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right));
+  inline-size: 48px; block-size: 48px; border-radius: 50%; z-index: 2;
+  font-size: 30px; line-height: 1; color: var(--z-ink);
+  background: rgba(8,9,11,0.7); border: 1px solid rgba(244,239,230,0.3); cursor: pointer;
+}
+.zs-viewer__close:hover, .zs-viewer__close:focus-visible{ outline: 2px solid var(--z-gold); outline-offset: 2px; }
+
+/* GROUP B MOBILE CENTERING (2026-10-09): the EXPLOSION / REASSEMBLY clips
+   (exploded_transition_*) were centred in a content box shorter than the 9:16
+   clip, so they overflowed upward under the navbar and sat top-heavy. On
+   phones they now occupy a fixed object zone between the navbar and the
+   caption (ratio preserved, centred horizontally, no crop). <900px only. */
+@media (max-width: 899px){
+  .museum__transition-video[data-slot^="exploded_transition"]{
+    top: 64px; left: 0; right: 0; margin-inline: auto;
+    width: auto; max-width: 100%;
+    height: calc(100% - 64px - 150px); max-height: none;
+  }
+}

@@ -18,7 +18,7 @@ import { buildPortal } from "./portal.js";
 import { initMuseum25D } from "./museum25d.js";
 import { initKframesGallery } from "./kframes-gallery.js";
 import { initMediaFeatures } from "../../js/media-feature.js";
-import { STEINERNE_VIDEO_WEB4_BASE } from "../../js/zt-paths.js";
+import { STEINERNE_VIDEO_WEB4_BASE, KFRAMES_4K_WEB_BASE } from "../../js/zt-paths.js";
 import { initBruckmandl } from "./bruckmandl.js";
 import { initBruckmandlHotspotBridge } from "./bruckmandl-hotspot-bridge.js";
 // Technical DOM event name only (not QA/provider data) — reused verbatim
@@ -274,12 +274,11 @@ const STATES = [
   },
   {
     key: "transform19c",
-    img: `${WEB_ASSET_BASE}/stage/sb_stage_1620262359164.webp`,
-    // Same overall composition family as "today-open" (cathedral + bridge),
-    // but the era-defining detail here is the scaffolding on the spire, so
-    // framed slightly higher than today-open to keep more of it visible.
+    // OWNER-DIRECTED (2026-10-09): slot now shows the canonical K10 / 1903 tram
+    // frame (replaces the 19th-century scaffold render; its source file stays on disk).
+    img: `${KFRAMES_4K_WEB_BASE}/sb_k10_1080_v01.webp`,
     objectFit: "cover",
-    objectPosition: "center 54%",
+    objectPosition: "center center",
     mobile: { objectPosition: "center center" }
   },
   {

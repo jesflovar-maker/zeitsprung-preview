@@ -21,6 +21,8 @@
      - no RAF loop, no scroll listener: IntersectionObserver + media events only.
    ============================================================================ */
 
+import { openElement, viewerLabel } from "./zs-media-viewer.js";
+
 export function initMediaFeatures({ root, base, playLabel, reducedMotion }) {
   const features = Array.from((root || document).querySelectorAll("[data-mf]"));
   const cleanBase = String(base || "").replace(/\/$/, "");
@@ -78,6 +80,26 @@ export function initMediaFeatures({ root, base, playLabel, reducedMotion }) {
         });
       }, { threshold: 0 });
       io.observe(video);
+    }
+    // EXPLICIT ENLARGE (opt-in via data-mf-expand, user-triggered only): re-parents the
+    // existing frame (video element kept -> playback/audio continue) into the common viewer.
+    const frame = video.closest(".mf__frame");
+    if (section.hasAttribute("data-mf-expand") && frame && mode !== "ambient") {
+      const exp = document.createElement("button");
+      exp.type = "button";
+      exp.className = "mf__expand";
+      exp.setAttribute("aria-label", viewerLabel("expand"));
+      exp.innerHTML = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+      frame.appendChild(exp);
+      exp.addEventListener("click", () => {
+        arm();
+        video.controls = true;
+        showPlay(false);
+        frame.classList.add("is-enlarged");
+        openElement(frame, { onClose: () => frame.classList.remove("is-enlarged") });
+        const p = video.play();
+        if (p && p.catch) p.catch(() => { video.controls = true; });
+      });
     }
     return { section, video };
   }).filter(Boolean);

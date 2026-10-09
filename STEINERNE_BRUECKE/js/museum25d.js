@@ -777,7 +777,9 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
       else flatLayer.appendChild(v);
     }
 
-    v.muted = true; v.loop = false; v.controls = false;
+    // 2026-10-09: a slot whose runtime file is a forward+reverse ping-pong derivative
+    // declares playback.loop=true and loops natively (no end-frame freeze).
+    v.muted = true; v.loop = !!(slot.playback && slot.playback.loop); v.controls = false;
     v.playsInline = true;
     v.setAttribute("muted", "");
     v.setAttribute("playsinline", "");

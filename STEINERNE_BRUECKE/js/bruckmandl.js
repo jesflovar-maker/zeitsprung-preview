@@ -935,6 +935,36 @@ function renderArtifactViewer(container, assets, t, lang, ui) {
   renderHotspots(views[0].id);
   tabs[0].classList.add("is-active");
 
+  // AUTO-ADVANCE (owner-directed 2026-10-09): the four general views rotate
+  // 01 -> 02 -> 03 -> 04 -> 01 every ~5 s (reuses the existing crossfade) so
+  // visitors notice there are several views. Any manual input (tap, key,
+  // focus) shows the chosen view immediately, pauses rotation and resumes after
+  // an idle interval. Disabled under prefers-reduced-motion; paused while the
+  // viewer is off-screen or the tab is hidden.
+  const AUTO_ADVANCE_MS = 5000;
+  const AUTO_RESUME_IDLE_MS = 12000;
+  let autoTimer = null;
+  let autoResume = null;
+  let autoInView = false;
+  function stopAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
+  function startAuto() {
+    if (autoTimer || prefersReducedMotion() || !autoInView || document.hidden) return;
+    autoTimer = setInterval(() => activateView(activeIndex + 1), AUTO_ADVANCE_MS);
+  }
+  function autoUserInteracted() {
+    stopAuto();
+    clearTimeout(autoResume);
+    autoResume = setTimeout(() => { autoResume = null; startAuto(); }, AUTO_RESUME_IDLE_MS);
+  }
+  ["pointerdown", "click", "keydown", "focusin"].forEach((evt) => viewer.addEventListener(evt, autoUserInteracted));
+  document.addEventListener("visibilitychange", () => { if (document.hidden) stopAuto(); else if (!autoResume) startAuto(); });
+  if (typeof IntersectionObserver !== "undefined") {
+    new IntersectionObserver((entries) => {
+      autoInView = entries.some((en) => en.isIntersecting);
+      if (autoInView) { if (!autoResume) startAuto(); } else stopAuto();
+    }, { threshold: 0.35 }).observe(viewer);
+  }
+
   function openHeroInspection() {
     const items = views.map((view) => ({
       id: view.id,

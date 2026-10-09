@@ -86,9 +86,9 @@ export const DICT = {
         text: "Die fertige Brücke trägt mehrere Türme; im Hintergrund erhebt sich noch der romanische Vorgängerbau des Doms — die gotischen Türme existieren noch nicht."
       },
       {
-        year: "1859–1869",
-        title: "Historische Verwandlung",
-        text: "Während die Stadt sich verändert, wachsen die gotischen Domtürme empor — eingerüstet und im Bau, ein neuer Horizont für die alte Brücke."
+        year: "1903",
+        title: "Die Straßenbahn erreicht die Brücke",
+        text: "Im April 1903 fuhr erstmals die Straßenbahn über die Steinerne Brücke. Gleise, Elektrifizierung und Umbauten am südlichen Zugang veränderten den historischen Verkehrsraum."
       },
       {
         year: "2010–2018",
@@ -348,9 +348,9 @@ export const DICT = {
         text: "The finished bridge carries several towers; in the background stands the Romanesque predecessor of the cathedral — the Gothic spires do not yet exist."
       },
       {
-        year: "1859–1869",
-        title: "Historical transformation",
-        text: "As the city changes around it, the Gothic cathedral spires rise — scaffolded and under construction, a new skyline for the old bridge."
+        year: "1903",
+        title: "The tram reaches the bridge",
+        text: "In April 1903 the tram crossed the Stone Bridge for the first time. Rails, electrification and modifications to the southern approach changed the historic traffic space."
       },
       {
         year: "2010–2018",
@@ -569,9 +569,9 @@ export const DICT = {
         text: "El puente terminado luce varias torres; al fondo se alza todavía el predecesor románico de la catedral — las agujas góticas aún no existen."
       },
       {
-        year: "1859–1869",
-        title: "Transformación histórica",
-        text: "Mientras la ciudad cambia a su alrededor, las agujas góticas de la catedral se elevan — entre andamios y en construcción, un nuevo perfil para el viejo puente."
+        year: "1903",
+        title: "El tranvía llega al puente",
+        text: "En abril de 1903 el tranvía cruzó por primera vez la Steinerne Brücke. Las vías, la electrificación y las reformas del acceso sur transformaron el espacio histórico de circulación."
       },
       {
         year: "2010–2018",
