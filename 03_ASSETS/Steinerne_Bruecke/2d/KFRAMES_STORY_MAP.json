@@ -41,13 +41,15 @@
       "focus": {
         "x": 50,
         "y": 50
-      }
+      },
+      "historical_text_status": "EXISTING_APPROVED_TEXT",
+      "visual_alignment_status": "INTERPRETIVE"
     },
     {
       "id": "k02",
       "asset": "k02_master.png",
       "order": 2,
-      "date": "1136–1140",
+      "date": "CA. 1140",
       "title": {
         "de": "Die Pfeiler wachsen",
         "en": "The piers rise",
@@ -74,31 +76,35 @@
       "focus": {
         "x": 38,
         "y": 50
-      }
+      },
+      "historical_text_status": "EXISTING_APPROVED_TEXT",
+      "visual_alignment_status": "INTERPRETIVE"
     },
     {
       "id": "k03",
       "asset": "k03_master.png",
       "order": 3,
-      "date": null,
+      "date": "1146",
       "title": {
-        "de": "Zustand nicht bestätigt",
-        "en": "Condition not confirmed",
-        "es": "Estado sin confirmar"
+        "de": "Überlieferte Vollendung",
+        "en": "Traditional completion date",
+        "es": "Finalización según la tradición histórica"
       },
       "description": {
-        "de": "",
-        "en": "",
-        "es": ""
+        "de": "Die Bauzeit der Steinernen Brücke wird traditionell mit elf Jahren angegeben. Die Vollendung um 1146/47 ist historisch überliefert, jedoch nicht durch eine zeitgenössische Bauurkunde eindeutig belegt.",
+        "en": "The Stone Bridge is traditionally said to have been completed after about eleven years of construction. Completion around 1146/47 is historically transmitted, but not conclusively documented by a contemporary construction record.",
+        "es": "La tradición histórica atribuye a la construcción del puente unos once años. Su finalización hacia 1146/47 está transmitida por fuentes posteriores, pero no queda documentada de forma concluyente por una fuente contemporánea de la obra."
       },
-      "evidence_status": "NEEDS_VALIDATION",
+      "evidence_status": "HISTORICAL_CONTEXT",
       "sources": [
-        "i18n.js states[4]"
+        "Die Steinerne Brücke – 2010 bis 2018 (book OCR copy, verified 2026-10-09)"
       ],
-      "source_ids": [],
+      "source_ids": [
+        "Q001"
+      ],
       "related_topic": null,
       "hotspot_target": "PENDING_DESTINATION",
-      "status": "PENDING_FREIGABE",
+      "status": "TEXT_SOURCE_VERIFIED",
       "asset_web4k": "sb_k03",
       "match_confidence_4k": "LOW",
       "held_original": {
@@ -121,40 +127,48 @@
         "related_topic": "BÖGEN",
         "hotspot_target": "#museum25d"
       },
-      "held_reason": "4K image shows a finished bridge; validated text describes arch centering/crane work.",
-      "uncertainty_type": "IMAGE_TEXT_MATCH",
       "flags": [
-        "HELD_TEXT_IMAGE_MISMATCH"
+        "VISUAL_INTERPRETIVE_NOT_ASSERTED"
       ],
       "focus": {
         "x": 54,
         "y": 50
-      }
+      },
+      "previous_held_reason": "4K image shows a finished bridge; validated text describes arch centering/crane work.",
+      "description_short": {
+        "de": "Elf Jahre Bauzeit werden überliefert. Die Vollendung um 1146/47 gilt als historische Datierung, ist aber nicht zeitgenössisch urkundlich belegt.",
+        "en": "Eleven years of construction are traditionally cited. Completion around 1146/47 is a transmitted dating, not backed by a contemporary construction record.",
+        "es": "La tradición atribuye unos once años a la obra. La finalización hacia 1146/47 es una datación transmitida, sin respaldo de un documento contemporáneo de la obra."
+      },
+      "historical_text_status": "SOURCE_VERIFIED_WITH_DATING_CAUTION",
+      "visual_alignment_status": "INTERPRETIVE",
+      "public_context_type": "TRADITIONAL_DATING"
     },
     {
       "id": "k04",
       "asset": "k04_master.png",
       "order": 4,
-      "date": null,
+      "date": "1245",
       "title": {
-        "de": "Zustand nicht bestätigt",
-        "en": "Condition not confirmed",
-        "es": "Estado sin confirmar"
+        "de": "Reichsfreiheit und nördlicher Brückenkopf",
+        "en": "Imperial freedom and the northern bridgehead",
+        "es": "Libertad imperial y cabecera norte"
       },
       "description": {
-        "de": "",
-        "en": "",
-        "es": ""
+        "de": "Mit der 1245 errungenen Reichsfreiheit wurde der nördliche Brückenkopf repräsentativ und wehrhaft ausgebaut. Katharinenspital, Turmbauten und Befestigungen prägten den Übergang nach Stadtamhof.",
+        "en": "After Regensburg gained imperial immediacy in 1245, the northern bridgehead was developed as a representative and defensive gateway. The Katharinenspital, towers and fortifications shaped the entrance toward Stadtamhof.",
+        "es": "Tras obtener Regensburg la condición de ciudad imperial en 1245, la cabecera norte del puente adquirió un carácter representativo y defensivo. El Katharinenspital, las torres y las fortificaciones marcaron el acceso hacia Stadtamhof."
       },
-      "evidence_status": "NEEDS_VALIDATION",
+      "evidence_status": "HISTORICAL_CONTEXT",
       "sources": [
-        "i18n.js states[3]",
-        "i18n.js states[4]"
+        "Die Steinerne Brücke – 2010 bis 2018 (book OCR copy, verified 2026-10-09)"
       ],
-      "source_ids": [],
+      "source_ids": [
+        "Q001"
+      ],
       "related_topic": null,
       "hotspot_target": "PENDING_DESTINATION",
-      "status": "PENDING_FREIGABE",
+      "status": "TEXT_SOURCE_VERIFIED",
       "note": "RE-INSPECTED 2026-09-01 (Phase 2.7C.3): this frame previously carried K03's identical 'The arches take shape' title/description, sharing the same 1140-1146 date range as K03/K05/K06. Direct visual inspection shows a genuinely distinct composition — a pier still under construction/protection (wattle fencing, stone packing, rafts), NOT an arch-lifting scene. Re-titled to reflect what is actually depicted (parallel pier/arch construction, which is historically plausible for a multi-year, multi-span build) while keeping the SAME validated '1140-1146' date range (the project has no narrower validated sub-date, and none is invented here). related_topic changed from BÖGEN to PFEILER to match the visual content. source_ids unchanged (still grounded in the same validated construction-date/materials sources); the specific compositional detail (concurrent pier/arch work) is a plausible construction-sequence reading of the image, not an independently sourced claim beyond that.",
       "asset_web4k": "sb_k04",
       "match_confidence_4k": "LOW",
@@ -178,39 +192,48 @@
         "related_topic": "PFEILER",
         "hotspot_target": "#museum25d"
       },
-      "held_reason": "4K image shows a finished bridge with the Dom under Gothic scaffolding; validated text describes pier/arch work in 1140-1146.",
-      "uncertainty_type": "IMAGE_TEXT_MATCH",
       "flags": [
-        "HELD_TEXT_IMAGE_MISMATCH"
+        "VISUAL_INTERPRETIVE_NOT_ASSERTED"
       ],
       "focus": {
         "x": 56,
         "y": 50
-      }
+      },
+      "previous_held_reason": "4K image shows a finished bridge with the Dom under Gothic scaffolding; validated text describes pier/arch work in 1140-1146.",
+      "description_short": {
+        "de": "Mit der Reichsfreiheit von 1245 wurde der nördliche Brückenkopf repräsentativ und wehrhaft ausgebaut – mit Katharinenspital, Türmen und Befestigungen.",
+        "en": "After imperial immediacy in 1245, the northern bridgehead became a representative, defensive gateway with the Katharinenspital, towers and fortifications.",
+        "es": "Tras la condición de ciudad imperial (1245), la cabecera norte se volvió representativa y defensiva, con el Katharinenspital, torres y fortificaciones."
+      },
+      "historical_text_status": "SOURCE_VERIFIED",
+      "visual_alignment_status": "INTERPRETIVE",
+      "public_context_type": "HISTORICAL_CONTEXT"
     },
     {
       "id": "k05",
       "asset": "k05_master.png",
       "order": 5,
-      "date": null,
+      "date": "1551",
       "title": {
-        "de": "Zustand nicht bestätigt",
-        "en": "Condition not confirmed",
-        "es": "Estado sin confirmar"
+        "de": "Der südliche Brückenkopf verändert sich",
+        "en": "The southern bridgehead changes",
+        "es": "Cambia la cabecera sur del puente"
       },
       "description": {
-        "de": "",
-        "en": "",
-        "es": ""
+        "de": "Mit der Erweiterung des Amberger Salzstadels wurde 1551 der erste Brückenbogen am südlichen Brückenkopf verbaut. Der ältere Schiffskanal verlor dadurch einen wesentlichen Teil seiner Funktion.",
+        "en": "In 1551 the expansion of the Amberger Salzstadel incorporated the first bridge arch at the southern bridgehead. The earlier navigation channel thereby lost a substantial part of its function.",
+        "es": "En 1551, la ampliación del Amberger Salzstadel integró el primer arco del puente en la cabecera sur. El antiguo canal de navegación perdió con ello una parte esencial de su función."
       },
-      "evidence_status": "NEEDS_VALIDATION",
+      "evidence_status": "HISTORICAL_CONTEXT",
       "sources": [
-        "i18n.js states[3]"
+        "Die Steinerne Brücke – 2010 bis 2018 (book OCR copy, verified 2026-10-09)"
       ],
-      "source_ids": [],
+      "source_ids": [
+        "Q001"
+      ],
       "related_topic": null,
       "hotspot_target": "PENDING_DESTINATION",
-      "status": "PENDING_FREIGABE",
+      "status": "TEXT_SOURCE_VERIFIED",
       "note": "RE-INSPECTED 2026-09-01 (Phase 2.7C.3): previously shared K03's 'The arches take shape' title/description. Direct visual inspection shows a large square pier with an exposed rubble core being faced with dressed ashlar (masonry/plastering work, workers on rafts) — no arch or arch-lifting is visible in this frame at all. Re-titled and re-described to match; description restates the SB_MATERIALS-adjacent 'rubble core + ashlar facing' construction technique already validated for the piers (see i18n.js states[3] / SB_MATERIALS), applied to this specific frame rather than reusing K03's arch-construction copy verbatim. Date range kept at the same validated '1140-1146' window (no narrower validated sub-date exists, none invented). related_topic changed from (implicit) BÖGEN to PFEILER.",
       "asset_web4k": "sb_k05",
       "match_confidence_4k": "LOW",
@@ -234,42 +257,50 @@
         "related_topic": "PFEILER",
         "hotspot_target": "#museum25d"
       },
-      "held_reason": "4K image shows a finished bridge with a Gothic Dom; validated text describes pier facing in 1140-1146.",
-      "uncertainty_type": "IMAGE_TEXT_MATCH",
       "flags": [
-        "HELD_TEXT_IMAGE_MISMATCH"
+        "VISUAL_INTERPRETIVE_NOT_ASSERTED"
       ],
       "focus": {
         "x": 56,
         "y": 50
-      }
+      },
+      "previous_held_reason": "4K image shows a finished bridge with a Gothic Dom; validated text describes pier facing in 1140-1146.",
+      "description_short": {
+        "de": "1551 wurde der erste Brückenbogen am südlichen Brückenkopf durch die Erweiterung des Amberger Salzstadels verbaut; der ältere Schiffskanal verlor dadurch einen wesentlichen Teil seiner Funktion.",
+        "en": "In 1551 the expansion of the Amberger Salzstadel incorporated the first bridge arch at the southern bridgehead; the earlier navigation channel thereby lost a substantial part of its function.",
+        "es": "En 1551, la ampliación del Amberger Salzstadel integró el primer arco de la cabecera sur; el antiguo canal de navegación perdió con ello una parte esencial de su función."
+      },
+      "historical_text_status": "SOURCE_VERIFIED",
+      "visual_alignment_status": "INTERPRETIVE",
+      "public_context_type": "HISTORICAL_CONTEXT"
     },
     {
       "id": "k06",
       "asset": "k06_master.png",
       "order": 6,
-      "date": null,
+      "date": "1633",
       "title": {
-        "de": "Zustand nicht bestätigt",
-        "en": "Condition not confirmed",
-        "es": "Estado sin confirmar"
+        "de": "Der Krieg erreicht die Brücke",
+        "en": "War reaches the bridge",
+        "es": "La guerra alcanza el puente"
       },
       "description": {
-        "de": "",
-        "en": "",
-        "es": ""
+        "de": "Im Dreißigjährigen Krieg wurde 1633 ein südlicher Brückenbogen gesprengt, um den Übergang gegen die anrückenden schwedischen Truppen zu sichern.",
+        "en": "During the Thirty Years' War in 1633, a southern bridge arch was blown up to defend the crossing against the advancing Swedish forces.",
+        "es": "Durante la Guerra de los Treinta Años, en 1633, se voló uno de los arcos del sector sur para defender el paso frente al avance de las tropas suecas."
       },
-      "evidence_status": "NEEDS_VALIDATION",
+      "evidence_status": "HISTORICAL_CONTEXT",
       "sources": [
-        "i18n.js states[4]"
+        "Die Steinerne Brücke – 2010 bis 2018 (book OCR copy, verified 2026-10-09)"
       ],
-      "source_ids": [],
+      "source_ids": [
+        "Q001"
+      ],
       "related_topic": null,
       "hotspot_target": "PENDING_DESTINATION",
-      "status": "PENDING_FREIGABE",
+      "status": "TEXT_SOURCE_VERIFIED",
       "flags": [
-        "HELD_TEXT_IMAGE_MISMATCH",
-        "VISUAL_REVIEW_REQUIRED"
+        "VISUAL_INTERPRETIVE_NOT_ASSERTED"
       ],
       "note": "RE-INSPECTED 2026-09-01 (Phase 2.7C.3): previously shared K03's 'The arches take shape' title/description; visual shows a wide aerial construction scene with completed arches and deck-paving underway alongside cranes/winches — re-titled/re-described to reflect the deck (FAHRBAHN) focus of THIS frame specifically. The 'roadway is paved once arches can bear weight' sequencing is a plausible, non-invented construction-order inference (no separate validated deck-paving date exists, none invented here); date range kept at the same validated '1140-1146' window. SEPARATE, UNRESOLVED ACCURACY FLAG (not fixed by this text change, and the master image was NOT altered): the background of this frame shows the cathedral with an apparently complete Gothic-style spire, which reads as inconsistent with SB_DOM_GOTHIC_RULE (the Gothic Dom must not appear before ~1275; K07's own text for the correct 1146-1275 window explicitly states the Gothic towers 'do not yet exist' yet). This discrepancy is flagged here and in CLAIM_SOURCE_MAP.json rather than silently resolved or hidden; it is a Visual-Lab asset question (master PNG) outside Web Architect scope to correct without explicit permission. PHASE 2.7C.4 additive: flags:[\"VISUAL_REVIEW_REQUIRED\"] registered above so downstream tooling/QA can programmatically surface this frame without parsing free text; no existing array-based flag convention was found elsewhere in this manifest (status/evidence_status are both scalar), so this is a new additive field, k06-only, nothing else in this file was changed.",
       "asset_web4k": "sb_k06",
@@ -294,36 +325,45 @@
         "related_topic": "FAHRBAHN",
         "hotspot_target": "#museum25d"
       },
-      "held_reason": "4K image shows a finished bridge with a Gothic Dom; validated text describes deck paving in 1140-1146.",
-      "uncertainty_type": "IMAGE_TEXT_MATCH",
       "focus": {
         "x": 56,
         "y": 50
-      }
+      },
+      "previous_held_reason": "4K image shows a finished bridge with a Gothic Dom; validated text describes deck paving in 1140-1146.",
+      "description_short": {
+        "de": "Im Dreißigjährigen Krieg wurde 1633 ein südlicher Brückenbogen gesprengt, um den Übergang gegen die anrückenden schwedischen Truppen zu sichern.",
+        "en": "During the Thirty Years' War in 1633, a southern bridge arch was blown up to defend the crossing against the advancing Swedish forces.",
+        "es": "Durante la Guerra de los Treinta Años, en 1633, se voló uno de los arcos del sector sur para defender el paso frente al avance de las tropas suecas."
+      },
+      "historical_text_status": "SOURCE_VERIFIED",
+      "visual_alignment_status": "INTERPRETIVE",
+      "public_context_type": "HISTORICAL_CONTEXT"
     },
     {
       "id": "k07",
       "asset": "k07_master.png",
       "order": 7,
-      "date": null,
+      "date": "1648",
       "title": {
-        "de": "Zustand nicht bestätigt",
-        "en": "Condition not confirmed",
-        "es": "Estado sin confirmar"
+        "de": "Reparatur nach dem Dreißigjährigen Krieg",
+        "en": "Repairs after the Thirty Years' War",
+        "es": "Reparaciones tras la Guerra de los Treinta Años"
       },
       "description": {
-        "de": "",
-        "en": "",
-        "es": ""
+        "de": "Nach den Kriegszerstörungen wurden beschädigte und ausgebrannte Turmbauten wiederhergestellt. Der 1633 zerstörte Brückenbogen blieb jedoch noch lange provisorisch geschlossen und wurde erst 1790/91 wieder in Stein errichtet.",
+        "en": "After the war, damaged and burnt bridge towers were rebuilt. The arch destroyed in 1633, however, remained provisionally closed for many decades and was not reconstructed in stone until 1790/91.",
+        "es": "Tras la guerra se reconstruyeron estructuras y torres dañadas por el fuego. Sin embargo, el arco destruido en 1633 permaneció durante décadas cerrado de forma provisional y no volvió a construirse en piedra hasta 1790/91."
       },
-      "evidence_status": "NEEDS_VALIDATION",
+      "evidence_status": "HISTORICAL_CONTEXT",
       "sources": [
-        "i18n.js states[5]"
+        "Die Steinerne Brücke – 2010 bis 2018 (book OCR copy, verified 2026-10-09)"
       ],
-      "source_ids": [],
+      "source_ids": [
+        "Q001"
+      ],
       "related_topic": null,
       "hotspot_target": "PENDING_DESTINATION",
-      "status": "PENDING_FREIGABE",
+      "status": "TEXT_SOURCE_VERIFIED",
       "asset_web4k": "sb_k07",
       "match_confidence_4k": "LOW",
       "held_original": {
@@ -346,108 +386,210 @@
         "related_topic": "GESAMT",
         "hotspot_target": "#museum25d"
       },
-      "held_reason": "4K image shows a Gothic Dom, which contradicts the validated text (Romanesque predecessor, Gothic towers not yet existing, 1146-1275; SB_DOM_GOTHIC_RULE).",
-      "uncertainty_type": "IMAGE_TEXT_MATCH",
       "flags": [
-        "HELD_TEXT_IMAGE_MISMATCH"
+        "VISUAL_INTERPRETIVE_NOT_ASSERTED"
       ],
       "focus": {
         "x": 56,
         "y": 50
-      }
+      },
+      "previous_held_reason": "4K image shows a Gothic Dom, which contradicts the validated text (Romanesque predecessor, Gothic towers not yet existing, 1146-1275; SB_DOM_GOTHIC_RULE).",
+      "description_short": {
+        "de": "Nach dem Krieg wurden ausgebrannte Türme wiederhergestellt. Der 1633 zerstörte Bogen blieb provisorisch geschlossen und wurde erst 1790/91 wieder in Stein errichtet.",
+        "en": "After the war burnt towers were rebuilt. The arch destroyed in 1633 stayed provisionally closed until it was rebuilt in stone in 1790/91.",
+        "es": "Tras la guerra se reconstruyeron torres dañadas por el fuego. El arco destruido en 1633 siguió cerrado provisionalmente hasta su reconstrucción en piedra en 1790/91."
+      },
+      "historical_text_status": "SOURCE_VERIFIED",
+      "visual_alignment_status": "INTERPRETIVE",
+      "public_context_type": "HISTORICAL_CONTEXT"
     },
     {
       "id": "k08",
       "asset": "k08_master.png",
       "order": 8,
-      "date": null,
+      "date": "1784",
       "title": {
-        "de": "Zustand nicht bestätigt",
-        "en": "Condition not confirmed",
-        "es": "Estado sin confirmar"
+        "de": "Der große Eisstoß",
+        "en": "The great ice flood",
+        "es": "La gran crecida de hielo"
       },
       "description": {
-        "de": "",
-        "en": "",
-        "es": ""
+        "de": "Ein katastrophaler Eisgang beschädigte die Steinerne Brücke schwer. Der Mittelturm wurde nach den Schäden abgetragen; auch die über Jahrhunderte gewachsenen Mühlenanlagen an der Brücke verschwanden weitgehend.",
+        "en": "A catastrophic ice event severely damaged the Stone Bridge. The central tower was removed after the damage, and the centuries-old mill structures around the bridge largely disappeared.",
+        "es": "Un episodio catastrófico de hielo dañó gravemente la Steinerne Brücke. Tras los daños se desmontó la torre central y desaparecieron en gran parte las antiguas instalaciones de molinos asociadas al puente."
       },
-      "evidence_status": "NEEDS_VALIDATION",
-      "uncertainty_type": "DATE",
-      "sources": [],
-      "source_ids": [],
+      "evidence_status": "HISTORICAL_CONTEXT",
+      "sources": [
+        "Die Steinerne Brücke – 2010 bis 2018 (book OCR copy, verified 2026-10-09)"
+      ],
+      "source_ids": [
+        "Q001"
+      ],
       "related_topic": null,
       "hotspot_target": "PENDING_DESTINATION",
-      "status": "PENDING_FREIGABE",
+      "status": "TEXT_SOURCE_VERIFIED",
       "note": "RE-MAPPED 2026-09-01: k08_master.png is no longer the K03 duplicate (see known_duplicate_note above) — it was replaced with a genuinely new render showing pier repair/maintenance work (visible timber patching on a damaged pier, rubble loaded onto a boat) with the Dom's twin spires shown FULLY COMPLETE in the background (spires completed 1869, so this scene reads as some later repair campaign). No entry in SOURCE_REGISTRY.md/.json documents a specific dated repair campaign matching this exact scene, so — mirroring K09's own convention — the title intentionally states only the evidence status, the description is left empty, and no date/topic is asserted rather than inventing one. Needs a real source before any date or campaign name can be added.",
       "asset_web4k": "sb_k08",
       "match_confidence_4k": "NONE",
       "focus": {
         "x": 56,
         "y": 50
-      }
+      },
+      "held_original": {
+        "date": null,
+        "title": {
+          "de": "Zustand nicht bestätigt",
+          "en": "Condition not confirmed",
+          "es": "Estado sin confirmar"
+        },
+        "description": {
+          "de": "",
+          "en": "",
+          "es": ""
+        },
+        "evidence_status": "NEEDS_VALIDATION",
+        "source_ids": [],
+        "related_topic": null,
+        "hotspot_target": "PENDING_DESTINATION",
+        "note": "previous public state preserved for audit (NEEDS_VALIDATION neutral wording / earlier validated text)"
+      },
+      "description_short": {
+        "de": "Ein katastrophaler Eisgang beschädigte die Brücke schwer. Der Mittelturm wurde abgetragen, die alten Mühlenanlagen verschwanden weitgehend.",
+        "en": "A catastrophic ice event severely damaged the bridge. The central tower was removed and the old mills largely disappeared.",
+        "es": "Un catastrófico episodio de hielo dañó gravemente el puente. Se desmontó la torre central y desaparecieron en gran parte los antiguos molinos."
+      },
+      "historical_text_status": "SOURCE_VERIFIED",
+      "visual_alignment_status": "INTERPRETIVE",
+      "public_context_type": "HISTORICAL_CONTEXT",
+      "flags": [
+        "VISUAL_INTERPRETIVE_NOT_ASSERTED"
+      ]
     },
     {
       "id": "k09",
       "asset": "k09_master.png",
       "order": 9,
-      "date": null,
+      "date": "1809–1810",
       "title": {
-        "de": "Zustand nicht bestätigt",
-        "en": "Condition not confirmed",
-        "es": "Estado sin confirmar"
+        "de": "Krieg am Stadtamhofer Brückenkopf",
+        "en": "War at the Stadtamhof bridgehead",
+        "es": "Guerra en la cabecera de Stadtamhof"
       },
       "description": {
-        "de": "",
-        "en": "",
-        "es": ""
+        "de": "Die Kämpfe von 1809 zerstörten den nördlichen Brückenkopf mit dem Schwarzen Turm und Teilen des Katharinenspitals. Die schwer beschädigten Befestigungen wurden anschließend 1810 abgetragen.",
+        "en": "Fighting in 1809 devastated the northern bridgehead, including the Black Tower and parts of the Katharinenspital. The heavily damaged fortifications were subsequently removed in 1810.",
+        "es": "Los combates de 1809 destruyeron la cabecera norte, incluido el Schwarzer Turm y partes del Katharinenspital. Las fortificaciones, gravemente dañadas, fueron desmontadas posteriormente en 1810."
       },
-      "evidence_status": "NEEDS_VALIDATION",
-      "uncertainty_type": "DATE",
-      "sources": [],
-      "source_ids": [],
+      "evidence_status": "HISTORICAL_CONTEXT",
+      "sources": [
+        "Die Steinerne Brücke – 2010 bis 2018 (book OCR copy, verified 2026-10-09)"
+      ],
+      "source_ids": [
+        "Q001"
+      ],
       "related_topic": null,
       "hotspot_target": "PENDING_DESTINATION",
-      "status": "PENDING_FREIGABE",
+      "status": "TEXT_SOURCE_VERIFIED",
       "note": "The image shows the bridge's nearest arch under what reads as repair/damage bracing (orange wood scaffolding) — no validated source or Freigabe covers any specific repair event, date or cause for this. Title deliberately describes only the EVIDENCE STATUS itself (not a historical claim); description is intentionally empty rather than inventing a date, incident or narrative. Do not add descriptive text here without a real source.",
       "asset_web4k": "sb_k09",
       "match_confidence_4k": "NONE",
       "focus": {
         "x": 56,
         "y": 50
-      }
+      },
+      "held_original": {
+        "date": null,
+        "title": {
+          "de": "Zustand nicht bestätigt",
+          "en": "Condition not confirmed",
+          "es": "Estado sin confirmar"
+        },
+        "description": {
+          "de": "",
+          "en": "",
+          "es": ""
+        },
+        "evidence_status": "NEEDS_VALIDATION",
+        "source_ids": [],
+        "related_topic": null,
+        "hotspot_target": "PENDING_DESTINATION",
+        "note": "previous public state preserved for audit (NEEDS_VALIDATION neutral wording / earlier validated text)"
+      },
+      "description_short": {
+        "de": "Die Kämpfe von 1809 zerstörten den nördlichen Brückenkopf mit dem Schwarzen Turm und Teilen des Katharinenspitals; die Befestigungen wurden 1810 abgetragen.",
+        "en": "Fighting in 1809 devastated the northern bridgehead with the Black Tower and parts of the Katharinenspital; the fortifications were removed in 1810.",
+        "es": "Los combates de 1809 destruyeron la cabecera norte con el Schwarzer Turm y partes del Katharinenspital; las fortificaciones se desmontaron en 1810."
+      },
+      "historical_text_status": "SOURCE_VERIFIED",
+      "visual_alignment_status": "INTERPRETIVE",
+      "public_context_type": "HISTORICAL_CONTEXT",
+      "flags": [
+        "VISUAL_INTERPRETIVE_NOT_ASSERTED"
+      ]
     },
     {
       "id": "k10",
       "asset": "k10_master.png",
       "order": 10,
-      "date": "1859–1869",
+      "date": "1903",
       "title": {
-        "de": "Historische Verwandlung",
-        "en": "Historical transformation",
-        "es": "Transformación histórica"
+        "de": "Die Straßenbahn erreicht die Brücke",
+        "en": "The tram reaches the bridge",
+        "es": "El tranvía llega al puente"
       },
       "description": {
-        "de": "Während die Stadt sich verändert, wachsen die gotischen Domtürme empor — eingerüstet und im Bau, ein neuer Horizont für die alte Brücke.",
-        "en": "As the city changes around it, the Gothic cathedral spires rise — scaffolded and under construction, a new skyline for the old bridge.",
-        "es": "Mientras la ciudad cambia a su alrededor, las agujas góticas de la catedral se elevan — entre andamios y en construcción, un nuevo perfil para el viejo puente."
+        "de": "Im April 1903 fuhr erstmals die Straßenbahn über die Steinerne Brücke. Gleise, Elektrifizierung und Umbauten am südlichen Zugang veränderten den historischen Verkehrsraum.",
+        "en": "In April 1903 the tram crossed the Stone Bridge for the first time. Rails, electrification and modifications to the southern approach changed the historic traffic space.",
+        "es": "En abril de 1903 el tranvía cruzó por primera vez la Steinerne Brücke. Las vías, la electrificación y las reformas del acceso sur transformaron el espacio histórico de circulación."
       },
-      "evidence_status": "RECONSTRUCTED",
+      "evidence_status": "HISTORICAL_CONTEXT",
       "sources": [
-        "i18n.js states[6]"
+        "Die Steinerne Brücke – 2010 bis 2018 (book OCR copy, verified 2026-10-09)"
       ],
       "source_ids": [
-        "Q007"
+        "Q001"
       ],
-      "related_topic": "DOM",
+      "related_topic": "STRASSENBAHN",
       "hotspot_target": "#stage",
-      "status": "PENDING_FREIGABE",
+      "status": "TEXT_SOURCE_VERIFIED",
       "note": "Closest validated era (Gothic tower construction). The image itself shows complete spires plus an electric tram (a later, 19th/early-20th-century-reading scene) — reused verbatim per the brief rather than inventing tram-specific copy; this discrepancy between image and validated date range is flagged, not silently resolved.",
       "asset_web4k": "sb_k10",
       "match_confidence_4k": "MEDIUM",
       "focus": {
         "x": 56,
         "y": 50
-      }
+      },
+      "held_original": {
+        "date": "1859–1869",
+        "title": {
+          "de": "Historische Verwandlung",
+          "en": "Historical transformation",
+          "es": "Transformación histórica"
+        },
+        "description": {
+          "de": "Während die Stadt sich verändert, wachsen die gotischen Domtürme empor — eingerüstet und im Bau, ein neuer Horizont für die alte Brücke.",
+          "en": "As the city changes around it, the Gothic cathedral spires rise — scaffolded and under construction, a new skyline for the old bridge.",
+          "es": "Mientras la ciudad cambia a su alrededor, las agujas góticas de la catedral se elevan — entre andamios y en construcción, un nuevo perfil para el viejo puente."
+        },
+        "evidence_status": "RECONSTRUCTED",
+        "source_ids": [
+          "Q007"
+        ],
+        "related_topic": "DOM",
+        "hotspot_target": "#stage",
+        "note": "previous public state preserved for audit (NEEDS_VALIDATION neutral wording / earlier validated text)"
+      },
+      "description_short": {
+        "de": "Im April 1903 fuhr erstmals die Straßenbahn über die Brücke. Gleise, Elektrifizierung und Umbauten am südlichen Zugang veränderten den Verkehrsraum.",
+        "en": "In April 1903 the tram crossed the bridge for the first time. Rails, electrification and changes to the southern approach altered the traffic space.",
+        "es": "En abril de 1903 el tranvía cruzó por primera vez el puente. Las vías, la electrificación y las reformas del acceso sur transformaron el espacio de circulación."
+      },
+      "historical_text_status": "SOURCE_VERIFIED",
+      "visual_alignment_status": "INTERPRETIVE",
+      "public_context_type": "HISTORICAL_CONTEXT",
+      "flags": [
+        "VISUAL_INTERPRETIVE_NOT_ASSERTED"
+      ]
     },
     {
       "id": "k11",
@@ -479,7 +621,9 @@
       "focus": {
         "x": 56,
         "y": 50
-      }
+      },
+      "historical_text_status": "EXISTING_APPROVED_TEXT",
+      "visual_alignment_status": "INTERPRETIVE"
     },
     {
       "id": "k12",
@@ -512,9 +656,17 @@
       "focus": {
         "x": 56,
         "y": 50
-      }
+      },
+      "date_i18n": {
+        "de": "HEUTE",
+        "en": "TODAY",
+        "es": "HOY"
+      },
+      "historical_text_status": "EXISTING_APPROVED_TEXT",
+      "visual_alignment_status": "INTERPRETIVE"
     }
   ],
   "web4k_note": "2026-10-08 STEINERNE FINAL CLOSURE — runtime now displays the owner's 4K series (OWNER_UPLOAD_2026-10-08, derivatives in 03_ASSETS/Steinerne_Bruecke/2d/KFRAMES_4K_WEB/sb_kNN_{1080,720}_v01.webp via each frame's `asset_web4k`; legacy `asset` PNG kept as error fallback). The 4K series is an aerial urban-evolution series, NOT a re-render of the legacy construction-scene series. Frames whose validated text contradicts the new image (K03-K07) are HELD: date/title/description neutralised to the already-approved NEEDS_VALIDATION wording (identical to K08/K09) and the original validated record preserved under `held_original` for restoration once the owner/ChatGPT approve a 4K-specific text. `match_confidence_4k` records the image-text assessment per frame. No new historical claim was written.",
-  "focus_note": "Mobile focal points (percent object-position) for the 4K series; the stage is ~9:16 so only the X axis crops on phones (viewport narrower than 9:16). K02 is shifted left to keep the timber crane/barges in frame; K04-K12 are shifted slightly right to keep the Dom on the right edge in frame while the bridge entering from the left stays visible."
+  "focus_note": "Mobile focal points (percent object-position) for the 4K series; the stage is ~9:16 so only the X axis crops on phones (viewport narrower than 9:16). K02 is shifted left to keep the timber crane/barges in frame; K04-K12 are shifted slightly right to keep the Dom on the right edge in frame while the bridge entering from the left stays visible.",
+  "context_model_note": "2026-10-09: K03-K10 show source-verified HISTORICAL CONTEXT (book 'Die Steinerne Brücke – 2010 bis 2018', local OCR copy). The generated images are interpretive visualizations: historical_text_status (text) is separate from visual_alignment_status (image = INTERPRETIVE / NOT_HISTORICALLY_ASSERTED). Public copy never describes what the image 'shows'. K03 carries SOURCE_VERIFIED_WITH_DATING_CAUTION (completion ~1146/47 transmitted, not contemporaneously documented). description_short = concise mobile form of the same verified statement. Previous states preserved in held_original."
 }

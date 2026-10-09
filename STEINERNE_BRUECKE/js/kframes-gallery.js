@@ -211,7 +211,20 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
   // width (720w for phones at 1x/2x, 1080w otherwise) so the preload cache and
   // the visible <img> always share the exact same URL. Frames without an
   // `asset_web4k` (or if that file 404s, see imgError below) use the legacy PNG.
-  const web4kWidth = (Math.max(window.innerWidth, 1) * (window.devicePixelRatio || 1) > 900 && window.innerWidth >= 700) ? 1080 : 720;
+  // PREMIUM MEDIA STANDARD V1: ladder 720 / 1080 / 1440 chosen from the stage's
+  // CSS width x devicePixelRatio (the 9:16 stage on desktop/tablet, the full
+  // viewport width on phones). Desktop never drops below 1080; 2160 masters are
+  // never requested (not justified by any real stage size).
+  const web4kWidth = (() => {
+    const dpr = window.devicePixelRatio || 1;
+    const st = document.querySelector(".kf__stage");
+    const cssW = (st && st.clientWidth) || window.innerWidth || 1;
+    const need = cssW * dpr;
+    const desktop = window.innerWidth >= 700;
+    if (need <= 800 && !desktop) return 720;
+    if (need <= 1300) return 1080;
+    return 1440;
+  })();
   const resolveUrl = (frame) => frame.asset_web4k
     ? encodeURI(`${KFRAMES_4K_WEB_BASE}/${frame.asset_web4k}_${web4kWidth}_v01.webp`)
     : legacyUrl(frame);
@@ -383,13 +396,18 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
     return { cap, eyebrow, date, evidence, h4, leadP, hotspotBtn, sourceP, sourceLabel: sourceP ? sourceP.firstChild : null, sourceText, frame, index: i };
   });
 
+  // 2026-10-09 — HISTORICAL CONTEXT model: localized date (K12 HEUTE/TODAY/HOY),
+  // concise mobile copy (description_short, same verified statement) below 1100px.
+  const dateFor = (f, lang) => (f.date_i18n && f.date_i18n[lang]) || f.date || "";
+  const mobileMQ = window.matchMedia("(max-width: 1099px)");
+  const descFor = (f, lang) => (mobileMQ.matches && f.description_short) ? pick(f.description_short, lang) : pick(f.description, lang);
   function fillCaptionText(lang) {
     capRefs.forEach((ref) => {
       const f = ref.frame;
-      ref.date.textContent = f.date || "";
+      ref.date.textContent = dateFor(f, lang);
       ref.evidence.textContent = evidenceLabel(f, t, lang);
       typo.setTitleText(ref.h4, pick(f.title, lang));
-      if (ref.leadP) typo.setLeadText(ref.leadP, pick(f.description, lang));
+      if (ref.leadP) typo.setLeadText(ref.leadP, descFor(f, lang));
       const noteEl = ref.cap.querySelector('[data-i18n-fill="kframesNeedsValidationNote"]');
       if (noteEl) noteEl.textContent = t(lang, "kframesNeedsValidationNote");
       if (ref.hotspotBtn) {
@@ -409,6 +427,8 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
   // shared key/lookup path itself is untouched and remains the fallback for
   // every other status and for any future non-date K-frame uncertainty.
   function evidenceLabel(frame, tFn, lang) {
+    if (frame.public_context_type === "TRADITIONAL_DATING") return tFn(lang, "kfBadgeTraditionalDating");
+    if (frame.public_context_type === "HISTORICAL_CONTEXT") return tFn(lang, "kfBadgeHistoricalContext");
     const status = frame.evidence_status;
     if (!status) return "";
     if (status === "NEEDS_VALIDATION" && frame.uncertainty_type === "DATE") {
@@ -419,6 +439,7 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
   }
 
   fillCaptionText(getLang());
+  if (mobileMQ.addEventListener) mobileMQ.addEventListener("change", () => fillCaptionText(getLang()));
 
   // Initial hidden state for every beat's animatable parts (rule 1 —
   // explicit initial state before any tween exists).
@@ -438,7 +459,7 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
     dot.setAttribute("tabindex", "0");
     dot.setAttribute("aria-label", `K${String(f.order).padStart(2, "0")}`);
     // desktop left rail: "01 · 1135" label (CSS ::after; hidden on mobile)
-    dot.dataset.label = String(f.order).padStart(2, "0") + (f.date ? "  ·  " + String(f.date).slice(0, 4) : "");
+    dot.dataset.label = String(f.order).padStart(2, "0") + (dateFor(f, getLang()) ? "  ·  " + dateFor(f, getLang()) : "");
     dot.addEventListener("click", () => jumpToFrame(i));
     dotsWrap.appendChild(dot);
   });
@@ -660,6 +681,7 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
   return {
     refreshLabels: () => {
       fillCaptionText(getLang());
+      dotsWrap.querySelectorAll(".kf__dot").forEach((d) => { const f = frames[Number(d.dataset.index)]; const dt = dateFor(f, getLang()); d.dataset.label = String(f.order).padStart(2, "0") + (dt ? "  ·  " + dt : ""); });
       [[imgA, layerAIdx], [imgB, layerBIdx]].forEach(([im, i]) => { im.alt = altFor(frames[i]); });
       renderSourcesPanel(getLang());
       // PHASE 2.5 FIX — see the invalidateOnRefresh comment above. Forces

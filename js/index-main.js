@@ -188,7 +188,10 @@ function wireHeroMedia() {
   // desktop-video and mobile-canvas paths as the pre-ready fallback (brief
   // Section 14) — never a black hero, empty canvas, or broken-image icon.
   const POSTER_IMG = "assets/video/index/intro/zeitsprung_intro_build_v01_poster.jpg";
-  if (poster) poster.src = POSTER_IMG;
+  // PREMIUM MEDIA STANDARD V1: desktop/tablet gets the 1080 poster (final frame of
+  // the owner-approved 1080 enhanced derivative); touch-first keeps the light 480 one.
+  const POSTER_DESKTOP = "assets/video/index/intro/zeitsprung_intro_build_v01_desktop_poster_1080.jpg";
+  if (poster) poster.src = isTouchFirstDevice() ? POSTER_IMG : POSTER_DESKTOP;
   // prefers-reduced-motion: the poster stays the permanent hero image on
   // EITHER path; neither the video nor the frame sequence is ever requested
   // (css/index.css also hides both defensively under prefers-reduced-motion).
@@ -204,7 +207,7 @@ function wireHeroMedia() {
   }
 
   if (!video) return;
-  video.src = "assets/video/index/intro/zeitsprung_intro_build_v01_web.mp4";
+  video.src = "assets/video/index/intro/zeitsprung_intro_build_v01_desktop_1080_web.mp4"; // 1080x1920 enhanced-upscale derivative (GOP 4, no B-frames, no audio); owner-approved
   register(video, { id: "indexHero", role: "hero-build-scrub" });
   video.preload = "auto"; // must be buffered enough to scrub smoothly, not just play once
   video.addEventListener("loadedmetadata", () => {

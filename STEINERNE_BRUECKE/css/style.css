@@ -2556,3 +2556,46 @@ img{ max-width:100%; display:block; }
 @media (min-width: 1100px) and (min-aspect-ratio: 21/9){
   :root{ --zt-desktop-max: 1760px; }
 }
+
+/* ---------------------------------------------------------------- */
+/* K-FRAME CAPTION LEGIBILITY ON MOBILE/TABLET (2026-10-09)           */
+/* The verified historical-context copy is longer than the old        */
+/* captions: a taller, softer scrim + light text-shadow keep it        */
+/* readable over bright water/bridge areas. < 1100px only; the        */
+/* desktop shell (copy outside the photograph) is untouched.          */
+/* ---------------------------------------------------------------- */
+@media (max-width: 1099px){
+  .kf__vignette{
+    background: linear-gradient(to top,
+      rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.66) 28%, rgba(0,0,0,0.30) 46%, rgba(0,0,0,0) 64%);
+  }
+  .kf__cap-lead{ color: rgba(244,239,230,0.86); text-shadow: 0 1px 10px rgba(0,0,0,0.65); }
+  .kf__cap-title{ text-shadow: 0 1px 12px rgba(0,0,0,0.6); }
+  .kf__cap-date{ color: #ecd3a0; text-shadow: 0 0 7px rgba(0,0,0,0.9), 0 1px 3px rgba(0,0,0,0.9); }
+  .kf__cap-evidence{ background: rgba(8,9,11,0.5); color: rgba(244,239,230,0.7); }
+}
+
+/* K-FRAMES MOBILE COMPOSITION = DESKTOP COMPOSITION (2026-10-09).
+   Desktop shows the WHOLE 9:16 frame (no crop). Phones are narrower than 9:16
+   (e.g. 375x812), so `cover` cropped ~18% of the width and pushed the cathedral
+   to the edge / made the shot feel tighter. Now the image is fitted to the stage
+   WIDTH at its native 9:16 ratio (same field of view as desktop, no zoom, no
+   distortion), anchored to the top; the leftover strip under it (behind the
+   caption) fades into the stage background. Tablet (9:16 stage) is unaffected. */
+@media (max-width:1099px){
+  .kf__stage{ background:#08090b; }
+  .kf__img{
+    inset:0 0 auto 0; height:auto; aspect-ratio:9 / 16;
+    object-fit:cover; object-position:50% 50%;
+    -webkit-mask-image:linear-gradient(to bottom,#000 0,#000 90%,transparent 100%);
+            mask-image:linear-gradient(to bottom,#000 0,#000 90%,transparent 100%);
+  }
+}
+
+/* LARGE DESKTOP (PREMIUM MEDIA STANDARD V1, 2026-10-09): at >= 2200px CSS width the
+   1560px museum container squeezed the right editorial rail to its 280px minimum
+   and clipped the title/lead. Widen the shell and allow a taller 9:16 stage.
+   Applies only to >= 2200px; 1100-2199px layouts are unchanged. */
+@media (min-width: 2200px){
+  :root{ --zt-desktop-max: 2240px; --zt-stage-h: min(calc(100dvh - var(--nav-h) - 24px), 1360px); }
+}
