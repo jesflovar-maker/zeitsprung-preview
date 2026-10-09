@@ -583,6 +583,15 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
   // ticker below (search "PING-PONG DRIVER") for the playback mechanism.
   const pingPongLoops = []; // { el, chapterKey, direction: 1|-1 }
 
+  // GROUP B V2 (2026-10-10) — a loop video shows its approved still (the slot's
+  // fallback_slot_id image, already in the image preload set) as its poster, so
+  // a clip that has not decoded its first frame yet never reads as an empty
+  // black stage. Visual-only; no new asset.
+  function setLoopPoster(videoEl, slot) {
+    if (!slot || !slot.fallback_slot_id) return;
+    const fb = resolveSlot(registry, slot.fallback_slot_id);
+    if (fb && fb.ok && fb.url) videoEl.poster = fb.url;
+  }
   (registry.manifest.slots || []).forEach((slot) => {
     if (!slot || slot.type !== LOOP_TYPE || !slot.chapter_key) return;
     const resolved = resolveSlot(registry, slot.slot_id);
@@ -597,6 +606,7 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
       if (!pendingVideo || !pendingLayer) return;
       pendingVideo.hidden = false;
       pendingLayer.classList.add("museum__pending--video-ready");
+      setLoopPoster(pendingVideo, slot);
       videoPreloadQueue.push({ el: pendingVideo, url: resolved.url });
       loopVideos.push(pendingVideo);
       loopLayers[slot.chapter_key] = { el: pendingLayer, video: pendingVideo, resolved, target };
@@ -628,6 +638,7 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     applyFitToMedia(v, resolved.slot); // same generic fit system as the images
     if (flatGuides) flatLayer.insertBefore(v, flatGuides);
     else flatLayer.appendChild(v);
+    setLoopPoster(v, slot);
     videoPreloadQueue.push({ el: v, url: resolved.url });
     loopVideos.push(v);
     loopLayers[slot.chapter_key] = { el: v, video: v, resolved, target };
@@ -1406,6 +1417,26 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
   // decoded we refresh ScrollTrigger so the pin measures a settled layout.
   // Nothing is ever created/destroyed per scroll tick.
   // -------------------------------------------------------------------
+  // GROUP B V2 — CURRENT + NEXT MEDIA. Chapter videos get their src at proximity but
+  // stay preload="none"; the NEXT two chapters' clips are switched to preload="auto"
+  // as soon as a chapter becomes active (and the first two when the section is
+  // approached), so the next exhibit is buffered before the visitor reaches it.
+  // Distant chapters stay untouched; nothing is decoded/played here.
+  const WARM_ORDER = CHAPTER_SCRIPT.map((c) => c.key);
+  function warmEl(el) {
+    if (!el || !el.src || el.preload === "auto") return;
+    el.preload = "auto";
+    if (el.readyState === 0 && el.networkState === 1) { try { el.load(); } catch (err) { /* noop */ } }
+  }
+  function warmAhead(key) {
+    const i = WARM_ORDER.indexOf(key);
+    if (i < 0) return;
+    for (let n = 1; n <= 2; n++) {
+      const k = WARM_ORDER[i + n];
+      const entry = k && loopLayers[k];
+      if (entry && entry.video) warmEl(entry.video);
+    }
+  }
   let assetsRequested = false;
   let videosRequested = false;
   // MOBILE-FIRST (2026-10-09): the museum's transition/loop videos total ~30+ MB
@@ -1422,6 +1453,7 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     // and it is deliberately NOT awaited, so a video can never delay the
     // ScrollTrigger.refresh() that the images' decode gate performs.
     videoPreloadQueue.forEach(({ el, url }) => { el.src = url; });
+    warmAhead("exploded"); // warms piers + arches
   }
   function ensureAssets(fromProximity) {
     if (!assetsRequested) {
@@ -1570,6 +1602,7 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     // BOTH the ambient-loop system and the PHASE 2.3 transition-clip system.
     onChapterChange: (index, key, direction) => {
       activeChapterKey = key;
+      warmAhead(key); // GROUP B V2 — current + next media strategy
       handleChapterAudio(key); // PHASE 2.4A — see LOOP_CHAPTER_SFX / BAU ambience above
       if (loopVideos.length) syncLoopPlayback();
       settleOtherTransitions(key); // always runs — harmless cleanup for a
