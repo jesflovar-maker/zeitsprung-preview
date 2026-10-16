@@ -479,6 +479,22 @@ function ztClearAwarenessObservers() {
   ztAwarenessObservers = [];
 }
 
+// RENDER-SCOPED CLEANUPS — render() rebuilds the whole subtree on every
+// language switch, but handlers attached to `document` and observers created
+// for per-render elements outlive that sweep. Anything a render registers
+// outside its own subtree (document listeners, its IntersectionObserver, its
+// auto-advance timers) pushes a teardown here; render() runs them all before
+// building the next subtree, so repeated re-renders never accumulate.
+let ztRenderCleanups = [];
+function ztOnRenderCleanup(fn) { ztRenderCleanups.push(fn); }
+function ztRunRenderCleanups() {
+  const pending = ztRenderCleanups;
+  ztRenderCleanups = [];
+  pending.forEach((fn) => {
+    try { fn(); } catch (err) { /* a stale teardown must never break a re-render */ }
+  });
+}
+
 // Bridges module-scope openInspection()/closeInspection() (shared by BOTH
 // galleries, defined outside renderAssistant()'s own closure — see those
 // functions below) to the assistant's single setPose() mutator, without a
@@ -957,13 +973,23 @@ function renderArtifactViewer(container, assets, t, lang, ui) {
     autoResume = setTimeout(() => { autoResume = null; startAuto(); }, AUTO_RESUME_IDLE_MS);
   }
   ["pointerdown", "click", "keydown", "focusin"].forEach((evt) => viewer.addEventListener(evt, autoUserInteracted));
-  document.addEventListener("visibilitychange", () => { if (document.hidden) stopAuto(); else if (!autoResume) startAuto(); });
+  const onAutoVisibility = () => { if (document.hidden) stopAuto(); else if (!autoResume) startAuto(); };
+  document.addEventListener("visibilitychange", onAutoVisibility);
+  let autoObserver = null;
   if (typeof IntersectionObserver !== "undefined") {
-    new IntersectionObserver((entries) => {
+    autoObserver = new IntersectionObserver((entries) => {
       autoInView = entries.some((en) => en.isIntersecting);
       if (autoInView) { if (!autoResume) startAuto(); } else stopAuto();
-    }, { threshold: 0.35 }).observe(viewer);
+    }, { threshold: 0.35 });
+    autoObserver.observe(viewer);
   }
+  ztOnRenderCleanup(() => {
+    document.removeEventListener("visibilitychange", onAutoVisibility);
+    if (autoObserver) autoObserver.disconnect();
+    stopAuto();
+    clearTimeout(autoResume);
+    autoResume = null;
+  });
 
   function openHeroInspection() {
     const items = views.map((view) => ({
@@ -1163,7 +1189,9 @@ function renderSources(container, t, lang, sourcesMap) {
   btn.addEventListener("click", openPanel);
   closeBtn.addEventListener("click", closePanel);
   panel.addEventListener("click", (e) => { if (e.target === panel) closePanel(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !panel.hidden) closePanel(); });
+  const onSourcesEscape = (e) => { if (e.key === "Escape" && !panel.hidden) closePanel(); };
+  document.addEventListener("keydown", onSourcesEscape);
+  ztOnRenderCleanup(() => document.removeEventListener("keydown", onSourcesEscape));
 
   container.appendChild(btn);
   container.appendChild(panel);
@@ -1606,6 +1634,7 @@ function render(inner, assets, sourcesMap, t, getLang) {
   ztStopViewerRaf();
   ztStopAiTiltRaf();
   ztClearAwarenessObservers();
+  ztRunRenderCleanups();
   closeInspection();
   // Reset AFTER closeInspection() above (which, if a previous render's
   // Inspection Mode was still open, calls the PREVIOUS render's own
