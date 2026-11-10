@@ -288,3 +288,4 @@ h2.dh{font:600 clamp(26px,6.4vw,46px)/1.12 var(--font-sans);letter-spacing:-.01e
 @media (min-width:1100px){.dpeople__grid{grid-template-columns:repeat(2,minmax(0,1fr))}.darch__body{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}.droute__body{grid-template-columns:minmax(0,5fr) minmax(0,6fr)}}
 .dtlv__chip b,.dtlv__chip span{text-align:left}
 @media (max-width:1099px){.dtlv__chips{padding-right:calc(var(--gutter) + 60px)}}
+@media (min-width:1100px){.dtlv__chip{justify-content:flex-start}}
