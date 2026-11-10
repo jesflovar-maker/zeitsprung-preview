@@ -16,7 +16,7 @@
 <header class="dn" id="dn">
   <a class="dn__brand" href="../index.html" aria-label="ZEITSPRUNG — zur Übersicht">ZEITSPRUNG</a>
   <nav class="dn__links" id="dnLinks" aria-label="Kapitel"></nav>
-  <a class="dn__back" href="../index.html">ÜBERSICHT</a>
+  <div class="dn__right"><button class="dn__trailer" type="button" data-trailer>▶ TRAILER</button><a class="dn__back" href="../index.html">ÜBERSICHT</a></div>
 </header>
 <div class="dprog" id="dProg" aria-hidden="true"><span></span></div>
 
@@ -26,22 +26,23 @@
     <div class="dhero__copy">
       <p class="dhero__eyebrow">REGENSBURG</p>
       <h1 class="dhero__title">DOM ST. PETER</h1>
-      <p class="dhero__sub">Gotische Kathedrale über der Donau — ein Bau, der über Jahrhunderte in die Höhe wuchs.</p>
+      <p class="dhero__sub">Gotische Kathedrale im Herzen Regensburgs — ein Bau, der über Jahrhunderte in die Höhe wuchs.</p>
       <div class="dhero__cta">
         <a class="dbtn dbtn--primary" href="#intro">ERLEBNIS BEGINNEN</a>
-        <button class="dbtn" type="button" id="trailerBtn">TRAILER ANSEHEN</button>
+        <button class="dbtn" type="button" id="trailerBtn" data-trailer>TRAILER ANSEHEN</button>
       </div>
     </div>
     <a class="dhero__scroll" href="#intro" aria-label="Nach unten"><span></span></a>
   </section>
   <section id="intro" class="dsec dintro"></section>
   <section id="zeitreise" class="dsec dkf" aria-labelledby="kfTitle"></section>
+  <section id="zeitleiste" class="dsec dtl"></section>
   <section id="bauabfolge" class="dsec dbau"></section>
+  <section id="glas" class="dsec darch dglas"></section>
+  <section id="menschen" class="dsec dpeople"></section>
   <section id="architektur" class="dsec darch"></section>
   <section id="rundum" class="dsec dscrub"></section>
   <section id="unten" class="dsec dunder"></section>
-  <section id="menschen" class="dsec dpeople"></section>
-  <section id="zeitleiste" class="dsec dtl"></section>
   <section id="rundgang" class="dsec droute"></section>
   <section id="heute" class="dsec dnow"></section>
   <section id="ende" class="dsec dend"></section>
@@ -51,6 +52,8 @@
   <button class="dtrailer__close" type="button" id="trailerClose" aria-label="Schließen">×</button>
   <div class="dtrailer__stage" id="trailerStage"></div>
 </dialog>
+<button class="dguide__fab" type="button" id="guideFab" aria-haspopup="dialog" aria-expanded="false" aria-controls="guidePanel"><img src="../assets/steinerne-bruecke/bruckmandl/ai/bruckmandl_ai_idle.webp" alt="" width="48" height="48"><span class="sr">Brückmandl fragen</span></button>
+<aside class="dguide" id="guidePanel" role="dialog" aria-label="Brückmandl — Ihr ZEITSPRUNG-Begleiter" hidden></aside>
 <script type="module" src="js/dom-main.js"></script>
 </body>
 </html>
