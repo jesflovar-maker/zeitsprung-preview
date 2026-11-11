@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" class="is-gated">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -14,9 +14,16 @@
 </head>
 <body>
 <header class="dn" id="dn">
-  <a class="dn__brand" href="../index.html" aria-label="ZEITSPRUNG — zur Übersicht">ZEITSPRUNG</a>
+  <a class="dn__brand" id="dnBrand" href="../index.html" aria-label="ZEITSPRUNG — zur Übersicht">ZEITSPRUNG</a>
   <nav class="dn__links" id="dnLinks" aria-label="Kapitel"></nav>
-  <div class="dn__right"><button class="dn__trailer" type="button" data-trailer>▶ TRAILER</button><a class="dn__back" href="../index.html">ÜBERSICHT</a></div>
+  <div class="dn__right">
+    <div class="dn__lang" id="dnLang" role="group" aria-label="Sprache">
+      <button type="button" data-lang="de" aria-pressed="true">DE</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      <button type="button" data-lang="es" aria-pressed="false">ES</button>
+    </div>
+    <a class="dn__back" id="dnBack" href="../index.html">ÜBERSICHT</a>
+  </div>
 </header>
 <div class="dprog" id="dProg" aria-hidden="true"><span></span></div>
 
@@ -24,24 +31,22 @@
   <section id="hero" class="dsec dhero" aria-label="Dom St. Peter">
     <div class="dhero__stage" id="heroStage"></div>
     <div class="dhero__copy">
-      <p class="dhero__eyebrow">REGENSBURG</p>
+      <p class="dhero__eyebrow" id="heroEyebrow">REGENSBURG</p>
       <h1 class="dhero__title">DOM ST. PETER</h1>
-      <p class="dhero__sub">Gotische Kathedrale im Herzen Regensburgs — ein Bau, der über Jahrhunderte in die Höhe wuchs.</p>
+      <p class="dhero__sub" id="heroSub">Gotische Kathedrale im Herzen Regensburgs — ein Bau, der über Jahrhunderte in die Höhe wuchs.</p>
       <div class="dhero__cta">
-        <a class="dbtn dbtn--primary" href="#intro">ERLEBNIS BEGINNEN</a>
-        <button class="dbtn" type="button" id="trailerBtn" data-trailer>TRAILER ANSEHEN</button>
+        <button class="dbtn dbtn--primary dhero__start" type="button" id="startBtn">ERLEBNIS BEGINNEN</button>
       </div>
     </div>
-    <a class="dhero__scroll" href="#intro" aria-label="Nach unten"><span></span></a>
   </section>
-  <section id="intro" class="dsec dintro"></section>
-  <section id="zeitreise" class="dsec dkf" aria-labelledby="kfTitle"></section>
-  <section id="zeitleiste" class="dsec dtl"></section>
-  <section id="bauabfolge" class="dsec dbau"></section>
-  <section id="glas" class="dsec darch dglas"></section>
-  <section id="menschen" class="dsec dpeople"></section>
-  <section id="architektur" class="dsec darch"></section>
   <section id="rundum" class="dsec dscrub"></section>
+  <section id="holo" class="dsec dholo"></section>
+  <section id="architektur" class="dsec dstory dstory--arch"></section>
+  <section id="bauabfolge" class="dsec dstory dstory--bau"></section>
+  <section id="zeitreise" class="dsec dstory dstory--kf"></section>
+  <section id="zeitleiste" class="dsec dtl"></section>
+  <section id="glas" class="dsec dstory dstory--glas"></section>
+  <section id="menschen" class="dsec dstory dstory--people"></section>
   <section id="unten" class="dsec dunder"></section>
   <section id="rundgang" class="dsec droute"></section>
   <section id="heute" class="dsec dnow"></section>
@@ -52,7 +57,7 @@
   <button class="dtrailer__close" type="button" id="trailerClose" aria-label="Schließen">×</button>
   <div class="dtrailer__stage" id="trailerStage"></div>
 </dialog>
-<button class="dguide__fab" type="button" id="guideFab" aria-haspopup="dialog" aria-expanded="false" aria-controls="guidePanel"><img src="../assets/steinerne-bruecke/bruckmandl/ai/bruckmandl_ai_idle.webp" alt="" width="48" height="48"><span class="sr">Brückmandl fragen</span></button>
+<button class="dguide__fab" type="button" id="guideFab" aria-haspopup="dialog" aria-expanded="false" aria-controls="guidePanel"><img src="../assets/steinerne-bruecke/bruckmandl/ai/bruckmandl_ai_idle.webp" alt="" width="48" height="48"><span class="sr" id="guideFabLabel">Brückmandl fragen</span></button>
 <aside class="dguide" id="guidePanel" role="dialog" aria-label="Brückmandl — Ihr ZEITSPRUNG-Begleiter" hidden></aside>
 <script type="module" src="js/dom-main.js"></script>
 </body>
