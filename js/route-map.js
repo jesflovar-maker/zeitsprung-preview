@@ -44,7 +44,12 @@ import { STEINERNE_ROUTE_JSON_URL } from "./zt-paths.js";
 
 const ROUTE_JSON_URL = STEINERNE_ROUTE_JSON_URL;
 const CONFIG_URL = "./monuments.config.json";
-const MAP_IMG = "assets/maps/regensburg_interactive_map_v01.png";
+// 2026-11-11 — NEW OWNER ROUTE MAP (INDEX_ROUTE_MAP_REAL_01, 941x1672, runtime WebP). The artwork already
+// carries the route line, the five numbered name plates and their anchor dots, so this component now only
+// adds: invisible-number hotspot rings on those anchor dots, the translated caption, and restrained motion
+// (slow breathing drift of the whole stage, a soft light sweep, hotspot pulses, light pointer parallax).
+// The image itself is never distorted and pins live inside the same moving stage, so alignment is preserved.
+const MAP_IMG = "assets/maps/regensburg_route_map_real_01.webp";
 
 // Visually calibrated against the actual artwork (see file header).
 // PIN_LAYOUT also supplies the route line's own vertices (see the SVG
@@ -53,21 +58,17 @@ const MAP_IMG = "assets/maps/regensburg_interactive_map_v01.png";
 // display-only correction for the numbered badge alone, used only where a
 // monument has no drawn ring in the artwork to visually anchor it to (only
 // Neupfarrplatz today — DESIGN REVISION, see file header date).
+// Calibrated 2026-11-11 against the anchor dots drawn in the new artwork (fractions of image width/height).
 const PIN_LAYOUT = {
-  "steinerne-bruecke": { x: 0.55, y: 0.29 },
-  "dom-st-peter": { x: 0.79, y: 0.615 },
-  "altes-rathaus": { x: 0.17, y: 0.51 },
-  "porta-praetoria": { x: 0.855, y: 0.545 },
-  "neupfarrplatz": { x: 0.40, y: 0.685 }
+  "steinerne-bruecke": { x: 0.622, y: 0.1015 },
+  "dom-st-peter": { x: 0.7105, y: 0.4825 },
+  "altes-rathaus": { x: 0.2256, y: 0.3775 },
+  "porta-praetoria": { x: 0.8277, y: 0.376 },
+  "neupfarrplatz": { x: 0.2709, y: 0.806 }
 };
 
-// Badge-only visual correction (does NOT feed the route line/polyline).
-// Neupfarrplatz's excavation site has no drawn ring in the artwork (unlike
-// the other four stops), so its badge needs to sit closer to/just above the
-// site itself to read as "belonging" to it the way 02/03/04 already do.
-const PIN_BADGE_OFFSET = {
-  "neupfarrplatz": { x: 0.41, y: 0.70 }
-};
+// No badge offsets are needed any more: every stop has its own drawn anchor dot in the new artwork.
+const PIN_BADGE_OFFSET = {};
 
 function el(tag, className, attrs) {
   const node = document.createElement(tag);
@@ -139,8 +140,15 @@ export async function initRouteMap({ root, getLang, getGalleryHandle, reducedMot
   caption.appendChild(capName);
   caption.appendChild(capStatus);
 
-  root.appendChild(img);
-  root.appendChild(svg);
+  // Everything that must stay registered with the artwork lives in ONE stage (image + overlay + pins),
+  // so the drift / parallax transform moves them together.
+  root.classList.add("route-map--real");
+  const stage = el("div", "route-map__stage");
+  const sweep = el("div", "route-map__sweep", { "aria-hidden": "true" });
+  stage.appendChild(img);
+  stage.appendChild(svg);
+  root.appendChild(stage);
+  root.appendChild(sweep);
 
   const pinEls = stops.map(({ stop, cfg, pos }) => {
     const badgePos = PIN_BADGE_OFFSET[cfg.id] || pos;
@@ -153,7 +161,7 @@ export async function initRouteMap({ root, getLang, getGalleryHandle, reducedMot
     pin.textContent = String(stop.order).padStart(2, "0");
     pin.classList.toggle("is-active", !!cfg.enabled);
     pin.classList.toggle("is-pending", !cfg.enabled);
-    root.appendChild(pin);
+    stage.appendChild(pin);
     return { pin, stop, cfg };
   });
 
@@ -207,6 +215,14 @@ export async function initRouteMap({ root, getLang, getGalleryHandle, reducedMot
   });
 
   setCurrent(currentId);
+
+  // Light pointer parallax (fine pointers only, never under reduced motion). One listener pair, added once.
+  if (!(reducedMotion && reducedMotion()) && window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    let raf = 0, px = 0, py = 0;
+    const apply = () => { raf = 0; stage.style.setProperty("--rm-px", px.toFixed(2) + "px"); stage.style.setProperty("--rm-py", py.toFixed(2) + "px"); };
+    root.addEventListener("pointermove", (e) => { const r = root.getBoundingClientRect(); px = ((e.clientX - r.left) / r.width - 0.5) * -10; py = ((e.clientY - r.top) / r.height - 0.5) * -10; if (!raf) raf = requestAnimationFrame(apply); });
+    root.addEventListener("pointerleave", () => { px = 0; py = 0; if (!raf) raf = requestAnimationFrame(apply); });
+  }
 
   return {
     refreshLang() {

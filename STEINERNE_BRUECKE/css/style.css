@@ -2700,47 +2700,49 @@ img{ max-width:100%; display:block; }
 }
 
 /* ============================================================================
-   MUSEUM PHOTO GALLERY — #craftGallery "Die Menschen hinter der Brücke"
-   (2026-11-11). Additive block; own .craft namespace, no existing rule changed.
-   Mobile-first: lead image large, supporting images in a 2-column grid.
-   Desktop >=1100px: editorial split (lead left, supporting right).
-   Fixed 9:16 boxes -> no layout shift.
+   MUSEUM PHOTO GALLERY — #craftGallery "Die Menschen hinter der Brücke".
+   2026-11-11 rev. 2: DOWN-SCROLL story. One sticky 9:16 stage; scrolling
+   advances the steps (js/craft-gallery.js). Own .craft namespace; no existing
+   rule changed. Mobile: stage full height, caption over a gradient.
+   Desktop >=1100px: stage left of centre, editorial caption column right.
    ============================================================================ */
-.craft{ position: relative; background: var(--z-bg); padding: clamp(64px, 12vw, 120px) 0 clamp(48px, 9vw, 96px); }
-.craft__inner{ max-width: 1180px; margin: 0 auto; padding: 0 clamp(18px, 5vw, 28px); }
+.craft{ position: relative; background: var(--z-bg); padding: clamp(64px, 12vw, 120px) 0 0; }
+.craft__inner{ max-width: none; margin: 0; padding: 0; }
+.craft__eyebrow, .craft__inner > h3, .craft__lead{ max-width: 1180px; margin-inline: auto; padding-inline: clamp(18px, 5vw, 28px); }
 .craft__eyebrow{ font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--z-gold); margin-bottom: 14px; }
 .craft__inner > h3{ font-size: clamp(24px, 6vw, 40px); font-weight: 600; line-height: 1.15; margin-bottom: 12px; }
-.craft__lead{ font-size: clamp(15px, 3.8vw, 17px); line-height: 1.6; color: var(--z-ink-dim); max-width: 56ch; }
-.craft__group{ margin-top: clamp(44px, 9vw, 84px); padding-top: 22px; border-top: 1px solid var(--z-line); }
-.craft__group-title{ font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.28em; color: var(--z-gold); margin: 0 0 20px; }
-.craft__grid{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 12px; }
-.craft__item{ margin: 0; min-width: 0; }
-.craft__item--lead{ grid-column: 1 / -1; }
-.craft__media{ display: block; width: 100%; padding: 0; border: 1px solid var(--z-line); background: #0b0d10; cursor: zoom-in; aspect-ratio: 9 / 16; overflow: hidden; }
-.craft__item--lead .craft__media{ width: min(100%, calc(78svh * 9 / 16)); margin-inline: auto; }
-.craft__media img{ display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(.22,.61,.36,1); }
-.craft__media:hover img{ transform: scale(1.02); }
-.craft__media:focus-visible{ outline: 2px solid var(--z-gold); outline-offset: 3px; }
-.craft__cap{ display: block; margin-top: 10px; }
-.craft__cap-title{ display: block; font-size: 15px; font-weight: 600; line-height: 1.25; margin-bottom: 4px; }
-.craft__cap-text{ display: block; font-size: 13px; line-height: 1.5; color: var(--z-ink-dim); }
-.craft__cap-ref{ display: block; margin-top: 7px; font-family: var(--font-mono); font-size: 9.5px; line-height: 1.5; letter-spacing: 0.08em; color: var(--z-ink-faint); }
-.craft__item--lead .craft__cap{ max-width: 52ch; margin-inline: auto; }
-.craft__item--lead .craft__cap-title{ font-size: 19px; }
-.craft__item--lead .craft__cap-text{ font-size: 14.5px; }
-.craft__note{ margin-top: clamp(36px, 7vw, 60px); font-family: var(--font-mono); font-size: 10px; line-height: 1.7; letter-spacing: 0.1em; color: var(--z-ink-faint); }
-@media (prefers-reduced-motion: reduce){ .craft__media img{ transition: none; } .craft__media:hover img{ transform: none; } }
-@media (min-width: 760px){
-  .craft__grid{ grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 18px; }
-  .craft__item--lead{ grid-column: span 2; grid-row: span 2; }
-  .craft__item--lead .craft__media{ width: 100%; }
-  .craft__item--lead .craft__cap{ max-width: none; margin-inline: 0; }
-}
+.craft__lead{ font-size: clamp(15px, 3.8vw, 17px); line-height: 1.6; color: var(--z-ink-dim); margin-bottom: 26px; }
+.craft__lead{ max-width: 1180px; }
+.craft__track{ position: relative; }
+.craft__sticky{ position: sticky; top: 0; height: 100svh; display: flex; align-items: center; justify-content: center; overflow: hidden; padding-top: 56px; }
+.craft__stage{ position: relative; display: block; height: min(100%, calc(100svh - 64px)); aspect-ratio: 9 / 16; max-width: 100%; padding: 0; border: 1px solid var(--z-line); background: #0b0d10; overflow: hidden; cursor: zoom-in; }
+.craft__stage:focus-visible{ outline: 2px solid var(--z-gold); outline-offset: -4px; }
+.craft__layer{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.9s cubic-bezier(.22,.61,.36,1); }
+.craft__layer.is-on{ opacity: 1; }
+.craft__cap{ position: absolute; left: 0; right: 0; bottom: 0; z-index: 4; padding: 90px calc(clamp(18px, 5vw, 28px) + 58px) calc(24px + env(safe-area-inset-bottom, 0px)) clamp(18px, 5vw, 28px); background: linear-gradient(to top, rgba(8,9,11,0.95) 0%, rgba(8,9,11,0.8) 55%, rgba(8,9,11,0) 100%); pointer-events: none; }
+.craft__cap-in{ max-width: 560px; margin-inline: auto; transition: opacity 0.4s cubic-bezier(.22,.61,.36,1), transform 0.4s cubic-bezier(.22,.61,.36,1); }
+.craft__cap-in.is-out{ opacity: 0; transform: translateY(8px); }
+.craft__cap-chapter{ font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.24em; color: var(--z-gold); margin: 0 0 8px; }
+.craft__cap-title{ font-size: clamp(21px, 5.8vw, 28px); font-weight: 600; line-height: 1.15; margin: 0 0 8px; }
+.craft__cap-text{ font-size: clamp(13.5px, 3.5vw, 15.5px); line-height: 1.55; color: rgba(244,239,230,0.86); margin: 0; }
+.craft__cap-ref{ margin: 9px 0 0; font-family: var(--font-mono); font-size: 9.5px; line-height: 1.5; letter-spacing: 0.08em; color: var(--z-ink-faint); }
+.craft__count{ position: absolute; top: 70px; left: clamp(18px, 5vw, 28px); z-index: 5; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em; color: rgba(244,239,230,0.75); }
+.craft__rail{ position: absolute; right: calc(clamp(18px, 5vw, 28px) - 6px); top: 46%; transform: translateY(-50%); z-index: 5; display: flex; flex-direction: column; gap: 8px; }
+.craft__rail i{ display: block; width: 5px; height: 5px; border-radius: 50%; background: rgba(244,239,230,0.28); transition: background 0.4s, transform 0.4s; }
+.craft__rail i.is-chapter{ margin-top: 7px; background: rgba(212,175,120,0.5); }
+.craft__rail i.is-chapter:first-child{ margin-top: 0; }
+.craft__rail i.is-on{ background: var(--z-gold); transform: scale(1.8); }
+.craft__next{ display: block; max-width: 1180px; margin: 0 auto; padding: 34px clamp(18px, 5vw, 28px) 0; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--z-gold); text-decoration: none; }
+.craft__note{ max-width: 1180px; margin: 0 auto; padding: 18px clamp(18px, 5vw, 28px) clamp(48px, 9vw, 96px); font-family: var(--font-mono); font-size: 10px; line-height: 1.7; letter-spacing: 0.1em; color: var(--z-ink-faint); }
+@media (prefers-reduced-motion: reduce){ .craft__layer, .craft__cap-in{ transition: none; } }
 @media (min-width: 1100px){
-  .craft__grid{ grid-template-columns: minmax(0, 5fr) repeat(3, minmax(0, 2.4fr)); gap: 36px 26px; align-items: start; }
-  .craft__item--lead{ grid-column: 1; grid-row: 1 / span 2; }
-  .craft__item--lead .craft__media{ width: min(100%, calc(82svh * 9 / 16)); margin-inline: 0; }
-  .craft__cap-title{ font-size: 16px; } .craft__cap-text{ font-size: 13.5px; }
-  .craft__item--lead .craft__cap-title{ font-size: 22px; } .craft__item--lead .craft__cap-text{ font-size: 15.5px; }
+  .craft__sticky{ flex-direction: row; }
+  .craft__stage{ margin-right: min(30vw, 380px); }
+  .craft__cap{ left: auto; right: 0; top: 0; bottom: 0; width: min(42vw, 520px); padding: 96px 64px 64px 24px; background: none; display: flex; align-items: center; }
+  .craft__cap-in{ max-width: none; }
+  .craft__cap-title{ font-size: 34px; } .craft__cap-text{ font-size: 16.5px; } .craft__cap-chapter{ font-size: 12px; } .craft__cap-ref{ font-size: 10.5px; }
+  .craft__rail{ right: auto; left: calc(50% - min(100svh, 1200px) * 9 / 32 - min(15vw, 190px) - 34px); }
+  .craft__count{ left: calc(50% - min(100svh, 1200px) * 9 / 32 - min(15vw, 190px) - 34px); top: 84px; }
 }
-@media (min-width: 2200px){ .craft__inner{ max-width: 1500px; } .craft__cap-text{ font-size: 16px; } .craft__cap-title{ font-size: 19px; } .craft__cap-ref{ font-size: 11.5px; } .craft__item--lead .craft__cap-text{ font-size: 19px; } }
+@media (min-width: 2200px){ .craft__cap{ width: min(40vw, 760px); } .craft__cap-title{ font-size: 46px; } .craft__cap-text{ font-size: 21px; } .craft__cap-chapter{ font-size: 15px; } .craft__cap-ref{ font-size: 13px; } }
+@media (min-width: 1100px){ .craft__count{ transform: translateX(-100%); margin-left: 22px; white-space: nowrap; } }

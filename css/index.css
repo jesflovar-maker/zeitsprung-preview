@@ -765,3 +765,33 @@ img{ max-width:100%; display:block; }
   .thesis-media__scrim{ display: none; }
   .thesis-chapter{ margin: 0 0 0 clamp(64px, 8vw, 160px); max-width: min(560px, 40vw); }
 }
+
+/* ---------------------------------------------------------------- */
+/* ROUTE MAP — NEW OWNER ARTWORK (2026-11-11). Additive overrides,   */
+/* scoped to .route-map--real (set by js/route-map.js).              */
+/* One image, motion only: slow breathing drift, soft light sweep,   */
+/* hotspot pulses, light pointer parallax. Reduced motion = static.  */
+/* ---------------------------------------------------------------- */
+.route-map--real{ aspect-ratio: 941 / 1672; max-width: min(560px, calc(88svh * 941 / 1672)); border-color: rgba(212,175,120,0.28); box-shadow: 0 24px 70px rgba(0,0,0,0.55); }
+.route-map--real .route-map__stage{ position: absolute; inset: -1.6%; --rm-px: 0px; --rm-py: 0px; transform: translate3d(var(--rm-px), var(--rm-py), 0); transition: transform 0.9s cubic-bezier(.22,.61,.36,1); will-change: transform; transform-origin: 58% 42%; animation: routeMapBreathe 26s ease-in-out infinite alternate; } /* image + pins breathe together */
+.route-map--real .route-map__svg{ display: none; } /* the route line is part of the artwork */
+@keyframes routeMapBreathe{ from{ scale: 1; } to{ scale: 1.035; } }
+.route-map--real .route-map__pin{ width: 44px; height: 44px; font-size: 0; color: transparent; background: transparent; border: 0; }
+.route-map--real .route-map__pin::before{ content: ""; position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; border: 1.5px solid var(--z-gold); background: rgba(212,175,120,0.25); box-shadow: 0 0 14px rgba(212,175,120,0.75); transition: transform 0.3s, background 0.3s; }
+.route-map--real .route-map__pin::after{ content: ""; position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; border: 1px solid var(--z-gold); opacity: 0; inset: auto; left: 50%; top: 50%; animation: routeMapPulse 3.2s ease-out infinite; }
+.route-map--real .route-map__pin:nth-of-type(2)::after{ animation-delay: .5s; } .route-map--real .route-map__pin:nth-of-type(3)::after{ animation-delay: 1s; }
+.route-map--real .route-map__pin:nth-of-type(4)::after{ animation-delay: 1.5s; } .route-map--real .route-map__pin:nth-of-type(5)::after{ animation-delay: 2s; }
+.route-map--real .route-map__pin.is-pending::before{ border-color: rgba(244,239,230,0.55); background: rgba(244,239,230,0.12); box-shadow: 0 0 10px rgba(244,239,230,0.3); }
+.route-map--real .route-map__pin.is-pending::after{ border-color: rgba(244,239,230,0.5); }
+.route-map--real .route-map__pin.is-current{ transform: translate(-50%, -50%); }
+.route-map--real .route-map__pin.is-current::before, .route-map--real .route-map__pin:hover::before, .route-map--real .route-map__pin:focus-visible::before{ transform: scale(1.5); background: rgba(212,175,120,0.6); }
+.route-map--real .route-map__pin:focus-visible{ outline: 2px solid var(--z-gold); outline-offset: -6px; border-radius: 50%; }
+@keyframes routeMapPulse{ 0%{ transform: scale(1); opacity: .75; } 100%{ transform: scale(3.4); opacity: 0; } }
+.route-map--real .route-map__sweep{ position: absolute; inset: 0; pointer-events: none; background: linear-gradient(115deg, rgba(255,236,200,0) 38%, rgba(255,236,200,0.10) 50%, rgba(255,236,200,0) 62%); background-size: 260% 260%; animation: routeMapSweep 14s ease-in-out infinite; mix-blend-mode: screen; }
+@keyframes routeMapSweep{ 0%{ background-position: 120% 120%; } 100%{ background-position: -20% -20%; } }
+.route-map--real .route-map__caption{ z-index: 3; }
+@media (prefers-reduced-motion: reduce){
+  .route-map--real .route-map__stage, .route-map--real .route-map__pin::after, .route-map--real .route-map__sweep{ animation: none; }
+  .route-map--real .route-map__sweep{ display: none; }
+  .route-map--real .route-map__stage{ transition: none; transform: none; }
+}

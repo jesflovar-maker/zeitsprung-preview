@@ -56,9 +56,9 @@
       "name": { "de": "Dom St. Peter", "en": "Dom St. Peter", "es": "Dom St. Peter" },
       "subtitle": { "de": "KATHEDRALE", "en": "CATHEDRAL", "es": "CATEDRAL" },
       "description": {
-        "de": "Die gotische Kathedrale Regensburgs über der Donau — vom Chor im Osten bis zu den Türmen im Westen, von den Dachräumen bis unter den Dom.",
-        "en": "Regensburg's Gothic cathedral above the Danube.",
-        "es": "La catedral gótica de Regensburg sobre el Danubio."
+        "de": "Die gotische Kathedrale im Herzen der Regensburger Altstadt — vom Chor im Osten bis zu den Türmen im Westen, von den Dachräumen bis unter den Dom.",
+        "en": "Regensburg's Gothic cathedral in the heart of the old town.",
+        "es": "La catedral gótica de Regensburg, en el corazón del casco antiguo."
       },
       "visual": "assets/dom-st-peter/img/dsp_k11_1080.webp",
       "poster": "assets/dom-st-peter/img/dsp_k11_1080.webp",
@@ -66,7 +66,7 @@
       "video_reverse": null,
       "video_mode": "static",
       "video_mode_previous": "ambient_loop",
-      "interactive_route": null,
+      "interactive_route": { "media_type": "trailer", "trailer_src": "dom-st-peter/video/dsp_trailer_720.mp4", "poster_src": "dom-st-peter/img/dsp_k11_1080.webp", "base": "web_root", "aspect_ratio": "9/16", "preload": "none", "autoplay": false, "muted": false, "loop": false, "playsinline": true },
       "background": "assets/video/index/monument_presentation/dom_st_peter/card_loop_01_web.mp4",
       "status": "active",
       "enabled": true,
