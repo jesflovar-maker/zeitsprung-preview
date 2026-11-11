@@ -533,7 +533,7 @@ export const DICT = {
     introTitle: "STEINERNE BRÜCKE",
     introCity: "REGENSBURG",
     introRange: "1135 → HOY",
-    introStart: "EXPERIENCIA INICIAR",
+    introStart: "INICIAR EXPERIENCIA",
     introSoundOn: "SONIDO ACTIVADO",
     introSoundOff: "SONIDO DESACTIVADO",
     introHint: "Listo para un viaje a través de 890 años de historia",

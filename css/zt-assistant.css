@@ -36,19 +36,17 @@
 .zt-assist__role{ font-size: 13px; color: var(--z-ink-dim, rgba(244,239,230,.62)); }
 .zt-assist__close{ margin-left: auto; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--z-line, rgba(244,239,230,.14)); background: none; color: inherit; font-size: 22px; line-height: 1; cursor: pointer; }
 .zt-assist__hi{ font-size: 14px; line-height: 1.5; color: var(--z-ink-dim, rgba(244,239,230,.62)); margin: 0 0 12px; }
-.zt-assist__topics{ display: flex; flex-wrap: wrap; gap: 6px; }
+.zt-assist__topics{ display: block; }
 .zt-assist__topic{ min-height: 44px; padding: 0 12px; background: none; border: 1px solid var(--z-line, rgba(244,239,230,.14)); color: var(--z-ink-dim, rgba(244,239,230,.62)); font-family: var(--font-sans, 'Inter', system-ui, sans-serif); font-size: 13px; cursor: pointer; text-align: left; }
 .zt-assist__topic[aria-pressed="true"]{ color: var(--z-ink, #f4efe6); border-color: var(--z-gold-dim, rgba(212,175,120,.55)); background: rgba(212,175,120,.08); }
 .zt-assist__topic:focus-visible, .zt-assist__close:focus-visible{ outline: 2px solid var(--z-gold, #d4af78); outline-offset: 2px; }
 .zt-assist__ans{ margin-top: 12px; font-size: 15px; line-height: 1.55; }
 .zt-assist__ans:empty{ display: none; }
 .zt-assist__ans p{ margin: 0; }
-.zt-assist__status{ display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
-.zt-assist__status:empty{ display: none; }
-.zt-assist__badge{ font-family: var(--font-mono, ui-monospace, monospace); font-size: 9.5px; letter-spacing: .18em; padding: 4px 7px; border: 1px solid var(--z-line, rgba(244,239,230,.14)); color: var(--z-ink-dim, rgba(244,239,230,.62)); }
-.zt-assist__badge--fact{ color: var(--z-gold, #d4af78); border-color: rgba(212,175,120,.4); }
-.zt-assist__badge--legend{ color: var(--z-warn, #e8a15c); border-color: rgba(232,161,92,.45); border-style: dashed; }
-.zt-assist__badge--uncertain{ border-style: dashed; }
+.zt-assist__legend{ font-family: var(--font-mono, ui-monospace, monospace); font-size: 10px; letter-spacing: .2em; text-transform: uppercase; color: var(--z-warn, #e8a15c); margin: 0 0 6px; }
+.zt-assist__group{ font-family: var(--font-mono, ui-monospace, monospace); font-size: 10px; letter-spacing: .24em; color: var(--z-gold, #d4af78); margin: 12px 0 8px; }
+.zt-assist__group:first-child{ margin-top: 0; }
+.zt-assist__group-list{ display: flex; flex-wrap: wrap; gap: 6px; }
 .zt-assist__go{ display: inline-flex; align-items: center; min-height: 44px; margin-top: 4px; color: var(--z-gold, #d4af78); font-family: var(--font-mono, ui-monospace, monospace); font-size: 11px; letter-spacing: .16em; text-decoration: none; text-transform: uppercase; }
 @media (prefers-reduced-motion: reduce){ .zt-assist, .zt-assist__fab{ transition: none; } }
 @media (min-width: 760px){
@@ -61,3 +59,11 @@
    answers; only the search-style text field is no longer shown (pattern V1:
    no search bar / chat textbox inside monument sections). */
 #bruckmandl .bruckmandl__ai-form{ display: none; }
+
+/* 2026-11-11 owner decision — no visitor-facing validation-status chips.
+   Statuses stay in data/metadata; the Steinerne chapter no longer shows the
+   "documented" / "unverified" chips on answers. An existing legend
+   classification remains, as plain editorial context. */
+#bruckmandl .bruckmandl__ai-status-badge--fact,
+#bruckmandl .bruckmandl__ai-status-badge--uncertain{ display: none; }
+#bruckmandl .bruckmandl__ai-status-badge--legend{ border: 0; padding: 0; background: none; }

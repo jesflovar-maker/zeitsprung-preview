@@ -33,7 +33,7 @@
       "status": "active",
       "enabled": true,
       "route": "STEINERNE_BRUECKE/index.html",
-      "cta": { "de": "ERLEBNIS STARTEN", "en": "START EXPERIENCE", "es": "EXPERIENCIA INICIAR" },
+      "cta": { "de": "ERLEBNIS STARTEN", "en": "START EXPERIENCE", "es": "INICIAR EXPERIENCIA" },
       "languages": ["de", "en", "es"],
       "featureFlags": {
         "_readme": "PHASE 3.0 — data model only, not wired into STEINERNE_BRUECKE/js/*.js UI conditionals today (that would touch approved/working display logic, out of scope for this pass). Reflects ACTUAL current reality of STEINERNE_BRUECKE/index.html + js/main.js as of this phase; keep in sync by hand until a future phase wires these flags into the template itself.",
@@ -71,7 +71,7 @@
       "status": "active",
       "enabled": true,
       "route": "DOM_ST_PETER/index.html",
-      "cta": { "de": "ERLEBNIS STARTEN", "en": "START EXPERIENCE", "es": "EXPERIENCIA INICIAR" },
+      "cta": { "de": "ERLEBNIS STARTEN", "en": "START EXPERIENCE", "es": "INICIAR EXPERIENCIA" },
       "languages": ["de", "en", "es"],
       "featureFlags": {
         "_readme": "PHASE 3.0 — data model only; no monument-shell UI exists yet for this in_development monument. All flags false/not-yet-applicable until content is briefed and produced.",

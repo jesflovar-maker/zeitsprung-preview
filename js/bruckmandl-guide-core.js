@@ -146,9 +146,9 @@ export const BRUCKMANDL_TOPIC_STATUS = {
 };
 
 export const BRUCKMANDL_STATUS_LABELS = {
-  de: { fact: "BELEGT", legend: "SAGE", uncertain: "UNGEPRÜFT" },
-  en: { fact: "DOCUMENTED", legend: "LEGEND", uncertain: "UNVERIFIED" },
-  es: { fact: "DOCUMENTADO", legend: "LEYENDA", uncertain: "NO VERIFICADO" }
+  de: { fact: "BELEGT", legend: "ÜBERLIEFERUNG / SAGE", uncertain: "UNGEPRÜFT" },
+  en: { fact: "DOCUMENTED", legend: "LEGEND / TRADITION", uncertain: "UNVERIFIED" },
+  es: { fact: "DOCUMENTADO", legend: "LEYENDA / TRADICIÓN", uncertain: "NO VERIFICADO" }
 };
 
 // Small UI chrome shared by both surfaces (heading/placeholder/send/alt

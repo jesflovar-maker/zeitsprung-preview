@@ -21,18 +21,22 @@
    No scroll / resize listeners, no timers, no IntersectionObserver.
    ============================================================================ */
 import { LocalValidatedProvider } from "./bruckmandl-knowledge-provider.js";
-import { BRUCKMANDL_STATUS_LABELS } from "./bruckmandl-guide-core.js";
+import { BRUCKMANDL_STATUS_LABELS, getBruckmandlEntry } from "./bruckmandl-guide-core.js";
+
+// The 6 bridge-level topics that already exist in the canonical knowledge (previously reachable only by typing).
+const MORE_TOPICS = ["bridge_overview", "arches", "piers", "bridge_materials", "timeline", "construction"];
 
 const AVATAR = new URL("../assets/steinerne-bruecke/bruckmandl/ai/", import.meta.url).href;
 const UI = {
-  de: { open: "Brückmandl öffnen", aria: "Brückmandl — Ihr ZEITSPRUNG-Begleiter", role: "Ihr ZEITSPRUNG-Begleiter", hi: "Grüß Gott! Ich bin das Bruckmandl von der Steinernen Brücke. Wählen Sie eine Frage.", close: "Schließen" },
-  en: { open: "Open Brückmandl guide", aria: "Bruckmandl — your ZEITSPRUNG guide", role: "Your ZEITSPRUNG guide", hi: "Grüß Gott! I am the Bruckmandl from the Stone Bridge. Choose a question.", close: "Close" },
-  es: { open: "Abrir guía Brückmandl", aria: "Bruckmandl — su guía ZEITSPRUNG", role: "Su guía ZEITSPRUNG", hi: "¡Grüß Gott! Soy el Bruckmandl del Puente de Piedra. Elija una pregunta.", close: "Cerrar" }
+  de: { open: "Brückmandl öffnen", aria: "Brückmandl — Ihr ZEITSPRUNG-Begleiter", role: "Ihr ZEITSPRUNG-Begleiter", hi: "Grüß Gott! Ich bin das Bruckmandl von der Steinernen Brücke. Wählen Sie eine Frage.", close: "Schließen", main: "HAUPTFRAGEN", more: "MEHR ENTDECKEN" },
+  en: { open: "Open Brückmandl guide", aria: "Bruckmandl — your ZEITSPRUNG guide", role: "Your ZEITSPRUNG guide", hi: "Grüß Gott! I am the Bruckmandl from the Stone Bridge. Choose a question.", close: "Close", main: "MAIN QUESTIONS", more: "DISCOVER MORE" },
+  es: { open: "Abrir guía Brückmandl", aria: "Bruckmandl — su guía ZEITSPRUNG", role: "Su guía ZEITSPRUNG", hi: "¡Grüß Gott! Soy el Bruckmandl del Puente de Piedra. Elija una pregunta.", close: "Cerrar", main: "PREGUNTAS PRINCIPALES", more: "DESCUBRIR MÁS" }
 };
 const langNow = () => { const l = (document.documentElement.lang || "de").slice(0, 2).toLowerCase(); return UI[l] ? l : "de"; };
 
 /**
- * @param {{ link: { href?: string, scrollTo?: string, label: {de:string,en:string,es:string} } }} opt
+ * @param {{ link: object, moreLink?: object }} opt  each: { href?: string, scrollTo?: string, label: {de,en,es} }
+ *   moreLink is used for the 6 bridge-level topics (falls back to link)
  *   link.href      -> normal navigation (e.g. from the index into a monument chapter)
  *   link.scrollTo  -> id of a section on the same page
  */
@@ -53,19 +57,24 @@ export function initAssistantFab(opt = {}) {
   let sel = null; // selected topic id
   const renderAnswer = () => {
     const l = langNow(); ans.replaceChildren();
-    [...topics.children].forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.topic === sel)));
+    topics.querySelectorAll(".zt-assist__topic").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.topic === sel)));
     if (!sel) return;
     const r = LocalValidatedProvider.answerTopic(sel, l);
-    const st = mk("div", "zt-assist__status"); (r.statusCodes || []).forEach((c) => { const s = mk("span", "zt-assist__badge zt-assist__badge--" + c); s.textContent = (BRUCKMANDL_STATUS_LABELS[l] || BRUCKMANDL_STATUS_LABELS.en)[c] || ""; st.appendChild(s); });
-    const p = mk("p"); p.textContent = r.text; ans.appendChild(st); ans.appendChild(p);
-    if (opt.link) { const a = mk("a", "zt-assist__go", { href: opt.link.href || "#" + opt.link.scrollTo }); a.textContent = opt.link.label[l] || opt.link.label.de; ans.appendChild(a); }
+    // Public UI shows NO validation-status chips (documented / unverified stay internal metadata).
+    // Only an existing legend classification is carried as editorial context.
+    if ((r.statusCodes || []).includes("legend")) { const lg = mk("p", "zt-assist__legend"); lg.textContent = (BRUCKMANDL_STATUS_LABELS[l] || BRUCKMANDL_STATUS_LABELS.en).legend; ans.appendChild(lg); }
+    const p = mk("p"); p.textContent = r.text; ans.appendChild(p);
+    const lk = MORE_TOPICS.includes(sel) && opt.moreLink ? opt.moreLink : opt.link;
+    if (lk) { const a = mk("a", "zt-assist__go", { href: lk.href || "#" + lk.scrollTo }); a.dataset.scroll = lk.scrollTo || ""; a.textContent = lk.label[l] || lk.label.de; ans.appendChild(a); }
     av.src = AVATAR + "bruckmandl_ai_expression_03_explain.webp";
   };
   const relabel = () => {
     const l = langNow(), u = UI[l];
     fab.setAttribute("aria-label", u.open); fab.title = u.open; pn.setAttribute("aria-label", u.aria); role.textContent = u.role; hi.textContent = u.hi; cls.setAttribute("aria-label", u.close);
     topics.replaceChildren();
-    LocalValidatedProvider.getSuggestedTopics(l).forEach((q) => { const b = mk("button", "zt-assist__topic", { type: "button", "aria-pressed": "false" }); b.dataset.topic = q.topic; b.textContent = q.question; topics.appendChild(b); });
+    const group = (title, list) => { const h = mk("p", "zt-assist__group"); h.textContent = title; const g = mk("div", "zt-assist__group-list", { role: "group", "aria-label": title }); list.forEach((q) => { const b = mk("button", "zt-assist__topic", { type: "button", "aria-pressed": "false" }); b.dataset.topic = q.topic; b.textContent = q.question; g.appendChild(b); }); topics.appendChild(h); topics.appendChild(g); };
+    group(u.main, LocalValidatedProvider.getSuggestedTopics(l));
+    group(u.more, MORE_TOPICS.map((id) => getBruckmandlEntry(id, l)).filter(Boolean).map((e) => ({ topic: e.topic, question: e.question })));
     renderAnswer();
   };
   // one delegated listener for all topic buttons (re-labelling never adds listeners)
@@ -77,7 +86,7 @@ export function initAssistantFab(opt = {}) {
   cls.addEventListener("click", () => close());
   ans.addEventListener("click", (e) => {
     const a = e.target.closest(".zt-assist__go"); if (!a) return;
-    if (opt.link && opt.link.scrollTo) { e.preventDefault(); const t = document.getElementById(opt.link.scrollTo); close(false); if (t) t.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); }
+    if (a.dataset.scroll) { e.preventDefault(); const t = document.getElementById(a.dataset.scroll); close(false); if (t) t.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); }
   });
   new MutationObserver(relabel).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
   relabel();
