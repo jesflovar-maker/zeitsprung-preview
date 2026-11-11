@@ -23,6 +23,7 @@
 
 <link rel="stylesheet" href="css/index.css?v=20260905">
 <link rel="stylesheet" href="css/zt-assistant.css">
+<link rel="stylesheet" href="css/index-hauptmenu.css">
 </head>
 <body>
 
@@ -41,6 +42,25 @@
 <!-- ============================================================ -->
 <!-- HERO                                                          -->
 <!-- ============================================================ -->
+<!-- ============================================================ -->
+<!-- HAUPTMENÜ (2026-11-11) — the INDEX is navigation first: five     -->
+<!-- monument cards + ONE stage with the selected monument's FULL     -->
+<!-- timeline film (the very same runtime file the monument page      -->
+<!-- uses) + "Erlebnis starten". Built by js/index-hauptmenu.js from  -->
+<!-- monuments.config.json. Everything below is secondary content.    -->
+<!-- ============================================================ -->
+<section id="hauptmenu" class="hm" aria-labelledby="hmTitle">
+  <div class="hm__inner">
+    <header class="hm__head">
+      <p class="hm__eyebrow" data-i18n="hmEyebrow">ZEITSPRUNG · REGENSBURG</p>
+      <h1 class="hm__title" id="hmTitle" data-i18n="hmTitle">HAUPTMENÜ</h1>
+      <p class="hm__intro" data-i18n="hmIntro">Fünf Orte in Regensburg, erlebbar durch die Zeit. Wähle ein Monument und sieh, wie es sich verändert hat.</p>
+    </header>
+    <div class="hm__cards" id="hmCards" role="tablist"></div>
+    <div class="hm__stage" id="hmStage" role="tabpanel"></div>
+  </div>
+</section>
+
 <header class="hero">
   <div class="hero__media" aria-hidden="true">
     <img id="heroPoster" alt="" draggable="false">
@@ -215,6 +235,7 @@
      sufficient and stays within "no new animation libraries." -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script type="module" src="js/index-main.js?v=20260905"></script>
+<script type="module" src="js/index-hauptmenu.js"></script>
 <script type="module">
   // BRUCKMANDL_ASSISTANT_PATTERN_V1 — small floating contextual help icon.
   import { initAssistantFab } from "./js/zt-assistant-fab.js";
