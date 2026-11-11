@@ -12,6 +12,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="../css/zt-assistant.css">
 </head>
 <body>
 
@@ -480,5 +481,12 @@
 </script>
 
 <script type="module" src="js/main.js"></script>
+<script type="module">
+  // BRUCKMANDL_ASSISTANT_PATTERN_V1 — small floating contextual help icon (shared module).
+  // Pure consumer of the canonical knowledge provider; the #bruckmandl module, its 8 hotspots
+  // and its lifecycle are untouched.
+  import { initAssistantFab } from "../js/zt-assistant-fab.js";
+  initAssistantFab({ link: { scrollTo: "bruckmandl", label: { de: "Zum Kapitel →", en: "Go to chapter →", es: "Ir al capítulo →" } } });
+</script>
 </body>
 </html>

@@ -19,7 +19,8 @@ const pad2 = (n) => String(n).padStart(2, "0");
 
 /* ---------- language ---------- */
 let lang = "de";
-try { const s = localStorage.getItem(STORAGE_KEY); if (LANGS.includes(s)) lang = s; } catch (e) {}
+// Same resolution order as the index and Steinerne (platform convention): stored choice -> browser language -> DE.
+try { const s = localStorage.getItem(STORAGE_KEY); if (LANGS.includes(s)) lang = s; else { const n = (navigator.language || "de").slice(0, 2).toLowerCase(); if (LANGS.includes(n)) lang = n; } } catch (e) {}
 const T = () => STR[lang];
 const LF = []; // text refreshers, registered once per built component
 const onLang = (fn) => { LF.push(fn); fn(); };
@@ -257,7 +258,7 @@ function buildGuide() {
   let sel = -1;
   const render = () => { [...topics.children].forEach((x, k) => x.setAttribute("aria-pressed", String(k === sel))); if (sel < 0) { ans.replaceChildren(); return; } av.src = `${B}expression_03_explain.webp`; ans.innerHTML = `<p>${T().guideTopics[sel][1]}</p><a class="dguide__go" href="#${GUIDE_GO[sel]}">${T().guide.go}</a>`; };
   STR.de.guideTopics.forEach((x, i) => { const b = el("button", "dguide__topic", { type: "button", "aria-pressed": "false" }); b.addEventListener("click", () => { sel = i; ctx.hidden = true; render(); }); topics.append(b); });
-  onLang(() => { const g = T().guide; pn.setAttribute("aria-label", g.aria); $("#guideFabLabel").textContent = g.fab; $(".dguide__role", pn).textContent = g.role; $(".dguide__hi", pn).textContent = g.hi; ctx.textContent = g.ctx; cls.setAttribute("aria-label", T().ui.close); [...topics.children].forEach((b, i) => { b.textContent = T().guideTopics[i][0]; }); render(); });
+  onLang(() => { const g = T().guide; pn.setAttribute("aria-label", g.aria); $("#guideFabLabel").textContent = g.fab; fab.title = g.fab; fab.setAttribute("aria-label", g.fab); $(".dguide__role", pn).textContent = g.role; $(".dguide__hi", pn).textContent = g.hi; ctx.textContent = g.ctx; cls.setAttribute("aria-label", T().ui.close); [...topics.children].forEach((b, i) => { b.textContent = T().guideTopics[i][0]; }); render(); });
   const onKey = (e) => { if (e.key === "Escape") close(); };
   function open() { const c = GUIDE_CTX[curSec]; if (c != null) { sel = c; ctx.hidden = false; render(); } pn.hidden = false; fab.setAttribute("aria-expanded", "true"); document.addEventListener("keydown", onKey); requestAnimationFrame(() => pn.classList.add("is-open")); cls.focus(); }
   function close(refocus = true) { if (pn.hidden) return; pn.classList.remove("is-open"); pn.hidden = true; fab.setAttribute("aria-expanded", "false"); document.removeEventListener("keydown", onKey); if (refocus) fab.focus(); }

@@ -316,3 +316,4 @@ html.is-gated .dhero{height:100svh;min-height:0}
 @media (min-width:1100px){.dgauge--story{left:calc(50% - min(100svh,1200px) * 9 / 32 - min(15vw,190px));right:auto;width:calc(min(100svh,1200px) * 9 / 16 - 60px);margin:0}.dtlv__note{text-align:left;max-width:calc(80svh * 9 / 16);margin-inline:auto}}
 @media (min-width:1240px){.dn__links{gap:14px}}
 @media (min-width:1100px){.dtlv__chip b{flex-basis:168px}}
+@media (min-width:2200px){.dguide__fab{width:64px;height:64px}}

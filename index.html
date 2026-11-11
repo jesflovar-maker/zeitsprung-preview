@@ -22,6 +22,7 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="css/index.css?v=20260905">
+<link rel="stylesheet" href="css/zt-assistant.css">
 </head>
 <body>
 
@@ -200,7 +201,8 @@
 <!-- activated on INDEX for this phase (§13 of the brief) — no other    -->
 <!-- monument page is touched. -->
 <!-- ============================================================ -->
-<div id="bruckmandlBar" class="bruckmandl-bar" hidden></div>
+<!-- 2026-11-11 BRUCKMANDL_ASSISTANT_PATTERN_V1: the former fixed input bar (#bruckmandlBar) is no longer
+     rendered; the assistant is now the small floating icon built by js/zt-assistant-fab.js (see below). -->
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
 <!-- PHASE — HERO BUILD SCROLL EXPERIENCE (ZEITSPRUNG DESIGN REVISION +
@@ -213,5 +215,10 @@
      sufficient and stays within "no new animation libraries." -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
 <script type="module" src="js/index-main.js?v=20260905"></script>
+<script type="module">
+  // BRUCKMANDL_ASSISTANT_PATTERN_V1 — small floating contextual help icon.
+  import { initAssistantFab } from "./js/zt-assistant-fab.js";
+  initAssistantFab({ link: { href: "STEINERNE_BRUECKE/index.html#bruckmandl", label: { de: "Zur Steinernen Brücke →", en: "To the Stone Bridge →", es: "Al Puente de Piedra →" } } });
+</script>
 </body>
 </html>

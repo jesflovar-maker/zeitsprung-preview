@@ -1,0 +1,63 @@
+/* ZEITSPRUNG V2 — css/zt-assistant.css
+   BRUCKMANDL_ASSISTANT_PATTERN_V1 (2026-11-11): small floating contextual
+   help icon + compact panel. Shared by the INDEX and STEINERNE_BRUECKE
+   (see js/zt-assistant-fab.js). Own .zt-assist namespace.
+   Layering: below the intro gates (z 200) and the media viewer (z 900),
+   above page navigation (z 100). */
+.zt-assist__fab{
+  position: fixed; z-index: 150;
+  right: calc(12px + env(safe-area-inset-right, 0px));
+  bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+  width: 52px; height: 52px; padding: 0; border-radius: 50%;
+  border: 1px solid var(--z-gold-dim, rgba(212,175,120,.55));
+  background: rgba(8,9,11,.82); overflow: hidden; cursor: pointer;
+  box-shadow: 0 6px 22px rgba(0,0,0,.5);
+  transition: transform .3s cubic-bezier(.22,.61,.36,1), border-color .3s;
+}
+.zt-assist__fab:hover{ border-color: var(--z-gold, #d4af78); transform: scale(1.05); }
+.zt-assist__fab:focus-visible{ outline: 2px solid var(--z-gold, #d4af78); outline-offset: 3px; }
+.zt-assist__fab img{ display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; }
+.zt-assist{
+  position: fixed; z-index: 151; left: 8px; right: 8px;
+  bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+  max-height: min(64svh, 540px); overflow: auto; padding: 16px;
+  background: rgba(14,16,20,.97); color: var(--z-ink, #f4efe6);
+  border: 1px solid var(--z-gold-dim, rgba(212,175,120,.55));
+  box-shadow: 0 18px 50px rgba(0,0,0,.6);
+  font-family: var(--font-sans, 'Inter', system-ui, sans-serif);
+  opacity: 0; transform: translateY(10px);
+  transition: opacity .3s cubic-bezier(.22,.61,.36,1), transform .3s cubic-bezier(.22,.61,.36,1);
+}
+.zt-assist[hidden]{ display: none; }
+.zt-assist.is-open{ opacity: 1; transform: none; }
+.zt-assist__head{ display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.zt-assist__av{ width: 56px; height: 56px; border-radius: 50%; object-fit: cover; object-position: 50% 12%; border: 1px solid var(--z-line, rgba(244,239,230,.14)); background: #0b0d10; }
+.zt-assist__name{ font-family: var(--font-mono, ui-monospace, monospace); font-size: 12px; font-weight: 500; letter-spacing: .28em; color: var(--z-gold, #d4af78); margin-bottom: 5px; }
+.zt-assist__role{ font-size: 13px; color: var(--z-ink-dim, rgba(244,239,230,.62)); }
+.zt-assist__close{ margin-left: auto; width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--z-line, rgba(244,239,230,.14)); background: none; color: inherit; font-size: 22px; line-height: 1; cursor: pointer; }
+.zt-assist__hi{ font-size: 14px; line-height: 1.5; color: var(--z-ink-dim, rgba(244,239,230,.62)); margin: 0 0 12px; }
+.zt-assist__topics{ display: flex; flex-wrap: wrap; gap: 6px; }
+.zt-assist__topic{ min-height: 44px; padding: 0 12px; background: none; border: 1px solid var(--z-line, rgba(244,239,230,.14)); color: var(--z-ink-dim, rgba(244,239,230,.62)); font-family: var(--font-sans, 'Inter', system-ui, sans-serif); font-size: 13px; cursor: pointer; text-align: left; }
+.zt-assist__topic[aria-pressed="true"]{ color: var(--z-ink, #f4efe6); border-color: var(--z-gold-dim, rgba(212,175,120,.55)); background: rgba(212,175,120,.08); }
+.zt-assist__topic:focus-visible, .zt-assist__close:focus-visible{ outline: 2px solid var(--z-gold, #d4af78); outline-offset: 2px; }
+.zt-assist__ans{ margin-top: 12px; font-size: 15px; line-height: 1.55; }
+.zt-assist__ans:empty{ display: none; }
+.zt-assist__ans p{ margin: 0; }
+.zt-assist__status{ display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.zt-assist__status:empty{ display: none; }
+.zt-assist__badge{ font-family: var(--font-mono, ui-monospace, monospace); font-size: 9.5px; letter-spacing: .18em; padding: 4px 7px; border: 1px solid var(--z-line, rgba(244,239,230,.14)); color: var(--z-ink-dim, rgba(244,239,230,.62)); }
+.zt-assist__badge--fact{ color: var(--z-gold, #d4af78); border-color: rgba(212,175,120,.4); }
+.zt-assist__badge--legend{ color: var(--z-warn, #e8a15c); border-color: rgba(232,161,92,.45); border-style: dashed; }
+.zt-assist__badge--uncertain{ border-style: dashed; }
+.zt-assist__go{ display: inline-flex; align-items: center; min-height: 44px; margin-top: 4px; color: var(--z-gold, #d4af78); font-family: var(--font-mono, ui-monospace, monospace); font-size: 11px; letter-spacing: .16em; text-decoration: none; text-transform: uppercase; }
+@media (prefers-reduced-motion: reduce){ .zt-assist, .zt-assist__fab{ transition: none; } }
+@media (min-width: 760px){
+  .zt-assist{ left: auto; right: 16px; width: 400px; bottom: calc(82px + env(safe-area-inset-bottom, 0px)); }
+  .zt-assist__fab{ right: 16px; bottom: 16px; width: 58px; height: 58px; }
+}
+@media (min-width: 2200px){ .zt-assist{ width: 480px; } .zt-assist__fab{ width: 64px; height: 64px; } }
+
+/* STEINERNE — the Bruckmandl chapter keeps its topic buttons, hotspots and
+   answers; only the search-style text field is no longer shown (pattern V1:
+   no search bar / chat textbox inside monument sections). */
+#bruckmandl .bruckmandl__ai-form{ display: none; }

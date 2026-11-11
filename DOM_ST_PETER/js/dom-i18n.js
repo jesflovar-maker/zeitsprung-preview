@@ -87,7 +87,7 @@ export const STR = {
     ],
     now: { eb: "HEUTE", h: "Der Dom heute", lead: "Seit 2006 gehört der Dom zum UNESCO-Welterbe „Regensburg mit Stadtamhof“. Die Dombauhütte arbeitet bis heute ausschließlich in Naturstein; 2023 feierte sie 100 Jahre ununterbrochene Arbeit.", alt: "Der Dom heute" },
     end: { h: "Ein Sprung durch die Zeit", p: "Der Dom ist ein Ort, an dem sich Jahrhunderte übereinanderlegen. Entdecken Sie weitere Orte Regensburgs.", overview: "ZUR ÜBERSICHT", sb: "STEINERNE BRÜCKE", note: "Die Bilder und Videos dieser Seite sind Visualisierungen auf Grundlage des historischen Forschungsstands und ersetzen keine dokumentarische Fotografie." },
-    guide: { fab: "Brückmandl fragen", aria: "Brückmandl — Ihr ZEITSPRUNG-Begleiter", role: "Ihr ZEITSPRUNG-Begleiter", hi: "Grüß Gott! Sonst wache ich auf der Steinernen Brücke — hier begleite ich Sie durch den Dom. Wählen Sie ein Thema.", go: "Zum Kapitel →", ctx: "Passend zu diesem Kapitel" },
+    guide: { fab: "Brückmandl öffnen", aria: "Brückmandl — Ihr ZEITSPRUNG-Begleiter", role: "Ihr ZEITSPRUNG-Begleiter", hi: "Grüß Gott! Sonst wache ich auf der Steinernen Brücke — hier begleite ich Sie durch den Dom. Wählen Sie ein Thema.", go: "Zum Kapitel →", ctx: "Passend zu diesem Kapitel" },
     guideTopics: [
       ["Baugeschichte", "Nach dem Brand von 1273 beginnt um 1275 der gotische Neubau — im Osten. Von dort wächst der Dom Joch um Joch nach Westen. Um 1520 ruhen die Arbeiten; erst 1859 bis 1869 werden die Türme vollendet."],
       ["Zeitleiste", "Die Zeitleiste zeigt die Bauzeit als Film. Wählen Sie dort ein Datum, um direkt zu diesem Moment zu springen."],
@@ -184,7 +184,7 @@ export const STR = {
     ],
     now: { eb: "TODAY", h: "The cathedral today", lead: "Since 2006 the cathedral has been part of the UNESCO World Heritage site “Old town of Regensburg with Stadtamhof”. To this day the cathedral workshop works exclusively in natural stone; in 2023 it celebrated 100 years of uninterrupted work.", alt: "The cathedral today" },
     end: { h: "A leap through time", p: "The cathedral is a place where centuries lie on top of one another. Discover more places in Regensburg.", overview: "TO THE OVERVIEW", sb: "STONE BRIDGE", note: "The images and videos on this page are visualisations based on the current state of historical research and do not replace documentary photography." },
-    guide: { fab: "Ask the Bruckmandl", aria: "Bruckmandl — your ZEITSPRUNG guide", role: "Your ZEITSPRUNG guide", hi: "Grüß Gott! I usually keep watch on the Stone Bridge — here I accompany you through the cathedral. Choose a topic.", go: "Go to chapter →", ctx: "Related to this chapter" },
+    guide: { fab: "Open Brückmandl guide", aria: "Bruckmandl — your ZEITSPRUNG guide", role: "Your ZEITSPRUNG guide", hi: "Grüß Gott! I usually keep watch on the Stone Bridge — here I accompany you through the cathedral. Choose a topic.", go: "Go to chapter →", ctx: "Related to this chapter" },
     guideTopics: [
       ["Building history", "After the fire of 1273 the Gothic rebuilding begins around 1275 — in the east. From there the cathedral grows bay by bay to the west. Around 1520 work comes to rest; the towers are only completed between 1859 and 1869."],
       ["Timeline", "The timeline shows the building period as a film. Choose a date there to jump straight to that moment."],
@@ -281,7 +281,7 @@ export const STR = {
     ],
     now: { eb: "HOY", h: "La catedral hoy", lead: "Desde 2006 la catedral forma parte del Patrimonio Mundial de la UNESCO «Casco antiguo de Ratisbona con Stadtamhof». El taller de la catedral trabaja hasta hoy exclusivamente con piedra natural; en 2023 celebró 100 años de trabajo ininterrumpido.", alt: "La catedral hoy" },
     end: { h: "Un salto en el tiempo", p: "La catedral es un lugar donde los siglos se superponen. Descubra otros lugares de Ratisbona.", overview: "AL INICIO", sb: "PUENTE DE PIEDRA", note: "Las imágenes y los vídeos de esta página son visualizaciones basadas en el estado actual de la investigación histórica y no sustituyen a la fotografía documental." },
-    guide: { fab: "Preguntar al Bruckmandl", aria: "Bruckmandl — su guía ZEITSPRUNG", role: "Su guía ZEITSPRUNG", hi: "¡Grüß Gott! Normalmente vigilo en el Puente de Piedra; aquí le acompaño por la catedral. Elija un tema.", go: "Ir al capítulo →", ctx: "Relacionado con este capítulo" },
+    guide: { fab: "Abrir guía Brückmandl", aria: "Bruckmandl — su guía ZEITSPRUNG", role: "Su guía ZEITSPRUNG", hi: "¡Grüß Gott! Normalmente vigilo en el Puente de Piedra; aquí le acompaño por la catedral. Elija un tema.", go: "Ir al capítulo →", ctx: "Relacionado con este capítulo" },
     guideTopics: [
       ["Historia constructiva", "Tras el incendio de 1273, hacia 1275 comienza la nueva construcción gótica, en el este. Desde allí la catedral crece tramo a tramo hacia el oeste. Hacia 1520 las obras se detienen; las torres no se culminan hasta 1859–1869."],
       ["Cronología", "La cronología muestra la época de construcción como película. Elija allí una fecha para saltar directamente a ese momento."],
