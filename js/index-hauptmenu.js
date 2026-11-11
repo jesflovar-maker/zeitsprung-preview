@@ -3,7 +3,11 @@
    INDEX HAUPTMENÜ V1 (2026-11-11) — the permanent monument navigation system.
    See 01_ARCHITECTURE/ZEITSPRUNG_INDEX_HAUPTMENU_STANDARD.md.
 
-     five monument cards  ->  ONE stage for the selected monument:
+   "Hauptmenü" is the INTERNAL name of this navigation concept — it is never
+   shown as a public title. Position in the index: directly AFTER the
+   cinematic intro and BEFORE Vision / Mission / Objective.
+
+     five PORTRAIT (9:16) monument cards  ->  ONE stage for the selected monument:
        active monument : its FULL timeline film + progress (+ chapters when the
                          monument already has chapter data) + "Erlebnis starten"
        future monument : identity image + "in preparation" (no fake timeline)
@@ -54,7 +58,7 @@ async function init() {
   /* ---------- cards ---------- */
   const cards = monuments.map((m, i) => {
     const b = mk("button", "hm__card " + (isActive(m) ? "hm__card--active" : "hm__card--future"), { type: "button", role: "tab", id: "hmTab-" + m.id, "aria-controls": "hmStage", "aria-selected": "false", tabindex: "-1" });
-    const th = mk("span", "hm__card-thumb"); const im = mk("img", "", { alt: "", loading: i < 2 ? "eager" : "lazy", decoding: "async", draggable: "false" }); im.src = m.visual || m.poster || ""; th.appendChild(im);
+    const th = mk("span", "hm__card-thumb"); const im = mk("img", "", { alt: "", loading: "lazy", decoding: "async", draggable: "false" }); im.src = m.visual || m.poster || ""; if (m.menu_focus) im.style.objectPosition = m.menu_focus; th.appendChild(im);
     const tx = mk("span", "hm__card-text"); const no = mk("span", "hm__card-no"); no.textContent = String(i + 1).padStart(2, "0"); const nm = mk("span", "hm__card-name"); const st = mk("span", "hm__card-status");
     tx.appendChild(no); tx.appendChild(nm); tx.appendChild(st); b.appendChild(th); b.appendChild(tx); cardsHost.appendChild(b);
     return { m, b, nm, st };
@@ -133,12 +137,12 @@ async function init() {
     cta.textContent = pick(sel.cta, l);
     renderChapters(); renderProgress();
   }
-  function select(m, focus) {
+  function select(m, focus, silent) {
     if (sel === m) return;
     if (sel) { if (tlOf(sel)) pos.set(sel.id, video.currentTime || pos.get(sel.id) || 0); try { video.pause(); } catch (e) {} }
     video.removeAttribute("src"); try { video.load(); } catch (e) {}
     sel = m; userPaused = false; chIdx = -1;
-    cards.forEach(({ m: x, b }) => { const on = x === m; b.setAttribute("aria-selected", String(on)); b.tabIndex = on ? 0 : -1; b.classList.toggle("is-selected", on); if (on && focus) b.focus(); });
+    cards.forEach(({ m: x, b }) => { const on = x === m; b.setAttribute("aria-selected", String(on)); b.tabIndex = on ? 0 : -1; b.classList.toggle("is-selected", on); if (on && focus) b.focus(); if (on && !silent && cardsHost.scrollWidth > cardsHost.clientWidth) cardsHost.scrollTo({ left: b.offsetLeft - (cardsHost.clientWidth - b.offsetWidth) / 2, behavior: reduced() ? "auto" : "smooth" }); });
     const act = isActive(m), tlm = tlOf(m);
     stageHost.classList.toggle("hm__stage--future", !act); media.classList.remove("is-playing", "has-started");
     posterImg.src = tlm && tlm.poster ? resolve(tlm, tlm.poster) : (m.visual || m.poster || "");
@@ -148,7 +152,7 @@ async function init() {
       import(new URL(tlm.chapters.labels_module, document.baseURI).href).then((mod) => { const S = mod.STR || {}; const out = {}; ["de", "en", "es"].forEach((l) => { const a = S[l] && S[l][tlm.chapters.labels_key]; if (Array.isArray(a)) out[l] = a.map((c) => ({ y: c.y, h: c.h })); }); labels.set(m.id, out); if (sel === m) renderChapters(); }).catch(() => {});
     }
     relabel(); autoplayMaybe();
-    try { history.replaceState(null, "", "#index-" + m.id); } catch (e) {}
+    if (!silent) { try { history.replaceState(null, "", "#index-" + m.id); } catch (e) {} }
   }
 
   /* ---------- wiring (once) ---------- */
@@ -173,6 +177,6 @@ async function init() {
   new MutationObserver(relabel).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
 
   const fromHash = monuments.find((m) => location.hash === "#index-" + m.id);
-  select(fromHash || monuments.find(isActive) || monuments[0]);
+  select(fromHash || monuments.find(isActive) || monuments[0], false, true); // default selection never touches the URL or the scroll position
 }
 init();

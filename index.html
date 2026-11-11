@@ -42,25 +42,6 @@
 <!-- ============================================================ -->
 <!-- HERO                                                          -->
 <!-- ============================================================ -->
-<!-- ============================================================ -->
-<!-- HAUPTMENÜ (2026-11-11) — the INDEX is navigation first: five     -->
-<!-- monument cards + ONE stage with the selected monument's FULL     -->
-<!-- timeline film (the very same runtime file the monument page      -->
-<!-- uses) + "Erlebnis starten". Built by js/index-hauptmenu.js from  -->
-<!-- monuments.config.json. Everything below is secondary content.    -->
-<!-- ============================================================ -->
-<section id="hauptmenu" class="hm" aria-labelledby="hmTitle">
-  <div class="hm__inner">
-    <header class="hm__head">
-      <p class="hm__eyebrow" data-i18n="hmEyebrow">ZEITSPRUNG · REGENSBURG</p>
-      <h1 class="hm__title" id="hmTitle" data-i18n="hmTitle">HAUPTMENÜ</h1>
-      <p class="hm__intro" data-i18n="hmIntro">Fünf Orte in Regensburg, erlebbar durch die Zeit. Wähle ein Monument und sieh, wie es sich verändert hat.</p>
-    </header>
-    <div class="hm__cards" id="hmCards" role="tablist"></div>
-    <div class="hm__stage" id="hmStage" role="tabpanel"></div>
-  </div>
-</section>
-
 <header class="hero">
   <div class="hero__media" aria-hidden="true">
     <img id="heroPoster" alt="" draggable="false">
@@ -100,6 +81,23 @@
 <!-- (buildBeatReveal() in js/index-main.js), mirroring the restraint -->
 <!-- already used by kframes-gallery.js's own text choreography.      -->
 <!-- ============================================================ -->
+<!-- ============================================================ -->
+<!-- MONUMENT SELECTOR (internal name: "Hauptmenü" — never a public   -->
+<!-- title). 2026-11-11 final index hierarchy:                        -->
+<!--   01 cinematic intro  ->  02 THIS: five portrait monument cards  -->
+<!--   + ONE stage with the selected monument's FULL timeline film    -->
+<!--   + "Erlebnis starten"  ->  03 Vision / Mission / Objective      -->
+<!--   ->  04 route map, gallery, guide.                              -->
+<!-- Built by js/index-hauptmenu.js from monuments.config.json.       -->
+<!-- ============================================================ -->
+<section id="hauptmenu" class="hm" aria-labelledby="hmLine">
+  <div class="hm__inner">
+    <p class="hm__line" id="hmLine" data-i18n="hmLine">Fünf Orte. Fünf Zeitreisen.</p>
+    <div class="hm__cards" id="hmCards" role="tablist"></div>
+    <div class="hm__stage" id="hmStage" role="tabpanel"></div>
+  </div>
+</section>
+
 <section class="thesis-wrap" aria-label="About ZEITSPRUNG">
   <!-- PHASE 2.7C.4 — three dedicated media layers (one per chapter), stacked
        in the SAME sticky .thesis-media box, crossfading via opacity as the

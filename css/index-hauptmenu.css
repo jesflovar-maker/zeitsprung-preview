@@ -1,32 +1,40 @@
 /* ZEITSPRUNG V2 — css/index-hauptmenu.css
-   INDEX HAUPTMENÜ V1 (2026-11-11): five monument cards + one timeline stage.
+   INDEX monument selector (internal name "Hauptmenü" — never a public title), 2026-11-11:
+   five PORTRAIT monument cards + one timeline stage, placed after the cinematic intro.
    Own .hm namespace; no existing index rule is changed. Mobile-first.
    Uses the index tokens (--z-*, --font-*, --nav-h). */
-.hm{ position: relative; z-index: 2; background: radial-gradient(120% 70% at 50% 0%, #12141a 0%, var(--z-bg) 62%); padding: calc(var(--nav-h, 60px) + 14px) 0 clamp(36px, 7vw, 64px); }
+.hm{ position: relative; z-index: 2; background: radial-gradient(120% 60% at 50% 0%, #12141a 0%, var(--z-bg) 60%); padding: clamp(36px, 7vw, 64px) 0 clamp(40px, 7vw, 72px); }
 .hm__inner{ max-width: 1240px; margin: 0 auto; padding: 0 clamp(16px, 4.5vw, 32px); }
-.hm__head{ margin-bottom: clamp(14px, 3vw, 22px); }
-.hm__eyebrow{ font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.32em; color: var(--z-gold); margin: 0 0 8px; }
-.hm__title{ font-family: var(--font-sans); font-size: clamp(24px, 6.4vw, 40px); font-weight: 700; letter-spacing: 0.06em; line-height: 1.05; margin: 0 0 8px; color: var(--z-ink); }
-.hm__intro{ font-size: clamp(14px, 3.7vw, 16px); line-height: 1.5; color: var(--z-ink-dim); max-width: 62ch; margin: 0; }
+/* ONE restrained editorial line — no public menu title, no brand repeat, no project explanation. */
+.hm__line{ font-family: var(--font-sans); font-size: clamp(17px, 4.6vw, 24px); font-weight: 300; letter-spacing: 0.01em; line-height: 1.3; color: var(--z-ink); margin: 0 0 clamp(16px, 3vw, 26px); text-align: center; }
 
-/* ---- cards: 2 active (wide) + 3 future (compact) on phones; one row of five from 900px ---- */
-.hm__cards{ display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-bottom: clamp(14px, 3vw, 22px); }
-.hm__card{ grid-column: span 2; position: relative; display: flex; flex-direction: column; min-width: 0; padding: 0; text-align: left; background: #0d0f13; border: 1px solid var(--z-line); color: var(--z-ink); cursor: pointer; overflow: hidden; transition: border-color .3s, transform .3s cubic-bezier(.22,.61,.36,1), background .3s; }
-.hm__card--active{ grid-column: span 3; }
-.hm__card-thumb{ display: block; aspect-ratio: 16 / 9; overflow: hidden; background: #0b0d10; }
-.hm__card--future .hm__card-thumb{ aspect-ratio: 16 / 10; }
-.hm__card-thumb img{ display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 32%; transition: transform .9s cubic-bezier(.22,.61,.36,1), filter .4s; }
-.hm__card--future .hm__card-thumb img{ filter: grayscale(.55) brightness(.62); }
-.hm__card-text{ display: block; padding: 9px 10px 11px; min-width: 0; }
-.hm__card-no{ display: block; font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.2em; color: var(--z-ink-faint); margin-bottom: 4px; }
-.hm__card-name{ display: block; font-size: 13.5px; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; }
-.hm__card--future .hm__card-name{ font-size: 11.5px; font-weight: 500; color: var(--z-ink-dim); }
-.hm__card-status{ display: block; margin-top: 5px; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.16em; color: var(--z-gold); }
-.hm__card--future .hm__card-status{ color: var(--z-ink-faint); font-size: 8.5px; letter-spacing: 0.12em; }
-.hm__card.is-selected{ border-color: var(--z-gold); background: #12141a; }
-.hm__card.is-selected::after{ content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: var(--z-gold); }
-.hm__card:focus-visible{ outline: 2px solid var(--z-gold); outline-offset: 2px; }
-@media (hover: hover){ .hm__card:hover{ border-color: var(--z-gold-dim); transform: translateY(-2px); } .hm__card:hover .hm__card-thumb img{ transform: scale(1.04); } }
+/* ---- five monument cards — PORTRAIT 9:16 AT EVERY BREAKPOINT (absolute rule: never landscape) ----
+   < 700px : horizontal snap row of portrait cards (about 2.4 visible, numbered 01–05)
+   >= 700px: all five in one row, width capped so the row never grows too tall                    */
+.hm__cards{ --hm-card-w: 38vw; display: flex; gap: 10px; margin: 0 calc(clamp(16px, 4.5vw, 32px) * -1) clamp(16px, 3vw, 26px); padding: 2px clamp(16px, 4.5vw, 32px) 6px; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.hm__cards::-webkit-scrollbar{ display: none; }
+.hm__card{ position: relative; flex: 0 0 var(--hm-card-w); width: var(--hm-card-w); aspect-ratio: 9 / 16; min-width: 0; padding: 0; text-align: left; background: #0b0d10; border: 1px solid var(--z-line); color: var(--z-ink); cursor: pointer; overflow: hidden; scroll-snap-align: center; transition: border-color .3s, transform .3s cubic-bezier(.22,.61,.36,1); }
+.hm__card-thumb{ position: absolute; inset: 0; display: block; }
+.hm__card-thumb img{ display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; transition: transform .9s cubic-bezier(.22,.61,.36,1), filter .4s; }
+.hm__card-thumb::after{ content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,9,11,.94) 0%, rgba(8,9,11,.7) 26%, rgba(8,9,11,0) 58%, rgba(8,9,11,.35) 100%); }
+.hm__card--future .hm__card-thumb img{ filter: grayscale(.6) brightness(.55); }
+.hm__card-text{ position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 10px 12px; }
+.hm__card-no{ position: absolute; left: 10px; top: 9px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.2em; color: rgba(244,239,230,.85); }
+.hm__card-name{ display: block; font-size: 14px; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; hyphens: auto; }
+.hm__card-status{ display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 9px; line-height: 1.35; letter-spacing: 0.14em; color: var(--z-gold); }
+.hm__card--future .hm__card-name{ color: rgba(244,239,230,.82); }
+.hm__card--future .hm__card-status{ color: rgba(244,239,230,.6); }
+.hm__card--active{ border-color: rgba(212,175,120,.4); }
+.hm__card.is-selected{ border-color: var(--z-gold); box-shadow: 0 0 0 1px var(--z-gold), 0 14px 40px rgba(0,0,0,.5); }
+.hm__card.is-selected::after{ content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--z-gold); }
+.hm__card:focus-visible{ outline: 2px solid var(--z-gold); outline-offset: 3px; }
+@media (hover: hover){ .hm__card:hover{ border-color: var(--z-gold-dim); transform: translateY(-3px); } .hm__card:hover .hm__card-thumb img{ transform: scale(1.04); } }
+@media (min-width: 700px){
+  .hm__cards{ --hm-card-w: min(calc((100% - 4 * 12px) / 5), calc(40svh * 9 / 16), 230px); gap: 12px; justify-content: center; overflow: visible; margin-inline: 0; padding-inline: 0; scroll-snap-type: none; }
+  .hm__card{ flex: 0 0 var(--hm-card-w); }
+}
+@media (min-width: 1100px){ .hm__cards{ gap: 16px; --hm-card-w: min(calc((100% - 4 * 16px) / 5), calc(40svh * 9 / 16), 230px); } .hm__card-name{ font-size: 15px; } .hm__card-status{ font-size: 9.5px; } .hm__card-text{ padding: 12px 12px 14px; } }
+@media (min-width: 2200px){ .hm__cards{ gap: 22px; --hm-card-w: min(calc((100% - 4 * 22px) / 5), calc(38svh * 9 / 16), 330px); } .hm__card-name{ font-size: 20px; } .hm__card-status{ font-size: 12px; } .hm__card-no{ font-size: 13px; } .hm__line{ font-size: 30px; } }
 
 /* ---- stage ---- */
 .hm__stage{ display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; border: 1px solid var(--z-line); background: linear-gradient(180deg, #0f1115, #0b0c0f); padding: clamp(12px, 3vw, 22px); }
@@ -83,13 +91,6 @@
   .hm__stage{ grid-template-columns: auto minmax(0, 1fr); gap: clamp(22px, 4vw, 48px); align-items: center; }
   .hm__media{ width: auto; height: min(58svh, 620px); margin: 0; }
 }
-@media (min-width: 900px){
-  .hm__cards{ grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.5fr) repeat(3, minmax(0, 1fr)); gap: 12px; }
-  .hm__card, .hm__card--active{ grid-column: auto; }
-  .hm__card-thumb, .hm__card--future .hm__card-thumb{ aspect-ratio: auto; height: clamp(64px, 11svh, 104px); }
-  .hm__card-name{ font-size: 15px; } .hm__card--future .hm__card-name{ font-size: 13px; }
-  .hm__card-status{ font-size: 9.5px; } .hm__card--future .hm__card-status{ font-size: 9px; }
-}
 @media (min-width: 1280px){ .hm__media{ height: min(60svh, 680px); } .hm__desc{ font-size: 16px; } .hm__chapter-now{ font-size: 16px; } }
-@media (min-width: 2200px){ .hm__inner{ max-width: 1680px; } .hm__media{ height: min(60svh, 900px); } .hm__desc{ font-size: 19px; } .hm__card-name{ font-size: 19px; } .hm__card--future .hm__card-name{ font-size: 16px; } .hm__chapter{ font-size: 13px; min-height: 48px; } .hm__btn{ font-size: 13px; } .hm__cta{ font-size: 14px; min-height: 62px; } .hm__card-thumb, .hm__card--future .hm__card-thumb{ height: clamp(90px, 11svh, 150px); } }
+@media (min-width: 2200px){ .hm__inner{ max-width: 1680px; } .hm__media{ height: min(60svh, 900px); } .hm__desc{ font-size: 19px; } .hm__chapter{ font-size: 13px; min-height: 48px; } .hm__btn{ font-size: 13px; } .hm__cta{ font-size: 14px; min-height: 62px; } }
 @media (min-width: 760px){ .hm__info{ padding-right: 60px; } } /* keep timeline controls clear of the floating guide icon */

@@ -46,9 +46,7 @@ export const DICT = {
     gallerySubtitle: "Fünf Orte, eine Zeitreise",
     galleryText: "Wähle ein Monument, um seine Geschichte zu entdecken.",
     // INDEX HAUPTMENÜ (2026-11-11) — js/index-hauptmenu.js
-    hmEyebrow: "ZEITSPRUNG · REGENSBURG",
-    hmTitle: "HAUPTMENÜ",
-    hmIntro: "Fünf Orte in Regensburg, erlebbar durch die Zeit. Wähle ein Monument und sieh, wie es sich verändert hat.",
+    hmLine: "Fünf Orte. Fünf Zeitreisen.",
     hmMenuAria: "Monumente",
     hmSoon: "IN VORBEREITUNG",
     hmSoonText: "Dieses Monument ist in Vorbereitung.",
@@ -104,9 +102,7 @@ export const DICT = {
     gallerySubtitle: "Five places, one journey through time",
     galleryText: "Choose a monument to discover its history.",
     // INDEX HAUPTMENÜ (2026-11-11) — js/index-hauptmenu.js
-    hmEyebrow: "ZEITSPRUNG · REGENSBURG",
-    hmTitle: "MAIN MENU",
-    hmIntro: "Five places in Regensburg, experienced through time. Choose a monument and see how it changed.",
+    hmLine: "Five places. Five journeys through time.",
     hmMenuAria: "Monuments",
     hmSoon: "COMING SOON",
     hmSoonText: "This monument is in preparation.",
@@ -162,9 +158,7 @@ export const DICT = {
     gallerySubtitle: "Cinco lugares, un viaje en el tiempo",
     galleryText: "Elige un monumento para descubrir su historia.",
     // INDEX HAUPTMENÜ (2026-11-11) — js/index-hauptmenu.js
-    hmEyebrow: "ZEITSPRUNG · RATISBONA",
-    hmTitle: "MENÚ PRINCIPAL",
-    hmIntro: "Cinco lugares de Ratisbona, vividos a través del tiempo. Elige un monumento y mira cómo ha cambiado.",
+    hmLine: "Cinco lugares. Cinco viajes en el tiempo.",
     hmMenuAria: "Monumentos",
     hmSoon: "PRÓXIMAMENTE",
     hmSoonText: "Este monumento está en preparación.",
