@@ -2698,3 +2698,49 @@ img{ max-width:100%; display:block; }
     height: calc(100% - 64px - 150px); max-height: none;
   }
 }
+
+/* ============================================================================
+   MUSEUM PHOTO GALLERY — #craftGallery "Die Menschen hinter der Brücke"
+   (2026-11-11). Additive block; own .craft namespace, no existing rule changed.
+   Mobile-first: lead image large, supporting images in a 2-column grid.
+   Desktop >=1100px: editorial split (lead left, supporting right).
+   Fixed 9:16 boxes -> no layout shift.
+   ============================================================================ */
+.craft{ position: relative; background: var(--z-bg); padding: clamp(64px, 12vw, 120px) 0 clamp(48px, 9vw, 96px); }
+.craft__inner{ max-width: 1180px; margin: 0 auto; padding: 0 clamp(18px, 5vw, 28px); }
+.craft__eyebrow{ font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.3em; text-transform: uppercase; color: var(--z-gold); margin-bottom: 14px; }
+.craft__inner > h3{ font-size: clamp(24px, 6vw, 40px); font-weight: 600; line-height: 1.15; margin-bottom: 12px; }
+.craft__lead{ font-size: clamp(15px, 3.8vw, 17px); line-height: 1.6; color: var(--z-ink-dim); max-width: 56ch; }
+.craft__group{ margin-top: clamp(44px, 9vw, 84px); padding-top: 22px; border-top: 1px solid var(--z-line); }
+.craft__group-title{ font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: 0.28em; color: var(--z-gold); margin: 0 0 20px; }
+.craft__grid{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 22px 12px; }
+.craft__item{ margin: 0; min-width: 0; }
+.craft__item--lead{ grid-column: 1 / -1; }
+.craft__media{ display: block; width: 100%; padding: 0; border: 1px solid var(--z-line); background: #0b0d10; cursor: zoom-in; aspect-ratio: 9 / 16; overflow: hidden; }
+.craft__item--lead .craft__media{ width: min(100%, calc(78svh * 9 / 16)); margin-inline: auto; }
+.craft__media img{ display: block; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s cubic-bezier(.22,.61,.36,1); }
+.craft__media:hover img{ transform: scale(1.02); }
+.craft__media:focus-visible{ outline: 2px solid var(--z-gold); outline-offset: 3px; }
+.craft__cap{ display: block; margin-top: 10px; }
+.craft__cap-title{ display: block; font-size: 15px; font-weight: 600; line-height: 1.25; margin-bottom: 4px; }
+.craft__cap-text{ display: block; font-size: 13px; line-height: 1.5; color: var(--z-ink-dim); }
+.craft__cap-ref{ display: block; margin-top: 7px; font-family: var(--font-mono); font-size: 9.5px; line-height: 1.5; letter-spacing: 0.08em; color: var(--z-ink-faint); }
+.craft__item--lead .craft__cap{ max-width: 52ch; margin-inline: auto; }
+.craft__item--lead .craft__cap-title{ font-size: 19px; }
+.craft__item--lead .craft__cap-text{ font-size: 14.5px; }
+.craft__note{ margin-top: clamp(36px, 7vw, 60px); font-family: var(--font-mono); font-size: 10px; line-height: 1.7; letter-spacing: 0.1em; color: var(--z-ink-faint); }
+@media (prefers-reduced-motion: reduce){ .craft__media img{ transition: none; } .craft__media:hover img{ transform: none; } }
+@media (min-width: 760px){
+  .craft__grid{ grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 28px 18px; }
+  .craft__item--lead{ grid-column: span 2; grid-row: span 2; }
+  .craft__item--lead .craft__media{ width: 100%; }
+  .craft__item--lead .craft__cap{ max-width: none; margin-inline: 0; }
+}
+@media (min-width: 1100px){
+  .craft__grid{ grid-template-columns: minmax(0, 5fr) repeat(3, minmax(0, 2.4fr)); gap: 36px 26px; align-items: start; }
+  .craft__item--lead{ grid-column: 1; grid-row: 1 / span 2; }
+  .craft__item--lead .craft__media{ width: min(100%, calc(82svh * 9 / 16)); margin-inline: 0; }
+  .craft__cap-title{ font-size: 16px; } .craft__cap-text{ font-size: 13.5px; }
+  .craft__item--lead .craft__cap-title{ font-size: 22px; } .craft__item--lead .craft__cap-text{ font-size: 15.5px; }
+}
+@media (min-width: 2200px){ .craft__inner{ max-width: 1500px; } .craft__cap-text{ font-size: 16px; } .craft__cap-title{ font-size: 19px; } .craft__cap-ref{ font-size: 11.5px; } .craft__item--lead .craft__cap-text{ font-size: 19px; } }

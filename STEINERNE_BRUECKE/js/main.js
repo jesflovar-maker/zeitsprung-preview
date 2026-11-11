@@ -17,6 +17,8 @@ import { DICT, getInitialLang, setLang, applyI18n, t } from "./i18n.js";
 import { buildPortal } from "./portal.js";
 import { initMuseum25D } from "./museum25d.js";
 import { initKframesGallery } from "./kframes-gallery.js";
+import { initCraftGallery } from "./craft-gallery.js";
+let craftApi = null; // museum photo gallery (#craftGallery); declared here so it exists before any wiring runs
 import { initMediaFeatures } from "../../js/media-feature.js";
 import { STEINERNE_VIDEO_WEB4_BASE, KFRAMES_4K_WEB_BASE } from "../../js/zt-paths.js";
 import { initBruckmandl } from "./bruckmandl.js";
@@ -480,6 +482,7 @@ function populateLangButtons() {
       renderFacts();
       if (museumApi) museumApi.refreshLabels();
       if (kframesApi) kframesApi.refreshLabels();
+      if (craftApi) craftApi.refreshLabels();
       if (mediaFeatureApi) mediaFeatureApi.refreshLabels();
       if (bruckmandlApi) bruckmandlApi.refreshLabels();
       const introStartBtn = document.getElementById("introStartBtn");
@@ -882,6 +885,10 @@ function initLenisAndScroll() {
   // Fix: wireMuseum25D() now returns its init promise; kframes is wired
   // only once that promise settles, so its own ScrollTrigger.create() can
   // never run before the museum's pin-spacer is in the DOM.
+  // MUSEUM PHOTO GALLERY (2026-11-11): built synchronously BEFORE the pinned
+  // museum / K-frames ScrollTriggers are created, so its (fixed-ratio) height
+  // is already part of the layout they measure.
+  craftApi = initCraftGallery({ t, getLang: () => lang });
   wireMediaFeatures();
   wireMuseum25D(lenis).then(() => wireKframesGallery(lenis)).then(() => wireBruckmandl(lenis));
   // buildHistoricalReel() / buildVideoChapter() calls removed — CONTENT
