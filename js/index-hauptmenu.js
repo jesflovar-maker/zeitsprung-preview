@@ -38,14 +38,21 @@
    chapter, mute), and resumes gently. prefers-reduced-motion: static orbit, no rAF, no ambient, no easing.
    Selecting a card never navigates — it only updates the stage below.
 
-   DECISION GATE (2026-11-12) — the selector is a gate, not a scroll section. While
-   html.zt-gate-locked is set (inline script in index.html) everything below the
-   selector is not rendered, so the page physically ends at the orbit: wheel,
-   trackpad inertia, touch, PageDown, Space, ArrowDown and End can never pass it.
-   The lock is released ONLY by an explicit choice (click / tap / Enter / Space)
-   of an ACTIVE monument. The default front card is NOT a choice. Browsing (arrow
-   keys, swipe) and future monuments never unlock; they only update the prompt.
-   Once unlocked the page stays unlocked until reload (no lock/unlock loops).
+   DECISION GATE (2026-11-12) — the selector is a gate, not a scroll section. html.zt-gate-locked
+   (inline script in index.html) keeps everything below the selector unrendered, so the page
+   physically ends at the orbit: wheel, trackpad inertia, touch, PageDown, Space, ArrowDown and End
+   can never pass it. Only an explicit choice (click / tap / Enter / Space) of an ACTIVE monument
+   opens the timeline decision screen. The default front card is NOT a choice; browsing (arrow
+   keys, swipe) and future monuments never open it, they only update the prompt.
+
+   TIMELINE DECISION SCREEN (2026-11-12, second gate) — choosing an ACTIVE monument opens
+   its timeline as a full-viewport decision screen (html.zt-stage-open: the stage is
+   position:fixed, document scrolling is off). Page navigation is locked in BOTH
+   directions; timeline controls, language and Brückmandl keep working. The only exits:
+     START EXPERIENCE        -> short entry transition (gold line, stage stays visible) -> monument page
+     BACK TO ALL MONUMENTS   -> closes the stage and returns DIRECTLY to the orbit (no intro replay);
+                                the orbit asks for a NEW explicit choice (front card is not a choice).
+   `#index-monuments` (used by every monument page's "All monuments" action) scrolls straight to the orbit.
 
    LIFECYCLE — built once. Language changes (observed on <html lang>) only
    rewrite text: selection, source and playback position are untouched.
@@ -77,8 +84,8 @@ async function init() {
   catch (err) { console.error("ZEITSPRUNG Hauptmenü: could not load monuments.config.json", err); root.classList.remove("zt-gate-locked"); return; }
   monuments.sort((a, b) => (a.menu_order ?? a.order) - (b.menu_order ?? b.order));
   if (!monuments.length) { root.classList.remove("zt-gate-locked"); return; }
-  let chosen = !root.classList.contains("zt-gate-locked");   // true once an ACTIVE monument was explicitly chosen
-  hm.classList.toggle("hm--locked", !chosen); hm.classList.toggle("hm--open", chosen);
+  let stageOpen = false, entering = false;   // the timeline decision screen is shown / the entry transition runs
+  hm.classList.add("hm--locked");
   const isActive = (m) => !!(m.enabled && m.route && m.menu_timeline && m.menu_timeline.src);
 
   /* ---------- cards ---------- */
@@ -110,8 +117,14 @@ async function init() {
   const soonText = mk("p", "hm__soontext");
   const cta = mk("a", "hm__cta zs-glass-cta");
   info.appendChild(count); info.appendChild(sub); info.appendChild(name); info.appendChild(desc); info.appendChild(tl); info.appendChild(soonText); info.appendChild(cta);
-  stageHost.appendChild(media); stageHost.appendChild(info);
-  const prompt = mk("p", "hm__prompt", { "aria-live": "polite" }); cardsHost.insertAdjacentElement("afterend", prompt); prompt.hidden = chosen;
+  const actions = mk("div", "hm__actions"); actions.appendChild(cta);
+  const back = mk("button", "hm__back zs-glass-control", { type: "button" }); actions.appendChild(back);
+  info.appendChild(actions);
+  const mbox = mk("div", "hm__mediabox"); mbox.appendChild(media);
+  const entryLine = mk("div", "hm__entry-line", { "aria-hidden": "true" });
+  stageHost.appendChild(mbox); stageHost.appendChild(info); stageHost.appendChild(entryLine); stageHost.tabIndex = -1;
+  const gate = document.getElementById("hmGate");
+  const prompt = mk("p", "hm__prompt", { "aria-live": "polite" }); cardsHost.insertAdjacentElement("afterend", prompt); prompt.hidden = false;
   const lineEl = document.getElementById("hmLine");
   if (lineEl) { lineEl.classList.add("hm__line--anim"); new IntersectionObserver((es, io) => { if (es.some((e) => e.isIntersecting)) { lineEl.classList.add("is-in"); io.disconnect(); } }, { threshold: 0.3 }).observe(lineEl); }
 
@@ -213,7 +226,7 @@ async function init() {
   function relabel() {
     const l = langNow();
     cardsHost.setAttribute("aria-label", t(l, "hmMenuAria"));
-    prompt.hidden = chosen; if (!chosen) { const fut = sel && !isActive(sel); prompt.dataset.future = fut ? "1" : "0"; prompt.textContent = fut ? pick(sel.name, l) + " — " + t(l, "hmSoon") : t(l, "hmPrompt"); }
+    prompt.hidden = false; { const fut = sel && !isActive(sel); prompt.dataset.future = fut ? "1" : "0"; prompt.textContent = fut ? pick(sel.name, l) + " — " + t(l, "hmSoon") : t(l, "hmPrompt"); }
     cards.forEach(({ m, nm, st }) => { nm.textContent = pick(m.name, l); st.textContent = isActive(m) ? pick(m.subtitle, l) : t(l, "hmSoon"); });
     if (!sel) return;
     const act = isActive(sel), tlm = tlOf(sel);
@@ -227,7 +240,7 @@ async function init() {
     // burned-in caption disclosure — only when the film's language is not the visitor's
     const bt = tlm ? tlm.burned_text || "" : ""; note.textContent = !bt || bt.split("+").includes(l) ? "" : t(l, bt === "de" ? "hmNoteDe" : "hmNoteDeEn"); note.hidden = !note.textContent;
     soon.textContent = t(l, "hmSoon"); soonText.textContent = t(l, "hmSoonText");
-    cta.textContent = pick(sel.cta, l);
+    cta.textContent = pick(sel.cta, l); back.textContent = t(l, "hmBack");
     renderChapters(); renderProgress();
   }
   function select(m, focus, silent) {
@@ -249,20 +262,40 @@ async function init() {
     if (!silent) { try { history.replaceState(null, "", "#index-" + m.id); } catch (e) {} }
   }
 
-  function unlock() {
-    chosen = true; root.classList.remove("zt-gate-locked"); hm.classList.remove("hm--locked"); hm.classList.add("hm--open"); relabel();
-    stageHost.classList.add("hm__stage--enter");
-    requestAnimationFrame(() => {
-      if (window.ScrollTrigger && typeof window.ScrollTrigger.refresh === "function") { try { window.ScrollTrigger.refresh(); } catch (e) {} }   // sections below were not rendered while locked
-      requestAnimationFrame(() => { stageHost.classList.remove("hm__stage--enter"); stageHost.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" }); });
-    });
+  function openStage() {
+    if (stageOpen || !sel || !isActive(sel)) return;
+    stageOpen = true; holdOrbit("stage", true); gate.inert = true;
+    root.classList.add("zt-stage-open"); stageHost.classList.add("hm__stage--enter");
+    document.addEventListener("keydown", onStageKey);
+    requestAnimationFrame(() => requestAnimationFrame(() => { stageHost.classList.remove("hm__stage--enter"); stageHost.focus({ preventScroll: true }); }));
+  }
+  function closeStage() {
+    if (!stageOpen) return;
+    stageOpen = false; entering = false; stageHost.classList.remove("hm__stage--entering");
+    try { video.pause(); } catch (e) {}
+    root.classList.remove("zt-stage-open"); gate.inert = false; document.removeEventListener("keydown", onStageKey);
+    holdOrbit("stage", false); relabel();
+    window.scrollTo(0, document.documentElement.scrollHeight);          // the page ends at the orbit: back to the selector, not to the intro
+    const cur = cards.find((c) => c.m === sel); if (cur) cur.b.focus({ preventScroll: true });
+  }
+  const onStageKey = (e) => { if (e.key === "Escape" && !entering) closeStage(); };
+  function beginEntry(href) {
+    if (entering) return; entering = true; stageHost.classList.add("hm__stage--entering");
+    setTimeout(() => { location.href = href; }, reduced() ? 0 : 560);          // short transition only — never an artificial wait
   }
 
   /* ---------- wiring (once) ---------- */
   cards.forEach(({ m, b }, i) => {
-    b.addEventListener("click", () => { if (dragSuppress) return; select(m); if (!chosen && isActive(m)) unlock(); });
+    b.addEventListener("click", () => { if (dragSuppress) return; select(m); if (isActive(m)) openStage(); });
     b.addEventListener("keydown", (e) => { let j = -1; if (e.key === "ArrowRight" || e.key === "ArrowDown") j = (i + 1) % cards.length; else if (e.key === "ArrowLeft" || e.key === "ArrowUp") j = (i - 1 + cards.length) % cards.length; else if (e.key === "Home") j = 0; else if (e.key === "End") j = cards.length - 1; if (j >= 0) { e.preventDefault(); select(cards[j].m, true); } });
   });
+  back.addEventListener("click", closeStage);
+  cta.addEventListener("click", (e) => { const href = cta.getAttribute("href"); if (!href || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return; e.preventDefault(); beginEntry(href); });
+  // decision screen: no page scroll (belt and braces for iOS); the chapter rail and an overflowing stage may scroll themselves
+  const guardScroll = (e) => { if (!stageOpen) return; const tg = e.target; if (tg && tg.closest && tg.closest(".hm__chapters")) return; if (stageHost.scrollHeight > stageHost.clientHeight + 1 && stageHost.contains(tg)) return; e.preventDefault(); };
+  document.addEventListener("wheel", guardScroll, { passive: false }); document.addEventListener("touchmove", guardScroll, { passive: false });
+  addEventListener("pageshow", (e) => { if (e.persisted) { entering = false; stageHost.classList.remove("hm__stage--entering"); } });
+  if (location.hash === "#index-monuments") { const go = () => { if (!stageOpen) window.scrollTo(0, document.documentElement.scrollHeight); }; go(); addEventListener("load", () => { go(); setTimeout(go, 500); }, { once: true }); setTimeout(go, 350); }
   const toggle = () => { nudgeOrbit(); if (video.paused) { userPaused = false; play(); } else { userPaused = true; video.pause(); } };
   bp.addEventListener("click", toggle); bigPlay.addEventListener("click", toggle); video.addEventListener("click", toggle);
   bm.addEventListener("click", () => { nudgeOrbit(); video.muted = !video.muted; bm.setAttribute("aria-pressed", String(!video.muted)); relabel(); });

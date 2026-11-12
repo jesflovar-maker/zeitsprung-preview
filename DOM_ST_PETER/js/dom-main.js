@@ -78,10 +78,24 @@ function buildHero() {
   v.addEventListener("error", () => { s.replaceChildren(mkImg("k11", "Dom St. Peter")); });
   bind($("#heroEyebrow"), (t) => t.hero.eyebrow); bind($("#heroSub"), (t) => t.hero.sub); const b = bind($("#startBtn"), (t) => t.hero.start);
   const go = () => $("#rundum").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+  // MONUMENT ENTRY STANDARD (2026-11-12, aligned with the Steinerne entry): START -> thin gold loading line while the hero
+  // stays visible -> critical first-view readiness -> release. Critical = page load (CSS/JS), fonts, hero video metadata.
+  // Minimum 450 ms (no flash on a warm cache), hard timeout 5 s (a stalled asset never traps the visitor), no percentages.
+  let entering = false;
+  const heroReady = new Promise((res) => { if (v.readyState >= 1) return res(); ["loadedmetadata", "loadeddata", "error", "stalled"].forEach((ev) => v.addEventListener(ev, res, { once: true })); });
+  const pageReady = new Promise((res) => { if (document.readyState === "complete") res(); else addEventListener("load", res, { once: true }); });
+  const fontsReady = (document.fonts && document.fonts.ready) ? document.fonts.ready.catch(() => {}) : Promise.resolve();
+  const load = document.createElement("div"); load.className = "dload"; load.hidden = true; load.setAttribute("aria-hidden", "true"); load.appendChild(document.createElement("i")); document.body.appendChild(load);
+  const release = () => {
+    root.classList.remove("is-loading", "is-gated"); root.classList.add("is-started"); load.classList.remove("is-on"); setTimeout(() => { load.hidden = true; }, 320);
+    requestAnimationFrame(() => { runSC(); VM.tick(); requestAnimationFrame(go); });
+  };
   b.addEventListener("click", () => {
     if (!root.classList.contains("is-gated")) { go(); return; }
-    root.classList.remove("is-gated"); root.classList.add("is-started");
-    requestAnimationFrame(() => { runSC(); VM.tick(); requestAnimationFrame(go); });
+    if (entering) return; entering = true; root.classList.add("is-loading"); load.hidden = false; requestAnimationFrame(() => load.classList.add("is-on"));
+    const t0 = performance.now(); let done = false;
+    const finish = () => { if (done) return; done = true; const wait = Math.max(0, 450 - (performance.now() - t0)); setTimeout(release, reduced ? 0 : wait); };
+    Promise.all([heroReady, pageReady, fontsReady]).then(finish, finish); setTimeout(finish, 5000);
   });
 }
 
@@ -230,7 +244,7 @@ function buildTrailer() {
 /* ---------- navigation, language switch ---------- */
 let curSec = "hero";
 function buildNav() {
-  const n = $("#dnLinks"); bind(n, (t) => t.ui.navAria, "aria-label"); bind($("#dnBrand"), (t) => t.ui.brandAria, "aria-label"); bind($("#dnBack"), (t) => t.ui.back); bind($("#dnLang"), (t) => t.ui.langAria, "aria-label");
+  const n = $("#dnLinks"); bind(n, (t) => t.ui.navAria, "aria-label"); bind($("#dnBrand"), (t) => t.ui.brandAria, "aria-label"); bind($("#dnBack"), (t) => t.ui.back); bind($("#dnBack"), (t) => t.ui.backShort, "data-short"); bind($("#dnLang"), (t) => t.ui.langAria, "aria-label");
   NAV.forEach((id) => { const a = el("a"); a.href = `#${id}`; bind(a, (t) => t.nav[id]); n.append(a); });
   const hd = $("#dn"), pr = $("#dProg span"); const all = [...document.querySelectorAll("main > section")];
   SC.push(() => { hd.classList.toggle("is-solid", scrollY > 40); const t = root.scrollHeight - innerHeight; pr.style.transform = `scaleX(${t > 0 ? clamp(scrollY / t, 0, 1) : 0})`; let c = "hero"; all.forEach((sc) => { if (sc.offsetHeight && sc.getBoundingClientRect().top < innerHeight * 0.4) c = sc.id; }); curSec = c; [...n.children].forEach((a) => a.setAttribute("aria-current", String(a.getAttribute("href") === `#${c}`))); });

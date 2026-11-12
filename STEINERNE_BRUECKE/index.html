@@ -54,6 +54,7 @@
 <!-- INTRO GATE                                                    -->
 <!-- ============================================================ -->
 <div id="intro-gate" class="intro-gate">
+  <a href="../index.html#index-monuments" class="intro-gate__all" data-i18n="navAll">ALLE MONUMENTE</a>
   <!-- PHASE 2.6 TASK 2 — cinematic video layer, BEHIND the existing content
        block below. #introPosterImg (the new production hero) is the
        always-present base layer; #introVideo is layered above it and only
@@ -109,6 +110,9 @@
          never stuck inside this single-monument experience. No other
          behaviour of this bridge is touched. -->
     <a href="../index.html" class="navbar__brand" aria-label="ZEITSPRUNG — zur Startseite / back to start / volver al inicio">ZEITSPRUNG</a>
+    <!-- NAVIGATION STANDARD (2026-11-12): every monument has a permanent "All monuments" action that returns
+         DIRECTLY to the INDEX orbit selector (../index.html#index-monuments), not to the index top. -->
+    <a href="../index.html#index-monuments" class="navbar__all"><span class="navbar__all-long" data-i18n="navAll">ALLE MONUMENTE</span><span class="navbar__all-short" data-i18n="navAllShort">MONUMENTE</span></a>
     <div class="navbar__links">
       <button type="button" data-scroll-to="#stage" data-i18n="navRoute">ROUTE</button>
       <button type="button" data-scroll-to="#timelineFilm" class="navbar__timeline-btn">

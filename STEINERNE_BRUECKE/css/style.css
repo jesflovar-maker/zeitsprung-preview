@@ -2746,3 +2746,11 @@ img{ max-width:100%; display:block; }
 }
 @media (min-width: 2200px){ .craft__cap{ width: min(40vw, 760px); } .craft__cap-title{ font-size: 46px; } .craft__cap-text{ font-size: 21px; } .craft__cap-chapter{ font-size: 15px; } .craft__cap-ref{ font-size: 13px; } }
 @media (min-width: 1100px){ .craft__count{ transform: translateX(-100%); margin-left: 22px; white-space: nowrap; } }
+
+/* NAVIGATION STANDARD (2026-11-12) — permanent "All monuments" action (additive; no other rule changed). */
+.navbar__all, .intro-gate__all{ font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.18em; color: var(--z-ink-dim); text-decoration: none; padding: 12px 4px; min-height: 44px; display: inline-flex; align-items: center; border-bottom: 1px solid transparent; }
+.navbar__all:hover, .intro-gate__all:hover{ color: var(--z-ink); border-color: var(--z-gold-dim); }
+.navbar__all-short{ display: none; }
+.navbar__all::before, .intro-gate__all::before{ content: "←"; margin-right: 8px; color: var(--z-gold); }
+.intro-gate__all{ position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); left: 14px; z-index: 5; }
+@media (max-width: 759px){ .navbar__all-long{ display: none; } .navbar__all-short{ display: inline; } .navbar__all{ letter-spacing: 0.12em; font-size: 10px; } }

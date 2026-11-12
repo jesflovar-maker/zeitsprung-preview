@@ -7,7 +7,7 @@ export const STORAGE_KEY = "zeitsprung_v2_lang"; // existing ZEITSPRUNG conventi
 export const STR = {
   de: {
     meta: { title: "ZEITSPRUNG — Dom St. Peter, Regensburg", desc: "Dom St. Peter in Regensburg: eine Zeitreise durch Bau, Architektur und Geschichte der gotischen Kathedrale." },
-    ui: { brandAria: "ZEITSPRUNG — zur Übersicht", back: "ÜBERSICHT", navAria: "Kapitel", langAria: "Sprache", vis: "Visualisierung", scrollAria: "Nach unten", close: "Schließen", trailer: "TRAILER ANSEHEN", trailerShort: "▶ TRAILER", trailerAria: "Trailer" },
+    ui: { brandAria: "ZEITSPRUNG — zur Übersicht", back: "ALLE MONUMENTE", backShort: "MONUMENTE", navAria: "Kapitel", langAria: "Sprache", vis: "Visualisierung", scrollAria: "Nach unten", close: "Schließen", trailer: "TRAILER ANSEHEN", trailerShort: "▶ TRAILER", trailerAria: "Trailer" },
     nav: { rundum: "Rundum", holo: "Modell", architektur: "Architektur", bauabfolge: "Bauabfolge", zeitreise: "Zeitreise", zeitleiste: "Zeitleiste", glas: "Glas", menschen: "Dombauhütte", unten: "Unten", heute: "Heute" },
     hero: { eyebrow: "REGENSBURG", sub: "Gotische Kathedrale im Herzen Regensburgs — ein Bau, der über Jahrhunderte in die Höhe wuchs.", start: "ERLEBNIS BEGINNEN" },
     scrub: { eb: "RUND UM DEN DOM", h: "Einmal um die Kathedrale", lead: "Von der Westfassade über Süd, Ost und Nord bis in die Höhe — und hinab unter den Dom.", play: "ABSPIELEN" },
@@ -104,7 +104,7 @@ export const STR = {
 
   en: {
     meta: { title: "ZEITSPRUNG — Regensburg Cathedral (Dom St. Peter)", desc: "Regensburg Cathedral: a journey through the construction, architecture and history of the Gothic cathedral." },
-    ui: { brandAria: "ZEITSPRUNG — back to overview", back: "OVERVIEW", navAria: "Chapters", langAria: "Language", vis: "Visualisation", scrollAria: "Scroll down", close: "Close", trailer: "WATCH TRAILER", trailerShort: "▶ TRAILER", trailerAria: "Trailer" },
+    ui: { brandAria: "ZEITSPRUNG — back to overview", back: "ALL MONUMENTS", backShort: "MONUMENTS", navAria: "Chapters", langAria: "Language", vis: "Visualisation", scrollAria: "Scroll down", close: "Close", trailer: "WATCH TRAILER", trailerShort: "▶ TRAILER", trailerAria: "Trailer" },
     nav: { rundum: "Around", holo: "Model", architektur: "Architecture", bauabfolge: "Building", zeitreise: "Time travel", zeitleiste: "Timeline", glas: "Glass", menschen: "Workshop", unten: "Below", heute: "Today" },
     hero: { eyebrow: "REGENSBURG", sub: "A Gothic cathedral in the heart of Regensburg — a building that rose over centuries.", start: "START EXPERIENCE" },
     scrub: { eb: "AROUND THE CATHEDRAL", h: "Once around the cathedral", lead: "From the west front past south, east and north, up to the top — and down beneath the cathedral.", play: "PLAY" },
@@ -201,7 +201,7 @@ export const STR = {
 
   es: {
     meta: { title: "ZEITSPRUNG — Catedral de Ratisbona (Dom St. Peter)", desc: "Catedral de Ratisbona: un viaje por la construcción, la arquitectura y la historia de la catedral gótica." },
-    ui: { brandAria: "ZEITSPRUNG — volver al inicio", back: "INICIO", navAria: "Capítulos", langAria: "Idioma", vis: "Visualización", scrollAria: "Bajar", close: "Cerrar", trailer: "VER TRÁILER", trailerShort: "▶ TRÁILER", trailerAria: "Tráiler" },
+    ui: { brandAria: "ZEITSPRUNG — volver al inicio", back: "TODOS LOS MONUMENTOS", backShort: "MONUMENTOS", navAria: "Capítulos", langAria: "Idioma", vis: "Visualización", scrollAria: "Bajar", close: "Cerrar", trailer: "VER TRÁILER", trailerShort: "▶ TRÁILER", trailerAria: "Tráiler" },
     nav: { rundum: "Alrededor", holo: "Modelo", architektur: "Arquitectura", bauabfolge: "Construcción", zeitreise: "Viaje", zeitleiste: "Cronología", glas: "Vidrio", menschen: "Taller", unten: "Subsuelo", heute: "Hoy" },
     hero: { eyebrow: "RATISBONA", sub: "Una catedral gótica en el corazón de Ratisbona: un edificio que creció hacia lo alto durante siglos.", start: "COMENZAR EXPERIENCIA" },
     scrub: { eb: "ALREDEDOR DE LA CATEDRAL", h: "Una vuelta a la catedral", lead: "De la fachada oeste por el sur, el este y el norte hasta lo alto — y hacia abajo, bajo la catedral.", play: "REPRODUCIR" },

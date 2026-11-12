@@ -20,8 +20,8 @@
 .hm__prompt{ margin: clamp(10px, 2vw, 18px) 0 0; min-height: 1.6em; text-align: center; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(212,175,120,.88); }
 .hm__prompt[hidden]{ display: none; }
 .hm__prompt[data-future="1"]{ color: var(--z-ink-dim); }
-/* DECISION GATE — until an active monument is chosen nothing below the selector is rendered (the page ends at the orbit). */
-html.zt-gate-locked #hauptmenu ~ section, html.zt-gate-locked #hauptmenu ~ footer, html.zt-gate-locked .hm__stage{ display: none !important; }
+/* DECISION GATE — nothing below the selector is rendered (the page ends at the orbit); the timeline stage only exists as the fixed decision screen below. */
+html.zt-gate-locked #hauptmenu ~ section, html.zt-gate-locked #hauptmenu ~ footer, html.zt-gate-locked:not(.zt-stage-open) .hm__stage{ display: none !important; }
 .hm .hm__stage{ scroll-margin-top: calc(var(--nav-h, 56px) + 12px); margin-bottom: clamp(40px, 7vw, 72px); transition: opacity .6s var(--zs-glass-ease, ease), transform .6s var(--zs-glass-ease, ease), background-position .9s var(--zs-glass-ease, ease), border-color .4s, box-shadow .4s; }
 .hm .hm__stage.hm__stage--enter{ opacity: 0; transform: translateY(18px); }
 @media (prefers-reduced-motion: reduce){ .hm .hm__stage{ transition: none; } .hm .hm__stage.hm__stage--enter{ transform: none; } }
@@ -103,16 +103,7 @@ html.zt-gate-locked #hauptmenu ~ section, html.zt-gate-locked #hauptmenu ~ foote
 .hm__cta:hover{ background: #e2c28c; } /* upgraded by .zs-glass-cta */
 .hm__cta:focus-visible{ outline: 2px solid var(--z-ink); outline-offset: 3px; }
 .hm__cta[hidden]{ display: none; }
-@media (max-width: 759px){ .hm__cta{ align-self: stretch; margin-right: 64px; } } /* keep clear of the floating guide icon */
 @media (prefers-reduced-motion: reduce){ .hm__card, .hm__card-thumb img, .hm__video, .hm__bigplay{ transition: none; } .hm__card:hover{ transform: none; } .hm__card:hover .hm__card-thumb img{ transform: none; } }
-
-@media (min-width: 760px){
-  .hm__stage{ grid-template-columns: auto minmax(0, 1fr); gap: clamp(22px, 4vw, 48px); align-items: center; }
-  .hm__media{ width: auto; height: min(58svh, 620px); margin: 0; }
-}
-@media (min-width: 1280px){ .hm__media{ height: min(60svh, 680px); } .hm__desc{ font-size: 16px; } .hm__chapter-now{ font-size: 16px; } }
-@media (min-width: 2200px){ .hm__inner{ max-width: 1680px; } .hm__media{ height: min(60svh, 900px); } .hm__desc{ font-size: 19px; } .hm__chapter{ font-size: 13px; min-height: 48px; } .hm__btn{ font-size: 13px; } .hm__cta{ font-size: 14px; min-height: 62px; } }
-@media (min-width: 760px){ .hm__info{ padding-right: 60px; } } /* keep timeline controls clear of the floating guide icon */
 
 /* ======================================================================
    ZEITSPRUNG_ORBIT_SELECTOR_V1 (2026-11-12) — INDEX ONLY.
@@ -149,3 +140,65 @@ html.zt-gate-locked #hauptmenu ~ section, html.zt-gate-locked #hauptmenu ~ foote
 @media (max-width: 759px){ .hm--orbit .hm__card{ box-shadow: 0 10px 20px rgba(0,0,0,.4); } .hm--orbit .hm__card.is-selected{ box-shadow: 0 0 0 1px var(--z-gold), 0 14px 26px rgba(0,0,0,.5); } }
 @media (prefers-reduced-motion: reduce){ .hm--orbit .hm__card{ will-change: auto; } }
 
+
+/* ======================================================================
+   TIMELINE DECISION SCREEN (2026-11-12) — second gate. The selected monument's timeline is a
+   FULL-VIEWPORT, non-scrolling decision screen: START EXPERIENCE or BACK TO ALL MONUMENTS.
+   Mobile priority: identity > timeline media > progress > Start > Back > secondary controls.
+   (ZEITSPRUNG_ACTION_STANDARD_V1: primary = gold, secondary = restrained outline, tertiary = controls)
+   ====================================================================== */
+html.zt-stage-open, html.zt-stage-open body{ overflow: hidden; overscroll-behavior: none; }
+html.zt-stage-open .hm__stage{
+  position: fixed; inset: 0; z-index: 500; margin: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px;
+  padding: calc(var(--nav-h, 60px) + 8px) clamp(14px, 4vw, 40px) max(14px, env(safe-area-inset-bottom));
+  background: radial-gradient(120% 70% at 50% 0%, #15171d 0%, #08090b 64%); border: 0; border-radius: 0; box-shadow: none;
+  overflow-x: hidden; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
+}
+html.zt-stage-open .hm__stage::-webkit-scrollbar{ display: none; }
+html.zt-stage-open .hm__stage:focus{ outline: none; }
+.hm__mediabox{ order: 2; flex: 1 1 0; min-height: 120px; display: flex; justify-content: center; }
+.hm__mediabox .hm__media{ width: auto; height: 100%; max-width: 100%; max-height: 100%; aspect-ratio: 9 / 16; margin: 0; }
+.hm__info{ display: contents; }
+.hm__count{ display: none; }
+.hm__sub{ order: 1; margin: 0; font-size: 10.5px; letter-spacing: .22em; }
+.hm__name{ order: 1; margin: 0; font-size: clamp(22px, 6.2vw, 30px); }
+.hm__desc{ display: none; }
+.hm__tl{ order: 3; margin: 0; padding: 8px 10px 10px; }
+.hm__tl-head{ margin-bottom: 2px; }
+.hm__chapters{ flex-wrap: nowrap; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; margin-top: 4px; padding-bottom: 2px; -webkit-overflow-scrolling: touch; }
+.hm__chapters::-webkit-scrollbar{ display: none; }
+.hm__chapter{ flex: 0 0 auto; min-height: 40px; }
+.hm__chapter-now{ min-height: 0; margin: 4px 0 0; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hm__ctl{ margin-top: 6px; }
+.hm__note{ margin: 4px 0 0; font-size: 9.5px; line-height: 1.4; }
+.hm__soontext{ display: none; }
+.hm__actions{ order: 4; display: flex; flex-direction: column; gap: 8px; margin-right: 64px; /* clear of the floating guide icon */ }
+.hm__actions .hm__cta{ width: 100%; align-self: stretch; min-height: 52px; padding: 0 16px; font-size: 11.5px; letter-spacing: .18em; }
+.hm__back{ display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 46px; padding: 0 14px; color: var(--z-ink); font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
+.hm__entry-line{ position: absolute; left: 0; right: 0; bottom: 0; height: 2px; opacity: 0; transform: scaleX(0); transform-origin: 0 50%; background: linear-gradient(90deg, rgba(212,175,120,0), #d4af78 35%, #f1dcaa 50%, #d4af78 65%, rgba(212,175,120,0)); pointer-events: none; }
+.hm__stage--entering{ pointer-events: none; }
+.hm__stage--entering .hm__entry-line{ opacity: 1; animation: hmEntry .9s ease-out forwards; }
+.hm__stage--entering .hm__sub, .hm__stage--entering .hm__name, .hm__stage--entering .hm__tl, .hm__stage--entering .hm__actions{ opacity: 0; transition: opacity .35s ease; }
+@keyframes hmEntry{ from{ transform: scaleX(0); } to{ transform: scaleX(1); } }
+@media (prefers-reduced-motion: reduce){ .hm__stage--entering .hm__entry-line{ animation: none; transform: scaleX(1); } .hm__stage--entering .hm__sub, .hm__stage--entering .hm__name, .hm__stage--entering .hm__tl, .hm__stage--entering .hm__actions{ transition: none; } }
+@media (min-width: 820px){
+  html.zt-stage-open .hm__stage{ flex-direction: row; align-items: center; justify-content: center; gap: clamp(28px, 5vw, 80px); padding-bottom: 24px; }
+  .hm__mediabox{ order: 0; flex: 0 0 auto; height: min(calc(100svh - var(--nav-h, 60px) - 48px), 780px); min-height: 0; }
+  .hm__info{ display: flex; flex-direction: column; flex: 0 1 560px; min-width: 0; justify-content: center; padding-right: 60px; }
+  .hm__count{ display: block; }
+  .hm__sub, .hm__name, .hm__tl, .hm__actions{ order: 0; }
+  .hm__sub{ margin: 0 0 6px; font-size: 11px; }
+  .hm__name{ margin: 0 0 10px; font-size: clamp(30px, 3.2vw, 44px); }
+  .hm__desc{ display: block; margin: 0 0 16px; }
+  .hm__tl{ padding: 14px 16px 16px; margin: 0 0 18px; }
+  .hm__chapters{ flex-wrap: wrap; overflow: visible; }
+  .hm__chapter-now{ font-size: 14px; margin-top: 10px; white-space: normal; }
+  .hm__ctl{ margin-top: 12px; }
+  .hm__note{ font-size: 10px; margin-top: 10px; }
+  .hm__actions{ flex-direction: row; flex-wrap: wrap; margin-right: 0; gap: 12px; }
+  .hm__actions .hm__cta{ width: auto; min-width: 240px; min-height: 54px; padding: 0 30px; font-size: 12px; letter-spacing: .22em; }
+  .hm__back{ width: auto; min-height: 54px; padding: 0 26px; font-size: 11.5px; }
+}
+@media (min-width: 1280px){ .hm__desc{ font-size: 16px; } .hm__chapter-now{ font-size: 16px; } }
+@media (min-width: 2200px){ .hm__mediabox{ height: min(calc(100svh - var(--nav-h, 60px) - 64px), 1100px); } .hm__info{ flex-basis: 760px; } .hm__desc{ font-size: 19px; } .hm__chapter{ font-size: 13px; min-height: 48px; } .hm__btn{ font-size: 13px; } .hm__actions .hm__cta{ font-size: 14px; min-height: 62px; } .hm__back{ font-size: 13px; min-height: 62px; } }
+html.zt-stage-open .hm__gate{ visibility: hidden; } /* the orbit rests behind the decision screen */

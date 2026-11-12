@@ -48,6 +48,7 @@ export const DICT = {
     // INDEX HAUPTMENÜ (2026-11-11) — js/index-hauptmenu.js
     hmLine: "Fünf Orte. Fünf Zeitreisen.",
     hmPrompt: "Wählen Sie einen Ort.",
+    hmBack: "ZU ALLEN MONUMENTEN",
     hmMenuAria: "Monumente",
     hmSoon: "IN VORBEREITUNG",
     hmSoonText: "Dieses Monument ist in Vorbereitung.",
@@ -105,6 +106,7 @@ export const DICT = {
     // INDEX HAUPTMENÜ (2026-11-11) — js/index-hauptmenu.js
     hmLine: "Five places. Five journeys through time.",
     hmPrompt: "Choose a place.",
+    hmBack: "BACK TO ALL MONUMENTS",
     hmMenuAria: "Monuments",
     hmSoon: "COMING SOON",
     hmSoonText: "This monument is in preparation.",
@@ -162,6 +164,7 @@ export const DICT = {
     // INDEX HAUPTMENÜ (2026-11-11) — js/index-hauptmenu.js
     hmLine: "Cinco lugares. Cinco viajes en el tiempo.",
     hmPrompt: "Elija un lugar.",
+    hmBack: "VOLVER A TODOS LOS MONUMENTOS",
     hmMenuAria: "Monumentos",
     hmSoon: "PRÓXIMAMENTE",
     hmSoonText: "Este monumento está en preparación.",
