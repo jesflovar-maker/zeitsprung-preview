@@ -16,10 +16,11 @@
 .hm__card{ position: relative; flex: 0 0 var(--hm-card-w); width: var(--hm-card-w); aspect-ratio: 9 / 16; min-width: 0; padding: 0; text-align: left; background: #0b0d10; border: 1px solid var(--z-line); color: var(--z-ink); cursor: pointer; overflow: hidden; scroll-snap-align: center; transition: border-color .3s, transform .3s cubic-bezier(.22,.61,.36,1); }
 .hm__card-thumb{ position: absolute; inset: 0; display: block; }
 .hm__card-thumb img{ display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; transition: transform .9s cubic-bezier(.22,.61,.36,1), filter .4s; }
-.hm__card-thumb::after{ content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(8,9,11,.94) 0%, rgba(8,9,11,.7) 26%, rgba(8,9,11,0) 58%, rgba(8,9,11,.35) 100%); }
+.hm__card-thumb::after{ content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(8,9,11,.38) 0%, rgba(8,9,11,0) 26%, rgba(8,9,11,0) 100%); } /* image stays crisp — caption legibility comes from the glass plate */
 .hm__card--future .hm__card-thumb img{ filter: grayscale(.6) brightness(.55); }
-.hm__card-text{ position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px 10px 12px; }
-.hm__card-no{ position: absolute; left: 10px; top: 9px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.2em; color: rgba(244,239,230,.85); }
+.hm__card-text{ position: absolute; left: 0; right: 0; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: flex-end; }
+.hm__card-plate{ display: block; padding: 10px 10px 12px; } /* material: .zs-glass .zs-glass--plate */
+.hm__card-no{ position: absolute; left: 10px; top: 9px; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.2em; color: rgba(244,239,230,.92); text-shadow: 0 1px 6px rgba(0,0,0,.7); }
 .hm__card-name{ display: block; font-size: 14px; font-weight: 600; line-height: 1.2; overflow-wrap: anywhere; hyphens: auto; }
 .hm__card-status{ display: block; margin-top: 6px; font-family: var(--font-mono); font-size: 9px; line-height: 1.35; letter-spacing: 0.14em; color: var(--z-gold); }
 .hm__card--future .hm__card-name{ color: rgba(244,239,230,.82); }
@@ -33,11 +34,11 @@
   .hm__cards{ --hm-card-w: min(calc((100% - 4 * 12px) / 5), calc(40svh * 9 / 16), 230px); gap: 12px; justify-content: center; overflow: visible; margin-inline: 0; padding-inline: 0; scroll-snap-type: none; }
   .hm__card{ flex: 0 0 var(--hm-card-w); }
 }
-@media (min-width: 1100px){ .hm__cards{ gap: 16px; --hm-card-w: min(calc((100% - 4 * 16px) / 5), calc(40svh * 9 / 16), 230px); } .hm__card-name{ font-size: 15px; } .hm__card-status{ font-size: 9.5px; } .hm__card-text{ padding: 12px 12px 14px; } }
+@media (min-width: 1100px){ .hm__cards{ gap: 16px; --hm-card-w: min(calc((100% - 4 * 16px) / 5), calc(40svh * 9 / 16), 230px); } .hm__card-name{ font-size: 15px; } .hm__card-status{ font-size: 9.5px; } .hm__card-plate{ padding: 12px 12px 14px; } }
 @media (min-width: 2200px){ .hm__cards{ gap: 22px; --hm-card-w: min(calc((100% - 4 * 22px) / 5), calc(38svh * 9 / 16), 330px); } .hm__card-name{ font-size: 20px; } .hm__card-status{ font-size: 12px; } .hm__card-no{ font-size: 13px; } .hm__line{ font-size: 30px; } }
 
 /* ---- stage ---- */
-.hm__stage{ display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; border: 1px solid var(--z-line); background: linear-gradient(180deg, #0f1115, #0b0c0f); padding: clamp(12px, 3vw, 22px); }
+.hm__stage{ display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; padding: clamp(12px, 3vw, 22px); } /* material: .zs-glass .zs-glass-floating (css/zs-glass.css) */
 .hm__media{ position: relative; width: min(100%, calc(62svh * 9 / 16)); aspect-ratio: 9 / 16; margin-inline: auto; background: #050607; border: 1px solid var(--z-line); overflow: hidden; }
 .hm__poster, .hm__video{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
 .hm__video{ opacity: 0; transition: opacity .5s; cursor: pointer; }
@@ -56,7 +57,7 @@
 .hm__sub{ font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.24em; color: var(--z-gold); margin: 0 0 6px; }
 .hm__name{ font-size: clamp(24px, 6.4vw, 38px); font-weight: 600; line-height: 1.1; margin: 0 0 10px; }
 .hm__desc{ font-size: 14.5px; line-height: 1.55; color: var(--z-ink-dim); margin: 0 0 16px; max-width: 56ch; }
-.hm__tl{ border-top: 1px solid var(--z-line); padding-top: 14px; margin-bottom: 18px; }
+.hm__tl{ padding: 14px 16px 16px; margin-bottom: 18px; } /* material: .zs-glass .zs-glass--flat */
 .hm__tl[hidden]{ display: none; }
 .hm__tl-head{ display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 10px; }
 .hm__tl-label{ font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.26em; color: var(--z-gold); }
@@ -81,7 +82,7 @@
 .hm__soontext{ font-size: 14.5px; color: var(--z-ink-dim); margin: 0; }
 .hm__soontext[hidden]{ display: none; }
 .hm__cta{ display: inline-flex; align-items: center; justify-content: center; align-self: flex-start; min-height: 54px; padding: 0 30px; background: var(--z-gold); color: #14100a; border: 1px solid var(--z-gold); font-family: var(--font-mono); font-size: 12px; font-weight: 600; letter-spacing: 0.22em; text-decoration: none; transition: background .3s; }
-.hm__cta:hover{ background: #e2c28c; }
+.hm__cta:hover{ background: #e2c28c; } /* upgraded by .zs-glass-cta */
 .hm__cta:focus-visible{ outline: 2px solid var(--z-ink); outline-offset: 3px; }
 .hm__cta[hidden]{ display: none; }
 @media (max-width: 759px){ .hm__cta{ align-self: stretch; margin-right: 64px; } } /* keep clear of the floating guide icon */
@@ -94,3 +95,39 @@
 @media (min-width: 1280px){ .hm__media{ height: min(60svh, 680px); } .hm__desc{ font-size: 16px; } .hm__chapter-now{ font-size: 16px; } }
 @media (min-width: 2200px){ .hm__inner{ max-width: 1680px; } .hm__media{ height: min(60svh, 900px); } .hm__desc{ font-size: 19px; } .hm__chapter{ font-size: 13px; min-height: 48px; } .hm__btn{ font-size: 13px; } .hm__cta{ font-size: 14px; min-height: 62px; } }
 @media (min-width: 760px){ .hm__info{ padding-right: 60px; } } /* keep timeline controls clear of the floating guide icon */
+
+/* ======================================================================
+   ZEITSPRUNG_ORBIT_SELECTOR_V1 (2026-11-12) — INDEX ONLY.
+   js/index-hauptmenu.js adds .hm--orbit and drives five portrait cards along a
+   flattened ellipse (translate3d + scale + opacity only). Cards never rotate:
+   they stay upright and readable. DOM order stays 01..05. Without JS (or before
+   it runs) the plain portrait row above is the selector.
+   ====================================================================== */
+.hm--orbit .hm__cards{
+  --hm-card-w: min(40vw, 190px);
+  position: relative; display: block; height: var(--hm-orbit-h, 300px); margin: 0 0 clamp(14px, 3vw, 24px); padding: 0;
+  overflow: hidden; overflow: clip; touch-action: pan-y; scroll-snap-type: none; -webkit-user-select: none; user-select: none;
+}
+@media (min-width: 700px){ .hm--orbit .hm__cards{ --hm-card-w: min(calc(38svh * 9 / 16), 21vw, 230px); justify-content: initial; } }
+@media (min-width: 2200px){ .hm--orbit .hm__cards{ --hm-card-w: min(calc(36svh * 9 / 16), 330px); } }
+/* the orbit path: a thin flattened ellipse at the feet of the cards (decorative, not a node) */
+.hm--orbit .hm__cards::before{
+  content: ""; position: absolute; left: 50%; bottom: calc(12px + var(--hm-ry, 20px) * .5 - 1px); z-index: 0; pointer-events: none;
+  width: calc(var(--hm-rx, 200px) * 2); height: var(--hm-ry, 20px); margin-left: calc(var(--hm-rx, 200px) * -1);
+  border: 1px solid rgba(212,175,120,.2); border-radius: 50%; box-shadow: 0 0 22px rgba(212,175,120,.06);
+}
+.hm--orbit .hm__card{
+  position: absolute; left: 50%; bottom: 12px; flex: none; width: var(--hm-card-w); margin-left: calc(var(--hm-card-w) / -2);
+  transform-origin: 50% 100%; will-change: transform; scroll-snap-align: none;
+  border-color: rgba(212,175,120,.26);
+  box-shadow: 0 16px 30px rgba(0,0,0,.45);   /* static: nothing here changes per frame (only transform + opacity do) */
+  transition: border-color .3s, box-shadow .3s;
+}
+/* depth: farther = a little darker (overlay, not a filter) */
+.hm--orbit .hm__card::before{ content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: rgb(8,9,11); opacity: calc((1 - var(--t, 1)) * .34); }
+.hm--orbit .hm__card--future .hm__card-thumb img{ filter: grayscale(.5) brightness(.78); }
+.hm--orbit .hm__card.is-selected{ border-color: var(--z-gold); box-shadow: 0 0 0 1px var(--z-gold), 0 26px 50px rgba(0,0,0,.55), 0 0 26px rgba(212,175,120,.16); }
+.hm--orbit .hm__card:hover{ transform: none; }
+@media (max-width: 759px){ .hm--orbit .hm__card{ box-shadow: 0 10px 20px rgba(0,0,0,.4); } .hm--orbit .hm__card.is-selected{ box-shadow: 0 0 0 1px var(--z-gold), 0 14px 26px rgba(0,0,0,.5); } }
+@media (prefers-reduced-motion: reduce){ .hm--orbit .hm__card{ will-change: auto; } }
+

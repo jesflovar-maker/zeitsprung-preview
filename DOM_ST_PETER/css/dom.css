@@ -317,3 +317,8 @@ html.is-gated .dhero{height:100svh;min-height:0}
 @media (min-width:1240px){.dn__links{gap:14px}}
 @media (min-width:1100px){.dtlv__chip b{flex-basis:168px}}
 @media (min-width:2200px){.dguide__fab{width:64px;height:64px}}
+
+/* ZEITSPRUNG_GLASS_SYSTEM_V1 adoption geometry (2026-11-12) — material comes from ../css/zs-glass.css.
+   Selective: story / Bauabfolge copy plates, timeline info + controls, fact blocks, guide panel. */
+.dkf__cap-in,.dscrub__mark-in{padding:14px 16px 15px}
+.dtlv__info{padding:14px 16px}

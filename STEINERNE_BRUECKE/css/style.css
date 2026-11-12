@@ -2746,3 +2746,8 @@ img{ max-width:100%; display:block; }
 }
 @media (min-width: 2200px){ .craft__cap{ width: min(40vw, 760px); } .craft__cap-title{ font-size: 46px; } .craft__cap-text{ font-size: 21px; } .craft__cap-chapter{ font-size: 15px; } .craft__cap-ref{ font-size: 13px; } }
 @media (min-width: 1100px){ .craft__count{ transform: translateX(-100%); margin-left: 22px; white-space: nowrap; } }
+
+/* ZEITSPRUNG_GLASS_SYSTEM_V1 adoption geometry (2026-11-12) — material comes from ../css/zs-glass.css.
+   Selective: people/material gallery captions, fact cards and 3D controls only. */
+.craft__cap-in{ padding: 14px 16px 15px; }
+.craft__cap-in .craft__cap-ref{ color: var(--z-ink-dim); } /* source line stays legible on the glass plate */
