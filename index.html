@@ -6,6 +6,10 @@
 <title>ZEITSPRUNG — Regensburg</title>
 <meta name="description" content="ZEITSPRUNG — Geschichte sehen, nicht nur lesen. Interaktive Zeitreise durch Regensburg.">
 <meta name="robots" content="noindex, nofollow">
+<!-- ORBIT DECISION GATE (2026-11-12): until an ACTIVE monument is explicitly chosen in the orbit selector, everything
+     below the selector is not rendered, so the page physically ends at the orbit (nothing can be scrolled past).
+     Fail-safe: if the selector script never reports ready, the lock is released after 9 s. No JS = never locked. -->
+<script>document.documentElement.classList.add("zt-gate-locked");setTimeout(function(){if(!window.__ztGateReady)document.documentElement.classList.remove("zt-gate-locked")},9000);</script>
 
 <!-- PHASE 2.7 — MAIN INDEX. Replaces the previous 16-line meta-refresh stub
      that redirected straight into STEINERNE_BRUECKE/index.html. This is now
@@ -93,8 +97,10 @@
 <!-- ============================================================ -->
 <section id="hauptmenu" class="hm" aria-labelledby="hmLine">
   <div class="hm__inner">
-    <p class="hm__line" id="hmLine" data-i18n="hmLine">Fünf Orte. Fünf Zeitreisen.</p>
-    <div class="hm__cards" id="hmCards" role="tablist"></div>
+    <div class="hm__gate" id="hmGate">
+      <p class="hm__line" id="hmLine" data-i18n="hmLine">Fünf Orte. Fünf Zeitreisen.</p>
+      <div class="hm__cards" id="hmCards" role="tablist"></div>
+    </div>
     <div class="hm__stage zs-glass zs-glass-floating zs-glass--still" id="hmStage" role="tabpanel"></div>
   </div>
 </section>

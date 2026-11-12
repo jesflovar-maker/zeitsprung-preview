@@ -47,6 +47,7 @@ export const DICT = {
     galleryText: "Wähle ein Monument, um seine Geschichte zu entdecken.",
     // INDEX HAUPTMENÜ (2026-11-11) — js/index-hauptmenu.js
     hmLine: "Fünf Orte. Fünf Zeitreisen.",
+    hmPrompt: "Wählen Sie einen Ort.",
     hmMenuAria: "Monumente",
     hmSoon: "IN VORBEREITUNG",
     hmSoonText: "Dieses Monument ist in Vorbereitung.",
@@ -103,6 +104,7 @@ export const DICT = {
     galleryText: "Choose a monument to discover its history.",
     // INDEX HAUPTMENÜ (2026-11-11) — js/index-hauptmenu.js
     hmLine: "Five places. Five journeys through time.",
+    hmPrompt: "Choose a place.",
     hmMenuAria: "Monuments",
     hmSoon: "COMING SOON",
     hmSoonText: "This monument is in preparation.",
@@ -159,6 +161,7 @@ export const DICT = {
     galleryText: "Elige un monumento para descubrir su historia.",
     // INDEX HAUPTMENÜ (2026-11-11) — js/index-hauptmenu.js
     hmLine: "Cinco lugares. Cinco viajes en el tiempo.",
+    hmPrompt: "Elija un lugar.",
     hmMenuAria: "Monumentos",
     hmSoon: "PRÓXIMAMENTE",
     hmSoonText: "Este monumento está en preparación.",

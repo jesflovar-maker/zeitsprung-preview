@@ -38,6 +38,15 @@
    chapter, mute), and resumes gently. prefers-reduced-motion: static orbit, no rAF, no ambient, no easing.
    Selecting a card never navigates — it only updates the stage below.
 
+   DECISION GATE (2026-11-12) — the selector is a gate, not a scroll section. While
+   html.zt-gate-locked is set (inline script in index.html) everything below the
+   selector is not rendered, so the page physically ends at the orbit: wheel,
+   trackpad inertia, touch, PageDown, Space, ArrowDown and End can never pass it.
+   The lock is released ONLY by an explicit choice (click / tap / Enter / Space)
+   of an ACTIVE monument. The default front card is NOT a choice. Browsing (arrow
+   keys, swipe) and future monuments never unlock; they only update the prompt.
+   Once unlocked the page stays unlocked until reload (no lock/unlock loops).
+
    LIFECYCLE — built once. Language changes (observed on <html lang>) only
    rewrite text: selection, source and playback position are untouched.
    Observers: IntersectionObserver x2 (stage video, orbit visibility),
@@ -61,13 +70,15 @@ const RESUME_MS = 2500;       // quiet time before the ambient orbit resumes
 const resolve = (tl, p) => (tl.base === "assets_root" ? ZT_PATHS.assetsRoot : tl.base === "web_root" ? ZT_PATHS.webRoot : "") + p;
 
 async function init() {
-  const cardsHost = document.getElementById("hmCards"), stageHost = document.getElementById("hmStage"), hm = document.getElementById("hauptmenu");
+  const cardsHost = document.getElementById("hmCards"), stageHost = document.getElementById("hmStage"), hm = document.getElementById("hauptmenu"), root = document.documentElement;
   if (!cardsHost || !stageHost) return;
   let monuments = [];
   try { monuments = ((await (await fetch(CONFIG_URL, { cache: "no-store" })).json()).monuments || []).slice(); }
-  catch (err) { console.error("ZEITSPRUNG Hauptmenü: could not load monuments.config.json", err); return; }
+  catch (err) { console.error("ZEITSPRUNG Hauptmenü: could not load monuments.config.json", err); root.classList.remove("zt-gate-locked"); return; }
   monuments.sort((a, b) => (a.menu_order ?? a.order) - (b.menu_order ?? b.order));
-  if (!monuments.length) return;
+  if (!monuments.length) { root.classList.remove("zt-gate-locked"); return; }
+  let chosen = !root.classList.contains("zt-gate-locked");   // true once an ACTIVE monument was explicitly chosen
+  hm.classList.toggle("hm--locked", !chosen); hm.classList.toggle("hm--open", chosen);
   const isActive = (m) => !!(m.enabled && m.route && m.menu_timeline && m.menu_timeline.src);
 
   /* ---------- cards ---------- */
@@ -100,6 +111,9 @@ async function init() {
   const cta = mk("a", "hm__cta zs-glass-cta");
   info.appendChild(count); info.appendChild(sub); info.appendChild(name); info.appendChild(desc); info.appendChild(tl); info.appendChild(soonText); info.appendChild(cta);
   stageHost.appendChild(media); stageHost.appendChild(info);
+  const prompt = mk("p", "hm__prompt", { "aria-live": "polite" }); cardsHost.insertAdjacentElement("afterend", prompt); prompt.hidden = chosen;
+  const lineEl = document.getElementById("hmLine");
+  if (lineEl) { lineEl.classList.add("hm__line--anim"); new IntersectionObserver((es, io) => { if (es.some((e) => e.isIntersecting)) { lineEl.classList.add("is-in"); io.disconnect(); } }, { threshold: 0.3 }).observe(lineEl); }
 
 
   /* ---------- orbit (INDEX only) ---------- */
@@ -199,6 +213,7 @@ async function init() {
   function relabel() {
     const l = langNow();
     cardsHost.setAttribute("aria-label", t(l, "hmMenuAria"));
+    prompt.hidden = chosen; if (!chosen) { const fut = sel && !isActive(sel); prompt.dataset.future = fut ? "1" : "0"; prompt.textContent = fut ? pick(sel.name, l) + " — " + t(l, "hmSoon") : t(l, "hmPrompt"); }
     cards.forEach(({ m, nm, st }) => { nm.textContent = pick(m.name, l); st.textContent = isActive(m) ? pick(m.subtitle, l) : t(l, "hmSoon"); });
     if (!sel) return;
     const act = isActive(sel), tlm = tlOf(sel);
@@ -234,9 +249,18 @@ async function init() {
     if (!silent) { try { history.replaceState(null, "", "#index-" + m.id); } catch (e) {} }
   }
 
+  function unlock() {
+    chosen = true; root.classList.remove("zt-gate-locked"); hm.classList.remove("hm--locked"); hm.classList.add("hm--open"); relabel();
+    stageHost.classList.add("hm__stage--enter");
+    requestAnimationFrame(() => {
+      if (window.ScrollTrigger && typeof window.ScrollTrigger.refresh === "function") { try { window.ScrollTrigger.refresh(); } catch (e) {} }   // sections below were not rendered while locked
+      requestAnimationFrame(() => { stageHost.classList.remove("hm__stage--enter"); stageHost.scrollIntoView({ behavior: reduced() ? "auto" : "smooth", block: "start" }); });
+    });
+  }
+
   /* ---------- wiring (once) ---------- */
   cards.forEach(({ m, b }, i) => {
-    b.addEventListener("click", () => { if (dragSuppress) return; select(m); });
+    b.addEventListener("click", () => { if (dragSuppress) return; select(m); if (!chosen && isActive(m)) unlock(); });
     b.addEventListener("keydown", (e) => { let j = -1; if (e.key === "ArrowRight" || e.key === "ArrowDown") j = (i + 1) % cards.length; else if (e.key === "ArrowLeft" || e.key === "ArrowUp") j = (i - 1 + cards.length) % cards.length; else if (e.key === "Home") j = 0; else if (e.key === "End") j = cards.length - 1; if (j >= 0) { e.preventDefault(); select(cards[j].m, true); } });
   });
   const toggle = () => { nudgeOrbit(); if (video.paused) { userPaused = false; play(); } else { userPaused = true; video.pause(); } };
@@ -256,6 +280,7 @@ async function init() {
   new MutationObserver(relabel).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
 
   const fromHash = monuments.find((m) => location.hash === "#index-" + m.id);
-  select(fromHash || monuments.find(isActive) || monuments[0], false, true); // default selection never touches the URL or the scroll position
+  select(fromHash || monuments.find(isActive) || monuments[0], false, true); // default selection never touches the URL or the scroll position — and is NOT a choice
+  window.__ztGateReady = true;
 }
 init();

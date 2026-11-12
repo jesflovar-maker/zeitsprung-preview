@@ -1,8 +1,11 @@
 /* ZEITSPRUNG V2 — css/zs-glass.css
    ============================================================================
-   ZEITSPRUNG_GLASS_SYSTEM_V1 (2026-11-12) — the ONE glass material of the
-   platform. Shared by INDEX, STEINERNE_BRUECKE, DOM_ST_PETER and every future
-   monument. See 01_ARCHITECTURE/ZEITSPRUNG_GLASS_SYSTEM_V1.md.
+   ZEITSPRUNG_GLASS_SYSTEM_V1 (2026-11-12) — INDEX-ONLY glass material.
+   OWNER CORRECTION (2026-11-12): glass is NOT a platform / monument standard.
+   It is linked ONLY from index.html. STEINERNE_BRUECKE, DOM_ST_PETER and every
+   future monument page keep their own premium museum layouts: they do NOT link
+   this file and do not inherit glass automatically.
+   See 01_ARCHITECTURE/ZEITSPRUNG_GLASS_SYSTEM_V1.md.
 
    Character: museum glass / floating architectural plates / exhibition
    vitrines — dark, restrained, a thin warm edge, a soft inner highlight and a
@@ -11,14 +14,12 @@
    Glass is used for interactive panels, information modules, controls and
    selected-content containers — never behind every paragraph or image.
 
-   How to adopt it
+   How to use it (INDEX only)
      1. NEW markup  : add the classes below.
-     2. EXISTING markup: add its selector to the "ADOPTION LIST" of the matching
-        surface kind below (one list, no per-monument style systems). Geometry
-        (padding / position) stays in the page's own stylesheet.
+     2. EXISTING INDEX markup: add its selector to the "ADOPTION LIST" below.
      3. NEVER blur the monument image itself. Glass belongs to the plate, the
         edge, the caption area and the overlay layer.
-   Load this file AFTER the page stylesheet (equal specificity, last one wins).
+   Load this file AFTER the index stylesheets (equal specificity, last one wins).
 
    Performance: backdrop-filter only on small plates, blur reduced on narrow
    screens, no full-screen blur layers, no per-frame style changes here.
@@ -56,9 +57,7 @@
 /* .zs-glass / .zs-glass-panel / .zs-glass-card / .zs-glass-floating share one look.
    The soft specular highlight is a gradient layer inside `background` (no pseudo-element),
    so it can sit on any element; on hover it drifts a little ("highlight response"). */
-.zs-glass, .zs-glass-panel, .zs-glass-card, .zs-glass-floating,
-/* ADOPTION LIST — standard surface (information modules) */
-.fact-card, .dfact{
+.zs-glass, .zs-glass-panel, .zs-glass-card, .zs-glass-floating{
   background: linear-gradient(135deg, var(--zs-glass-highlight) 0%, rgba(255,244,222,0) 42%) 0 0 / 240% 240% no-repeat, var(--zs-glass-bg);
   border: 1px solid var(--zs-glass-border);
   border-radius: var(--zs-glass-radius);
@@ -68,9 +67,9 @@
 }
 /* (hover transitions only on the system's own classes — adopted elements keep their own transitions) */
 .zs-glass, .zs-glass-panel, .zs-glass-card, .zs-glass-floating{ transition: background-position .9s var(--zs-glass-ease), border-color .4s, box-shadow .4s; }
-/* ADOPTION LIST — text-heavy plates (captions, assistant panels, copy): denser glass, always readable */
+/* ADOPTION LIST — text-heavy plates (INDEX: route-map label, Brückmandl panel): denser glass, always readable */
 .zs-glass-panel,
-.route-map__caption, .craft__cap-in, .dkf__cap-in, .dscrub__mark-in, .dtlv__info, .zt-assist, .dguide{
+.route-map__caption, .zt-assist{
   background: linear-gradient(135deg, var(--zs-glass-highlight) 0%, rgba(255,244,222,0) 42%) 0 0 / 240% 240% no-repeat, var(--zs-glass-bg-text);
   border: 1px solid var(--zs-glass-border);
   border-radius: var(--zs-glass-radius);
@@ -105,9 +104,7 @@
 }
 
 /* ---------------------------------------------------------------- control */
-.zs-glass-control,
-/* ADOPTION LIST — controls */
-.threed-chapter__controls button, .dtlv__ctl .dbtn{
+.zs-glass-control{
   background: rgba(255,244,222,.045);
   border: 1px solid var(--zs-glass-border);
   border-radius: var(--zs-glass-radius);
@@ -115,8 +112,7 @@
   box-shadow: inset 0 1px 0 var(--zs-glass-highlight);
   transition: border-color .3s, background .3s, color .3s;
 }
-.zs-glass-control:hover,
-.threed-chapter__controls button:hover, .dtlv__ctl .dbtn:hover{ border-color: var(--zs-glass-border-hi); background: rgba(212,175,120,.11); }
+.zs-glass-control:hover{ border-color: var(--zs-glass-border-hi); background: rgba(212,175,120,.11); }
 .zs-glass-control:focus-visible{ outline: 2px solid var(--z-gold, #d4af78); outline-offset: 2px; }
 
 /* ---------------------------------------------------------------- call to action */

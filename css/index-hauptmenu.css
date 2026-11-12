@@ -3,10 +3,28 @@
    five PORTRAIT monument cards + one timeline stage, placed after the cinematic intro.
    Own .hm namespace; no existing index rule is changed. Mobile-first.
    Uses the index tokens (--z-*, --font-*, --nav-h). */
-.hm{ position: relative; z-index: 2; background: radial-gradient(120% 60% at 50% 0%, #12141a 0%, var(--z-bg) 60%); padding: clamp(36px, 7vw, 64px) 0 clamp(40px, 7vw, 72px); }
+.hm{ position: relative; z-index: 2; background: radial-gradient(120% 60% at 50% 0%, #12141a 0%, var(--z-bg) 60%); padding: 0; }
 .hm__inner{ max-width: 1240px; margin: 0 auto; padding: 0 clamp(16px, 4.5vw, 32px); }
 /* ONE restrained editorial line — no public menu title, no brand repeat, no project explanation. */
-.hm__line{ font-family: var(--font-sans); font-size: clamp(17px, 4.6vw, 24px); font-weight: 300; letter-spacing: 0.01em; line-height: 1.3; color: var(--z-ink); margin: 0 0 clamp(16px, 3vw, 26px); text-align: center; }
+.hm__gate{ min-height: 100vh; min-height: 100svh; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; padding: calc(var(--nav-h, 56px) + 20px) 0 28px; }
+/* ORBIT TITLE — ZEITSPRUNG gold: warm gold gradient text, a very soft glow, no neon / bloom / metallic look. Copy unchanged. */
+.hm__line{ font-family: var(--font-sans); font-size: clamp(19px, 5vw, 28px); font-weight: 400; letter-spacing: 0.05em; line-height: 1.3; margin: 0 0 clamp(14px, 2.6vw, 24px); text-align: center;
+  color: #d4af78; background: linear-gradient(100deg, #b98f52 0%, #dcbc82 34%, #f1dcaa 50%, #dcbc82 66%, #b98f52 100%) 50% 0 / 260% 100% no-repeat;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 10px rgba(212,175,120,.16)); }
+@supports not ((-webkit-background-clip: text) or (background-clip: text)){ .hm__line{ background: none; -webkit-text-fill-color: currentColor; } }
+/* soft reveal: opacity + tiny drift + one gold light sweep. Only when JS marked the line (never hidden without JS). */
+.hm__line--anim{ opacity: 0; transform: translateY(8px); transition: opacity .9s var(--zs-glass-ease, ease), transform .9s var(--zs-glass-ease, ease); }
+.hm__line--anim.is-in{ opacity: 1; transform: none; animation: hmSweep 2.6s ease-in-out .35s 1 both; }
+@keyframes hmSweep{ from{ background-position: 100% 0; } to{ background-position: 0 0; } }
+@media (prefers-reduced-motion: reduce){ .hm__line--anim{ opacity: 1; transform: none; transition: none; } .hm__line--anim.is-in{ animation: none; } }
+.hm__prompt{ margin: clamp(10px, 2vw, 18px) 0 0; min-height: 1.6em; text-align: center; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.26em; text-transform: uppercase; color: rgba(212,175,120,.88); }
+.hm__prompt[hidden]{ display: none; }
+.hm__prompt[data-future="1"]{ color: var(--z-ink-dim); }
+/* DECISION GATE — until an active monument is chosen nothing below the selector is rendered (the page ends at the orbit). */
+html.zt-gate-locked #hauptmenu ~ section, html.zt-gate-locked #hauptmenu ~ footer, html.zt-gate-locked .hm__stage{ display: none !important; }
+.hm .hm__stage{ scroll-margin-top: calc(var(--nav-h, 56px) + 12px); margin-bottom: clamp(40px, 7vw, 72px); transition: opacity .6s var(--zs-glass-ease, ease), transform .6s var(--zs-glass-ease, ease), background-position .9s var(--zs-glass-ease, ease), border-color .4s, box-shadow .4s; }
+.hm .hm__stage.hm__stage--enter{ opacity: 0; transform: translateY(18px); }
+@media (prefers-reduced-motion: reduce){ .hm .hm__stage{ transition: none; } .hm .hm__stage.hm__stage--enter{ transform: none; } }
 
 /* ---- five monument cards — PORTRAIT 9:16 AT EVERY BREAKPOINT (absolute rule: never landscape) ----
    < 700px : horizontal snap row of portrait cards (about 2.4 visible, numbered 01–05)
