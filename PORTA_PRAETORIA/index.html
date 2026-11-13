@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de" class="is-gated">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ZEITSPRUNG — Porta Praetoria · Castra Regina, Regensburg</title>
+<meta name="description" content="Porta Praetoria in Regensburg: vom erhaltenen Tor zum verlorenen römischen Legionslager Castra Regina.">
+<meta name="theme-color" content="#08090b">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/porta.css">
+</head>
+<body>
+<a class="pskip" href="#ctx" id="pSkip">Zum Inhalt springen</a>
+<header class="pn" id="pn">
+  <a class="pn__brand" id="pnBrand" href="../index.html" aria-label="ZEITSPRUNG">ZEITSPRUNG</a>
+  <nav class="pn__links" id="pnLinks" aria-label="Kapitel"></nav>
+  <div class="pn__right">
+    <div class="pn__lang" id="pnLang" role="group" aria-label="Sprache">
+      <button type="button" data-lang="de" aria-pressed="true">DE</button>
+      <button type="button" data-lang="en" aria-pressed="false">EN</button>
+      <button type="button" data-lang="es" aria-pressed="false">ES</button>
+    </div>
+    <a class="pn__back" id="pnBack" href="../index.html#index-monuments">ALLE MONUMENTE</a>
+  </div>
+</header>
+<div class="pprog" id="pProg" aria-hidden="true"><span></span></div>
+
+<main id="pMain">
+  <section id="hero" class="psec phero" aria-label="Porta Praetoria">
+    <div class="phero__bg" id="heroBg" aria-hidden="true"></div>
+    <div class="phero__stage" id="heroStage"></div>
+    <div class="phero__copy">
+      <p class="phero__eyebrow" id="heroEyebrow">REGENSBURG</p>
+      <h1 class="phero__title" id="heroTitle">PORTA PRAETORIA</h1>
+      <p class="phero__sub" id="heroSub">CASTRA REGINA</p>
+      <p class="phero__range" id="heroRange">UM 179 N. CHR. → HEUTE</p>
+      <p class="plabel plabel--hero" id="heroLabel"></p>
+      <div class="phero__cta">
+        <button class="pbtn pbtn--primary" type="button" id="startBtn">ERLEBNIS STARTEN</button>
+        <a class="pbtn" id="heroAll" href="../index.html#index-monuments">ALLE MONUMENTE</a>
+      </div>
+    </div>
+  </section>
+  <section id="ctx" class="psec pctx"></section>
+  <section id="holo" class="psec pholo"></section>
+  <section id="durchfahrt" class="psec psplit"></section>
+  <section id="turm" class="psec psplit"></section>
+  <section id="y179" class="psec py179"></section>
+  <section id="castra" class="psec pcastra"></section>
+  <section id="plan" class="psec pplan"></section>
+  <section id="bau" class="psec pbau"></section>
+  <section id="film" class="psec ptl"></section>
+  <section id="alltag" class="psec ploops"></section>
+  <section id="heute" class="psec pend"></section>
+</main>
+
+<dialog class="psrc" id="srcDlg" aria-labelledby="srcTitle">
+  <div class="psrc__in">
+    <h2 id="srcTitle"></h2>
+    <ul id="srcList"></ul>
+    <p class="psrc__disc" id="srcDisc"></p>
+    <button class="pbtn" type="button" id="srcClose">Schließen</button>
+  </div>
+</dialog>
+<script type="module" src="js/porta-main.js"></script>
+</body>
+</html>
