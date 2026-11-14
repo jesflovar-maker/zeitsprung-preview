@@ -208,7 +208,7 @@ function buildPlan() {
 }
 
 /* ---------- 09 construction story K02 -> K05 (crossfade only; no interpolated architecture) ---------- */
-const BAU = [["pp_k02", "foundation"], ["pp_k03", "scaffold"], ["pp_k04", "centring"], ["pp_anchor", "pullback"]];
+const BAU = [["pp_k02", "foundation"], ["pp_k03", "scaffold"], ["pp_k04", "centring"], ["pp_k05_v11", "pullback"]]; // V1.1: K05 is its own corrected image (platform HEUTE stays pp_anchor)
 function buildBau() {
   const s = $("#bau"); const hd = el("div", "pwrap pbau__head pr"); head(hd, "bau"); s.append(hd);
   const N = BAU.length; const tr = el("div", "ptrack"); tr.style.height = reduced ? "auto" : (N * 100) + "svh";
