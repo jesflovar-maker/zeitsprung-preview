@@ -1,7 +1,7 @@
 // PORTA PRAETORIA · CASTRA REGINA — PUBLIC V1: one vanilla ES module, DE / EN / ES, no external libraries.
 // The DOM is built ONCE; a language switch only re-runs text refreshers (no rebuild, no new listeners / observers / timers).
 // Media: runtime derivatives only (../assets/porta-praetoria/). One video plays at a time; every video loads lazily (preload none + poster).
-import { STR, LANGS, STORAGE_KEY } from "./porta-i18n.js";
+import { STR, LANGS, STORAGE_KEY } from "./porta-i18n.js?v=20261114b";
 
 const A = "../assets/porta-praetoria/";
 const img = (n, w = 720) => `${A}img/${n}_${w}.webp`;
