@@ -85,9 +85,9 @@ function buildNav() {
 
 /* ---------- 01 entry: hero + experience gate ---------- */
 function buildHero() {
-  const im = el("img", "", { src: img("pp_anchor"), width: "720", height: "1291", fetchpriority: "high", decoding: "async" }); bind(im, (t) => t.hero.alt, "alt");
-  $("#heroStage").append(im); $("#heroBg").style.backgroundImage = `url(${img("pp_anchor")})`;
-  bind($("#heroEyebrow"), (t) => t.hero.eyebrow); bind($("#heroTitle"), (t) => t.hero.title); bind($("#heroSub"), (t) => t.hero.sub); bind($("#heroRange"), (t) => t.hero.range); bind($("#heroLabel"), (t) => t.recAi);
+  const im = el("img", "", { src: img("pp_heute"), width: "720", height: "1280", fetchpriority: "high", decoding: "async" }); bind(im, (t) => t.heute.alt, "alt");
+  $("#heroStage").append(im); $("#heroBg").style.backgroundImage = `url(${img("pp_heute")})`;
+  bind($("#heroEyebrow"), (t) => t.hero.eyebrow); bind($("#heroTitle"), (t) => t.hero.title); bind($("#heroSub"), (t) => t.hero.sub); bind($("#heroRange"), (t) => t.hero.range);
   const b = bind($("#startBtn"), (t) => t.hero.start); bind($("#heroAll"), (t) => t.hero.all);
   const go = () => $("#ctx").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
   // MONUMENT ENTRY STANDARD: START -> thin gold loading line while the hero stays visible -> critical first-view readiness -> release.
@@ -270,7 +270,7 @@ function buildLoops() {
 /* ---------- 12 return + sources ---------- */
 function buildEnd() {
   const s = $("#heute"); const w = el("div", "pwrap pr"); head(w, "end"); w.append(lead("end", "p"));
-  const st = el("div", "pstage"); const i = el("img", "", { src: img("pp_anchor"), loading: "lazy", decoding: "async" }); bind(i, (t) => t.hero.alt, "alt"); st.append(i, tag("recAi")); w.append(st);
+  const st = el("div", "pstage"); const i = el("img", "", { src: img("pp_heute"), loading: "lazy", decoding: "async" }); bind(i, (t) => t.heute.alt, "alt"); st.append(i); w.append(st); // HEUTE: the owner anchor image, no reconstruction badge
   const cta = el("div", "pend__cta"); const sb = el("button", "pbtn", { type: "button" }); bind(sb, (t) => t.end.sources); const ab = el("a", "pbtn pbtn--primary", { href: "../index.html#index-monuments" }); bind(ab, (t) => t.back); cta.append(sb, ab); w.append(cta);
   const d = el("p", "pend__disc"); bind(d, (t) => t.end.disc); w.append(d); s.append(w);
   const dlg = $("#srcDlg"); const list = $("#srcList"); const cl = $("#srcClose");
