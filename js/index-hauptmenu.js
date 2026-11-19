@@ -248,6 +248,7 @@ async function init() {
     if (sel === m) return;
     if (sel) { if (tlOf(sel)) pos.set(sel.id, video.currentTime || pos.get(sel.id) || 0); try { video.pause(); } catch (e) {} }
     video.removeAttribute("src"); try { video.load(); } catch (e) {}
+    video.muted = true; bm.setAttribute("aria-pressed", "false"); // every selection starts muted: sound only after an explicit tap on this film
     sel = m; userPaused = false; chIdx = -1;
     cards.forEach(({ m: x, b }) => { const on = x === m; b.setAttribute("aria-selected", String(on)); b.tabIndex = on ? 0 : -1; b.classList.toggle("is-selected", on); if (on && focus) b.focus({ preventScroll: true }); if (on && !silent && !orbitOn && cardsHost.scrollWidth > cardsHost.clientWidth) cardsHost.scrollTo({ left: b.offsetLeft - (cardsHost.clientWidth - b.offsetWidth) / 2, behavior: reduced() ? "auto" : "smooth" }); });
     const act = isActive(m), tlm = tlOf(m);

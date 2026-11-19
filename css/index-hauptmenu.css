@@ -202,3 +202,14 @@ html.zt-stage-open .hm__stage:focus{ outline: none; }
 @media (min-width: 1280px){ .hm__desc{ font-size: 16px; } .hm__chapter-now{ font-size: 16px; } }
 @media (min-width: 2200px){ .hm__mediabox{ height: min(calc(100svh - var(--nav-h, 60px) - 64px), 1100px); } .hm__info{ flex-basis: 760px; } .hm__desc{ font-size: 19px; } .hm__chapter{ font-size: 13px; min-height: 48px; } .hm__btn{ font-size: 13px; } .hm__actions .hm__cta{ font-size: 14px; min-height: 62px; } .hm__back{ font-size: 13px; min-height: 62px; } }
 html.zt-stage-open .hm__gate{ visibility: hidden; } /* the orbit rests behind the decision screen */
+
+/* 06F — INDEX title, editorial / museum: lighter weight, larger optical size, controlled tracking that settles on reveal,
+   a thin gold rule drawn after the line. No glow, no bounce. Copy and order unchanged. */
+.hm__line{ font-weight: 300; font-size: clamp(23px, 6vw, 42px); line-height: 1.16; letter-spacing: 0.055em; text-wrap: balance; max-width: 22ch; margin: 0 auto; filter: none; }
+.hm__rule{ display: block; width: clamp(56px, 11vw, 120px); height: 1px; margin: clamp(12px, 2vw, 18px) auto clamp(16px, 2.6vw, 26px);
+  background: linear-gradient(90deg, transparent, #b98f52 25%, #f1dcaa 50%, #b98f52 75%, transparent); transform-origin: 50% 50%; }
+.hm__line--anim{ letter-spacing: 0.15em; transition: opacity 1.1s var(--zs-glass-ease, ease), transform 1.1s var(--zs-glass-ease, ease), letter-spacing 1.8s var(--zs-glass-ease, ease); }
+.hm__line--anim.is-in{ letter-spacing: 0.055em; }
+.hm__line--anim + .hm__rule{ transform: scaleX(0); transition: transform 1.3s var(--zs-glass-ease, ease) .5s; }
+.hm__line--anim.is-in + .hm__rule{ transform: scaleX(1); }
+@media (prefers-reduced-motion: reduce){ .hm__line--anim{ letter-spacing: 0.055em; transition: none; } .hm__line--anim + .hm__rule{ transform: none; transition: none; } }

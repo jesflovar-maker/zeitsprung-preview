@@ -4,7 +4,7 @@
 // 06C.4 owner override: clean master timeline AR_ASSET_191 is the scroll-scrubbed build scene; chapter/trailer films stay excluded.
 // 06E: hero film AR_ASSET_059, Erker V2 + hologram assembly (scroll-scrub), building-site loops, portal/Erker corrected stills.
 // Visible AI / reconstruction badges = 0 (owner rule 2026-11-18); provenance stays in the media manifest.
-import { STR, LANGS, STORAGE_KEY } from "./ar-i18n.js?v=20261119b";
+import { STR, LANGS, STORAGE_KEY } from "./ar-i18n.js?v=20261119c";
 
 const A = "../assets/altes-rathaus/";
 const img = (n) => `${A}img/${n}_720.webp`;
@@ -206,7 +206,8 @@ function buildEvo(s) {
 const TL_CUE = [0, 13.75, 31.0, 37.75, 44.5, 51.5, 55.5]; // seconds in the clean master where each overlay chapter starts
 function buildTimeline() {
   const s = $("#zeit"); const w = el("div", "awrap aseq__head ar"); head(w, "time"); w.append(lead("time", "p")); s.append(w);
-  const POSTER = `${A}poster/ar_timeline_scrub_v1_poster.webp`, SRC = `${A}video/ar_timeline_scrub_v1_540.mp4`;
+  // 06F: v2 = same video stream (frame-identical) + synchronized soundtrack from AR_ASSET_173 for the INDEX stage; muted here (scrub).
+  const POSTER = `${A}poster/ar_timeline_scrub_v1_poster.webp`, SRC = `${A}video/ar_timeline_scrub_v2_540.mp4`;
   const ch = () => T().time.ch; const N = TL_CUE.length;
   if (reduced) {
     const list = el("div", "awrap aseq__static"); const fig = el("figure", "aseq__fig"); const st = el("div", "astage");
@@ -285,7 +286,8 @@ function buildToggle() {
 
 /* ---------- 12 return to today + sources (no visible AI / methodology note: platform footer later) ---------- */
 function buildEnd() {
-  const s = $("#ende"); const w = el("div", "awrap ar"); head(w, "end"); w.append(lead("end", "p"));
+  // 06F: editorial title treatment (staged reveal: eyebrow -> title scale/opacity -> gold rule -> lead). Same i18n keys.
+  const s = $("#ende"); const w = el("div", "awrap ar aend__in"); head(w, "end"); w.append(el("span", "aend__rule", { "aria-hidden": "true" }), lead("end", "p"));
   const st = el("div", "astage"); st.append(pic("ar_heute_v1", (t) => t.hero.alt)); w.append(st);
   const cta = el("div", "aend__cta"); const sb = el("button", "abtn", { type: "button" }); bind(sb, (t) => t.end.sources); const ab = el("a", "abtn abtn--primary", { href: "../index.html#index-monuments" }); bind(ab, (t) => t.back); cta.append(sb, ab); w.append(cta);
   s.append(w);
