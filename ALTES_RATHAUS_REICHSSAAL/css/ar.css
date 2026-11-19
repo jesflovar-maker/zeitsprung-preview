@@ -286,3 +286,9 @@ html.is-reduced .adis .alabel,html.is-reduced .adis__cap{position:static}
 @media (prefers-reduced-motion:reduce){.aend__t1,.aend__t2{opacity:1!important;transform:none!important;letter-spacing:.42em;transition:none}.aend__t2{letter-spacing:-.01em}}
 /* 06G: compact ♪ beside DE | EN | ES — keep the nav on one line on the smallest phones */
 @media (max-width:380px){.an{gap:8px}.an__right{gap:6px}.an__right .zt-snd{margin-left:0}.an__brand{letter-spacing:.16em}.an__lang button{min-width:36px;padding:0 4px}}
+/* 06G.1: hero centring — the 9:16 stage sits in the area below the nav with EQUAL top / bottom whitespace, and the
+   copy (title, subtitle, CTA row) is anchored to the stage bottom (not to the viewport centre, which ignored the nav). */
+@media (min-width:900px){
+  .ahero{--hg:clamp(18px,3.2svh,36px);--sh:min(calc(100svh - var(--nav) - var(--st) - 2 * var(--hg)),1080px);padding-top:calc(var(--nav) + var(--st))}
+  .ahero__copy{bottom:calc((100% - var(--nav) - var(--st) - var(--sh)) / 2 + 22px)}
+}

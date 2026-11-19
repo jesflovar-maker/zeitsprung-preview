@@ -7,7 +7,7 @@
       "menu_order": 1,
       "readiness": { "heute_image": "assets/steinerne-bruecke/hero/sb_hero_current_9x16_v01.webp", "card_hero_image": "assets/steinerne-bruecke/hero/sb_hero_current_9x16_v01.webp", "card_hero_status": "HEUTE", "monument_heute_ready": true, "monument_card_hero_ready": true, "monument_entry_loader_ready": true, "primary_start_cta_ready": true, "back_to_all_monuments_ready": true, "mobile_action_layout_ready": true },
       "menu_focus": "50% 50%",
-      "menu_timeline": { "src": "Steinerne_Bruecke/VIDEO/WEB4/sb_timeline_720_v01_web.mp4", "poster": "Steinerne_Bruecke/VIDEO/WEB4/sb_timeline_poster_v01.jpg", "base": "assets_root", "duration_s": 154.1, "burned_text": "de", "chapters": null },
+      "menu_timeline": { "src": "Steinerne_Bruecke/VIDEO/WEB4/sb_timeline_720_v01_web.mp4", "poster": "Steinerne_Bruecke/VIDEO/WEB4/sb_timeline_poster_v01.jpg", "base": "assets_root", "duration_s": 154.1, "burned_text": "de", "has_audio": true, "chapters": { "times": [20.5, 33.25, 42.0, 54.75, 67.75, 80.75, 93.5, 106.5, 119.25, 132.0, 145.0, 149.5], "labels_module": "STEINERNE_BRUECKE/js/sb-index-chapters.js?v=20261119g", "labels_key": "tlv" } },
       "name": { "de": "Steinerne Brücke", "en": "Steinerne Brücke", "es": "Steinerne Brücke" },
       "subtitle": { "de": "1135 → HEUTE", "en": "1135 → TODAY", "es": "1135 → HOY" },
       "description": {
@@ -60,7 +60,7 @@
       "menu_order": 2,
       "readiness": { "heute_image": "assets/dom-st-peter/img/dsp_heute_1080.webp", "card_hero_image": "assets/dom-st-peter/img/dsp_heute_1080.webp", "card_hero_status": "HEUTE_AI_VISUALISATION", "monument_heute_ready": true, "monument_card_hero_ready": true, "monument_entry_loader_ready": true, "primary_start_cta_ready": true, "back_to_all_monuments_ready": true, "mobile_action_layout_ready": true },
       "menu_focus": "50% 42%",
-      "menu_timeline": { "src": "dom-st-peter/video/dsp_timeline_720.mp4", "poster": "dom-st-peter/poster/dsp_timeline_poster.webp", "base": "web_root", "duration_s": 89.4, "burned_text": "de+en", "chapters": { "times": [0, 7, 19, 27, 37, 45, 65, 73, 79.4], "labels_module": "DOM_ST_PETER/js/dom-i18n.js", "labels_key": "tlv" } },
+      "menu_timeline": { "src": "dom-st-peter/video/dsp_timeline_720.mp4", "poster": "dom-st-peter/poster/dsp_timeline_poster.webp", "base": "web_root", "duration_s": 89.4, "burned_text": "de+en", "has_audio": true, "chapters": { "times": [0, 7, 19, 27, 37, 45, 65, 73, 79.4], "labels_module": "DOM_ST_PETER/js/dom-i18n.js", "labels_key": "tlv" } },
       "name": { "de": "Dom St. Peter", "en": "Dom St. Peter", "es": "Dom St. Peter" },
       "subtitle": { "de": "KATHEDRALE", "en": "CATHEDRAL", "es": "CATEDRAL" },
       "description": {
@@ -94,7 +94,7 @@
       "menu_order": 4,
       "readiness": { "heute_image": "assets/altes-rathaus/img/ar_heute_v1_720.webp", "card_hero_image": "assets/altes-rathaus/img/ar_heute_v1_720.webp", "card_hero_status": "HEUTE_OWNER_ANCHOR_VISUALIZATION", "monument_heute_ready": true, "monument_card_hero_ready": true, "monument_entry_loader_ready": true, "primary_start_cta_ready": true, "back_to_all_monuments_ready": true, "mobile_action_layout_ready": true },
       "menu_focus": "50% 58%",
-      "menu_timeline": { "src": "altes-rathaus/video/ar_timeline_scrub_v2_540.mp4", "poster": "altes-rathaus/poster/ar_timeline_scrub_v1_poster.webp", "base": "web_root", "duration_s": 58.8, "burned_text": "", "has_audio": true, "chapters": { "times": [0, 13.75, 31, 37.75, 44.5, 51.5, 55.5], "labels_module": "ALTES_RATHAUS_REICHSSAAL/js/ar-i18n.js?v=20261119c", "labels_key": "tlv" } },
+      "menu_timeline": { "src": "altes-rathaus/video/ar_timeline_scrub_v2_540.mp4", "poster": "altes-rathaus/poster/ar_timeline_scrub_v1_poster.webp", "base": "web_root", "duration_s": 58.8, "burned_text": "", "has_audio": true, "chapters": { "times": [0, 13.75, 31, 37.75, 44.5, 51.5, 55.5], "labels_module": "ALTES_RATHAUS_REICHSSAAL/js/ar-i18n.js?v=20261119e", "labels_key": "tlv" } },
       "name": { "de": "Altes Rathaus · Reichssaal", "en": "Altes Rathaus · Reichssaal", "es": "Altes Rathaus · Reichssaal" },
       "subtitle": { "de": "REICHSSTADT", "en": "IMPERIAL CITY", "es": "CIUDAD IMPERIAL" },
       "description": {
@@ -128,7 +128,7 @@
       "menu_order": 3,
       "readiness": { "heute_image": "assets/porta-praetoria/img/pp_heute_720.webp", "card_hero_image": "assets/porta-praetoria/img/pp_heute_720.webp", "card_hero_status": "HEUTE_OWNER_ANCHOR", "monument_heute_ready": true, "monument_card_hero_ready": true, "monument_entry_loader_ready": true, "primary_start_cta_ready": true, "back_to_all_monuments_ready": true, "mobile_action_layout_ready": true },
       "menu_focus": "47% 50%",
-      "menu_timeline": { "src": "porta-praetoria/video/pp_timeline_540.mp4", "poster": "porta-praetoria/poster/pp_timeline_poster.webp", "base": "web_root", "duration_s": 191, "burned_text": "de+en+es", "chapters": null },
+      "menu_timeline": { "src": "porta-praetoria/video/pp_timeline_540.mp4", "poster": "porta-praetoria/poster/pp_timeline_poster.webp", "base": "web_root", "duration_s": 191, "burned_text": "de+en+es", "has_audio": true, "chapters": { "times": [0, 7.25, 29.25, 36.0, 103.25, 108.25, 115.5, 180.5, 187.75], "labels_module": "PORTA_PRAETORIA/js/pp-index-chapters.js?v=20261119g", "labels_key": "tlv" } },
       "name": { "de": "Porta Praetoria · Castra Regina", "en": "Porta Praetoria · Castra Regina", "es": "Porta Praetoria · Castra Regina" },
       "subtitle": { "de": "RÖMISCHES REGENSBURG", "en": "ROMAN REGENSBURG", "es": "REGENSBURG ROMANA" },
       "description": {

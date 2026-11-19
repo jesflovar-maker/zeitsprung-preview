@@ -54,7 +54,7 @@ export const DICT = {
     hmSoonText: "Dieses Monument ist in Vorbereitung.",
     hmActive: "ERLEBBAR",
     hmTimeline: "ZEITLEISTE",
-    hmPlay: "Abspielen",
+    hmPlay: "Wiedergeben",
     hmPause: "Pause",
     hmSoundOn: "Ton an",
     hmSoundOff: "Ton aus",

@@ -235,3 +235,18 @@ html.zt-stage-open .hm__gate{ visibility: hidden; } /* the orbit rests behind th
 @media (prefers-reduced-motion: reduce){ .hm__line--anim .hm__l1{ letter-spacing: 0.035em; transition: none; } .hm__line--anim .hm__l2{ opacity: 1; transform: none; transition: none; animation: none; } }
 .hm__line{ max-width: min(94vw, 1100px); }
 .hm__l1, .hm__l2{ text-wrap: balance; }
+
+/* 06G.1 — ZEITSPRUNG_INDEX_ACTIVE_MONUMENT_CARD_STANDARD_V1: the decision stage is ONE centred composition.
+   Desktop: [portrait media] + [information / chronology] centred as a group — symmetric side padding (clears the
+   floating guide on both sides, no one-sided offset), fixed information column so every monument sits identically.
+   Mobile: media ↓ information, CTAs full width and centred; bottom clearance for the guide instead of a one-sided margin. */
+.hm__actions{ margin-right: 0; }
+@media (max-width: 819px){
+  html.zt-stage-open .hm__stage{ padding-bottom: calc(max(14px, env(safe-area-inset-bottom)) + 64px); }
+  .hm__tl{ width: 100%; }
+}
+@media (min-width: 820px){
+  html.zt-stage-open .hm__stage{ padding-left: max(clamp(14px, 4vw, 40px), 76px); padding-right: max(clamp(14px, 4vw, 40px), 76px); }
+  .hm__info{ padding-right: 0; flex: 0 1 540px; }
+}
+@media (min-width: 2200px){ .hm__info{ flex-basis: 720px; } }
