@@ -221,3 +221,5 @@ html.is-reduced .pbau__lite{display:grid}
 .pbau__lite{display:none;gap:24px}
 .pbau__lite article{max-width:420px;margin-inline:auto}
 .pbau__lite img{width:100%;aspect-ratio:9/16;object-fit:cover;border:1px solid var(--z-line)}
+/* 06G: compact ♪ beside DE | EN | ES — keep the nav on one line on the smallest phones */
+@media (max-width:380px){.pn{gap:8px}.pn__right{gap:6px}.pn__right .zt-snd{margin-left:0}.pn__brand{letter-spacing:.16em}.pn__lang button{min-width:36px;padding:0 4px}}

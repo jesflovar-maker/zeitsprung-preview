@@ -4,7 +4,8 @@
 // 06C.4 owner override: clean master timeline AR_ASSET_191 is the scroll-scrubbed build scene; chapter/trailer films stay excluded.
 // 06E: hero film AR_ASSET_059, Erker V2 + hologram assembly (scroll-scrub), building-site loops, portal/Erker corrected stills.
 // Visible AI / reconstruction badges = 0 (owner rule 2026-11-18); provenance stays in the media manifest.
-import { STR, LANGS, STORAGE_KEY } from "./ar-i18n.js?v=20261119c";
+import { STR, LANGS, STORAGE_KEY } from "./ar-i18n.js?v=20261119e";
+import { ztSound } from "../../js/zt-sound.js?v=20261119e"; // 06G: one compact ♪ control beside DE | EN | ES
 
 const A = "../assets/altes-rathaus/";
 const img = (n) => `${A}img/${n}_720.webp`;
@@ -91,6 +92,7 @@ function buildNav() {
   NAV.forEach((id, i) => { const a = el("a", "", { href: "#" + id }); bind(a, (t) => t.navItems[i]); links.append(a); });
   onLang(() => { const b = $("#anBack"); b.textContent = T().back; b.dataset.short = T().backShort; $("#anLang").setAttribute("aria-label", T().langLabel); links.setAttribute("aria-label", T().nav); $("#aSkip").textContent = T().skip; });
   document.querySelectorAll("#anLang button").forEach((b) => { b.setAttribute("aria-pressed", String(b.dataset.lang === lang)); b.addEventListener("click", () => setLang(b.dataset.lang)); });
+  ztSound.mount($("#anLang"), () => T().snd); LF.push(() => ztSound.relabel());
   const bar = $("#aProg"); const an = $("#an");
   SC.push(() => {
     an.classList.toggle("is-solid", scrollY > 40);
@@ -131,16 +133,38 @@ function heroFilm(pageReady) {
   const SRC = `${A}video/ar_hero_entry_v1_720.mp4`, POSTER = `${A}poster/ar_hero_entry_v1_poster.webp`;
   const stage = $("#heroStage");
   const v = el("video", "ahero__film", { muted: "", playsinline: "", preload: "none", poster: POSTER, disablepictureinpicture: "", tabindex: "-1" }); v.muted = true; bind(v, (t) => t.hero.videoAlt, "aria-label");
-  const snd = el("button", "ahero__snd", { type: "button", "aria-pressed": "false" }); snd.hidden = true;
-  stage.append(v); $("#hero").append(snd);
-  const lbl = () => { snd.textContent = v.muted ? T().hero.soundOn : T().hero.soundOff; snd.setAttribute("aria-pressed", String(!v.muted)); }; onLang(lbl);
+  stage.append(v);
   const play = () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
   let vis = true;
-  v.addEventListener("playing", () => { v.classList.add("is-on"); snd.hidden = false; });
-  v.addEventListener("error", () => { v.remove(); snd.remove(); });
-  snd.addEventListener("click", () => { v.muted = !v.muted; if (!v.muted && (v.ended || v.paused)) { if (v.ended) v.currentTime = 0; play(); } lbl(); });
+  // 06G: sound only through the compact ♪ in the nav; switching it on while the hero is visible replays the film with sound.
+  ztSound.add(v, { onEnable: () => { if (vis && v.getAttribute("src") && (v.ended || v.paused)) { if (v.ended) v.currentTime = 0; play(); } } });
+  v.addEventListener("playing", () => v.classList.add("is-on"));
+  v.addEventListener("error", () => v.remove());
   new IntersectionObserver((es) => es.forEach((e) => { vis = e.isIntersecting; if (!vis && !v.paused) v.pause(); else if (vis && v.paused && !v.ended && v.currentTime > 0) play(); }), { threshold: 0.25 }).observe(stage);
   pageReady.then(() => setTimeout(() => { if (!vis) return; v.src = SRC; play(); }, 250));
+}
+
+/* ---------- 12 trailer: AR_ASSET_221 (RATH_TRAILER_CLEAN_V1.mp4, owner-approved 06G; burned-in chronology titles approved) ----------
+   Primary visual of "Ein Gebäude, viele Zeiten". HEUTE image = poster + fallback (stays underneath). Muted autoplay only while
+   >= 55 % visible; paused off screen; sound only via the compact ♪; no native controls; at the end it fades back to HEUTE and
+   restarts on the next entry. Reduced motion = HEUTE image only. */
+function endTrailer() {
+  const SRC = `${A}video/ar_trailer_v1_720.mp4`;
+  const st = el("div", "astage aend__film"); st.append(pic("ar_heute_v1", (t) => t.hero.alt));
+  if (reduced) return st;
+  const v = el("video", "aend__vid", { playsinline: "", preload: "none", poster: img("ar_heute_v1"), disablepictureinpicture: "", tabindex: "-1" }); bind(v, (t) => t.end.trailerAlt, "aria-label");
+  st.append(v); ztSound.add(v, { onEnable: () => { if (vis && v.paused) play(); } });
+  const play = () => { if (!v.getAttribute("src")) { v.src = SRC; } const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+  let vis = false;
+  v.addEventListener("playing", () => st.classList.add("is-playing"));
+  v.addEventListener("ended", () => { st.classList.remove("is-playing"); v.dataset.done = "1"; });
+  v.addEventListener("error", () => { st.classList.remove("is-playing"); v.remove(); });
+  new IntersectionObserver((es) => es.forEach((en) => {
+    vis = en.isIntersecting;
+    if (vis) { if (v.dataset.done) { delete v.dataset.done; try { v.currentTime = 0; } catch (x) {} } play(); }
+    else if (!v.paused) v.pause();
+  }), { threshold: 0.55 }).observe(st);
+  return st;
 }
 
 /* ---------- 01 today ---------- */
@@ -287,8 +311,13 @@ function buildToggle() {
 /* ---------- 12 return to today + sources (no visible AI / methodology note: platform footer later) ---------- */
 function buildEnd() {
   // 06F: editorial title treatment (staged reveal: eyebrow -> title scale/opacity -> gold rule -> lead). Same i18n keys.
-  const s = $("#ende"); const w = el("div", "awrap ar aend__in"); head(w, "end"); w.append(el("span", "aend__rule", { "aria-hidden": "true" }), lead("end", "p"));
-  const st = el("div", "astage"); st.append(pic("ar_heute_v1", (t) => t.hero.alt)); w.append(st);
+  // 06G: cinematic chapter title (small tracked first phrase / large serif second phrase), then the trailer as primary visual.
+  const s = $("#ende"); const w = el("div", "awrap ar aend__in");
+  const e = el("p", "aeyebrow"); bind(e, (t) => t.end.eyebrow);
+  const h = el("h2", "ah aend__title"); const h1 = el("span", "aend__t1"); const h2 = el("span", "aend__t2"); h.append(h1, h2);
+  onLang(() => { const m = T().end.h.match(/^(.*?,)\s*(.*)$/); h1.textContent = m ? m[1] : ""; h2.textContent = m ? m[2] : T().end.h; h.setAttribute("aria-label", T().end.h); });
+  w.append(e, h, el("span", "aend__rule", { "aria-hidden": "true" }), lead("end", "p"));
+  w.append(endTrailer());
   const cta = el("div", "aend__cta"); const sb = el("button", "abtn", { type: "button" }); bind(sb, (t) => t.end.sources); const ab = el("a", "abtn abtn--primary", { href: "../index.html#index-monuments" }); bind(ab, (t) => t.back); cta.append(sb, ab); w.append(cta);
   s.append(w);
   const dlg = $("#srcDlg"); const list = $("#srcList"); const cl = $("#srcClose");

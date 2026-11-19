@@ -102,6 +102,11 @@ async function init() {
   const media = mk("div", "hm__media");
   const posterImg = mk("img", "hm__poster", { alt: "", decoding: "async", draggable: "false" });
   const video = mk("video", "hm__video", { playsinline: "", preload: "none", disablepictureinpicture: "", controlslist: "nodownload noplaybackrate" }); video.muted = true; video.setAttribute("muted", "");
+  // 06G: stage audio = global compact sound control (#navSoundToggle, aria-pressed managed by index-main.js). Never audible
+  // without a gesture: the toggle itself or the explicit card selection that opens the stage.
+  const navSnd = document.getElementById("navSoundToggle");
+  const stageAudible = (m) => !!(navSnd && navSnd.getAttribute("aria-pressed") === "true" && m && m.menu_timeline && m.menu_timeline.has_audio !== false);
+  if (navSnd) new MutationObserver(() => { if (sel) video.muted = !stageAudible(sel); }).observe(navSnd, { attributes: true, attributeFilter: ["aria-pressed"] });
   const bigPlay = mk("button", "hm__bigplay", { type: "button" }); bigPlay.appendChild(mk("span", "hm__bigplay-icon", { "aria-hidden": "true" }));
   const soon = mk("div", "hm__soonflag");
   media.appendChild(posterImg); media.appendChild(video); media.appendChild(bigPlay); media.appendChild(soon);
@@ -111,7 +116,7 @@ async function init() {
   const bar = mk("div", "hm__bar", { role: "slider", tabindex: "0", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": "0" }); const fill = mk("span", "hm__bar-fill"); bar.appendChild(fill);
   const chapters = mk("div", "hm__chapters", { role: "group" });
   const chapterNow = mk("p", "hm__chapter-now"); chapterNow.setAttribute("aria-live", "polite");
-  const ctl = mk("div", "hm__ctl"); const bp = mk("button", "hm__btn zs-glass-control", { type: "button" }); const bm = mk("button", "hm__btn zs-glass-control", { type: "button", "aria-pressed": "false" }); ctl.appendChild(bp); ctl.appendChild(bm);
+  const ctl = mk("div", "hm__ctl"); const bp = mk("button", "hm__btn zs-glass-control", { type: "button" }); const bm = mk("button", "hm__btn zs-glass-control", { type: "button", "aria-pressed": "false" }); ctl.appendChild(bp); bm.hidden = true; /* 06G: no large in-panel sound button — audio follows the compact nav ♪ (#navSoundToggle) */
   const note = mk("p", "hm__note");
   tl.appendChild(tlHead); tl.appendChild(bar); tl.appendChild(chapters); tl.appendChild(chapterNow); tl.appendChild(ctl); tl.appendChild(note);
   const soonText = mk("p", "hm__soontext");
@@ -126,6 +131,9 @@ async function init() {
   const gate = document.getElementById("hmGate");
   const prompt = mk("p", "hm__prompt", { "aria-live": "polite" }); cardsHost.insertAdjacentElement("afterend", prompt); prompt.hidden = false;
   const lineEl = document.getElementById("hmLine");
+  // 06G: editorial title — split the localized line into two phrases (re-split whenever i18n rewrites the text).
+  const splitLine = () => { if (!lineEl || lineEl.querySelector(".hm__l1")) return; const t = lineEl.textContent.trim(); const m = t.match(/^(.*?[.!?])\s+(.+)$/); if (!m) return; lineEl.replaceChildren(mk("span", "hm__l1"), document.createTextNode(" "), mk("span", "hm__l2")); lineEl.firstChild.textContent = m[1]; lineEl.lastChild.textContent = m[2]; };
+  if (lineEl) { splitLine(); new MutationObserver(splitLine).observe(lineEl, { childList: true, characterData: true, subtree: true }); }
   if (lineEl) { lineEl.classList.add("hm__line--anim"); new IntersectionObserver((es, io) => { if (es.some((e) => e.isIntersecting)) { lineEl.classList.add("is-in"); io.disconnect(); } }, { threshold: 0.3 }).observe(lineEl); }
 
 
@@ -200,7 +208,7 @@ async function init() {
   const dur = () => (isFinite(video.duration) && video.duration > 0 ? video.duration : (sel && tlOf(sel) ? tlOf(sel).duration_s || 0 : 0));
 
   function ensureSrc() { const tlm = sel && tlOf(sel); if (!tlm) return false; if (!video.getAttribute("src")) { video.src = resolve(tlm, tlm.src); video.preload = "metadata"; const at = pos.get(sel.id) || 0; if (at > 0.2) video.addEventListener("loadedmetadata", () => { try { video.currentTime = at; } catch (e) {} }, { once: true }); } return true; }
-  function play() { if (!ensureSrc()) return; const p = video.play(); if (p && p.catch) p.catch(() => {}); }
+  function play() { if (!ensureSrc()) return; const p = video.play(); if (p && p.catch) p.catch(() => { if (!video.muted) { video.muted = true; const q = video.play(); if (q && q.catch) q.catch(() => {}); } }); }
   function autoplayMaybe() { if (inView && !userPaused && !reduced() && sel && tlOf(sel) && video.paused && document.visibilityState === "visible") play(); }
 
   function renderChapters() {
@@ -237,7 +245,6 @@ async function init() {
     video.setAttribute("aria-label", t(l, "hmFilmAria") + " — " + pick(sel.name, l));
     bp.textContent = video.paused ? t(l, "hmPlay") : t(l, "hmPause"); bigPlay.setAttribute("aria-label", t(l, "hmPlay"));
     bm.textContent = video.muted ? t(l, "hmSoundOn") : t(l, "hmSoundOff");
-    bm.hidden = !!(tlm && tlm.has_audio === false); // opt-in per monument: silent timeline film -> no sound toggle
     // burned-in caption disclosure — only when the film's language is not the visitor's
     const bt = tlm ? tlm.burned_text || "" : ""; note.textContent = !bt || bt.split("+").includes(l) ? "" : t(l, bt === "de" ? "hmNoteDe" : "hmNoteDeEn"); note.hidden = !note.textContent;
     soon.textContent = t(l, "hmSoon"); soonText.textContent = t(l, "hmSoonText");
@@ -248,7 +255,7 @@ async function init() {
     if (sel === m) return;
     if (sel) { if (tlOf(sel)) pos.set(sel.id, video.currentTime || pos.get(sel.id) || 0); try { video.pause(); } catch (e) {} }
     video.removeAttribute("src"); try { video.load(); } catch (e) {}
-    video.muted = true; bm.setAttribute("aria-pressed", "false"); // every selection starts muted: sound only after an explicit tap on this film
+    video.muted = !stageAudible(m); // 06G: follows the compact nav ♪; silent films (has_audio:false) always muted
     sel = m; userPaused = false; chIdx = -1;
     cards.forEach(({ m: x, b }) => { const on = x === m; b.setAttribute("aria-selected", String(on)); b.tabIndex = on ? 0 : -1; b.classList.toggle("is-selected", on); if (on && focus) b.focus({ preventScroll: true }); if (on && !silent && !orbitOn && cardsHost.scrollWidth > cardsHost.clientWidth) cardsHost.scrollTo({ left: b.offsetLeft - (cardsHost.clientWidth - b.offsetWidth) / 2, behavior: reduced() ? "auto" : "smooth" }); });
     const act = isActive(m), tlm = tlOf(m);

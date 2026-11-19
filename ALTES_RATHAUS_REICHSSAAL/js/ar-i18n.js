@@ -201,3 +201,11 @@ LANGS.forEach((l) => {
   s.plan.items.push(a.roof);   // ansicht: layers, elevation, + roof
   s.mat.items.unshift(a.board); // material: overview first
 });
+
+// Phase 06G (2026-11-19): trailer label (section 12) + compact ♪ control labels (title case for aria / tooltip).
+const ADD_06G = {
+  de: { trailerAlt: "Trailer: Das Alte Rathaus entsteht – vom Bauplatz bis heute", on: "Ton an", off: "Ton aus" },
+  en: { trailerAlt: "Trailer: the Old Town Hall takes shape – from building site to today", on: "Sound on", off: "Sound off" },
+  es: { trailerAlt: "Tráiler: el Antiguo Ayuntamiento toma forma, de la obra a hoy", on: "Activar sonido", off: "Quitar sonido" },
+};
+LANGS.forEach((l) => { STR[l].end.trailerAlt = ADD_06G[l].trailerAlt; STR[l].snd = { on: ADD_06G[l].on, off: ADD_06G[l].off }; });

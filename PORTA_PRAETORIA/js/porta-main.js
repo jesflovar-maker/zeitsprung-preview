@@ -2,6 +2,7 @@
 // The DOM is built ONCE; a language switch only re-runs text refreshers (no rebuild, no new listeners / observers / timers).
 // Media: runtime derivatives only (../assets/porta-praetoria/). One video plays at a time; every video loads lazily (preload none + poster).
 import { STR, LANGS, STORAGE_KEY } from "./porta-i18n.js?v=20261114b";
+import { ztSound } from "../../js/zt-sound.js?v=20261119e"; // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
 
 const A = "../assets/porta-praetoria/";
 const img = (n, w = 720) => `${A}img/${n}_${w}.webp`;
@@ -73,7 +74,8 @@ function buildNav() {
   const pn = $("#pn"); const links = $("#pnLinks");
   NAV.forEach((id, i) => { const a = el("a", "", { href: "#" + id }); bind(a, (t) => t.navItems[i]); links.append(a); });
   onLang(() => { $("#pnBack").textContent = T().back; $("#pnBack").dataset.short = T().backShort; $("#pnLang").setAttribute("aria-label", T().langLabel); links.setAttribute("aria-label", T().nav); $("#pSkip").textContent = T().skip; document.title = "ZEITSPRUNG — Porta Praetoria · Castra Regina, Regensburg"; });
-  document.querySelectorAll("#pnLang button").forEach((b) => { b.setAttribute("aria-pressed", String(b.dataset.lang === lang)); b.addEventListener("click", () => setLang(b.dataset.lang)); });
+  document.querySelectorAll("#pnLang button").forEach((b) => { b.setAttribute("aria-pressed", String(b.dataset.lang === lang)); b.addEventListener("click", () => { setLang(b.dataset.lang); ztSound.relabel(); }); });
+  ztSound.mount($("#pnLang"));
   const bar = $("#pProg span");
   SC.push(() => {
     pn.classList.toggle("is-solid", scrollY > 40);
@@ -235,7 +237,7 @@ function buildBau() {
 function player(host, name, labelKey, noteKey) {
   const w = el("div", "pplayer"); const st = el("div", "pplayer__stage", { tabindex: "0", role: "group" });
   const v = el("video", "", { playsinline: "", preload: "none" }); v.muted = true; v.setAttribute("muted", ""); v.poster = vposter(name); v.dataset.src = vsrc(name); v.setAttribute("aria-label", name);
-  st.append(v, tag(labelKey)); const ctl = el("div", "pplayer__ctl"); const pb = el("button", "pbtn pbtn--sm", { type: "button" }); const sb = el("button", "pbtn pbtn--sm", { type: "button" }); const tm = el("span", "pplayer__time"); ctl.append(pb, sb, tm);
+  st.append(v, tag(labelKey)); const ctl = el("div", "pplayer__ctl"); const pb = el("button", "pbtn pbtn--sm", { type: "button" }); const sb = el("button", "pbtn pbtn--sm", { type: "button" }); const tm = el("span", "pplayer__time"); ctl.append(pb, tm); ztSound.add(v); // 06G: sb (large sound button) removed from the panel
   const rg = el("input", "", { type: "range", min: "0", max: "1000", value: "0", step: "1" }); bind(rg, (t) => t.tl.seek, "aria-label");
   const kb = el("p", "pplayer__kbd"); bind(kb, (t) => t.tl.kbd); w.append(st, ctl, rg, kb); if (noteKey) { const n = el("p", "pnote"); bind(n, (t) => t.tl.note); w.append(n); } host.append(w);
   let dur = 0, drag = false, pend = null;

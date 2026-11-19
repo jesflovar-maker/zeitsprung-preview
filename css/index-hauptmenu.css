@@ -213,3 +213,25 @@ html.zt-stage-open .hm__gate{ visibility: hidden; } /* the orbit rests behind th
 .hm__line--anim + .hm__rule{ transform: scaleX(0); transition: transform 1.3s var(--zs-glass-ease, ease) .5s; }
 .hm__line--anim.is-in + .hm__rule{ transform: scaleX(1); }
 @media (prefers-reduced-motion: reduce){ .hm__line--anim{ letter-spacing: 0.055em; transition: none; } .hm__line--anim + .hm__rule{ transform: none; transition: none; } }
+
+/* 06G — INDEX title: museum-poster editorial art direction (typography only; architecture/order unchanged).
+   Two intentional phrases: an ivory roman first line and a larger gold italic second line in a high-contrast serif,
+   a thin gold rule, restrained reveal (opacity rise, slight lift, tracking settles, phrase separation, rule draws). */
+.hm__line{ font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif; font-weight: 400; max-width: 26ch; line-height: 1; letter-spacing: 0;
+  background: none; -webkit-background-clip: border-box; background-clip: border-box; -webkit-text-fill-color: currentColor; color: #efe6d6; filter: none; }
+.hm__l1{ display: block; font-weight: 400; font-size: clamp(25px, 6.4vw, 46px); line-height: 1.08; letter-spacing: 0.035em; color: #efe6d6; }
+.hm__l2{ display: block; margin-top: 0.12em; font-style: italic; font-weight: 300; font-size: clamp(31px, 8.4vw, 62px); line-height: 1.04; letter-spacing: 0.005em;
+  color: #d9b980; background: linear-gradient(100deg, #b8904f 0%, #dcbd84 38%, #f0dcac 50%, #dcbd84 62%, #b8904f 100%) 50% 0 / 240% 100% no-repeat;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; padding: 0 0.06em 0.06em; }
+@supports not ((-webkit-background-clip: text) or (background-clip: text)){ .hm__l2{ background: none; -webkit-text-fill-color: currentColor; } }
+.hm__line--anim, .hm__line--anim.is-in{ letter-spacing: 0; animation: none; }
+.hm__line--anim .hm__l1{ letter-spacing: 0.16em; transition: letter-spacing 1.8s var(--zs-glass-ease, ease); }
+.hm__line--anim.is-in .hm__l1{ letter-spacing: 0.035em; }
+.hm__line--anim .hm__l2{ opacity: 0; transform: translateY(10px); transition: opacity 1.1s var(--zs-glass-ease, ease) .35s, transform 1.2s var(--zs-glass-ease, ease) .35s; }
+.hm__line--anim.is-in .hm__l2{ opacity: 1; transform: none; animation: hmSweep2 2.8s ease-in-out .9s 1 both; }
+@keyframes hmSweep2{ from{ background-position: 100% 0; } to{ background-position: 0 0; } }
+.hm__line--anim + .hm__rule{ transition-delay: .9s; }
+.hm__rule{ width: clamp(48px, 9vw, 96px); margin-top: clamp(14px, 2.2vw, 22px); }
+@media (prefers-reduced-motion: reduce){ .hm__line--anim .hm__l1{ letter-spacing: 0.035em; transition: none; } .hm__line--anim .hm__l2{ opacity: 1; transform: none; transition: none; animation: none; } }
+.hm__line{ max-width: min(94vw, 1100px); }
+.hm__l1, .hm__l2{ text-wrap: balance; }

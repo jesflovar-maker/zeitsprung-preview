@@ -245,11 +245,6 @@ html.is-reduced .adis .alabel,html.is-reduced .adis__cap{position:static}
 /* ---------- 06E: hero film + sound toggle, Reichssaal hotspot detail image, building-site loops ---------- */
 .ahero__film{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 58%;opacity:0;transition:opacity .9s var(--ease);pointer-events:none}
 .ahero__film.is-on{opacity:1}
-.ahero__snd{position:absolute;z-index:4;right:var(--g);top:calc(var(--nav) + var(--st) + 12px);min-height:44px;min-width:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:rgba(11,10,9,.58);color:var(--ink);font:500 10.5px/1 var(--mono);letter-spacing:.2em;cursor:pointer;transition:border-color .2s,color .2s}
-.ahero__snd[aria-pressed="true"]{border-color:var(--bronze2);color:var(--bronze)}
-.ahero__snd:hover{border-color:var(--bronze2)}
-html.is-loading .ahero__snd{opacity:0;pointer-events:none}
-@media (min-width:900px){.ahero__snd{right:calc(50% - var(--sh)*9/32 + 12px);top:calc(50% - var(--sh)/2 + var(--nav)/2 + 16px)}}
 .asaal__img{float:left;width:54px;aspect-ratio:9/16;margin:10px 14px 4px 0;border:1px solid var(--line);overflow:hidden;background:#000}
 .asaal__img img{width:100%;height:100%;object-fit:cover}
 .asaal__img[hidden]{display:none}
@@ -272,3 +267,22 @@ html.is-loading .ahero__snd{opacity:0;pointer-events:none}
 .aend__in.is-in h2.ah{transition-delay:.12s}.aend__in.is-in .aend__rule{transition-delay:.45s}.aend__in.is-in .alead{transition-delay:.6s}
 @supports not ((-webkit-background-clip:text) or (background-clip:text)){.aend__in h2.ah{background:none;-webkit-text-fill-color:currentColor}}
 @media (prefers-reduced-motion:reduce){.aend__in .aeyebrow,.aend__in h2.ah,.aend__in .aend__rule,.aend__in .alead{opacity:1!important;transform:none!important;transition:none}}
+
+/* ---------- 06G: section 12 — cinematic chapter title + trailer as primary visual ---------- */
+.aend__title{display:block;background:none;-webkit-text-fill-color:currentColor;max-width:none;margin:0 auto}
+.aend__in h2.aend__title{background:none;-webkit-text-fill-color:currentColor;max-width:none;font-weight:inherit}
+.aend__t1{display:block;font:500 clamp(11.5px,3vw,14px)/1.4 var(--sans);letter-spacing:.42em;text-transform:uppercase;color:var(--ink2);margin-bottom:clamp(10px,2vw,16px);padding-left:.42em}
+.aend__t2{display:block;font-family:'Cormorant Garamond',Georgia,'Times New Roman',serif;font-weight:300;font-size:clamp(48px,13.5vw,108px);line-height:.94;letter-spacing:-.01em;text-wrap:balance;
+  background:linear-gradient(180deg,#f6efe2 0%,#efe2c6 48%,#c9a467 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;padding-bottom:.08em}
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){.aend__t2{background:none;-webkit-text-fill-color:currentColor;color:#efe2c6}}
+.aend__in:not(.is-in) .aend__t1{opacity:0;letter-spacing:.7em}
+.aend__in:not(.is-in) .aend__t2{opacity:0;transform:translateY(14px)}
+.aend__t1,.aend__t2{transition:opacity 1.1s var(--ease),transform 1.3s var(--ease),letter-spacing 1.8s var(--ease)}
+.aend__in.is-in .aend__t2{transition-delay:.25s}
+.aend__in h2.aend__title{transform:none!important;opacity:1!important}
+.aend .aend__film{width:min(100%,calc(min(86svh,940px) * 9 / 16));margin:clamp(28px,5vw,44px) auto 0}
+.aend__vid{opacity:0;transition:opacity .8s var(--ease)}
+.aend__film.is-playing .aend__vid{opacity:1}
+@media (prefers-reduced-motion:reduce){.aend__t1,.aend__t2{opacity:1!important;transform:none!important;letter-spacing:.42em;transition:none}.aend__t2{letter-spacing:-.01em}}
+/* 06G: compact ♪ beside DE | EN | ES — keep the nav on one line on the smallest phones */
+@media (max-width:380px){.an{gap:8px}.an__right{gap:6px}.an__right .zt-snd{margin-left:0}.an__brand{letter-spacing:.16em}.an__lang button{min-width:36px;padding:0 4px}}

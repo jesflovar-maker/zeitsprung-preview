@@ -3,6 +3,7 @@
 // language switches only re-run text refreshers (no rebuild, no new listeners / observers / timers).
 // Media: runtime derivatives only (../assets/dom-st-peter/). One primary video plays at a time; lazy loading.
 import { STR, LANGS, STORAGE_KEY } from "./dom-i18n.js";
+import { ztSound } from "../../js/zt-sound.js?v=20261119e"; // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
 
 const A = "../assets/dom-st-peter/";
 const HI = new Set(["k03", "k05", "k06", "k07", "k08", "k10", "k11", "int_portal", "int_nave", "int_choir", "int_vault", "heute"]); // also exist at 1080 px
@@ -167,12 +168,12 @@ function buildStory(sel, key, stepsKey, MEDIA, opt = {}) {
 function buildTimeline() {
   const s = $("#zeitleiste"); const w = el("div", "dwrap"); w.append(head("tl"));
   const g = el("div", "dtlv rv"); const col = el("div", "dtlv__media"); const st = stage("dtlv__stage");
-  const v = el("video"); v.dataset.src = vid("timeline"); v.poster = poster("timeline"); bind(v, (t) => t.tl.videoAria, "aria-label"); VM.add(v, { loop: false, role: "timeline" });
+  const v = el("video"); v.dataset.src = vid("timeline"); v.poster = poster("timeline"); bind(v, (t) => t.tl.videoAria, "aria-label"); VM.add(v, { loop: false, role: "timeline" }); ztSound.add(v);
   const rec = VM.list.get(v); rec.hold = false;
   const bar = el("div", "dtlv__bar"); bar.innerHTML = "<span></span>"; st.append(v, bar, tag());
   const ctl = el("div", "dtlv__ctl"); const bp = el("button", "dbtn", { type: "button" }); const bm = el("button", "dbtn", { type: "button", "aria-pressed": "false" }); const bt = el("button", "dbtn", { type: "button", "data-trailer": "" }); bind(bt, (t) => t.ui.trailerShort);
   const note = el("p", "dtlv__note"); bind(note, (t) => t.tl.note);
-  ctl.append(bp, bm, bt); col.append(st, ctl, note);
+  ctl.append(bp, bt); /* 06G: bm (large sound button) removed from the panel */ col.append(st, ctl, note);
   const side = el("div", "dtlv__side"); const chips = el("div", "dtlv__chips"); chips.setAttribute("role", "list"); const info = el("div", "dtlv__info"); info.setAttribute("aria-live", "polite"); side.append(chips, info);
   g.append(col, side); w.append(g); s.append(w); reveal(s);
   let cur = 0;
@@ -248,7 +249,8 @@ function buildNav() {
   NAV.forEach((id) => { const a = el("a"); a.href = `#${id}`; bind(a, (t) => t.nav[id]); n.append(a); });
   const hd = $("#dn"), pr = $("#dProg span"); const all = [...document.querySelectorAll("main > section")];
   SC.push(() => { hd.classList.toggle("is-solid", scrollY > 40); const t = root.scrollHeight - innerHeight; pr.style.transform = `scaleX(${t > 0 ? clamp(scrollY / t, 0, 1) : 0})`; let c = "hero"; all.forEach((sc) => { if (sc.offsetHeight && sc.getBoundingClientRect().top < innerHeight * 0.4) c = sc.id; }); curSec = c; [...n.children].forEach((a) => a.setAttribute("aria-current", String(a.getAttribute("href") === `#${c}`))); });
-  $("#dnLang").addEventListener("click", (e) => { const b = e.target.closest("[data-lang]"); if (b) setLang(b.dataset.lang); });
+  $("#dnLang").addEventListener("click", (e) => { const b = e.target.closest("[data-lang]"); if (b) setLang(b.dataset.lang); ztSound.relabel(); });
+  ztSound.mount($("#dnLang"));
 }
 function applyLang() {
   root.lang = lang; document.title = T().meta.title; const md = $('meta[name="description"]'); if (md) md.setAttribute("content", T().meta.desc);
