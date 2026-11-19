@@ -117,9 +117,18 @@
        bruckmandlMaterialLabels/bruckmandlGalleryLabel* keys; the only NEW
        i18n keys added (bruckmandlInspectPrev/Next/Close/Open, all 3
        languages) are functional UI microcopy, not historical claims.
+   06G.2B.2 (2026-11-19) — FINAL SCROLL CONVERSION. Gallery 01's tabbed
+   viewer (auto-rotation, crossfade, tilt), Gallery 02's card grids and the
+   module's own Inspection Mode are RETIRED. Views and parts/material details
+   are now vertical cinematic scroll stages (renderViewsScroll() /
+   renderDetailsScroll()); enlarging uses the platform's single shared
+   zs-viewer (openBruckmandlPhoto()). Hotspot ids, the hotspot event, the
+   assistant reactions and every text string are unchanged. The notes above
+   describe the earlier implementation and are kept for history only.
    ============================================================================ */
 
 import { STEINERNE_BRUCKMANDL_ASSET_BASE, STEINERNE_SOURCES_URL } from "../../js/zt-paths.js";
+import { openPhoto } from "../../js/zs-media-viewer.js"; // 06G.2B.2: the ONE shared viewer (same URL as main.js / craft-gallery.js)
 import {
   BRUCKMANDL_STATUS_LABELS,
   BRUCKMANDL_UI_LABELS,
@@ -403,37 +412,6 @@ function ztClearScrollTriggers() {
   ztScrollTriggers = [];
 }
 
-// Small GSAP ScrollTrigger-driven entrance reveal, reusing the exact
-// fromTo(autoAlpha/y)/toggleActions pattern already used elsewhere on this
-// page (js/main.js's buildFactsReveal()). Falls back to an instant, fully
-// visible state when GSAP is unavailable or the visitor prefers reduced
-// motion — never a blocked/invisible element.
-function revealOnScroll(target, index, reduced) {
-  if (!target) return;
-  if (reduced || typeof gsap === "undefined") {
-    target.style.opacity = "1";
-    target.style.transform = "none";
-    return;
-  }
-  const tween = gsap.fromTo(
-    target,
-    { autoAlpha: 0, y: 36 },
-    {
-      autoAlpha: 1,
-      y: 0,
-      duration: 0.6,
-      ease: "power2.out",
-      delay: (index || 0) * 0.06,
-      scrollTrigger: {
-        trigger: target,
-        start: "top 90%",
-        toggleActions: "play none none reverse"
-      }
-    }
-  );
-  if (tween && tween.scrollTrigger) ztScrollTriggers.push(tween.scrollTrigger);
-}
-
 // Hero parallax/breathing loop (see startHeroMotion() below) — a single
 // rAF id tracked at module scope so a language-switch re-render (or the
 // viewer simply not being reduced-motion-eligible) can always cancel a
@@ -512,500 +490,112 @@ let ztExplodedPieceEls = {};
 function highlightExplodedPiece(id) {
   const target = ztExplodedPieceEls[id];
   if (!target) return;
-  target.classList.add("bruckmandl__exploded-piece--linked");
-  aiScheduleTimer(() => target.classList.remove("bruckmandl__exploded-piece--linked"), 2400);
+  target.classList.add("is-linked");
+  aiScheduleTimer(() => target.classList.remove("is-linked"), 2400);
 }
 
 // ---------------------------------------------------------------------------
-// INSPECTION MODE — shared fullscreen piece viewer for BOTH galleries.
-// Appended to document.body (a true fullscreen layer, not confined to
-// .bruckmandl__inner's own stacking context/overflow) — so, unlike every
-// other piece of this module's DOM, it is NOT removed automatically by
-// render()'s `inner.innerHTML = ""` sweep. closeInspection() is therefore
-// called explicitly at the top of render() (see aiClearTimers()'s identical
-// precedent) so a language switch can never leave a detached overlay + a
-// dangling document-level keydown listener + a locked <body> scroll behind.
+// 06G.2B.2 — SHARED VIEWER BRIDGE. Every Bruckmandl view/detail enlarges in
+// the platform's ONE zs-viewer (contain, black museum backdrop, close, ESC,
+// native pinch-zoom; Lenis is stopped by main.js while it is open). The
+// assistant keeps its existing "inspection" reaction: an ambient POINT pose
+// held while the viewer is open and released when it closes.
 // ---------------------------------------------------------------------------
-let ztInspectionEl = null;
-let ztInspectionKeydownHandler = null;
-let ztInspectionReturnFocusEl = null;
-let ztInspectionPrevBodyOverflow = "";
-
-function closeInspection() {
-  if (!ztInspectionEl) return;
-  if (ztInspectionKeydownHandler) {
-    document.removeEventListener("keydown", ztInspectionKeydownHandler);
-    ztInspectionKeydownHandler = null;
-  }
-  ztInspectionEl.remove();
-  ztInspectionEl = null;
-  document.body.style.overflow = ztInspectionPrevBodyOverflow;
-  const returnEl = ztInspectionReturnFocusEl;
-  ztInspectionReturnFocusEl = null;
-  if (returnEl && typeof returnEl.focus === "function") returnEl.focus();
-  // SECTION REACTIONS (brief §6) — "inspection mode" is one of the existing
-  // events the brief asks Brückmandl to react to. A pure ambient pose hold
-  // (never showAnswer()/text — see HARD CONSTRAINT 4), released the instant
-  // Inspection Mode closes. No-ops if the assistant isn't mounted (initial
-  // page load before renderAssistant() has run once) or is mid-way through
-  // a REAL answer (ambientAmbient's own isAnswerActive gate — see
-  // renderAssistant() below).
-  if (ztAssistantAmbient) ztAssistantAmbient.release();
-}
-
-// Shared two-layer crossfade image stage — used by BOTH the Gallery 01 hero
-// viewer and Inspection Mode's own stage. Two stacked <img> layers instead
-// of a single swapped `src` (the previous implementation): swapping `src`
-// alone is an instant cut with no transition. The outgoing frame stays
-// visible and in place while the incoming frame fades/slides/scales in with
-// a minimal transitory blur, then the outgoing layer is discarded. Respects
-// prefers-reduced-motion by degrading to an instant swap (see
-// prefersReducedMotion() above). DEVIATION FROM BRIEF (documented in the
-// delivery report): the View Transitions API is intentionally NOT used here
-// — its browser support/testability tradeoffs made the always-safe, fully
-// verifiable two-layer CSS-transition approach the more defensible choice
-// for "fallback seguro"; this mechanism already delivers every visual
-// requirement (crossfade, scale/depth, directional movement, minimal blur).
-function createCrossfadeStage(stageExtraClass, initialUrl, initialAlt) {
-  const stage = el("div", `zt-crossfade ${stageExtraClass}`);
-  const layerA = el("img", "zt-crossfade__img zt-crossfade__img--active", { alt: initialAlt || "", draggable: "false" });
-  layerA.src = initialUrl;
-  const layerB = el("img", "zt-crossfade__img", { alt: "", draggable: "false" });
-  stage.appendChild(layerA);
-  stage.appendChild(layerB);
-  let active = layerA;
-  let inactive = layerB;
-
-  function swapTo(url, alt, direction) {
-    if (prefersReducedMotion()) {
-      active.src = url;
-      active.alt = alt || "";
-      return;
-    }
-    const enterSide = direction < 0 ? "zt-crossfade__img--enter-left" : "zt-crossfade__img--enter-right";
-    const exitSide = direction < 0 ? "zt-crossfade__img--exit-right" : "zt-crossfade__img--exit-left";
-    inactive.src = url;
-    inactive.alt = alt || "";
-    inactive.classList.add(enterSide);
-    // Force a reflow so the "enter" starting transform above is committed
-    // before the next line flips it to --active — without this the browser
-    // can coalesce both class changes into a single frame and skip the
-    // transition entirely.
-    void inactive.offsetWidth;
-    inactive.classList.add("zt-crossfade__img--active");
-    inactive.classList.remove(enterSide);
-    active.classList.remove("zt-crossfade__img--active");
-    active.classList.add(exitSide);
-    const prevActive = active;
-    active = inactive;
-    inactive = prevActive;
-    window.setTimeout(() => {
-      inactive.classList.remove(
-        "zt-crossfade__img--exit-left",
-        "zt-crossfade__img--exit-right",
-        "zt-crossfade__img--enter-left",
-        "zt-crossfade__img--enter-right"
-      );
-    }, 700);
-  }
-
-  return { stageEl: stage, swapTo };
-}
-
-// Shared, minimal fullscreen piece viewer opened by Gallery 01's hero expand
-// control (cycles the 4 gallery views) and by Gallery 02's non-hotspot
-// pieces (cycles that piece's own cutouts/materials collection). Never
-// opened FROM a hotspot-enabled card — those keep their existing,
-// regression-tested tap -> BRUCKMANDL_HOTSPOT_EVENT behavior completely
-// unchanged. Its own optional "ask" affordance (rendered only when the
-// current item is hotspot-enabled) dispatches the EXACT SAME event, never a
-// second/duplicated QA path — see the module header for the full chain.
-// @param {{items: Array<{id:string,url:string,name:string,category:string,isHotspot:boolean}>,
-//           startIndex: number, t: Function, lang: string, ui: object, triggerEl?: Element}} params
-function openInspection({ items, startIndex, t, lang, ui, triggerEl }) {
-  if (!items || !items.length) return;
-  closeInspection();
-  ztInspectionReturnFocusEl = triggerEl || null;
-  ztInspectionPrevBodyOverflow = document.body.style.overflow;
-  document.body.style.overflow = "hidden";
-  // SECTION REACTIONS (brief §6) — the visitor is now closely examining a
-  // piece; hold a "point"/attentive pose for as long as Inspection Mode
-  // stays open (released above in closeInspection()). Pure ambient pose
-  // only, gated by the same isAnswerActive priority rule as every other
-  // ambient reaction (see renderAssistant()'s ambientSetPose()).
-  if (ztAssistantAmbient) ztAssistantAmbient.hold("point");
-
-  let index = ((startIndex % items.length) + items.length) % items.length;
-
-  const overlay = el("div", "bruckmandl__inspect", { role: "dialog", "aria-modal": "true" });
-  const stage = el("div", "bruckmandl__inspect-stage");
-  const crossfade = createCrossfadeStage("bruckmandl__inspect-frame", items[index].url, items[index].name || "");
-  stage.appendChild(crossfade.stageEl);
-
-  const closeBtn = el("button", "bruckmandl__inspect-close", { type: "button", "aria-label": t(lang, "bruckmandlInspectClose") });
-  closeBtn.textContent = "×";
-  stage.appendChild(closeBtn);
-
-  let prevBtn = null;
-  let nextBtn = null;
-  if (items.length > 1) {
-    prevBtn = el("button", "bruckmandl__inspect-nav bruckmandl__inspect-nav--prev", { type: "button", "aria-label": t(lang, "bruckmandlInspectPrev") });
-    prevBtn.textContent = "‹";
-    nextBtn = el("button", "bruckmandl__inspect-nav bruckmandl__inspect-nav--next", { type: "button", "aria-label": t(lang, "bruckmandlInspectNext") });
-    nextBtn.textContent = "›";
-    stage.appendChild(prevBtn);
-    stage.appendChild(nextBtn);
-  }
-
-  const annotation = el("button", "bruckmandl__inspect-annotation", { type: "button", hidden: "" });
-  annotation.appendChild(el("span", "bruckmandl__inspect-annotation-line", { "aria-hidden": "true" }));
-  const annotationLabel = el("span", "bruckmandl__inspect-annotation-label");
-  annotation.appendChild(annotationLabel);
-  stage.appendChild(annotation);
-
-  const meta = el("div", "bruckmandl__inspect-meta");
-  const indexEl = el("p", "bruckmandl__inspect-index");
-  const nameEl = el("h4", "bruckmandl__inspect-name");
-  const categoryEl = el("p", "bruckmandl__inspect-category");
-  const askWrap = el("div", "bruckmandl__inspect-ask-wrap");
-  meta.appendChild(indexEl);
-  meta.appendChild(nameEl);
-  meta.appendChild(categoryEl);
-  meta.appendChild(askWrap);
-
-  overlay.appendChild(stage);
-  overlay.appendChild(meta);
-  document.body.appendChild(overlay);
-  ztInspectionEl = overlay;
-
-  function renderCurrent(direction) {
-    const item = items[index];
-    if (direction != null) crossfade.swapTo(item.url, item.name || "", direction);
-    indexEl.textContent = items.length > 1
-      ? `${String(index + 1).padStart(2, "0")} / ${String(items.length).padStart(2, "0")}`
-      : "";
-    nameEl.textContent = item.name || "";
-    categoryEl.textContent = item.category || "";
-    overlay.setAttribute("aria-label", [item.category, item.name].filter(Boolean).join(" — "));
-
-    askWrap.innerHTML = "";
-    annotation.hidden = true;
-    if (item.isHotspot) {
-      const askLabel = item.name ? `${item.name} — ${ui.heading || ""}` : (ui.heading || "");
-      const askBtn = el("button", "bruckmandl__inspect-ask", { type: "button" });
-      askBtn.textContent = ui.heading || "";
-      askBtn.setAttribute("aria-label", askLabel);
-      askBtn.addEventListener("click", () => {
-        document.dispatchEvent(new CustomEvent(BRUCKMANDL_HOTSPOT_EVENT, { detail: { hotspotId: item.id } }));
-        highlightExplodedPiece(item.id);
-      });
-      askWrap.appendChild(askBtn);
-
-      annotation.hidden = false;
-      annotationLabel.textContent = item.name || "";
-      annotation.setAttribute("aria-label", askLabel);
-      annotation.onclick = () => askBtn.click();
-    }
-  }
-
-  function go(delta) {
-    if (items.length < 2) return;
-    index = ((index + delta) % items.length + items.length) % items.length;
-    renderCurrent(delta > 0 ? 1 : -1);
-  }
-
-  if (prevBtn) prevBtn.addEventListener("click", () => go(-1));
-  if (nextBtn) nextBtn.addEventListener("click", () => go(1));
-  closeBtn.addEventListener("click", closeInspection);
-  overlay.addEventListener("click", (e) => { if (e.target === overlay) closeInspection(); });
-
-  ztInspectionKeydownHandler = (e) => {
-    if (e.key === "Escape") { e.preventDefault(); closeInspection(); }
-    else if (e.key === "ArrowRight") { go(1); }
-    else if (e.key === "ArrowLeft") { go(-1); }
-  };
-  document.addEventListener("keydown", ztInspectionKeydownHandler);
-
-  let touchStartX = null;
-  stage.addEventListener("touchstart", (e) => { touchStartX = e.touches[0].clientX; }, { passive: true });
-  stage.addEventListener("touchend", (e) => {
-    if (touchStartX == null) return;
-    const dx = e.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1);
-    touchStartX = null;
-  }, { passive: true });
-
-  renderCurrent(null);
-  closeBtn.focus();
-}
-
-// Drives Gallery 01's "physical piece in a digital vitrine" motion: a small
-// pointer-following tilt (rotateX/rotateY, clamped to a few degrees) plus an
-// extremely slow, near-imperceptible breathing scale — both computed in a
-// single rAF loop so they combine smoothly without a CSS-animation/inline-
-// style transform conflict. No-ops entirely under prefers-reduced-motion
-// (the stage stays perfectly static). pointermove/pointerleave are attached
-// to `stageEl`, a DOM node rebuilt by every render() — no explicit removal
-// needed (see the module-level cleanup note above); the rAF id itself is the
-// only thing requiring the explicit ztStopViewerRaf() teardown.
-function startHeroMotion(tiltEl, stageEl) {
-  if (prefersReducedMotion()) return;
-  let targetRX = 0;
-  let targetRY = 0;
-  let curRX = 0;
-  let curRY = 0;
-  const startTime = performance.now();
-
-  stageEl.addEventListener("pointermove", (e) => {
-    const rect = stageEl.getBoundingClientRect();
-    if (!rect.width || !rect.height) return;
-    const px = (e.clientX - rect.left) / rect.width;
-    const py = (e.clientY - rect.top) / rect.height;
-    targetRY = (px - 0.5) * 10;
-    targetRX = (0.5 - py) * 8;
-    stageEl.style.setProperty("--vpx", `${(px * 100).toFixed(1)}%`);
-    stageEl.style.setProperty("--vpy", `${(py * 100).toFixed(1)}%`);
+function openBruckmandlPhoto(url, alt) {
+  openPhoto({ src: url, alt: alt || "" });
+  if (!ztAssistantAmbient) return;
+  const ambient = ztAssistantAmbient;
+  ambient.hold("point");
+  const mo = new MutationObserver(() => {
+    if (!document.documentElement.classList.contains("zs-viewer-open")) { mo.disconnect(); ambient.release(); }
   });
-  stageEl.addEventListener("pointerleave", () => {
-    targetRX = 0;
-    targetRY = 0;
-  });
+  mo.observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+}
 
-  function tick(now) {
-    curRX += (targetRX - curRX) * 0.08;
-    curRY += (targetRY - curRY) * 0.08;
-    const breathe = 1 + Math.sin((now - startTime) / 1900) * 0.008;
-    tiltEl.style.transform = `rotateX(${curRX.toFixed(2)}deg) rotateY(${curRY.toFixed(2)}deg) scale(${breathe.toFixed(4)})`;
-    ztViewerRafId = window.requestAnimationFrame(tick);
+const ZOOM_ICON_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+
+// One IntersectionObserver per render (no scroll listeners): adds .is-in once a
+// stage/detail reaches the useful viewport. CSS owns the restrained reveal
+// (opacity + small rise + scale settle, caption after the image). Reduced
+// motion: everything is visible immediately, no transforms.
+function observeReveal(nodes) {
+  if (prefersReducedMotion() || typeof IntersectionObserver === "undefined") {
+    nodes.forEach((n) => n.classList.add("is-in"));
+    return;
   }
-  ztViewerRafId = window.requestAnimationFrame(tick);
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add("is-in"); io.unobserve(en.target); } });
+  }, { threshold: 0.3, rootMargin: "0px 0px -8% 0px" });
+  nodes.forEach((n) => io.observe(n));
+  ztOnRenderCleanup(() => io.disconnect());
+}
+
+function zoomButton(label, onOpen) {
+  const b = el("button", "zt-zoom bm-zoom", { type: "button", "aria-label": label || "" });
+  b.innerHTML = ZOOM_ICON_SVG;
+  b.addEventListener("click", (e) => { e.stopPropagation(); onOpen(); });
+  return b;
 }
 
 // ---------------------------------------------------------------------------
-// GALLERY 01 — CINEMATIC ARTIFACT VIEWER. Replaces the former independent
-// renderHero()/renderGallery() pair: the master image used to be a separate
-// "hero" asset byte-identical to the gallery's own FRONT entry (confirmed
-// duplicate — same file size/pixels, see the delivery report) — it is now
-// simply the gallery's first entry, so the big artifact image and the
-// FRONT/BACK/SIDE/INSCRIPTION selector below it are ONE connected object,
-// not two unrelated images. Selecting a view crossfades the SAME stage
-// (createCrossfadeStage()) with directional movement + minimal blur;
-// desktop pointer movement drives a small, restrained parallax tilt +
-// specular sheen (startHeroMotion()) so the artifact reads as a physical
-// piece in a vitrine, never a spinning novelty (no rotation is ever
-// simulated — only 4 real photographed views exist). Hotspot dots reuse the
-// EXACT existing tap -> BRUCKMANDL_HOTSPOT_EVENT -> bridge -> assistant
-// chain (see HOTSPOT_ENABLED_CUTOUT_IDS/HERO_VIEW_HOTSPOTS above) — no new
-// event, no duplicated QA rendering. Clicking the hero itself (or its
-// explicit "enlarge" control) opens the shared Inspection Mode, cycling
-// through the same 4 views.
+// 06G.2B.2 — VIEWS: vertical cinematic scroll. Each approved view is its own
+// light-sticky stage inside the usable scene (below nav + safe area + 20px):
+// the sculpture dominates (~80% of the useful height, contain, never cropped),
+// rises/settles into place, holds while the visitor keeps scrolling, then the
+// next view rises in. Caption in a controlled lower band. Existing validated
+// hotspot dots (HERO_VIEW_HOTSPOTS) stay on their views and fire the SAME
+// BRUCKMANDL_HOTSPOT_EVENT. No tabs, no auto-rotation, no carousel.
 // ---------------------------------------------------------------------------
-function renderArtifactViewer(container, assets, t, lang, ui) {
+function renderViewsScroll(container, assets, t, lang, ui) {
   const views = assets.gallery;
   if (!views || !views.length) return;
-
-  container.appendChild(el("p", "bruckmandl__section-label")).textContent = t(lang, "bruckmandlGalleryLabel");
-
   const cutoutLabels = t(lang, "bruckmandlCutoutLabels") || {};
-  const categoryLabel = t(lang, "bruckmandlCutoutsLabel") || "";
-
-  const viewer = el("div", "bruckmandl__viewer");
-  const stage = el("div", "bruckmandl__viewer-stage");
-  const tilt = el("div", "bruckmandl__viewer-tilt");
-
-  let activeIndex = 0;
-  const firstView = views[0];
-  const crossfade = createCrossfadeStage("bruckmandl__viewer-frame", firstView.url, t(lang, firstView.labelKey) || "");
-  tilt.appendChild(crossfade.stageEl);
-
-  const hotspotLayer = el("div", "bruckmandl__viewer-hotspots");
-  tilt.appendChild(hotspotLayer);
-
-  const sheen = el("div", "bruckmandl__viewer-sheen", { "aria-hidden": "true" });
-  const expandBtn = el("button", "bruckmandl__viewer-expand", { type: "button", "aria-label": t(lang, "bruckmandlInspectOpen") });
-  expandBtn.textContent = "⤢";
-
-  stage.appendChild(tilt);
-  stage.appendChild(sheen);
-  stage.appendChild(expandBtn);
-  viewer.appendChild(stage);
-
-  const microtext = el("div", "bruckmandl__viewer-microtext", { "aria-live": "polite" });
-  microtext.hidden = true;
-  const microName = el("p", "bruckmandl__viewer-microtext-name");
-  const microCategory = el("p", "bruckmandl__viewer-microtext-category");
-  const microBadge = el("span", "bruckmandl__viewer-microtext-badge");
-  microtext.appendChild(microName);
-  microtext.appendChild(microCategory);
-  microtext.appendChild(microBadge);
-  viewer.appendChild(microtext);
-
-  function showMicrotext(hotspotId) {
-    const name = cutoutLabels[hotspotId];
-    if (!name) { microtext.hidden = true; return; }
-    microName.textContent = name;
-    microCategory.textContent = categoryLabel;
-    microBadge.textContent = ui.heading || "";
-    microtext.hidden = false;
-  }
-  function hideMicrotext() { microtext.hidden = true; }
-
-  // Reuses the EXACT existing hotspot chain (see HOTSPOT_ENABLED_CUTOUT_IDS
-  // above / renderExplodedCollection() below): dispatches the same
-  // BRUCKMANDL_HOTSPOT_EVENT the media cards already fire, resolved by
-  // STEINERNE_BRUECKE/js/bruckmandl-hotspot-bridge.js into the assistant's
-  // own POINT/TALK answer (auto-scrolled into view by that existing chain —
-  // untouched here). The hero's own microtext (name/category/badge only,
-  // never the validated answer text itself — see HARD CONSTRAINT 4 / the
-  // delivery report) is a purely local, non-duplicated addition.
-  function fireHotspot(hotspotId) {
-    document.dispatchEvent(new CustomEvent(BRUCKMANDL_HOTSPOT_EVENT, { detail: { hotspotId } }));
-    showMicrotext(hotspotId);
-    highlightExplodedPiece(hotspotId);
-  }
-
-  function renderHotspots(viewId) {
-    hotspotLayer.innerHTML = "";
-    const points = HERO_VIEW_HOTSPOTS[viewId] || [];
-    points.forEach((point) => {
+  const openLabel = t(lang, "bruckmandlInspectOpen") || "";
+  const wrap = el("div", "bm-views");
+  wrap.appendChild(el("p", "bruckmandl__section-label bm-views__label")).textContent = t(lang, "bruckmandlGalleryLabel");
+  const stages = [];
+  views.forEach((view, i) => {
+    const name = t(lang, view.labelKey) || "";
+    const stage = el("section", "bm-view", { "aria-label": `${String(i + 1).padStart(2, "0")} — ${name}` });
+    const pin = el("div", "bm-view__pin");
+    const frame = el("div", "bm-view__frame");
+    const img = el("img", "bm-view__img", { alt: name, draggable: "false", loading: i === 0 ? "eager" : "lazy", decoding: "async", width: "941", height: "1672" });
+    img.src = view.url;
+    frame.appendChild(img);
+    const dots = el("div", "bm-view__dots");
+    (HERO_VIEW_HOTSPOTS[view.id] || []).forEach((point) => {
       const label = cutoutLabels[point.id] || "";
-      const dot = el("button", "bruckmandl__viewer-hotspot", {
+      const dot = el("button", "bm-view__dot", {
         type: "button",
         style: `left:${point.x}%; top:${point.y}%;`,
         "aria-label": label ? (ui.heading ? `${label} — ${ui.heading}` : label) : (ui.heading || "")
       });
-      dot.addEventListener("click", () => fireHotspot(point.id));
-      hotspotLayer.appendChild(dot);
+      dot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        document.dispatchEvent(new CustomEvent(BRUCKMANDL_HOTSPOT_EVENT, { detail: { hotspotId: point.id } }));
+        highlightExplodedPiece(point.id);
+        if (label) { micro.textContent = label; micro.hidden = false; }
+      });
+      dots.appendChild(dot);
     });
-  }
-
-  const selector = el("div", "bruckmandl__viewer-selector", {
-    role: "tablist",
-    "aria-label": t(lang, "bruckmandlGalleryLabel")
+    frame.appendChild(dots);
+    const open = () => openBruckmandlPhoto(view.url, name);
+    frame.appendChild(zoomButton(openLabel, open));
+    frame.addEventListener("click", open);
+    pin.appendChild(frame);
+    const cap = el("div", "bm-view__cap");
+    cap.appendChild(el("span", "bm-view__idx")).textContent = `${String(i + 1).padStart(2, "0")} / ${String(views.length).padStart(2, "0")}`;
+    cap.appendChild(el("span", "bm-view__name")).textContent = name;
+    const micro = el("span", "bm-view__micro", { "aria-live": "polite" });
+    micro.hidden = true;
+    cap.appendChild(micro);
+    pin.appendChild(cap);
+    stage.appendChild(pin);
+    wrap.appendChild(stage);
+    stages.push(stage);
   });
-  const tabs = [];
-
-  function focusActiveTab() {
-    if (tabs[activeIndex]) tabs[activeIndex].focus();
-  }
-
-  function activateView(index, options) {
-    const animate = !options || options.animate !== false;
-    const prevIndex = activeIndex;
-    activeIndex = ((index % views.length) + views.length) % views.length;
-    const view = views[activeIndex];
-    const alt = t(lang, view.labelKey) || "";
-    if (animate && activeIndex !== prevIndex) {
-      crossfade.swapTo(view.url, alt, activeIndex > prevIndex ? 1 : -1);
-    }
-    renderHotspots(view.id);
-    hideMicrotext();
-    tabs.forEach((tabBtn, i) => {
-      const isActive = i === activeIndex;
-      tabBtn.classList.toggle("is-active", isActive);
-      tabBtn.setAttribute("aria-selected", isActive ? "true" : "false");
-      tabBtn.setAttribute("tabindex", isActive ? "0" : "-1");
-    });
-  }
-
-  views.forEach((view, i) => {
-    const tabBtn = el("button", "bruckmandl__viewer-tab", {
-      type: "button",
-      role: "tab",
-      "aria-selected": i === 0 ? "true" : "false",
-      tabindex: i === 0 ? "0" : "-1"
-    });
-    tabBtn.appendChild(el("span", "bruckmandl__viewer-tab-index")).textContent = String(i + 1).padStart(2, "0");
-    tabBtn.appendChild(el("span", "bruckmandl__viewer-tab-label")).textContent = t(lang, view.labelKey) || "";
-
-    tabBtn.addEventListener("click", () => activateView(i));
-    tabBtn.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowRight" || e.key === "ArrowDown") {
-        e.preventDefault();
-        activateView(i + 1);
-        focusActiveTab();
-      } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
-        e.preventDefault();
-        activateView(i - 1);
-        focusActiveTab();
-      } else if (e.key === "Home") {
-        e.preventDefault();
-        activateView(0);
-        focusActiveTab();
-      } else if (e.key === "End") {
-        e.preventDefault();
-        activateView(views.length - 1);
-        focusActiveTab();
-      }
-    });
-
-    tabs.push(tabBtn);
-    selector.appendChild(tabBtn);
-  });
-
-  viewer.appendChild(selector);
-  container.appendChild(viewer);
-
-  // Initial paint — no crossfade animation needed, layerA already holds the
-  // first view's image.
-  renderHotspots(views[0].id);
-  tabs[0].classList.add("is-active");
-
-  // AUTO-ADVANCE (owner-directed 2026-10-09): the four general views rotate
-  // 01 -> 02 -> 03 -> 04 -> 01 every ~5 s (reuses the existing crossfade) so
-  // visitors notice there are several views. Any manual input (tap, key,
-  // focus) shows the chosen view immediately, pauses rotation and resumes after
-  // an idle interval. Disabled under prefers-reduced-motion; paused while the
-  // viewer is off-screen or the tab is hidden.
-  const AUTO_ADVANCE_MS = 5000;
-  const AUTO_RESUME_IDLE_MS = 12000;
-  let autoTimer = null;
-  let autoResume = null;
-  let autoInView = false;
-  function stopAuto() { if (autoTimer) { clearInterval(autoTimer); autoTimer = null; } }
-  function startAuto() {
-    if (autoTimer || prefersReducedMotion() || !autoInView || document.hidden) return;
-    autoTimer = setInterval(() => activateView(activeIndex + 1), AUTO_ADVANCE_MS);
-  }
-  function autoUserInteracted() {
-    stopAuto();
-    clearTimeout(autoResume);
-    autoResume = setTimeout(() => { autoResume = null; startAuto(); }, AUTO_RESUME_IDLE_MS);
-  }
-  ["pointerdown", "click", "keydown", "focusin"].forEach((evt) => viewer.addEventListener(evt, autoUserInteracted));
-  const onAutoVisibility = () => { if (document.hidden) stopAuto(); else if (!autoResume) startAuto(); };
-  document.addEventListener("visibilitychange", onAutoVisibility);
-  let autoObserver = null;
-  if (typeof IntersectionObserver !== "undefined") {
-    autoObserver = new IntersectionObserver((entries) => {
-      autoInView = entries.some((en) => en.isIntersecting);
-      if (autoInView) { if (!autoResume) startAuto(); } else stopAuto();
-    }, { threshold: 0.35 });
-    autoObserver.observe(viewer);
-  }
-  ztOnRenderCleanup(() => {
-    document.removeEventListener("visibilitychange", onAutoVisibility);
-    if (autoObserver) autoObserver.disconnect();
-    stopAuto();
-    clearTimeout(autoResume);
-    autoResume = null;
-  });
-
-  function openHeroInspection() {
-    const items = views.map((view) => ({
-      id: view.id,
-      url: view.url,
-      name: t(lang, view.labelKey) || "",
-      category: t(lang, "bruckmandlGalleryLabel") || "",
-      isHotspot: false
-    }));
-    openInspection({ items, startIndex: activeIndex, t, lang, ui, triggerEl: expandBtn });
-  }
-  expandBtn.addEventListener("click", openHeroInspection);
-  crossfade.stageEl.style.cursor = "pointer";
-  crossfade.stageEl.addEventListener("click", openHeroInspection);
-
-  startHeroMotion(tilt, stage);
+  container.appendChild(wrap);
+  observeReveal(stages);
 }
 
 function renderVideo(container, assets, t, lang) {
@@ -1060,94 +650,57 @@ function renderFactcheck(container, t, lang) {
 }
 
 // ---------------------------------------------------------------------------
-// GALLERY 02 — EXPLODED INTERACTIVE COLLECTION. Replaces the former
-// renderMediaStrip()'s uniform horizontal-scroll grid of square cards (used
-// for BOTH the materials and cutouts sections) with an asymmetric editorial
-// layout — hero/medium/small pieces + negative space, a CSS grid on desktop
-// and an offset editorial stack on mobile (see css/style.css's
-// .bruckmandl__exploded rules). hotspotIds keeps its EXACT existing meaning/
-// behavior from renderMediaStrip() (tap/click/keydown -> the SAME
-// BRUCKMANDL_HOTSPOT_EVENT, completely unchanged); pieces WITHOUT a hotspot
-// mapping open the shared Inspection Mode (openInspection()) instead —
-// never both on the same piece, and never a hotspot id outside the already-
-// reviewed HOTSPOT_ENABLED_CUTOUT_IDS/HOTSPOT_ENABLED_MATERIAL_IDS sets.
-// opts.registerPieces (used only for the CUTOUTS call) records each piece's
-// element in ztExplodedPieceEls so a Gallery 01 hero hotspot can visually
-// echo-highlight its corresponding Gallery 02 piece (highlightExplodedPiece()
-// above) — the brief's "connection between galleries", implemented as a
-// same-page visual echo rather than a forced/ambiguous cross-navigation.
+// 06G.2B.2 — DETAILS / PARTS: vertical cinematic scroll (normal flow, no pin).
+// Each existing approved part/material crop becomes: NUMBER · CATEGORY ↓
+// large centred image (contain, lazy) ↓ its existing caption ↓ next detail.
+// Image enters → settles → caption reveals (IntersectionObserver + CSS).
+// Tap/enlarge opens the shared zs-viewer. Hotspot-enabled ids keep their
+// EXACT existing behaviour through a small "ask" control that dispatches the
+// SAME BRUCKMANDL_HOTSPOT_EVENT (HOTSPOT_ENABLED_* sets unchanged).
+// Small material crops are never shown above their native pixel width.
 // ---------------------------------------------------------------------------
-const EXPLODED_SIZE_PATTERN = ["hero", "sm", "md", "sm", "sm", "md", "sm"];
-
-function renderExplodedCollection(container, labelKey, rawAssets, labelMapKey, t, lang, hotspotIds, ui, opts) {
+function renderDetailsScroll(container, labelKey, rawAssets, labelMapKey, t, lang, hotspotIds, ui, opts) {
   const options = opts || {};
-  container.appendChild(el("p", "bruckmandl__section-label")).textContent = t(lang, labelKey);
-  const grid = el("div", "bruckmandl__exploded");
   const labelMap = t(lang, labelMapKey) || {};
   const categoryLabel = t(lang, labelKey) || "";
-  const reduced = prefersReducedMotion();
-  const canHover = !(window.matchMedia && window.matchMedia("(hover: none)").matches);
-
-  const items = rawAssets.map((item) => ({
-    id: item.id,
-    url: item.url,
-    name: labelMap[item.id] || "",
-    category: categoryLabel,
-    isHotspot: !!(hotspotIds && hotspotIds.has(item.id))
-  }));
-
-  items.forEach((item, i) => {
-    const size = EXPLODED_SIZE_PATTERN[i % EXPLODED_SIZE_PATTERN.length];
-    const pieceClass = `bruckmandl__exploded-piece bruckmandl__exploded-piece--${size}` + (item.isHotspot ? " bruckmandl__exploded-piece--hotspot" : "");
-    const piece = el("div", pieceClass, { role: "button", tabindex: "0" });
-    const label = item.isHotspot && ui && ui.heading ? `${item.name} — ${ui.heading}` : item.name;
-    piece.setAttribute("aria-label", label || "");
-
-    const figure = el("div", "bruckmandl__exploded-figure");
-    const img = el("img", "bruckmandl__exploded-img", { alt: item.name, draggable: "false" });
+  const openLabel = t(lang, "bruckmandlInspectOpen") || "";
+  const group = el("div", `bm-details ${options.modifier || ""}`);
+  group.appendChild(el("p", "bruckmandl__section-label bm-details__label")).textContent = categoryLabel;
+  const nodes = [];
+  rawAssets.forEach((item, i) => {
+    const name = labelMap[item.id] || "";
+    const isHotspot = !!(hotspotIds && hotspotIds.has(item.id));
+    const fig = el("figure", "bm-detail");
+    fig.appendChild(el("p", "bm-detail__idx")).textContent = `${String(i + 1).padStart(2, "0")} / ${String(rawAssets.length).padStart(2, "0")} · ${categoryLabel}`;
+    const frame = el("div", "bm-detail__frame");
+    const img = el("img", "bm-detail__img", { alt: name, draggable: "false", loading: "lazy", decoding: "async" });
+    if (options.nativeWidths && options.nativeWidths[item.id]) img.style.maxWidth = `min(100%, ${options.nativeWidths[item.id]}px)`;
     img.src = item.url;
-    figure.appendChild(img);
-    piece.appendChild(figure);
-    piece.appendChild(el("p", "bruckmandl__exploded-caption")).textContent = item.name;
-
-    function activate() {
-      if (item.isHotspot) {
-        document.dispatchEvent(new CustomEvent(BRUCKMANDL_HOTSPOT_EVENT, { detail: { hotspotId: item.id } }));
-      } else {
-        openInspection({ items, startIndex: i, t, lang, ui, triggerEl: piece });
-      }
+    frame.appendChild(img);
+    const open = () => openBruckmandlPhoto(item.url, name);
+    frame.appendChild(zoomButton(openLabel, open));
+    frame.addEventListener("click", open);
+    fig.appendChild(frame);
+    const cap = el("figcaption", "bm-detail__cap");
+    cap.appendChild(el("span", "bm-detail__name")).textContent = name;
+    if (isHotspot && ui && ui.heading) {
+      const ask = el("button", "bm-detail__ask", { type: "button", "aria-label": name ? `${name} — ${ui.heading}` : ui.heading });
+      ask.textContent = ui.heading;
+      ask.addEventListener("click", () => document.dispatchEvent(new CustomEvent(BRUCKMANDL_HOTSPOT_EVENT, { detail: { hotspotId: item.id } })));
+      cap.appendChild(ask);
     }
-    piece.addEventListener("click", activate);
-    piece.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
-        e.preventDefault();
-        activate();
-      }
-    });
-
-    if (!reduced && canHover) {
-      piece.addEventListener("pointermove", (e) => {
-        const rect = piece.getBoundingClientRect();
-        if (!rect.width || !rect.height) return;
-        const px = (e.clientX - rect.left) / rect.width - 0.5;
-        const py = (e.clientY - rect.top) / rect.height - 0.5;
-        piece.style.setProperty("--epx", `${(px * 6).toFixed(2)}deg`);
-        piece.style.setProperty("--epy", `${(py * -6).toFixed(2)}deg`);
-      });
-      piece.addEventListener("pointerleave", () => {
-        piece.style.setProperty("--epx", "0deg");
-        piece.style.setProperty("--epy", "0deg");
-      });
-    }
-
-    if (options.registerPieces) ztExplodedPieceEls[item.id] = piece;
-
-    grid.appendChild(piece);
-    revealOnScroll(piece, i, reduced);
+    fig.appendChild(cap);
+    if (options.registerPieces) ztExplodedPieceEls[item.id] = fig;
+    group.appendChild(fig);
+    nodes.push(fig);
   });
-
-  container.appendChild(grid);
+  container.appendChild(group);
+  observeReveal(nodes);
 }
+
+// Native pixel widths of the five small material close-up crops (measured from the
+// approved WebP files) — they are displayed at most at this CSS width (no upscale).
+const MATERIAL_NATIVE_WIDTHS = { stone_surface: 320, weathering: 320, inscription_surface: 650, relief_surface: 400, column_surface: 500 };
 
 function renderSources(container, t, lang, sourcesMap) {
   const btn = el("button", "bruckmandl__sources-btn", {
@@ -1463,7 +1016,7 @@ function renderAssistant(container, assets, t, lang) {
     isAnswerActive = true;
     aiScheduleTimer(() => {
       isAnswerActive = false;
-      if (ztInspectionEl) ambientSetPose("point");
+      if (document.documentElement.classList.contains("zs-viewer-open")) ambientSetPose("point"); // 06G.2B.2: shared viewer still open
       else setPose("idle");
     }, 2400);
   }
@@ -1588,14 +1141,14 @@ function renderAssistant(container, assets, t, lang) {
   // Gallery 01's own hotspot-interactive artifact viewer -> POINT + a small
   // gaze lean (already inside `container`/`inner`, appended earlier in
   // this same render() pass, so it is safe to query here).
-  observeAwareness(container.querySelector(".bruckmandl__viewer-stage"), () => {
+  observeAwareness(container.querySelector(".bm-views"), () => {
     ambientPose("point", 1600);
     gazeTowards(-3, 1600);
   });
 
   // Gallery 02's two exploded collections (materials + cutouts) -> POINT +
   // a small gaze lean the other way.
-  container.querySelectorAll(".bruckmandl__exploded").forEach((gridEl) => {
+  container.querySelectorAll(".bm-details").forEach((gridEl) => {
     observeAwareness(gridEl, () => {
       ambientPose("point", 1600);
       gazeTowards(3, 1600);
@@ -1635,17 +1188,17 @@ function render(inner, assets, sourcesMap, t, getLang) {
   ztStopAiTiltRaf();
   ztClearAwarenessObservers();
   ztRunRenderCleanups();
-  closeInspection();
-  // Reset AFTER closeInspection() above (which, if a previous render's
-  // Inspection Mode was still open, calls the PREVIOUS render's own
-  // ztAssistantAmbient.release() one last time) so this render starts with
-  // a clean null hook — openInspection()/closeInspection() defensively
-  // no-op via `if (ztAssistantAmbient)` whenever nothing is mounted yet.
+  // 06G.2B.2: the module's own Inspection Mode is retired (the shared zs-viewer
+  // is used instead); start each render with a clean ambient hook.
   ztAssistantAmbient = null;
   ztExplodedPieceEls = {};
   inner.innerHTML = "";
+  // 06G.2B.2 FLOW: intro → VIEWS (vertical cinematic scroll) → PARTS → MATERIAL
+  // details (vertical cinematic scroll) → history / legend / fact-check → sources → assistant.
   renderIntro(inner, t, lang);
-  renderArtifactViewer(inner, assets, t, lang, ui);
+  renderViewsScroll(inner, assets, t, lang, ui);
+  renderDetailsScroll(inner, "bruckmandlCutoutsLabel", assets.cutouts, "bruckmandlCutoutLabels", t, lang, HOTSPOT_ENABLED_CUTOUT_IDS, ui, { registerPieces: true, modifier: "bm-details--parts" });
+  renderDetailsScroll(inner, "bruckmandlMaterialsLabel", assets.materials, "bruckmandlMaterialLabels", t, lang, HOTSPOT_ENABLED_MATERIAL_IDS, ui, { nativeWidths: MATERIAL_NATIVE_WIDTHS, modifier: "bm-details--material" });
   // TEMPORARY PUBLICATION FIX (2026-09-07): video block hidden until a
   // better replacement video is uploaded. renderVideo() itself is untouched
   // below — restore by uncommenting the next line.
@@ -1653,8 +1206,6 @@ function render(inner, assets, sourcesMap, t, getLang) {
   renderHistory(inner, t, lang);
   renderLegend(inner, t, lang);
   renderFactcheck(inner, t, lang);
-  renderExplodedCollection(inner, "bruckmandlMaterialsLabel", assets.materials, "bruckmandlMaterialLabels", t, lang, HOTSPOT_ENABLED_MATERIAL_IDS, ui, {});
-  renderExplodedCollection(inner, "bruckmandlCutoutsLabel", assets.cutouts, "bruckmandlCutoutLabels", t, lang, HOTSPOT_ENABLED_CUTOUT_IDS, ui, { registerPieces: true });
   renderSources(inner, t, lang, sourcesMap);
   return renderAssistant(inner, assets, t, lang);
 }

@@ -22,7 +22,7 @@ let craftApi = null; // museum photo gallery (#craftGallery); declared here so i
 import { initMediaFeatures } from "../../js/media-feature.js?v=20261119m";
 import { openPhoto, openElement } from "../../js/zs-media-viewer.js"; // same URL as craft-gallery.js -> one shared viewer instance
 import { STEINERNE_VIDEO_WEB4_BASE, KFRAMES_4K_WEB_BASE } from "../../js/zt-paths.js";
-import { initBruckmandl } from "./bruckmandl.js";
+import { initBruckmandl } from "./bruckmandl.js?v=20261119p";
 import { TIMES as SB_CH_T, STR as SB_CH } from "./sb-index-chapters.js"; // 06G.2B: language-neutral clean timeline + DE/EN/ES chapter overlay
 import { initBruckmandlHotspotBridge } from "./bruckmandl-hotspot-bridge.js";
 // Technical DOM event name only (not QA/provider data) — reused verbatim

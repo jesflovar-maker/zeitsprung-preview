@@ -1695,139 +1695,6 @@ img{ max-width:100%; display:block; }
   margin-bottom: 32px;
 }
 
-/* ---------------------------------------------------------------- */
-/* SHARED CROSSFADE STAGE — used by BOTH Gallery 01's hero viewer     */
-/* (.bruckmandl__viewer-frame) and Inspection Mode's own stage        */
-/* (.bruckmandl__inspect-frame). Two stacked <img> layers so a view   */
-/* change is a real transition (crossfade + minimal directional move  */
-/* + transitory blur), never an instant src swap. See                 */
-/* createCrossfadeStage() in js/bruckmandl.js.                        */
-/* ---------------------------------------------------------------- */
-.zt-crossfade{ position: absolute; inset: 0; }
-.zt-crossfade__img{
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: contain; object-position: center center;
-  opacity: 0;
-  transform: scale(1.045);
-  filter: blur(6px);
-  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.22,0.61,0.36,1), filter 0.5s ease;
-  will-change: opacity, transform;
-}
-.zt-crossfade__img--active{ opacity: 1; transform: scale(1); filter: blur(0); }
-.zt-crossfade__img--enter-left{ opacity: 0; transform: translateX(-3%) scale(1.045); filter: blur(6px); }
-.zt-crossfade__img--enter-right{ opacity: 0; transform: translateX(3%) scale(1.045); filter: blur(6px); }
-.zt-crossfade__img--exit-left{ opacity: 0; transform: translateX(-3%) scale(0.98); filter: blur(4px); }
-.zt-crossfade__img--exit-right{ opacity: 0; transform: translateX(3%) scale(0.98); filter: blur(4px); }
-
-/* ---------------------------------------------------------------- */
-/* GALLERY 01 — CINEMATIC ARTIFACT VIEWER. Replaces the former        */
-/* independent .bruckmandl__hero / .bruckmandl__gallery pair: ONE     */
-/* connected stage + a premium indexed view selector below it. The    */
-/* strict 9:16 centered-contain framing kept from the previous        */
-/* TEMPORARY PUBLICATION FIX (2026-09-07) note — full monument never   */
-/* cropped, restore by widening .bruckmandl__viewer-stage's aspect-    */
-/* ratio once final art-directed crops exist.                         */
-/* ---------------------------------------------------------------- */
-.bruckmandl__viewer{ margin-bottom: 28px; }
-.bruckmandl__viewer-stage{
-  position: relative; width: 100%; aspect-ratio: 9 / 16;
-  background: var(--z-bg-soft); border: 1px solid var(--z-line);
-  overflow: hidden;
-  perspective: 900px;
-}
-.bruckmandl__viewer-tilt{
-  position: absolute; inset: 0;
-  transform-style: preserve-3d;
-  will-change: transform;
-}
-.bruckmandl__viewer-hotspots{ position: absolute; inset: 0; pointer-events: none; z-index: 2; }
-.bruckmandl__viewer-hotspot{
-  position: absolute; pointer-events: auto;
-  width: 22px; height: 22px; margin: -11px 0 0 -11px;
-  background: transparent; border: none; padding: 0; cursor: pointer;
-}
-.bruckmandl__viewer-hotspot::before{
-  content: ""; position: absolute; inset: 8px;
-  background: var(--z-gold); border-radius: 50%;
-  animation: bruckmandlHotspotPulse 2.6s ease-in-out infinite;
-}
-.bruckmandl__viewer-hotspot:hover::before,
-.bruckmandl__viewer-hotspot:focus-visible::before{
-  inset: 6px;
-}
-.bruckmandl__viewer-hotspot:focus-visible{
-  outline: 2px solid var(--z-gold); outline-offset: 3px; border-radius: 50%;
-}
-@keyframes bruckmandlHotspotPulse{
-  0%, 100%{ box-shadow: 0 0 0 0 rgba(212,175,120,0.5); }
-  50%{ box-shadow: 0 0 0 7px rgba(212,175,120,0); }
-}
-.bruckmandl__viewer-sheen{
-  position: absolute; inset: 0; z-index: 1; pointer-events: none;
-  background: radial-gradient(circle at var(--vpx, 50%) var(--vpy, 50%), rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 45%);
-  opacity: 0; mix-blend-mode: soft-light;
-  transition: opacity 0.4s ease;
-}
-.bruckmandl__viewer-stage:hover .bruckmandl__viewer-sheen{ opacity: 1; }
-@media (hover: none){ .bruckmandl__viewer-sheen{ display: none; } }
-.bruckmandl__viewer-expand{
-  position: absolute; right: 10px; bottom: 10px; z-index: 3;
-  width: 36px; height: 36px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  background: rgba(8,9,11,0.55); border: 1px solid rgba(212,175,120,0.4);
-  color: var(--z-gold); font-size: 15px; line-height: 1;
-  cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-.bruckmandl__viewer-expand:hover, .bruckmandl__viewer-expand:focus-visible{
-  background: rgba(212,175,120,0.18); border-color: var(--z-gold); outline: none;
-}
-
-.bruckmandl__viewer-microtext{
-  margin-top: 12px; padding: 10px 12px;
-  border: 1px solid rgba(212,175,120,0.35); background: rgba(212,175,120,0.06);
-  display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px;
-}
-.bruckmandl__viewer-microtext[hidden]{ display: none; }
-.bruckmandl__viewer-microtext-name{ font-size: 13.5px; font-weight: 600; color: var(--z-ink); margin: 0; }
-.bruckmandl__viewer-microtext-category{
-  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--z-ink-faint); margin: 0;
-}
-.bruckmandl__viewer-microtext-badge{
-  margin-left: auto;
-  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em;
-  color: var(--z-gold); border: 1px solid rgba(212,175,120,0.4); border-radius: 3px;
-  padding: 2px 6px;
-}
-
-.bruckmandl__viewer-selector{
-  display: flex; gap: 6px; margin-top: 14px;
-  overflow-x: auto; padding-bottom: 2px;
-}
-.bruckmandl__viewer-tab{
-  flex: 0 0 auto; display: flex; flex-direction: column; gap: 4px;
-  min-width: 70px; padding: 8px 6px 10px;
-  background: transparent; border: none; border-bottom: 2px solid var(--z-line);
-  cursor: pointer; opacity: 0.55;
-  transition: opacity 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
-}
-.bruckmandl__viewer-tab-index{
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; color: var(--z-gold-dim);
-}
-.bruckmandl__viewer-tab-label{
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--z-ink-dim); white-space: nowrap;
-}
-.bruckmandl__viewer-tab:hover{ opacity: 0.8; }
-.bruckmandl__viewer-tab:focus-visible{ outline: none; opacity: 0.9; }
-.bruckmandl__viewer-tab.is-active{
-  opacity: 1; border-bottom-color: var(--z-gold);
-  transform: translateY(-1px) scale(1.02);
-}
-.bruckmandl__viewer-tab.is-active .bruckmandl__viewer-tab-index,
-.bruckmandl__viewer-tab.is-active .bruckmandl__viewer-tab-label{ color: var(--z-gold); }
-
 /* 10-second monument assembly video */
 .bruckmandl__video{
   position: relative; width: 100%; aspect-ratio: 9 / 16;
@@ -1900,81 +1767,6 @@ img{ max-width:100%; display:block; }
 }
 .bruckmandl__factcheck-column--uncertain .bruckmandl__factcheck-heading{ color: var(--z-ink-faint); }
 
-/* ---------------------------------------------------------------- */
-/* GALLERY 02 — EXPLODED INTERACTIVE COLLECTION. Replaces the former   */
-/* uniform .bruckmandl__media-strip grid (used for BOTH materials and  */
-/* cutouts) with an asymmetric editorial layout: base rules below are  */
-/* the MOBILE offset-stack composition; the min-width:900px block      */
-/* further down switches to a dense CSS grid of hero/medium/small      */
-/* pieces. Hover/tilt motion uses --epx/--epy (set via pointermove in  */
-/* js/bruckmandl.js) layered on top of the lift/shadow transition.     */
-/* ---------------------------------------------------------------- */
-.bruckmandl__exploded{
-  display: flex; flex-direction: column; gap: 22px;
-  margin-bottom: 28px;
-}
-.bruckmandl__exploded-piece{
-  position: relative; width: 92%;
-  display: flex; flex-direction: column;
-  border: 1px solid var(--z-line); background: var(--z-bg-soft);
-  padding: 10px; cursor: pointer;
-  transform: perspective(800px) rotateX(var(--epy, 0deg)) rotateY(var(--epx, 0deg)) translateY(0);
-  transition: transform 0.35s ease, border-color 0.3s ease, box-shadow 0.35s ease;
-}
-.bruckmandl__exploded-piece:hover,
-.bruckmandl__exploded-piece:focus-visible{
-  transform: perspective(800px) rotateX(var(--epy, 0deg)) rotateY(var(--epx, 0deg)) translateY(-6px);
-  border-color: var(--z-gold-dim);
-  box-shadow: 0 18px 40px rgba(0,0,0,0.35);
-  outline: none;
-}
-.bruckmandl__exploded-piece--md{ width: 80%; align-self: flex-end; }
-.bruckmandl__exploded-piece--sm{ width: 62%; }
-.bruckmandl__exploded-piece--sm:nth-of-type(odd){ align-self: flex-start; }
-.bruckmandl__exploded-piece--sm:nth-of-type(even){ align-self: flex-end; }
-.bruckmandl__exploded-figure{
-  position: relative; overflow: hidden; aspect-ratio: 3 / 4;
-}
-.bruckmandl__exploded-img{
-  position: absolute; inset: 0; width: 100%; height: 100%;
-  object-fit: contain;
-  transform: scale(1);
-  transition: transform 0.7s ease;
-}
-.bruckmandl__exploded-piece:hover .bruckmandl__exploded-img,
-.bruckmandl__exploded-piece:focus-visible .bruckmandl__exploded-img{ transform: scale(1.04); }
-.bruckmandl__exploded-caption{
-  font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.1em;
-  color: var(--z-ink-faint); opacity: 0.72;
-  padding-top: 8px;
-  transition: opacity 0.3s ease, color 0.3s ease;
-}
-.bruckmandl__exploded-piece:hover .bruckmandl__exploded-caption,
-.bruckmandl__exploded-piece:focus-visible .bruckmandl__exploded-caption{
-  opacity: 1; color: var(--z-ink-dim);
-}
-
-/* Hotspot affordance — ONLY the specific cutout/material pieces wired to
-   the Bruckmandl hotspot bridge (see js/bruckmandl-hotspot-bridge.js) get
-   this treatment. Reuses the same gold accent language as the rest of the
-   module (.bruckmandl__ai-question-btn's hover/active states) rather than
-   introducing a new visual system. */
-.bruckmandl__exploded-piece--hotspot::after{
-  content: "";
-  position: absolute; top: 10px; right: 10px;
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--z-gold);
-  animation: bruckmandlHotspotPulse 2.6s ease-in-out infinite;
-}
-/* Cross-gallery connection — briefly echoes a Gallery 01 hero hotspot tap
-   on its corresponding Gallery 02 piece (highlightExplodedPiece() in
-   js/bruckmandl.js). Border/shadow only, never a looping animation, so it
-   stays inert under prefers-reduced-motion without a separate override. */
-.bruckmandl__exploded-piece--linked{
-  border-color: var(--z-gold);
-  box-shadow: 0 0 0 2px rgba(212,175,120,0.35), 0 18px 40px rgba(0,0,0,0.3);
-}
-
 /* Quellen — identical dialog pattern to .kf__sources-btn/.kf__sources-panel,
    scoped under .bruckmandl__ so both modules can coexist without collision. */
 .bruckmandl__sources-btn{
@@ -2032,90 +1824,6 @@ img{ max-width:100%; display:block; }
 }
 .bruckmandl__source-entry__institution{
   font-size: 12px; color: rgba(244,239,230,0.62); margin: 0;
-}
-
-/* ---------------------------------------------------------------- */
-/* INSPECTION MODE — shared fullscreen piece viewer for BOTH galleries */
-/* (see openInspection()/closeInspection() in js/bruckmandl.js).       */
-/* Appended to document.body, not scoped under .bruckmandl — a true    */
-/* fullscreen overlay above the whole page (z-index intentionally      */
-/* higher than .bruckmandl__sources-panel's 80).                       */
-/* ---------------------------------------------------------------- */
-.bruckmandl__inspect{
-  position: fixed; inset: 0; z-index: 200;
-  background: rgba(6,7,8,0.94);
-  display: flex; flex-direction: column;
-  animation: bruckmandlInspectIn 0.28s ease-out both;
-}
-@keyframes bruckmandlInspectIn{ from{ opacity: 0; } to{ opacity: 1; } }
-.bruckmandl__inspect-stage{
-  position: relative; flex: 1 1 auto; min-height: 0;
-  display: flex; align-items: center; justify-content: center;
-  padding: 24px 16px 8px;
-}
-.bruckmandl__inspect-frame{ position: relative; width: 100%; height: 100%; max-width: 640px; }
-.bruckmandl__inspect-close{
-  position: absolute; top: 14px; right: 14px; z-index: 3;
-  width: 40px; height: 40px; border-radius: 50%;
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(244,239,230,0.25);
-  color: var(--z-ink); font-size: 22px; line-height: 1; cursor: pointer;
-}
-.bruckmandl__inspect-close:hover, .bruckmandl__inspect-close:focus-visible{
-  border-color: var(--z-gold); color: var(--z-gold); outline: none;
-}
-.bruckmandl__inspect-nav{
-  position: absolute; top: 50%; z-index: 3;
-  transform: translateY(-50%);
-  width: 44px; height: 44px; border-radius: 50%;
-  background: rgba(255,255,255,0.06); border: 1px solid rgba(244,239,230,0.25);
-  color: var(--z-ink); font-size: 26px; line-height: 1; cursor: pointer;
-}
-.bruckmandl__inspect-nav--prev{ left: 8px; }
-.bruckmandl__inspect-nav--next{ right: 8px; }
-.bruckmandl__inspect-nav:hover, .bruckmandl__inspect-nav:focus-visible{
-  border-color: var(--z-gold); color: var(--z-gold); outline: none;
-}
-.bruckmandl__inspect-annotation{
-  position: absolute; left: 50%; top: 16%; z-index: 2;
-  transform: translateX(-50%);
-  display: flex; flex-direction: column; align-items: center;
-  background: none; border: none; padding: 0; cursor: pointer;
-}
-.bruckmandl__inspect-annotation[hidden]{ display: none; }
-.bruckmandl__inspect-annotation-line{
-  display: block; width: 1px; height: 34px; margin-bottom: 6px;
-  background: linear-gradient(to bottom, rgba(212,175,120,0.85), rgba(212,175,120,0));
-}
-.bruckmandl__inspect-annotation-label{
-  font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.12em;
-  color: var(--z-gold);
-  background: rgba(8,9,11,0.7); border: 1px solid rgba(212,175,120,0.4);
-  padding: 3px 8px; white-space: nowrap;
-}
-.bruckmandl__inspect-meta{
-  flex: 0 0 auto; text-align: center;
-  padding: 12px 20px 24px;
-  border-top: 1px solid rgba(244,239,230,0.1);
-}
-.bruckmandl__inspect-index{
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.16em;
-  color: var(--z-gold-dim); margin: 0 0 6px;
-}
-.bruckmandl__inspect-name{ font-size: 17px; font-weight: 600; color: var(--z-ink); margin: 0 0 4px; }
-.bruckmandl__inspect-category{
-  font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--z-ink-faint); margin: 0 0 14px;
-}
-.bruckmandl__inspect-ask-wrap{ display: flex; justify-content: center; }
-.bruckmandl__inspect-ask{
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em;
-  color: var(--z-gold); background: transparent;
-  border: 1px solid rgba(212,175,120,0.45); border-radius: 20px;
-  padding: 9px 18px; cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-.bruckmandl__inspect-ask:hover, .bruckmandl__inspect-ask:focus-visible{
-  background: rgba(212,175,120,0.12); border-color: var(--z-gold); outline: none;
 }
 
 /* Small gold mono subsection label — used above the video, gallery,
@@ -2322,26 +2030,6 @@ img{ max-width:100%; display:block; }
   .bruckmandl{ padding: 130px 60px 80px; }
   .bruckmandl__inner{ max-width: 760px; }
   .bruckmandl__title{ font-size: clamp(26px, 2.8vw, 32px); }
-  .bruckmandl__viewer-stage{ max-width: 420px; margin: 0 auto; }
-  .bruckmandl__viewer-selector{ justify-content: center; }
-  /* GALLERY 02 desktop — dense CSS grid of hero/medium/small pieces +
-     negative space, replacing the mobile offset-stack composition above. */
-  .bruckmandl__exploded{
-    display: grid; grid-template-columns: repeat(6, 1fr);
-    grid-auto-rows: 64px; grid-auto-flow: dense; gap: 14px;
-  }
-  .bruckmandl__exploded-piece{
-    width: auto; align-self: auto;
-    grid-column: span 3; grid-row: span 3;
-  }
-  .bruckmandl__exploded-piece--hero{ grid-column: span 4; grid-row: span 6; }
-  .bruckmandl__exploded-piece--md{ grid-column: span 3; grid-row: span 4; width: auto; align-self: auto; }
-  .bruckmandl__exploded-piece--sm{ grid-column: span 2; grid-row: span 3; width: auto; align-self: auto; }
-  /* the mobile offset-stack rules above use :nth-of-type(odd|even){align-self:flex-start|flex-end} (higher specificity than the --sm rule),
-     which kept the small grid pieces from stretching to their spanned rows → image height 0 → empty cards. Reset them for the desktop grid. */
-  .bruckmandl__exploded-piece--sm:nth-of-type(odd),
-  .bruckmandl__exploded-piece--sm:nth-of-type(even){ align-self: auto; }
-  .bruckmandl__exploded-figure{ aspect-ratio: auto; height: 100%; }
   .bruckmandl__video{ max-width: 420px; }
   .bruckmandl__factcheck{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
   .bruckmandl__factcheck-column{ margin-bottom: 0; }
@@ -2374,25 +2062,7 @@ img{ max-width:100%; display:block; }
      (WELCOME/POINT/TALK/IDLE) keep working exactly as before — untouched. */
   .bruckmandl__ai-life{ animation: none; }
 
-  /* GALLERY 01/02 + INSPECTION MODE — defense-in-depth on top of the JS-side
-     prefersReducedMotion() branches (createCrossfadeStage()'s instant swap,
-     startHeroMotion() never starting its rAF loop, revealOnScroll()'s
-     instant-visible fallback): strip every remaining CSS transition/
-     animation/transform so nothing here can still visibly move. */
-  .zt-crossfade__img{ transition: none; filter: none; transform: none; opacity: 1; }
-  .zt-crossfade__img:not(.zt-crossfade__img--active){ opacity: 0; }
-  .bruckmandl__viewer-tilt{ transform: none !important; }
-  .bruckmandl__viewer-hotspot::before{ animation: none; }
-  .bruckmandl__viewer-sheen{ display: none; }
-  .bruckmandl__viewer-tab{ transition: none; }
-  .bruckmandl__viewer-tab.is-active{ transform: none; }
-  .bruckmandl__exploded-piece{ transition: none; transform: none !important; }
-  .bruckmandl__exploded-piece:hover, .bruckmandl__exploded-piece:focus-visible{ transform: none !important; }
-  .bruckmandl__exploded-img{ transition: none; }
-  .bruckmandl__exploded-piece:hover .bruckmandl__exploded-img,
-  .bruckmandl__exploded-piece:focus-visible .bruckmandl__exploded-img{ transform: none; }
-  .bruckmandl__exploded-piece--hotspot::after{ animation: none; }
-  .bruckmandl__inspect{ animation: none; }
+  .bm-view__dot::before{ animation: none; }
 }
 
 
@@ -2916,3 +2586,83 @@ img{ max-width:100%; display:block; }
   .kf__viewport{ padding-block-start: calc(var(--zt-scene-top) - 16px); }
 }
 @media (min-width: 2200px){ :root{ --zt-stage-h: min(calc(100dvh - var(--zt-scene-top) - 16px), 1360px); } }
+
+/* ================================================================ */
+/* 06G.2B.2 — BRUCKMANDL: VIEWS + DETAILS AS VERTICAL CINEMATIC SCROLL */
+/* Uses the 06G.2B.1 scene tokens (nav + safe area + 20px).            */
+/* Views: light sticky stage per view (hold, then the next rises in).  */
+/* Details: normal flow, image enters → settles → caption reveals.     */
+/* IntersectionObserver adds .is-in (js/bruckmandl.js); no scroll       */
+/* listeners. Images contain, never cropped, never upscaled.            */
+/* ================================================================ */
+.bm-views{ margin-top: 6px; }
+.bm-views__label, .bm-details__label{ margin-bottom: 0; }
+.bm-view{ position: relative; height: calc(var(--zt-scene-h) + 38svh); }
+.bm-view:last-child{ height: calc(var(--zt-scene-h) + 12svh); }
+.bm-view__pin{
+  position: sticky; top: var(--zt-scene-top); height: var(--zt-scene-h);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+}
+.bm-view__frame{
+  position: relative; flex: 0 0 auto; aspect-ratio: 941 / 1672; max-width: 100%;
+  height: min(calc(var(--zt-scene-h) * 0.8), calc((100vw - 40px) * 1672 / 941), 1180px);
+  cursor: zoom-in;
+}
+.bm-view__img{
+  position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain;
+  opacity: 0; transform: translateY(28px) scale(1.03);
+  transition: opacity .9s cubic-bezier(.22,.61,.36,1), transform 1.15s cubic-bezier(.22,.61,.36,1);
+}
+.bm-view.is-in .bm-view__img{ opacity: 1; transform: none; }
+.bm-view__dots{ position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .5s ease .75s; }
+.bm-view.is-in .bm-view__dots{ opacity: 1; }
+.bm-view__dot{
+  position: absolute; pointer-events: auto; width: 44px; height: 44px; margin: -22px 0 0 -22px;
+  background: transparent; border: 0; padding: 0; cursor: pointer; border-radius: 50%;
+}
+.bm-view__dot::before{
+  content: ""; position: absolute; inset: 17px; border-radius: 50%; background: var(--z-gold);
+  animation: bmDotPulse 2.6s ease-in-out infinite;
+}
+.bm-view__dot:hover::before, .bm-view__dot:focus-visible::before{ inset: 15px; }
+.bm-view__dot:focus-visible{ outline: 2px solid var(--z-gold); outline-offset: -8px; }
+@keyframes bmDotPulse{ 0%, 100%{ box-shadow: 0 0 0 0 rgba(212,175,120,.5); } 50%{ box-shadow: 0 0 0 7px rgba(212,175,120,0); } }
+.bm-view__cap{
+  flex: 0 0 auto; min-height: 44px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center;
+  opacity: 0; transform: translateY(8px); transition: opacity .6s ease .45s, transform .6s ease .45s;
+}
+.bm-view.is-in .bm-view__cap{ opacity: 1; transform: none; }
+.bm-view__idx, .bm-detail__idx{ font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .2em; color: var(--z-gold-dim); text-transform: uppercase; }
+.bm-view__name{ font-size: 15px; line-height: 1.35; color: var(--z-ink); letter-spacing: .01em; }
+.bm-view__micro{ font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; color: var(--z-ink-faint); text-transform: uppercase; }
+.bm-view__micro[hidden]{ display: none; }
+.bm-zoom{ top: 10px; right: 10px; }
+
+.bm-details{ padding-top: 5svh; }
+.bm-details + .bm-details{ padding-top: 2svh; }
+.bm-detail{ margin: 0; padding: 4.5svh 0; display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; }
+.bm-detail__idx{ margin: 0; opacity: 0; transition: opacity .5s ease; }
+.bm-detail__frame{ position: relative; display: inline-block; max-width: 100%; cursor: zoom-in; line-height: 0; }
+.bm-detail__img{
+  display: block; width: auto; height: auto; max-width: 100%;
+  max-height: calc(var(--zt-scene-h) * 0.72); object-fit: contain;
+  opacity: 0; transform: translateY(32px) scale(1.025);
+  transition: opacity .85s cubic-bezier(.22,.61,.36,1), transform 1.05s cubic-bezier(.22,.61,.36,1), filter .4s ease;
+}
+.bm-detail__cap{
+  display: flex; flex-direction: column; align-items: center; gap: 10px; max-width: 40ch;
+  opacity: 0; transform: translateY(8px); transition: opacity .6s ease .4s, transform .6s ease .4s;
+}
+.bm-detail.is-in .bm-detail__idx, .bm-detail.is-in .bm-detail__cap{ opacity: 1; transform: none; }
+.bm-detail.is-in .bm-detail__img{ opacity: 1; transform: none; }
+.bm-detail__name{ font-size: 14.5px; line-height: 1.5; color: var(--z-ink-dim); }
+.bm-detail__ask{
+  min-height: 44px; padding: 0 16px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .18em;
+  color: var(--z-gold); background: transparent; border: 1px solid rgba(212,175,120,.45); cursor: pointer;
+}
+.bm-detail__ask:hover, .bm-detail__ask:focus-visible{ background: rgba(212,175,120,.1); border-color: var(--z-gold); outline: none; }
+.bm-detail.is-linked .bm-detail__img{ filter: drop-shadow(0 0 22px rgba(212,175,120,.5)); }
+.bm-details + .bruckmandl__section-label{ margin-top: 3svh; }
+@media (prefers-reduced-motion: reduce){
+  .bm-view__img, .bm-view__cap, .bm-view__dots, .bm-detail__img, .bm-detail__cap, .bm-detail__idx{ opacity: 1 !important; transform: none !important; transition: none !important; }
+}
