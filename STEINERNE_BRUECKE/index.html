@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/style.css?v=20261119k">
+<link rel="stylesheet" href="css/style.css?v=20261119m">
 <link rel="stylesheet" href="../css/zt-assistant.css">
 </head>
 <body>
@@ -447,17 +447,37 @@
       <p class="mf__eyebrow" data-i18n="mfRouteEyebrow">ROUTE</p>
       <h3 class="mf__title" id="bridgeRouteTitle" data-i18n="mfRouteTitle"></h3>
       <p class="mf__text" data-i18n="mfRouteText"></p>
+      <!-- 06G.2B.1: ambient film — muted autoplay when visible, paused offscreen, loops; no local play/pause control -->
       <div class="mf__frame">
-        <video class="mf__video" playsinline preload="none" disablepictureinpicture controlslist="nodownload"></video>
-        <button type="button" class="mf__play" aria-label="Play"><span class="mf__play-icon" aria-hidden="true"></span></button>
+        <video class="mf__video" muted loop playsinline preload="none" disablepictureinpicture controlslist="nodownload"></video>
       </div>
     </div>
   </section>
 
-  <footer class="continue">
-    <h3 data-i18n="continueTitle">Reise fortsetzen</h3>
-    <p data-i18n="continueText">Weitere Monumente von ZEITSPRUNG folgen in Kürze.</p>
-    <button id="footerBackBtn" type="button" data-i18n="footerBack">ZURÜCK ZUM ANFANG</button>
+  <!-- 06G.2B.1 — ZEITSPRUNG destination ending (closing visual = route film above).
+       Destinations are rendered from monuments.config.json (enabled + route, never the current monument);
+       the static links below are the no-JS fallback with the same routes. -->
+  <footer class="continue sb-end" id="sbEnd" aria-labelledby="sbEndTitle">
+    <div class="sb-end__in">
+      <div class="sb-end__copy">
+        <span class="sb-end__rule" aria-hidden="true"></span>
+        <p class="sb-end__eyebrow">ZEITSPRUNG</p>
+        <h3 class="sb-end__title" id="sbEndTitle" data-i18n="continueTitle">Reise fortsetzen</h3>
+        <p class="sb-end__text" data-i18n="continueText">Regensburg erzählt weiter — wählen Sie Ihr nächstes Monument.</p>
+        <div class="sb-end__actions">
+          <a class="sb-end__primary" href="../index.html#index-monuments" data-i18n="endAll">ALLE MONUMENTE</a>
+        </div>
+      </div>
+      <div class="sb-end__more">
+        <p class="sb-end__dest-label" id="sbEndDestLabel" data-i18n="endNext">NÄCHSTES MONUMENT</p>
+        <nav class="sb-end__dest" id="sbEndDest" aria-labelledby="sbEndDestLabel">
+          <a class="sb-end__btn" data-mid="dom-st-peter" href="../DOM_ST_PETER/index.html">DOM ST. PETER</a>
+          <a class="sb-end__btn" data-mid="porta-praetoria" href="../PORTA_PRAETORIA/index.html">PORTA PRAETORIA</a>
+          <a class="sb-end__btn" data-mid="altes-rathaus" href="../ALTES_RATHAUS_REICHSSAAL/index.html">ALTES RATHAUS</a>
+        </nav>
+        <button type="button" class="sb-end__trailer" id="sbEndTrailer" aria-haspopup="dialog"><span class="sb-end__trailer-icon" aria-hidden="true"></span><span data-i18n="endTrailer">TRAILER ANSEHEN</span></button>
+      </div>
+    </div>
   </footer>
 
 </div>
@@ -481,7 +501,7 @@
 }
 </script>
 
-<script type="module" src="js/main.js?v=20261119k"></script>
+<script type="module" src="js/main.js?v=20261119m"></script>
 <script type="module">
   // BRUCKMANDL_ASSISTANT_PATTERN_V1 — small floating contextual help icon (shared module).
   // Pure consumer of the canonical knowledge provider; the #bruckmandl module, its 8 hotspots

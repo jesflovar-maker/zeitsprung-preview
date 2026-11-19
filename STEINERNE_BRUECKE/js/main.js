@@ -19,7 +19,8 @@ import { initMuseum25D } from "./museum25d.js";
 import { initKframesGallery } from "./kframes-gallery.js";
 import { initCraftGallery } from "./craft-gallery.js";
 let craftApi = null; // museum photo gallery (#craftGallery); declared here so it exists before any wiring runs
-import { initMediaFeatures } from "../../js/media-feature.js";
+import { initMediaFeatures } from "../../js/media-feature.js?v=20261119m";
+import { openPhoto, openElement } from "../../js/zs-media-viewer.js"; // same URL as craft-gallery.js -> one shared viewer instance
 import { STEINERNE_VIDEO_WEB4_BASE, KFRAMES_4K_WEB_BASE } from "../../js/zt-paths.js";
 import { initBruckmandl } from "./bruckmandl.js";
 import { TIMES as SB_CH_T, STR as SB_CH } from "./sb-index-chapters.js"; // 06G.2B: language-neutral clean timeline + DE/EN/ES chapter overlay
@@ -549,6 +550,8 @@ function setSoundEnabled(next) {
   // 06G.2B: the hero film has a real soundtrack — unmute only through this gesture-driven toggle; replay if it already ended.
   const iv = document.getElementById("introVideo"); const gate = document.getElementById("intro-gate");
   if (iv && gate && gate.style.display !== "none") { iv.muted = !next; if (next && iv.ended) { try { iv.currentTime = 0; } catch (e) {} const q = iv.play(); if (q && q.catch) q.catch(() => {}); } }
+  // 06G.2B.1: an open ending-trailer follows the same single sound state (the toggle itself is the gesture)
+  if (sbTrailer) { sbTrailer.video.muted = !next; if (next && sbTrailer.video.paused) { const q = sbTrailer.video.play(); if (q && q.catch) q.catch(() => {}); } sbTrailer.sync(); }
   ZT_AUDIO_BUS.setMuted(!soundEnabled); // master-gain ramp, never gates any visual/content behavior
   try { sessionStorage.setItem(ZT_SOUND_PREF_KEY, soundEnabled ? "1" : "0"); } catch (e) {}
   applyMuteUI();
@@ -911,6 +914,8 @@ function initLenisAndScroll() {
   // (not just a visual hide) — see THREE_D_ENABLED above.
   if (THREE_D_ENABLED) wireThreeDChapter();
   wireNav(lenis);
+  wireEnding();
+  wireZoom(lenis);
 
   // Reveal nav + scroll hint
   gsap.to(".navbar", { autoAlpha: 1, y: 0, duration: 0.6, delay: 0.1 });
@@ -1386,7 +1391,162 @@ function wireNav(lenis) {
     });
   });
 
-  document.getElementById("footerBackBtn").addEventListener("click", () => {
-    lenis.scrollTo(0, { duration: 1.4 });
+}
+
+// ---------------------------------------------------------------------------
+// 06G.2B.1 — ZEITSPRUNG DESTINATION ENDING
+// Destinations come from the platform route architecture (monuments.config.json:
+// enabled + route, never the current monument). The static links in index.html
+// carry the same routes as the no-JS / fetch-failure fallback.
+// ---------------------------------------------------------------------------
+const SB_SELF_ID = "steinerne-bruecke";
+const SB_END_ORDER = ["dom-st-peter", "porta-praetoria", "altes-rathaus"];
+const SB_END_LABEL = { "dom-st-peter": "DOM ST. PETER", "porta-praetoria": "PORTA PRAETORIA", "altes-rathaus": "ALTES RATHAUS" };
+let sbTrailer = null;
+
+function wireEnding() {
+  const dest = document.getElementById("sbEndDest");
+  if (dest) {
+    fetch("../monuments.config.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).then((cfg) => {
+      const list = cfg && (Array.isArray(cfg.monuments) ? cfg.monuments : null);
+      if (!list) return;
+      const live = list.filter((m) => m && m.enabled === true && m.route && m.id !== SB_SELF_ID);
+      live.sort((a, b) => (SB_END_ORDER.indexOf(a.id) + 99) % 99 - (SB_END_ORDER.indexOf(b.id) + 99) % 99);
+      if (!live.length) return;
+      dest.textContent = "";
+      live.forEach((m) => {
+        const a = document.createElement("a");
+        a.className = "sb-end__btn";
+        a.dataset.mid = m.id;
+        a.href = "../" + String(m.route).replace(/^\/+/, "");
+        a.textContent = SB_END_LABEL[m.id] || String((m.short_name || m.name || m.id)).toUpperCase();
+        dest.appendChild(a);
+      });
+    }).catch(() => { /* static fallback links stay */ });
+  }
+  const tb = document.getElementById("sbEndTrailer");
+  if (tb) tb.addEventListener("click", openEndingTrailer);
+}
+
+// Steinerne clean 15 s trailer in the shared viewer: no native controls, tap toggles pause,
+// sound only through the single ♪ state (never audible unless the visitor enabled it).
+function openEndingTrailer() {
+  const frame = document.createElement("div");
+  frame.className = "sb-trailer";
+  const v = document.createElement("video");
+  v.setAttribute("playsinline", ""); v.playsInline = true;
+  v.setAttribute("disablepictureinpicture", "");
+  v.preload = "auto";
+  v.poster = `${STEINERNE_VIDEO_WEB4_BASE}/sb_trailer_clean_poster_v1.jpg`;
+  v.src = `${STEINERNE_VIDEO_WEB4_BASE}/sb_trailer_clean_v1_720.mp4`;
+  v.muted = !soundEnabled;
+  const snd = document.createElement("button");
+  snd.type = "button";
+  snd.className = "sb-trailer__snd";
+  snd.innerHTML = '<span aria-hidden="true">♪</span>';
+  frame.append(v, snd);
+  const sync = () => {
+    snd.classList.toggle("is-on", soundEnabled);
+    snd.setAttribute("aria-pressed", soundEnabled ? "true" : "false");
+    snd.setAttribute("aria-label", t(lang, soundEnabled ? "introSoundOn" : "introSoundOff"));
+  };
+  sync();
+  v.addEventListener("click", () => { if (v.paused) { const q = v.play(); if (q && q.catch) q.catch(() => {}); } else v.pause(); });
+  snd.addEventListener("click", (e) => { e.stopPropagation(); ZT_AUDIO_BUS.unlock(); setSoundEnabled(!soundEnabled); });
+  document.body.appendChild(frame); // openElement re-parents from (and restores to) a real parent
+  sbTrailer = { video: v, sync };
+  openElement(frame, { onClose: () => {
+    v.pause(); v.removeAttribute("src"); try { v.load(); } catch (e) { /* noop */ }
+    frame.remove(); sbTrailer = null;
+  } });
+  const p = v.play();
+  if (p && p.catch) p.catch(() => { v.muted = true; const q = v.play(); if (q && q.catch) q.catch(() => {}); });
+}
+
+// ---------------------------------------------------------------------------
+// 06G.2B.1 — TAP TO ENLARGE (significant still visuals only: museum cutout plates
+// and the 12 K-Frames; the craft gallery and the Bruckmandl viewer already have it).
+// Opens the shared zs-viewer (black museum backdrop, contain, close, ESC, native
+// pinch-zoom). Hidden whenever the current scene is a film, so no video is ever
+// "enlarged" as a still. Lenis is stopped while any viewer is open (scroll lock).
+// ---------------------------------------------------------------------------
+const ZOOM_ICON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+function effectiveOpacity(el, stop) {
+  let o = 1;
+  for (let e = el; e && e !== stop.parentElement; e = e.parentElement) {
+    const cs = getComputedStyle(e);
+    if (cs.display === "none" || cs.visibility === "hidden") return 0;
+    o *= parseFloat(cs.opacity);
+  }
+  return o;
+}
+function dominantMedia(host, selector) {
+  let best = null; let bo = 0.5;
+  host.querySelectorAll(selector).forEach((el) => {
+    if (el.tagName === "IMG" ? !(el.currentSrc && el.naturalWidth) : !(el.currentSrc || el.src)) return;
+    const r = el.getBoundingClientRect();
+    if (r.width < 60 || r.height < 30) return;
+    const o = effectiveOpacity(el, host);
+    if (o > bo) { bo = o; best = el; }
   });
+  return best;
+}
+// K-Frames: the dominant still itself.
+const kfStill = (host) => { const el = dominantMedia(host, ".kf__img"); return el && el.tagName === "IMG" ? el : null; };
+// Museum: every chapter is now a film; the inspection view shows that chapter's approved still
+// cutout plate (same exploded view, real pixels) — never a frame grabbed from the film.
+const MUSEUM_STILL_FOR = { pfeiler_loop: "pfeiler_detail", boegen_loop: "boegen_detail", fahrbahn_loop: "fahrbahn_main", materials_loop: "material_stone", museumPendingVideo: "bau_construction", exploded_transition_assembly: "explosion_main", exploded_transition_disassembly: "explosion_main" };
+const museumStill = (host) => {
+  const el = dominantMedia(host, ".museum__flat-img, .museum__bridge, #museumPendingVideo");
+  if (!el) return null;
+  if (el.tagName === "IMG") return el.id === "museumBridgeImg" ? host.querySelector('img[data-slot="explosion_main"]') : el;
+  const slot = MUSEUM_STILL_FOR[el.dataset.slot || el.id];
+  const img = slot && host.querySelector(`img[data-slot="${slot}"]`);
+  return img && (img.currentSrc || img.getAttribute("src")) ? img : null;
+};
+function wireZoom(lenis) {
+  new MutationObserver(() => {
+    const open = document.documentElement.classList.contains("zs-viewer-open");
+    if (open) lenis.stop(); else lenis.start();
+  }).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
+
+  const zooms = [];
+  const add = (host, finder, upgrade) => {
+    if (!host) return;
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "zt-zoom";
+    b.innerHTML = ZOOM_ICON;
+    b.hidden = true;
+    host.appendChild(b);
+    const open = () => {
+      const img = finder(host);
+      if (!img) return;
+      const src = img.currentSrc || img.src;
+      openPhoto({ src: upgrade ? upgrade(src) : src, alt: img.alt || "" });
+    };
+    b.addEventListener("click", (e) => { e.stopPropagation(); open(); });
+    host.addEventListener("click", (e) => {
+      if (e.target.closest("button, a, input, select, textarea, [role='button']")) return;
+      if (!b.hidden) open();
+    });
+    zooms.push({ b, host, finder });
+  };
+  add(document.getElementById("museumViewport"), museumStill);
+  // K-Frames: the inspection view always uses the existing 1440 WebP derivative (real pixels, no upscale)
+  add(document.querySelector("#kframesGallery .kf__stage"), kfStill, (src) => src.replace(/_(720|1080)_v01\.webp(\?.*)?$/, "_1440_v01.webp"));
+  let due = 0;
+  const refresh = () => {
+    due = 0;
+    zooms.forEach((z) => {
+      const r = z.host.getBoundingClientRect();
+      const onScreen = r.bottom > 0 && r.top < innerHeight;
+      z.b.hidden = !(onScreen && z.finder(z.host));
+      z.b.setAttribute("aria-label", t(lang, "zoomOpen"));
+    });
+  };
+  const schedule = () => { if (!due) due = setTimeout(refresh, 220); };
+  lenis.on("scroll", schedule);
+  window.addEventListener("resize", schedule, { passive: true });
+  setTimeout(refresh, 800);
 }

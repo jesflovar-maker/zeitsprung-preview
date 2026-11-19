@@ -50,19 +50,35 @@ export function initMediaFeatures({ root, base, playLabel, reducedMotion }) {
       video.muted = true;
       video.loop = true;
       video.setAttribute("muted", "");
+      // 06G.2B.1 — AMBIENT = no local play/pause control at all. If the browser blocks muted
+      // autoplay (e.g. iOS Low Power Mode), retry once on the visitor's next gesture anywhere.
+      let inView = false;
+      let retryArmed = false;
+      const retryOnGesture = () => {
+        if (retryArmed) return;
+        retryArmed = true;
+        const go = () => {
+          ["pointerdown", "touchend", "keydown"].forEach((ev) => document.removeEventListener(ev, go, true));
+          retryArmed = false;
+          if (inView) { const q = video.play(); if (q && q.catch) q.catch(() => {}); }
+        };
+        ["pointerdown", "touchend", "keydown"].forEach((ev) => document.addEventListener(ev, go, true));
+      };
       const io = new IntersectionObserver((entries) => {
         entries.forEach((e) => {
           if (e.isIntersecting && e.intersectionRatio >= 0.45) {
+            inView = true;
             arm();
             const p = video.play();
-            if (p && p.catch) p.catch(() => showPlay(true));
-          } else if (armed) {
-            video.pause();
+            if (p && p.catch) p.catch(retryOnGesture);
+          } else {
+            inView = false;
+            if (armed) video.pause();
           }
         });
       }, { threshold: [0, 0.45, 0.8] });
       io.observe(video);
-      showPlay(false);
+      if (btn) btn.remove();
     } else {
       showPlay(true);
       const start = () => {

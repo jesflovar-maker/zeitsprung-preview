@@ -299,7 +299,8 @@ export const DICT = {
     museumEvidenceESTIMATED: "GESCHÄTZT",
     museumEvidenceNEEDS_VALIDATION: "ZU PRÜFEN",
     continueTitle: "Reise fortsetzen",
-    continueText: "Weitere Monumente von ZEITSPRUNG folgen in Kürze.",
+    continueText: "Regensburg erzählt weiter — wählen Sie Ihr nächstes Monument.",
+    endAll: "ALLE MONUMENTE", endNext: "DIREKT WEITER ZU", endTrailer: "TRAILER ANSEHEN", zoomOpen: "Bild vergrößern",
     footerBack: "ZURÜCK ZUM ANFANG"
   },
   en: {
@@ -532,7 +533,8 @@ export const DICT = {
     museumEvidenceESTIMATED: "ESTIMATED",
     museumEvidenceNEEDS_VALIDATION: "NEEDS VALIDATION",
     continueTitle: "Continue the journey",
-    continueText: "More ZEITSPRUNG monuments are coming soon.",
+    continueText: "Regensburg's story goes on — choose your next monument.",
+    endAll: "ALL MONUMENTS", endNext: "CONTINUE DIRECTLY TO", endTrailer: "WATCH TRAILER", zoomOpen: "Enlarge image",
     footerBack: "BACK TO START"
   },
   es: {
@@ -765,7 +767,8 @@ export const DICT = {
     museumEvidenceESTIMATED: "ESTIMADO",
     museumEvidenceNEEDS_VALIDATION: "POR VALIDAR",
     continueTitle: "Continuar el viaje",
-    continueText: "Pronto llegarán más monumentos de ZEITSPRUNG.",
+    continueText: "Regensburg sigue contando su historia: elige tu próximo monumento.",
+    endAll: "TODOS LOS MONUMENTOS", endNext: "CONTINUAR DIRECTAMENTE A", endTrailer: "VER TRÁILER", zoomOpen: "Ampliar imagen",
     footerBack: "VOLVER AL INICIO"
   }
 };
