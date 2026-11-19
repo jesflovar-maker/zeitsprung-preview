@@ -163,3 +163,41 @@ export const STR = {
 };
 // INDEX selector chapter labels (monuments.config.json -> menu_timeline.chapters.labels_key = "tlv"), derived from the same chronology.
 LANGS.forEach((l) => { STR[l].tlv = STR[l].time.ch.map((c) => ({ y: c[0], h: c[1] })); });
+
+// Phase 06E (2026-11-19): hero film, building-site loops, hologram assembly, roof + material overview.
+// Kept as one additive block so the approved 06C texts above stay byte-identical.
+const ADD_06E = {
+  de: {
+    hero: { soundOn: "TON AN", soundOff: "TON AUS", videoAlt: "Das Alte Rathaus entsteht als Lichtmodell und wird zum heutigen Bau" },
+    bau: { eyebrow: "03 · BAUSTELLE", h: "Die Bauhütte", p: "Wer baute das Rathaus? Scrollen Sie durch die Arbeit auf der Baustelle.", items: [
+      ["Steinmetze", "In der Bauhütte richteten Steinmetze jeden Werkstein von Hand zu – Quader, Gewände und Maßwerk."],
+      ["Tretradkran", "Menschen im Laufrad trieben den Kran an und hoben schwere Steine auf die Mauer."]] },
+    evo: { t: "Stück für Stück", d: "Scrollen Sie: Fundament, Saalbau, Turm und Dach fügen sich zusammen.", alt: "Modell des Alten Rathauses, das sich Bauteil für Bauteil zusammensetzt" },
+    roof: ["Das Dach", "Ziegeldeckung, Lattung und hölzerner Dachstuhl schließen den Saalbau nach oben ab."],
+    board: ["Materialien", "Naturstein, farbiger Putz, Holz, Dachziegel, Eisen und Glas prägen den Bau."],
+  },
+  en: {
+    hero: { soundOn: "SOUND ON", soundOff: "SOUND OFF", videoAlt: "The Old Town Hall appears as a model of light and becomes today's building" },
+    bau: { eyebrow: "03 · BUILDING SITE", h: "The masons' lodge", p: "Who built the town hall? Scroll through the work on the building site.", items: [
+      ["Stonemasons", "In the masons' lodge every stone was dressed by hand – ashlar blocks, door frames and tracery."],
+      ["Treadwheel crane", "People walking inside the wheel powered the crane and lifted heavy stones onto the walls."]] },
+    evo: { t: "Piece by piece", d: "Scroll: foundation, hall building, tower and roof come together.", alt: "Model of the Old Town Hall assembling part by part" },
+    roof: ["The roof", "Tiles, battens and a timber roof structure close the hall building at the top."],
+    board: ["Materials", "Natural stone, coloured render, wood, roof tiles, iron and glass shape the building."],
+  },
+  es: {
+    hero: { soundOn: "ACTIVAR SONIDO", soundOff: "QUITAR SONIDO", videoAlt: "El Antiguo Ayuntamiento aparece como un modelo de luz y se convierte en el edificio actual" },
+    bau: { eyebrow: "03 · OBRA", h: "El taller de cantería", p: "¿Quién construyó el ayuntamiento? Desplácese por el trabajo en la obra.", items: [
+      ["Canteros", "En el taller, los canteros labraban a mano cada piedra: sillares, jambas y tracerías."],
+      ["Grúa de rueda", "Personas que caminaban dentro de la rueda movían la grúa y subían las piedras pesadas al muro."]] },
+    evo: { t: "Pieza a pieza", d: "Desplácese: cimientos, edificio del salón, torre y tejado se ensamblan.", alt: "Modelo del Antiguo Ayuntamiento que se ensambla pieza a pieza" },
+    roof: ["El tejado", "Tejas, listones y una armadura de madera cierran por arriba el edificio del salón."],
+    board: ["Materiales", "Piedra natural, revoque de color, madera, tejas, hierro y vidrio definen el edificio."],
+  },
+};
+LANGS.forEach((l) => {
+  const a = ADD_06E[l], s = STR[l];
+  Object.assign(s.hero, a.hero); s.bau = a.bau; s.evo = a.evo;
+  s.plan.items.push(a.roof);   // ansicht: layers, elevation, + roof
+  s.mat.items.unshift(a.board); // material: overview first
+});

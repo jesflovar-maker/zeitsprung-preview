@@ -94,7 +94,7 @@
       "menu_order": 4,
       "readiness": { "heute_image": "assets/altes-rathaus/img/ar_heute_v1_720.webp", "card_hero_image": "assets/altes-rathaus/img/ar_heute_v1_720.webp", "card_hero_status": "HEUTE_OWNER_ANCHOR_VISUALIZATION", "monument_heute_ready": true, "monument_card_hero_ready": true, "monument_entry_loader_ready": true, "primary_start_cta_ready": true, "back_to_all_monuments_ready": true, "mobile_action_layout_ready": true },
       "menu_focus": "50% 58%",
-      "menu_timeline": { "src": "altes-rathaus/video/ar_timeline_scrub_v1_540.mp4", "poster": "altes-rathaus/poster/ar_timeline_scrub_v1_poster.webp", "base": "web_root", "duration_s": 58.8, "burned_text": "", "chapters": { "times": [0, 13.75, 31, 37.75, 44.5, 51.5, 55.5], "labels_module": "ALTES_RATHAUS_REICHSSAAL/js/ar-i18n.js?v=20261118e", "labels_key": "tlv" } },
+      "menu_timeline": { "src": "altes-rathaus/video/ar_timeline_scrub_v1_540.mp4", "poster": "altes-rathaus/poster/ar_timeline_scrub_v1_poster.webp", "base": "web_root", "duration_s": 58.8, "burned_text": "", "has_audio": false, "chapters": { "times": [0, 13.75, 31, 37.75, 44.5, 51.5, 55.5], "labels_module": "ALTES_RATHAUS_REICHSSAAL/js/ar-i18n.js?v=20261119b", "labels_key": "tlv" } },
       "name": { "de": "Altes Rathaus · Reichssaal", "en": "Altes Rathaus · Reichssaal", "es": "Altes Rathaus · Reichssaal" },
       "subtitle": { "de": "REICHSSTADT", "en": "IMPERIAL CITY", "es": "CIUDAD IMPERIAL" },
       "description": {

@@ -237,6 +237,7 @@ async function init() {
     video.setAttribute("aria-label", t(l, "hmFilmAria") + " — " + pick(sel.name, l));
     bp.textContent = video.paused ? t(l, "hmPlay") : t(l, "hmPause"); bigPlay.setAttribute("aria-label", t(l, "hmPlay"));
     bm.textContent = video.muted ? t(l, "hmSoundOn") : t(l, "hmSoundOff");
+    bm.hidden = !!(tlm && tlm.has_audio === false); // opt-in per monument: silent timeline film -> no sound toggle
     // burned-in caption disclosure — only when the film's language is not the visitor's
     const bt = tlm ? tlm.burned_text || "" : ""; note.textContent = !bt || bt.split("+").includes(l) ? "" : t(l, bt === "de" ? "hmNoteDe" : "hmNoteDeEn"); note.hidden = !note.textContent;
     soon.textContent = t(l, "hmSoon"); soonText.textContent = t(l, "hmSoonText");

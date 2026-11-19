@@ -132,7 +132,7 @@ html.is-gated main>section:not(#hero),html.is-gated .an__links,html.is-gated .ap
 /* 06 portal transition */
 .aportal__head{padding-block:var(--space) 20px}
 .aportal .adis{background:#000}
-.aportal__zoom{position:absolute;inset:0;transform-origin:50% 62%;will-change:transform}
+.aportal__zoom{position:absolute;inset:0;transform-origin:50% 72%;will-change:transform}
 .aportal__zoom img{object-position:50% 50%}
 .aportal__black{position:absolute;inset:0;background:#000;opacity:0;z-index:2;pointer-events:none}
 .aportal__hall{position:absolute;inset:0;opacity:0;z-index:3}
@@ -241,3 +241,19 @@ html.is-reduced .aportal__zoom{position:relative;inset:auto;transform:none!impor
 html.is-reduced .aportal__black{display:none}
 html.is-reduced .adis .alabel,html.is-reduced .adis__cap{position:static}
 @media (min-width:900px){.art__in{grid-template-columns:1fr}}
+
+/* ---------- 06E: hero film + sound toggle, Reichssaal hotspot detail image, building-site loops ---------- */
+.ahero__film{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 58%;opacity:0;transition:opacity .9s var(--ease);pointer-events:none}
+.ahero__film.is-on{opacity:1}
+.ahero__snd{position:absolute;z-index:4;right:var(--g);top:calc(var(--nav) + var(--st) + 12px);min-height:44px;min-width:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;background:rgba(11,10,9,.58);color:var(--ink);font:500 10.5px/1 var(--mono);letter-spacing:.2em;cursor:pointer;transition:border-color .2s,color .2s}
+.ahero__snd[aria-pressed="true"]{border-color:var(--bronze2);color:var(--bronze)}
+.ahero__snd:hover{border-color:var(--bronze2)}
+html.is-loading .ahero__snd{opacity:0;pointer-events:none}
+@media (min-width:900px){.ahero__snd{right:calc(50% - var(--sh)*9/32 + 12px);top:calc(50% - var(--sh)/2 + var(--nav)/2 + 16px)}}
+.asaal__img{float:left;width:54px;aspect-ratio:9/16;margin:10px 14px 4px 0;border:1px solid var(--line);overflow:hidden;background:#000}
+.asaal__img img{width:100%;height:100%;object-fit:cover}
+.asaal__img[hidden]{display:none}
+.asaal__txt::after{content:"";display:block;clear:both}
+@media (min-width:900px){.asaal__img{float:none;width:120px;margin:16px 0 4px}}
+.aseq__stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .6s var(--ease)}
+.aseq__stage video.is-off{opacity:0}
