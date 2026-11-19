@@ -242,7 +242,7 @@ export const STR = {
       { d: "1859 – 1869", t: "Se culminan las torres", p: "Sobre los muñones medievales llega la culminación: las torres se prolongan en vertical y reciben cuerpos octogonales y las actuales agujas neogóticas (unos 105 m). En 1870–72 siguen los hastiales del transepto y la aguja sobre el crucero (Dachreiter)." },
       { d: "SIGLO XX", t: "Taller de la catedral y restauración", p: "En 1923/24 la Dombauhütte (taller de la catedral) se restablece como taller estatal y trabaja desde entonces sin interrupción. En 1984–1989 siguen una restauración integral y la construcción de la cripta episcopal; en 1985–1988 se restaura la policromía del interior." }
     ],
-    tl: { eb: "CRONOLOGÍA", h: "Casi 600 años de historia constructiva", lead: "La película recorre la época de construcción de la catedral. Elija una fecha para saltar directamente a ese momento.", play: "REPRODUCIR", pause: "PAUSA", soundOn: "ACTIVAR SONIDO", soundOff: "QUITAR SONIDO", videoAria: "Película: cronología de la catedral", note: "Los rótulos dentro de la película están en alemán e inglés." },
+    tl: { eb: "CRONOLOGÍA", h: "Casi 600 años de historia constructiva", lead: "La película recorre la época de construcción de la catedral. Elija una fecha para saltar directamente a ese momento.", play: "REPRODUCIR", pause: "PAUSA", soundOn: "ACTIVAR SONIDO", soundOff: "QUITAR SONIDO", videoAria: "Película: cronología de la catedral", note: "" },
     tlv: [
       { y: "1273", h: "Incendio de la catedral románica", p: "En 1273 un incendio destruye el edificio románico anterior." },
       { y: "HACIA 1275", h: "Inicio de la construcción gótica", p: "La nueva obra comienza en el este. Como primera parte se consagró en 1276, probablemente, el coro sur." },

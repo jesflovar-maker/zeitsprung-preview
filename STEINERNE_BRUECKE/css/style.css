@@ -2754,3 +2754,41 @@ img{ max-width:100%; display:block; }
 .navbar__all::before, .intro-gate__all::before{ content: "←"; margin-right: 8px; color: var(--z-gold); }
 .intro-gate__all{ position: absolute; top: calc(10px + env(safe-area-inset-top, 0px)); left: 14px; z-index: 5; }
 @media (max-width: 759px){ .navbar__all-long{ display: none; } .navbar__all-short{ display: inline; } .navbar__all{ letter-spacing: 0.12em; font-size: 10px; } }
+
+/* ---------------------------------------------------------------- */
+/* 06G.2B — single entry: thin gold readiness line over the hero (no percentage screen) */
+.preloader.preloader--line{inset:auto;left:50%;bottom:calc(12vh + env(safe-area-inset-bottom,0px));width:min(320px,62vw);height:2px;transform:translateX(-50%);background:transparent;gap:0;z-index:260;pointer-events:none}
+.preloader--line .preloader__label,.preloader--line .preloader__pct{display:none}
+.preloader--line .preloader__bar{width:100%}
+/* hero: the old secondary hint line is not part of the standard hero grammar */
+.intro-gate__hint{display:none}
+/* clean timeline: DE/EN/ES chapter overlay (text in HTML, never burned into the video) */
+.mf__frame{position:relative}
+.mf__chapter{position:absolute;left:12px;right:12px;top:12px;z-index:3;margin:0;font:500 11px/1.4 var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--z-gold);text-shadow:0 1px 8px rgba(0,0,0,.85);pointer-events:none}
+.museum__cap-evidence:empty,.kf__cap-evidence:empty{display:none!important}
+/* 06G.2B — Steinerne hero adopts the shared monument hero grammar (Dom / Porta / Rathaus):
+   portrait film stage, copy anchored at the bottom, gold primary START + outline ALL MONUMENTS in one row,
+   compact ♪ top-right. Desktop: centred 9:16 stage with equal top/bottom whitespace. */
+.intro-gate{align-items:flex-end;padding:0!important}
+.intro-gate__scrim{background:linear-gradient(to top,rgba(8,9,11,.96) 0%,rgba(8,9,11,.82) 28%,rgba(8,9,11,.2) 56%,rgba(8,9,11,.35) 100%)}
+.intro-gate__inner{width:100%;max-width:560px;gap:10px;padding:0 clamp(18px,5vw,28px) calc(22px + env(safe-area-inset-bottom,0px))}
+.intro-gate__reveal-group{gap:8px}
+.intro-gate__eyebrow{font-size:11px;letter-spacing:.34em}
+.intro-gate__title{font-family:var(--font-sans);font-weight:700;font-size:clamp(30px,9.4vw,52px);letter-spacing:.02em;line-height:1.04}
+.intro-gate__city{font-size:clamp(13px,3.8vw,17px);letter-spacing:.34em;color:var(--z-ink)}
+.intro-gate__range{margin-bottom:0;font-size:11px}
+.intro-gate__cta{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;width:100%;margin-top:12px}
+.intro-gate__cta>.intro-gate__start,.intro-gate__cta>.intro-gate__all{flex:1 1 150px;max-width:240px;min-height:48px;display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;text-decoration:none;padding:0 14px;text-align:center}
+.intro-gate__cta>.intro-gate__start{background:var(--z-gold);color:#14110c;border:1px solid var(--z-gold)}
+.intro-gate__cta>.intro-gate__start:hover,.intro-gate__cta>.intro-gate__start:focus-visible{background:#e0c08a;letter-spacing:.24em}
+.intro-gate__cta>.intro-gate__all{position:static;border:1px solid rgba(244,239,230,.4);color:var(--z-ink)}
+.intro-gate__cta>.intro-gate__all::before{margin-right:6px}
+.intro-gate>.intro-gate__sound{position:absolute;top:calc(12px + env(safe-area-inset-top,0px));right:clamp(14px,4vw,24px);z-index:3;margin:0;width:44px;height:44px;border-radius:50%;border:1px solid rgba(241,235,225,.24);justify-content:center;padding:0;color:rgba(241,235,225,.62)}
+.intro-gate>.intro-gate__sound.is-on{border-color:rgba(212,175,120,.75);color:#e6cf9f}
+.intro-gate__sound-label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (min-width:900px){
+  .intro-gate{--hg:clamp(18px,3.2svh,36px);--sh:min(calc(100svh - 2 * var(--hg)),1080px)}
+  .intro-gate__media,.intro-gate__scrim{inset:auto;left:50%;top:50%;height:var(--sh);width:calc(var(--sh) * 9 / 16);transform:translate(-50%,-50%);border:1px solid var(--z-line);overflow:hidden}
+  .intro-gate__inner{position:absolute;left:50%;bottom:calc((100svh - var(--sh)) / 2 + 22px);transform:translateX(-50%);width:calc(var(--sh) * 9 / 16);max-width:none;padding-bottom:0}
+  .intro-gate>.intro-gate__sound{right:calc(50% - var(--sh) * 9 / 32 + 12px);top:calc((100svh - var(--sh)) / 2 + 12px)}
+}

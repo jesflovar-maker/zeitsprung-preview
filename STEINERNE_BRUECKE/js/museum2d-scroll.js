@@ -243,6 +243,7 @@ const EVIDENCE_KEYS = [
   "PRESERVED", "PARTIALLY_PRESERVED", "RECONSTRUCTED", "ESTIMATED", "NEEDS_VALIDATION"
 ];
 function evidenceLabel(status, t, lang) {
+  if (arguments[0] === "RECONSTRUCTED") return ""; // 06G.2B: no visible reconstruction insignia (provenance stays in the content map)
   if (!status) return "";
   return EVIDENCE_KEYS.indexOf(status) === -1 ? status : t(lang, `museumEvidence${status}`);
 }

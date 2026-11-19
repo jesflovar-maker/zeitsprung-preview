@@ -2,7 +2,7 @@
 // One runtime, vanilla ES module, no external libraries. Text lives in dom-i18n.js; the DOM is built ONCE and
 // language switches only re-run text refreshers (no rebuild, no new listeners / observers / timers).
 // Media: runtime derivatives only (../assets/dom-st-peter/). One primary video plays at a time; lazy loading.
-import { STR, LANGS, STORAGE_KEY } from "./dom-i18n.js";
+import { STR, LANGS, STORAGE_KEY } from "./dom-i18n.js?v=20261119k";
 import { ztSound } from "../../js/zt-sound.js?v=20261119e"; // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
 
 const A = "../assets/dom-st-peter/";
@@ -34,7 +34,9 @@ const BAU_M = [{ v: "bau_choir" }, { v: "bau_nave" }, { v: "bau_west" }, { v: "b
 const KF_M = ["k03", "k04", "k05", "k06", "k07", "k08", "k10", "k11"].map((s) => ({ s }));
 const GLAS_M = [{ v: "glass_light", ti: 0 }, { s: "glass_choir", ti: 0 }, { v: "glass_painter", ti: 1 }, { v: "glass_lead", ti: 1 }, { s: "glass_macro", ti: 2 }, { s: "stone_quarry", ti: 3 }, { s: "stone_wall", ti: 3 }, { v: "work_carver", ti: 4 }];
 const PEOPLE_M = [{ v: "people_mason" }, { v: "people_bauhuette" }, { v: "work_master" }, { v: "work_truss" }, { v: "work_wheel" }];
-const TLV_T = [0, 7, 19, 27, 37, 45, 65, 73, 79.4]; // seek positions (s) in dsp_timeline_720.mp4
+// 06G.2B: clean master DOM_TIMELINE_MASTER_CLEAN_V1 (DSP_ASSET_218 → dsp_timeline_clean_720.mp4). Cues re-measured by frame alignment
+// against the old cut (constant −6.25 s; the old cut opened with ~6.5 s of title cards; the ending runs ~3 s longer). Labels unchanged.
+const TLV_T = [0, 0.75, 11.75, 20.5, 30.75, 38.75, 58.5, 66.5, 82.5]; // seek positions (s) in dsp_timeline_clean_720.mp4
 const ROUTE_M = [{ v: "tour_nw" }, { v: "tour_ws" }, { v: "tour_se" }, { s: ["int_portal", "int_nave", "int_choir"] }, { v: "arch_pillars" }];
 const NAV = ["rundum", "holo", "architektur", "bauabfolge", "zeitreise", "zeitleiste", "glas", "menschen", "unten", "heute"];
 const GUIDE_GO = ["zeitreise", "zeitleiste", "bauabfolge", "architektur", "bauabfolge", "glas", "glas", "menschen", "unten", "heute"]; // topic -> chapter
@@ -65,7 +67,7 @@ document.addEventListener("visibilitychange", () => { VM.pause = document.hidden
 function mkVideo(name, opt = {}) { const v = el("video"); v.dataset.src = vid(name); v.poster = poster(name); v.setAttribute("aria-hidden", "true"); VM.add(v, opt); return v; }
 function mkImg(name, alt) { const i = el("img"); i.src = img(name, 720); i.srcset = srcset(name); i.sizes = "(min-width:1100px) 460px, 92vw"; i.alt = alt || ""; i.decoding = "async"; i.loading = "lazy"; return i; }
 const stage = (extra = "") => el("div", "stage " + extra);
-const tag = () => { const s = el("span", "dvis stage__tag"); s.textContent = T().ui.vis; return s; };
+const tag = () => document.createComment("vis"); // 06G.2B: no visible "Visualisierung" badges (provenance stays in the manifest)
 onLang(() => document.querySelectorAll(".stage__tag").forEach((s) => { s.textContent = T().ui.vis; }));
 
 /* ---------- reveal ---------- */
@@ -168,7 +170,7 @@ function buildStory(sel, key, stepsKey, MEDIA, opt = {}) {
 function buildTimeline() {
   const s = $("#zeitleiste"); const w = el("div", "dwrap"); w.append(head("tl"));
   const g = el("div", "dtlv rv"); const col = el("div", "dtlv__media"); const st = stage("dtlv__stage");
-  const v = el("video"); v.dataset.src = vid("timeline"); v.poster = poster("timeline"); bind(v, (t) => t.tl.videoAria, "aria-label"); VM.add(v, { loop: false, role: "timeline" }); ztSound.add(v);
+  const v = el("video"); v.dataset.src = vid("timeline_clean"); v.poster = poster("timeline_clean"); bind(v, (t) => t.tl.videoAria, "aria-label"); VM.add(v, { loop: false, role: "timeline" }); ztSound.add(v);
   const rec = VM.list.get(v); rec.hold = false;
   const bar = el("div", "dtlv__bar"); bar.innerHTML = "<span></span>"; st.append(v, bar, tag());
   const ctl = el("div", "dtlv__ctl"); const bp = el("button", "dbtn", { type: "button" }); const bm = el("button", "dbtn", { type: "button", "aria-pressed": "false" }); const bt = el("button", "dbtn", { type: "button", "data-trailer": "" }); bind(bt, (t) => t.ui.trailerShort);
@@ -225,7 +227,7 @@ function buildNow() {
 function buildEnd() {
   const s = $("#ende"); const br = el("div", "dend__brand rv"); br.textContent = "ZEITSPRUNG"; const h = bind(el("h2", "dend__t rv"), (t) => t.end.h); const p = bind(el("p", "dend__p rv"), (t) => t.end.p);
   const cta = el("div", "dend__cta rv"); const a1 = bind(el("a", "dbtn dbtn--primary", { href: "../index.html" }), (t) => t.end.overview); const a2 = bind(el("a", "dbtn", { href: "../STEINERNE_BRUECKE/index.html" }), (t) => t.end.sb); const tr = bind(el("button", "dbtn", { type: "button", "data-trailer": "" }), (t) => t.ui.trailer); cta.append(a1, a2, tr);
-  const note = bind(el("p", "dend__note"), (t) => t.end.note); s.append(br, h, p, cta, note); reveal(s);
+  s.append(br, h, p, cta); reveal(s); // 06G.2B: methodology note removed from the page (global footer later)
 }
 
 /* ---------- trailer (kept, but only inside the experience) ---------- */
@@ -233,7 +235,7 @@ function buildTrailer() {
   const dlg = $("#trailerDlg"), box = $("#trailerStage"); bind(dlg, (t) => t.ui.trailerAria, "aria-label"); bind($("#trailerClose"), (t) => t.ui.close, "aria-label");
   document.addEventListener("click", (ev) => {
     if (!ev.target.closest("[data-trailer]") || dlg.open) return;
-    box.replaceChildren(); const t = el("video"); t.controls = true; t.playsInline = true; t.preload = "metadata"; t.poster = poster("trailer"); t.src = vid("trailer"); box.append(t);
+    box.replaceChildren(); const t = el("video"); t.controls = false; t.playsInline = true; t.preload = "auto"; t.poster = poster("trailer_clean"); t.src = vid("trailer_clean"); ztSound.add(t); t.addEventListener("click", () => { if (t.paused) { const q = t.play(); if (q && q.catch) q.catch(() => {}); } else t.pause(); }); box.append(t); // 06G.2B: clean 15 s master, no native controls, sound via ♪
     trailerOpen = true; VM.pause = true; VM.tick(); dlg.showModal(); const p = t.play(); if (p && p.catch) p.catch(() => {});
   });
   const close = () => { try { dlg.close(); } catch (e) {} };

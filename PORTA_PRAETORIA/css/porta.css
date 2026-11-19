@@ -223,3 +223,54 @@ html.is-reduced .pbau__lite{display:grid}
 .pbau__lite img{width:100%;aspect-ratio:9/16;object-fit:cover;border:1px solid var(--z-line)}
 /* 06G: compact ♪ beside DE | EN | ES — keep the nav on one line on the smallest phones */
 @media (max-width:380px){.pn{gap:8px}.pn__right{gap:6px}.pn__right .zt-snd{margin-left:0}.pn__brand{letter-spacing:.16em}.pn__lang button{min-width:36px;padding:0 4px}}
+
+/* ======================================================================
+   06G.2B — Porta vertical museum language (shared grammar with Dom / Rathaus)
+   ====================================================================== */
+/* hero film over the anchor (Type A); hero centring like Rathaus 06G.1 */
+.phero__film{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 42%;opacity:0;transition:opacity .9s var(--ease);pointer-events:none}
+.phero__film.is-on{opacity:1}
+@media (min-width:900px){
+  .phero{--hg:clamp(18px,3.2svh,36px);--sh:min(calc(100svh - var(--nav-h) - var(--safe-top) - 2 * var(--hg)),1080px);padding-top:calc(var(--nav-h) + var(--safe-top))}
+  .phero__copy{bottom:calc((100% - var(--nav-h) - var(--safe-top) - var(--sh)) / 2 + 22px)}
+}
+/* context: facts as a vertical editorial list */
+.pctx .pfacts{grid-template-columns:1fr;max-width:560px;background:none;border:0;gap:0}
+.pctx .pfacts>div{background:none;border-top:1px solid var(--z-line);padding:18px 0;display:grid;grid-template-columns:minmax(120px,38%) 1fr;gap:16px;align-items:baseline}
+.pctx .pfacts>div:last-child{border-bottom:1px solid var(--z-line)}
+.pctx .pfacts b{font-size:clamp(22px,6vw,32px)}
+.pctx .pfacts span{margin-top:0}
+/* vertical sections: text → portrait media → facts, one centred column */
+.pvert{padding-block:var(--section-space)}
+.pvert__in{display:flex;flex-direction:column;align-items:center;gap:clamp(22px,4vw,36px)}
+.pvert__in>.pr:first-child{width:100%;max-width:640px}
+.pvert__media{width:min(100%,calc(min(78svh,860px)*9/16));margin-inline:auto}
+.pvert__media.pr{transform:translateY(24px) scale(.97)}
+.pvert__media.pr.is-in{transform:none}
+.pvert .pfacts{width:100%;max-width:640px}
+.pvert .pnote{max-width:640px;width:100%}
+.pstage video{transition:opacity .45s var(--ease)}
+.pstage video.is-fade{opacity:.15}
+/* plan: single centred column */
+.pplan__grid{grid-template-columns:1fr!important;max-width:640px;margin-inline:auto}
+/* vertical sequence (workers, gallery) */
+.pvseq .psticky{padding-top:calc(var(--nav-h) + 8px)}
+.pvseq__wrap{display:grid;gap:14px;width:100%;max-width:var(--content-max);padding-inline:var(--gutter);justify-items:center;align-items:center}
+.pvseq__stage{position:relative;height:min(calc(100svh - 190px),900px);aspect-ratio:9/16;max-width:100%;background:#000;border:1px solid var(--z-line);overflow:hidden}
+.pvseq__stage img,.pvseq__stage video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .6s var(--ease),transform 1.2s var(--ease)}
+.pvseq__stage .is-off{opacity:0;transform:scale(1.03)}
+.pvseq__bar{position:absolute;left:0;right:0;bottom:0;height:2px;background:rgba(244,239,230,.12);z-index:3}
+.pvseq__bar span{position:absolute;inset:0;background:var(--z-gold);transform-origin:0 50%;transform:scaleX(0)}
+.pvseq__txt{width:100%;max-width:520px;text-align:center}
+.pvseq__k{font:500 11px/1 var(--font-mono);letter-spacing:.3em;color:var(--z-gold)}
+.pvseq__t{font:600 clamp(18px,4.8vw,24px)/1.2 var(--font-sans);margin-top:8px}
+.pvseq__txt.is-new{animation:pvseqIn .5s var(--ease)}
+@keyframes pvseqIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+@media (min-width:900px){.pvseq__wrap{grid-template-columns:auto minmax(280px,420px);gap:clamp(40px,6vw,90px);justify-content:center}.pvseq__stage{height:min(calc(100svh - 120px),960px)}.pvseq__txt{text-align:left}}
+.pvseq__static{display:grid;gap:30px;padding-block:24px}
+.pvseq__fig .pstage{width:min(100%,380px);margin-inline:auto}
+.pvseq__fig figcaption{text-align:center;margin-top:10px}
+.pgal{padding-top:var(--section-space)}
+.pgal__head{padding-bottom:12px}
+.ploops .pwrap.pr:first-child{padding-bottom:12px}
+@media (prefers-reduced-motion:reduce){.pvert__media.pr{transform:none}.pvseq__txt.is-new{animation:none}}

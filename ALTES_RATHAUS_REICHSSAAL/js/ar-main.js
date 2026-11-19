@@ -149,7 +149,7 @@ function heroFilm(pageReady) {
    >= 55 % visible; paused off screen; sound only via the compact ♪; no native controls; at the end it fades back to HEUTE and
    restarts on the next entry. Reduced motion = HEUTE image only. */
 function endTrailer() {
-  const SRC = `${A}video/ar_trailer_v1_720.mp4`;
+  const SRC = `${A}video/ar_trailer_v2_720.mp4`; // 06G.2B: clean 15 s master AR_ASSET_223 (AR_221 34 s trailer kept as reference: ar_trailer_v1_720.mp4)
   const st = el("div", "astage aend__film"); st.append(pic("ar_heute_v1", (t) => t.hero.alt));
   if (reduced) return st;
   const v = el("video", "aend__vid", { playsinline: "", preload: "none", poster: img("ar_heute_v1"), disablepictureinpicture: "", tabindex: "-1" }); bind(v, (t) => t.end.trailerAlt, "aria-label");
@@ -231,7 +231,7 @@ const TL_CUE = [0, 13.75, 31.0, 37.75, 44.5, 51.5, 55.5]; // seconds in the clea
 function buildTimeline() {
   const s = $("#zeit"); const w = el("div", "awrap aseq__head ar"); head(w, "time"); w.append(lead("time", "p")); s.append(w);
   // 06F: v2 = same video stream (frame-identical) + synchronized soundtrack from AR_ASSET_173 for the INDEX stage; muted here (scrub).
-  const POSTER = `${A}poster/ar_timeline_scrub_v1_poster.webp`, SRC = `${A}video/ar_timeline_scrub_v2_540.mp4`;
+  const POSTER = `${A}poster/ar_timeline_scrub_v1_poster.webp`, SRC = `${A}video/ar_timeline_scrub_v3_540.mp4`; // 06G.2B: new clean master AR_ASSET_224 (61.83 s, own audio; frame-identical to v2 for 0–58.79 s → cues unchanged)
   const ch = () => T().time.ch; const N = TL_CUE.length;
   if (reduced) {
     const list = el("div", "awrap aseq__static"); const fig = el("figure", "aseq__fig"); const st = el("div", "astage");
@@ -246,7 +246,7 @@ function buildTimeline() {
   const bar = el("div", "aseq__bar", { "aria-hidden": "true" }); const fill = el("span"); bar.append(fill); stage.append(bar);
   const txt = el("div", "aseq__txt", { "aria-live": "polite" }); const k = el("p", "aseq__k"); const y = el("p", "aseq__y"); const t = el("h3", "aseq__t"); const d = el("p", "aseq__d"); txt.append(k, y, t, d);
   wrap.append(stage, txt); st.append(wrap); tr.append(st); s.append(tr);
-  const DUR = 58.79; const ease = (p) => clamp((p - 0.03) / 0.94, 0, 1);
+  const DUR = 61.83; const ease = (p) => clamp((p - 0.03) / 0.94, 0, 1);
   const getT = scrubVideo(tr, v, SRC, ease);
   let cur = -1;
   const paint = () => { const it = ch()[cur]; k.textContent = String(cur + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0"); y.textContent = it[0]; t.textContent = it[1]; d.textContent = it[2]; tk.forEach((li, j) => li.classList.toggle("is-on", j <= cur)); };

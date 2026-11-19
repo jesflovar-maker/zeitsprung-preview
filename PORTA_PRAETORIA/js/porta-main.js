@@ -1,7 +1,7 @@
 // PORTA PRAETORIA · CASTRA REGINA — PUBLIC V1: one vanilla ES module, DE / EN / ES, no external libraries.
 // The DOM is built ONCE; a language switch only re-runs text refreshers (no rebuild, no new listeners / observers / timers).
 // Media: runtime derivatives only (../assets/porta-praetoria/). One video plays at a time; every video loads lazily (preload none + poster).
-import { STR, LANGS, STORAGE_KEY } from "./porta-i18n.js?v=20261114b";
+import { STR, LANGS, STORAGE_KEY } from "./porta-i18n.js?v=20261119k";
 import { ztSound } from "../../js/zt-sound.js?v=20261119e"; // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
 
 const A = "../assets/porta-praetoria/";
@@ -66,7 +66,8 @@ function loop(name, auto = true, cls = "pstage") {
   VM.register(v, "loop", auto);
   return { st, v };
 }
-const tag = (key) => { const p = el("p", "plabel"); bind(p, (t) => t[key]); return p; };
+// 06G.2B: standalone methodology badges are no longer rendered (provenance stays in the media manifest).
+const tag = () => document.createComment("badge-removed");
 
 /* ---------- 00 header + nav ---------- */
 const NAV = ["ctx", "holo", "durchfahrt", "turm", "y179", "castra", "bau", "film"];
@@ -92,6 +93,7 @@ function buildHero() {
   bind($("#heroEyebrow"), (t) => t.hero.eyebrow); bind($("#heroTitle"), (t) => t.hero.title); bind($("#heroSub"), (t) => t.hero.sub); bind($("#heroRange"), (t) => t.hero.range);
   const b = bind($("#startBtn"), (t) => t.hero.start); bind($("#heroAll"), (t) => t.hero.all);
   const go = () => $("#ctx").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+  if (!reduced) heroFilm();
   // MONUMENT ENTRY STANDARD: START -> thin gold loading line while the hero stays visible -> critical first-view readiness -> release.
   // Critical = page load (CSS/JS), fonts, hero image decode. Minimum 450 ms, hard timeout 5 s, no percentages.
   let entering = false;
@@ -110,6 +112,51 @@ function buildHero() {
     const finish = () => { if (done) return; done = true; setTimeout(release, reduced ? 0 : Math.max(0, 450 - (performance.now() - t0))); };
     Promise.all([heroReady, pageReady, fontsReady]).then(finish, finish); setTimeout(finish, 5000);
   });
+}
+
+/* ---------- 06G.2B hero film: PP_HERO_ENTRY_V1 → pp_hero_entry_720.mp4 (Type A) ----------
+   The anchor image stays as base / fallback. Loads after window load, starts muted, plays ONCE and holds its last frame
+   (= poster). Sound only via the compact ♪ (switching it on while visible replays with sound). Paused off screen. */
+function heroFilm() {
+  const stage = $("#heroStage");
+  const v = el("video", "phero__film", { muted: "", playsinline: "", preload: "none", poster: `${A}poster/pp_hero_entry_poster.webp`, disablepictureinpicture: "", tabindex: "-1" }); v.muted = true; bind(v, (t) => t.hero.film, "aria-label");
+  stage.append(v); let vis = true;
+  const play = () => { const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+  ztSound.add(v, { onEnable: () => { if (vis && v.getAttribute("src") && (v.ended || v.paused)) { if (v.ended) v.currentTime = 0; play(); } } });
+  v.addEventListener("playing", () => v.classList.add("is-on")); v.addEventListener("error", () => v.remove());
+  new IntersectionObserver((es) => es.forEach((e) => { vis = e.isIntersecting; if (!vis && !v.paused) v.pause(); else if (vis && v.paused && !v.ended && v.currentTime > 0) play(); }), { threshold: 0.25 }).observe(stage);
+  const start = () => setTimeout(() => { if (!vis) return; v.src = `${A}video/pp_hero_entry_720.mp4`; play(); }, 250);
+  if (document.readyState === "complete") start(); else addEventListener("load", start, { once: true });
+}
+
+/* ---------- 06G.2B vertical scroll sequence (one sticky 9:16 stage, one item per scroll step) ----------
+   items: [{ img } | { video, poster }], label(i) → title text. Videos: muted loop, only the active one plays while on screen. */
+function vseq(host, items, label, vh = 60) {
+  const N = items.length;
+  if (reduced) {
+    const list = el("div", "pwrap pvseq__static");
+    items.forEach((it, i) => { const f = el("figure", "pvseq__fig pr"); const st = el("div", "pstage"); const im = el("img", "", { src: it.img || it.poster, loading: "lazy", decoding: "async" }); bind(im, () => label(i) || "", "alt"); st.append(im); const c = el("figcaption", "pvseq__t"); bind(c, () => label(i) || ""); f.append(st, c); list.append(f); });
+    host.append(list); return;
+  }
+  const tr = el("div", "ptrack pvseq"); tr.style.height = (N * vh + 40) + "svh";
+  const sticky = el("div", "psticky"); const wrap = el("div", "pvseq__wrap"); const st = el("div", "pvseq__stage");
+  const els = items.map((it, i) => {
+    let m;
+    if (it.video) { m = el("video", "", { playsinline: "", preload: "none", poster: it.poster, disablepictureinpicture: "", tabindex: "-1" }); m.muted = true; m.setAttribute("muted", ""); m.loop = true; m.dataset.src = it.video; }
+    else { m = el("img", "", { src: it.img, loading: "lazy", decoding: "async" }); if (it.srcset) { m.srcset = it.srcset; m.sizes = "(max-width:900px) 92vw, 540px"; } }
+    bind(m, () => label(i) || "", it.video ? "aria-label" : "alt"); if (i) m.classList.add("is-off"); st.append(m); return m;
+  });
+  const bar = el("div", "pvseq__bar", { "aria-hidden": "true" }); const fill = el("span"); bar.append(fill); st.append(bar);
+  const tx = el("div", "pvseq__txt", { "aria-live": "polite" }); const k = el("p", "pvseq__k"); const t = el("h3", "pvseq__t"); tx.append(k, t);
+  wrap.append(st, tx); sticky.append(wrap); tr.append(sticky); host.append(tr);
+  let cur = -1; const vids = els.filter((m) => m.tagName === "VIDEO");
+  const paint = () => { k.textContent = String(cur + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0"); t.textContent = label(cur) || ""; };
+  const onScreen = () => { const r = tr.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; };
+  const syncV = () => { const live = onScreen(); vids.forEach((v) => { const on = live && els[cur] === v; if (on && v.paused) { if (!v.getAttribute("src")) v.src = v.dataset.src; const p = v.play(); if (p && p.catch) p.catch(() => {}); } else if (!on && !v.paused) v.pause(); }); };
+  const show = (i) => { if (i === cur) return; cur = i; els.forEach((m, j) => m.classList.toggle("is-off", j !== i)); tx.classList.remove("is-new"); void tx.offsetWidth; tx.classList.add("is-new"); paint(); };
+  LF.push(() => { if (cur >= 0) paint(); });
+  show(0);
+  SC.push(() => { const r = tr.getBoundingClientRect(); if (r.bottom < -innerHeight || r.top > innerHeight * 2) { if (vids.length) syncV(); return; } const p = prog(tr); fill.style.transform = "scaleX(" + p + ")"; show(clamp(Math.floor(p * N), 0, N - 1)); if (vids.length) syncV(); });
 }
 
 /* ---------- section helpers ---------- */
@@ -137,7 +184,7 @@ function buildHolo() {
   const tr = el("div", "ptrack"); tr.style.height = reduced ? "auto" : "240svh";
   const sticky = el("div", "psticky"); const d = el("div", "pdis");
   const a = el("img", "", { src: img("pp_anchor"), loading: "lazy", decoding: "async" }); const h = el("img", "pdis__holo", { src: img("pp_holo_front"), loading: "lazy", decoding: "async" });
-  bind(a, (t) => t.hero.alt, "alt"); bind(h, (t) => t.holo.cap, "alt"); const lb = el("p", "plabel"); bind(lb, (t) => t.recAi); d.append(a, h, lb); sticky.append(d); tr.append(sticky); s.append(tr);
+  bind(a, (t) => t.hero.alt, "alt"); bind(h, (t) => t.holo.cap, "alt"); d.append(a, h); sticky.append(d); tr.append(sticky); s.append(tr);
   if (!reduced) SC.push(() => { const p = prog(tr); const k = clamp((p - 0.25) / 0.5, 0, 1); const e = k * k * (3 - 2 * k); h.style.opacity = e; a.style.opacity = 1 - e * 0.85; d.style.transform = "scale(" + (1 + p * 0.03) + ")"; });
   const cp = el("p", "pcap pwrap"); bind(cp, (t) => t.holo.cap); s.append(cp);
   const c = el("div", "pwrap pholo__clip"); const lp = loop("holo_to_real", true); lp.st.append(el("span")); const l2 = tag("rec"); lp.st.append(l2); c.append(lp.st); const ct = el("p", "pcap"); ct.style.textAlign = "center"; bind(ct, (t) => t.holo.clip); c.append(ct); s.append(c);
@@ -145,23 +192,34 @@ function buildHolo() {
 
 /* ---------- 04 double passage / 05 tower + wall ---------- */
 function buildPass() {
-  const s = $("#durchfahrt"); const w = el("div", "pwrap psplit__in");
-  const st = stageImg("pp_double_303", (t) => t.pass.alt, "pstage pstage--hologram"); st.append(tag("rec"));
-  const tx = el("div", "pr"); head(tx, "pass"); tx.append(lead("pass", "p1"), lead("pass", "p2"), facts("pass", [1, 2, 3])); w.append(st, tx); s.append(w);
+  // 06G.2B: vertical museum order — text → portrait media (scroll reveal) → facts
+  const s = $("#durchfahrt"); s.classList.add("pvert"); const w = el("div", "pwrap pvert__in");
+  const tx = el("div", "pr"); head(tx, "pass"); tx.append(lead("pass", "p1"), lead("pass", "p2"));
+  const st = stageImg("pp_double_303", (t) => t.pass.alt, "pstage pstage--hologram pvert__media pr");
+  const f = facts("pass", [1, 2, 3]); f.classList.add("pr"); w.append(tx, st, f); s.append(w);
 }
 function buildTower() {
-  const s = $("#turm"); s.classList.add("psplit--rev"); const w = el("div", "pwrap psplit__in");
-  const st = stageImg("pp_holo_302", (t) => t.tow.alt, "pstage pstage--hologram pstage--pt"); st.append(tag("rec"));
-  const tx = el("div", "pr"); head(tx, "tow"); tx.append(lead("tow", "p1"), lead("tow", "p2")); const g = facts("tow", [1, 2]); g.style.gridTemplateColumns = "repeat(2,1fr)"; tx.append(g); const n = el("p", "pnote"); bind(n, (t) => t.tow.p3); tx.append(n); w.append(st, tx); s.append(w);
+  const s = $("#turm"); s.classList.add("pvert"); const w = el("div", "pwrap pvert__in");
+  const tx = el("div", "pr"); head(tx, "tow"); tx.append(lead("tow", "p1"), lead("tow", "p2"));
+  const st = stageImg("pp_holo_302", (t) => t.tow.alt, "pstage pstage--hologram pstage--pt pvert__media pr");
+  const g = facts("tow", [1, 2]); g.classList.add("pr"); g.style.gridTemplateColumns = "repeat(2,1fr)"; const n = el("p", "pnote pr"); bind(n, (t) => t.tow.p3); w.append(tx, st, g, n); s.append(w);
 }
 
 /* ---------- 06 AD 179 ---------- */
 function buildY179() {
-  const s = $("#y179"); const w = el("div", "pwrap psplit__in");
+  // 06G.2B: PP_RECONSTRUCTION_V2 (PP_ASSET_155) replaces the 5 s castra_aerial loop. Not seamless → play once, hold the last
+  // frame ~2.5 s, soft fade, restart; only while visible; muted; no controls. Reduced motion: poster only.
+  const s = $("#y179"); s.classList.add("pvert"); const w = el("div", "pwrap pvert__in");
   const tx = el("div", "pr"); head(tx, "y179"); tx.append(lead("y179", "p1"), lead("y179", "p2"));
-  const lp = loop("castra_aerial", true); lp.st.append(tag("recAi")); const cp = el("p", "pcap"); bind(cp, (t) => t.y179.clip);
-  const col = el("div"); col.append(lp.st, cp); col.style.cssText = "width:min(100%,380px);margin-inline:auto"; w.append(tx, col); s.append(w);
-  w.style.cssText = "display:grid;gap:28px;align-items:center"; if (innerWidth >= 900) w.style.gridTemplateColumns = "1fr 1fr";
+  const st = el("div", "pstage pvert__media pr"); const cp = el("p", "pcap pr"); cp.style.textAlign = "center"; bind(cp, (t) => t.y179.clip);
+  const v = el("video", "", { playsinline: "", preload: "none", poster: `${A}poster/pp_reconstruction_v2_poster.webp`, disablepictureinpicture: "", tabindex: "-1" }); v.muted = true; v.setAttribute("muted", ""); bind(v, (t) => t.y179.clip, "aria-label"); st.append(v);
+  w.append(tx, st, cp); s.append(w);
+  if (!reduced) {
+    let vis = false, hold = 0;
+    const play = () => { if (!v.getAttribute("src")) v.src = `${A}video/pp_reconstruction_v2_540.mp4`; const p = v.play(); if (p && p.catch) p.catch(() => {}); };
+    v.addEventListener("ended", () => { clearTimeout(hold); hold = setTimeout(() => { if (!vis) return; v.classList.add("is-fade"); setTimeout(() => { try { v.currentTime = 0; } catch (e) {} v.classList.remove("is-fade"); if (vis) play(); }, 450); }, 2500); });
+    new IntersectionObserver((es) => es.forEach((e) => { vis = e.isIntersecting && e.intersectionRatio >= 0.5; if (vis) { if (v.paused && !v.ended) play(); } else { clearTimeout(hold); if (!v.paused) v.pause(); } }), { threshold: [0, 0.5] }).observe(st);
+  }
 }
 
 /* ---------- 07 Castra Regina reveal (zoom out) ---------- */
@@ -169,7 +227,7 @@ function buildCastra() {
   const s = $("#castra"); const hd = el("div", "pwrap pr"); head(hd, "cas"); hd.append(lead("cas", "p")); const big = el("p", "pcastra__big"); bind(big, (t) => t.cas.big); const bs = el("p", "pcastra__bigs"); bind(bs, (t) => t.cas.bigs); hd.append(big, bs); s.append(hd);
   const tr = el("div", "ptrack"); tr.style.height = reduced ? "auto" : "260svh"; tr.style.marginTop = "28px"; const sticky = el("div", "psticky"); const d = el("div", "pdis");
   const z = el("div", "pcastra__zoom"); z.style.cssText = "position:absolute;inset:0"; const i = el("img", "", { src: img("pp_castra_301", 720), srcset: `${img("pp_castra_301", 720)} 720w, ${img("pp_castra_301", 1080)} 1080w`, sizes: "(max-width:900px) 92vw, 720px", loading: "lazy", decoding: "async" }); i.style.objectFit = "contain"; bind(i, (t) => t.cas.alt, "alt"); z.append(i); d.append(z);
-  const lb = el("p", "plabel"); bind(lb, (t) => t.recSch); d.append(lb); const cap = el("div", "pcastra__cap"); const ct = el("p", "pcastra__big"); ct.style.margin = "0"; bind(ct, (t) => t.cas.big); cap.append(ct); d.append(cap);
+  const cap = el("div", "pcastra__cap"); const ct = el("p", "pcastra__big"); ct.style.margin = "0"; bind(ct, (t) => t.cas.big); cap.append(ct); d.append(cap);
   sticky.append(d); tr.append(sticky); s.append(tr);
   if (!reduced) { d.style.aspectRatio = "1199/1312"; SC.push(() => { const p = prog(tr); const e = clamp(p / 0.75, 0, 1); const k = 1 - Math.pow(1 - e, 3); z.style.transform = "scale(" + (2.9 - 1.9 * k) + ")"; cap.classList.toggle("is-on", p > 0.7); }); }
   else cap.classList.add("is-on");
@@ -206,7 +264,7 @@ function buildPlan() {
   sv("line", { x1: 132, y1: 196, x2: 228, y2: 196, stroke: "rgba(244,239,230,.5)" }, g2); const l2 = sv("text", { x: 180, y: 212, "text-anchor": "middle", "font-size": 8.5 }, g2); bind(l2, (t) => t.plan.gh);
   const l3 = sv("text", { x: 153, y: 232, "text-anchor": "middle", "font-size": 8 }, g2); bind(l3, (t) => t.plan.ps);
   const l4 = sv("text", { x: 8, y: 138, "font-size": 8.5 }, g2); bind(l4, (t) => t.plan.wl);
-  fig2.append(g2); grid.append(fig, fig2); w.append(grid); const cp = el("p", "pcap"); bind(cp, (t) => t.recSch); w.append(cp); s.append(w);
+  fig2.append(g2); grid.append(fig, fig2); w.append(grid); s.append(w); // 06G.2B: "schematic reconstruction" badge removed (the lead already says "schematic sketch")
 }
 
 /* ---------- 09 construction story K02 -> K05 (crossfade only; no interpolated architecture) ---------- */
@@ -215,7 +273,6 @@ function buildBau() {
   const s = $("#bau"); const hd = el("div", "pwrap pbau__head pr"); head(hd, "bau"); s.append(hd);
   const N = BAU.length; const tr = el("div", "ptrack"); tr.style.height = reduced ? "auto" : (N * 100) + "svh";
   const sticky = el("div", "psticky"); const wrap = el("div", "pbau__wrap"); const st = el("div", "pbau__stage"); const imgs = BAU.map(([n], i) => { const im = el("img", i === 0 ? "is-on" : "", { src: img(n), loading: "lazy", decoding: "async" }); st.append(im); return im; });
-  const lb = tag("recAi"); st.append(lb);
   const mv = el("video", "", { playsinline: "", preload: "none", "aria-hidden": "true" }); mv.muted = true; mv.setAttribute("muted", ""); mv.loop = true; st.append(mv); VM.register(mv, "loop", false);
   const tx = el("div", "pbau__txt"); const k = el("p", "pbau__k"); const t = el("h3", "pbau__t"); const p = el("p", "pbau__p"); const ctl = el("div", "pbau__ctl");
   const mb = el("button", "pbtn pbtn--sm", { type: "button" }); const dots = el("div", "pdots"); const db = BAU.map((_, i) => { const b = el("button", "", { type: "button" }); b.append(el("i")); bind(b, (T_) => T_.bau.step + " " + (i + 1) + " / " + N + " — " + T_.bau.states[i].t, "aria-label"); dots.append(b); return b; });
@@ -237,7 +294,7 @@ function buildBau() {
 function player(host, name, labelKey, noteKey) {
   const w = el("div", "pplayer"); const st = el("div", "pplayer__stage", { tabindex: "0", role: "group" });
   const v = el("video", "", { playsinline: "", preload: "none" }); v.muted = true; v.setAttribute("muted", ""); v.poster = vposter(name); v.dataset.src = vsrc(name); v.setAttribute("aria-label", name);
-  st.append(v, tag(labelKey)); const ctl = el("div", "pplayer__ctl"); const pb = el("button", "pbtn pbtn--sm", { type: "button" }); const sb = el("button", "pbtn pbtn--sm", { type: "button" }); const tm = el("span", "pplayer__time"); ctl.append(pb, tm); ztSound.add(v); // 06G: sb (large sound button) removed from the panel
+  st.append(v); const ctl = el("div", "pplayer__ctl"); const pb = el("button", "pbtn pbtn--sm", { type: "button" }); const sb = el("button", "pbtn pbtn--sm", { type: "button" }); const tm = el("span", "pplayer__time"); ctl.append(pb, tm); ztSound.add(v); // 06G: sb (large sound button) removed from the panel
   const rg = el("input", "", { type: "range", min: "0", max: "1000", value: "0", step: "1" }); bind(rg, (t) => t.tl.seek, "aria-label");
   const kb = el("p", "pplayer__kbd"); bind(kb, (t) => t.tl.kbd); w.append(st, ctl, rg, kb); if (noteKey) { const n = el("p", "pnote"); bind(n, (t) => t.tl.note); w.append(n); } host.append(w);
   let dur = 0, drag = false, pend = null;
@@ -262,11 +319,17 @@ function buildFilm() {
 /* ---------- 11 loops strip + master film ---------- */
 function buildLoops() {
   const s = $("#alltag"); const w = el("div", "pwrap pr"); head(w, "loops"); w.append(lead("loops", "p")); s.append(w);
-  const strip = el("div", "pstrip", { tabindex: "0", role: "group" }); bind(strip, (t) => t.loops.more, "aria-label");
-  STR.de.loops.items.forEach(([name], i) => { const c = el("div", "pcard"); const lp = loop(name, true); lp.st.append(tag("recAi")); const ti = el("p", "pcard__t"); bind(ti, (t) => t.loops.items[i][1]); c.append(lp.st, ti); strip.append(c); });
-  s.append(strip);
+  // 06G.2B: vertical worker sequence (no horizontal scroll-snap strip); the active loop plays muted only while on screen.
+  vseq(s, STR.de.loops.items.map(([name]) => ({ video: vsrc(name), poster: vposter(name) })), (i) => T().loops.items[i] ? T().loops.items[i][1] : "", 50);
   const m = el("div", "pwrap ploops__master pr"); const h3 = el("h3", "ph"); h3.style.fontSize = "clamp(20px,5vw,28px)"; bind(h3, (t) => t.loops.master); const mp = el("p", "plead"); bind(mp, (t) => t.loops.masterP); m.append(h3, mp); const host = el("div"); m.append(host); s.append(m);
   player(host, "master", "recAi", false);
+}
+
+/* ---------- 06G.2B owner gallery: the 5 approved ZEITSPRUNG_Porta_Praetoria_01…05 images (PP_ASSET 06G.2A set), vertical ---------- */
+function buildGallery() {
+  const s = $("#galerie"); if (!s) return; const w = el("div", "pwrap pr pgal__head"); head(w, "gal"); w.append(lead("gal", "p")); s.append(w);
+  const items = [1, 2, 3, 4, 5].map((n) => { const b = `pp_gallery_${String(n).padStart(2, "0")}`; return { img: img(b), srcset: `${img(b)} 720w, ${img(b, 1080)} 1080w` }; });
+  vseq(s, items, (i) => T().gal.h + " · " + String(i + 1).padStart(2, "0"), 55);
 }
 
 /* ---------- 12 return + sources ---------- */
@@ -274,9 +337,9 @@ function buildEnd() {
   const s = $("#heute"); const w = el("div", "pwrap pr"); head(w, "end"); w.append(lead("end", "p"));
   const st = el("div", "pstage"); const i = el("img", "", { src: img("pp_heute"), loading: "lazy", decoding: "async" }); bind(i, (t) => t.heute.alt, "alt"); st.append(i); w.append(st); // HEUTE: the owner anchor image, no reconstruction badge
   const cta = el("div", "pend__cta"); const sb = el("button", "pbtn", { type: "button" }); bind(sb, (t) => t.end.sources); const ab = el("a", "pbtn pbtn--primary", { href: "../index.html#index-monuments" }); bind(ab, (t) => t.back); cta.append(sb, ab); w.append(cta);
-  const d = el("p", "pend__disc"); bind(d, (t) => t.end.disc); w.append(d); s.append(w);
+  s.append(w); // 06G.2B: methodology disclaimer removed from the page (global footer later)
   const dlg = $("#srcDlg"); const list = $("#srcList"); const cl = $("#srcClose");
-  onLang(() => { $("#srcTitle").textContent = T().end.srcH; list.replaceChildren(...T().end.srcList.map((x) => { const li = el("li"); li.textContent = x; return li; })); $("#srcDisc").textContent = T().end.disc; cl.textContent = T().end.close; });
+  onLang(() => { $("#srcTitle").textContent = T().end.srcH; list.replaceChildren(...T().end.srcList.map((x) => { const li = el("li"); li.textContent = x; return li; })); $("#srcDisc").textContent = ""; $("#srcDisc").hidden = true; cl.textContent = T().end.close; });
   sb.addEventListener("click", () => { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); });
   cl.addEventListener("click", () => { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); });
   dlg.addEventListener("click", (e) => { if (e.target === dlg && dlg.close) dlg.close(); });
@@ -290,5 +353,5 @@ function reveal() {
 
 try { history.scrollRestoration = "manual"; } catch (e) {}
 root.lang = lang;
-buildNav(); buildHero(); buildCtx(); buildHolo(); buildPass(); buildTower(); buildY179(); buildCastra(); buildPlan(); buildBau(); buildFilm(); buildLoops(); buildEnd(); reveal();
+buildNav(); buildHero(); buildCtx(); buildHolo(); buildPass(); buildTower(); buildY179(); buildCastra(); buildPlan(); buildBau(); buildFilm(); buildLoops(); buildGallery(); buildEnd(); reveal();
 requestAnimationFrame(runSC);

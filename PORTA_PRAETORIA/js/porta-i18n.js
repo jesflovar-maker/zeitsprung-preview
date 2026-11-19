@@ -95,3 +95,12 @@ export const STR = {
     load: "Cargando", skip: "Saltar al contenido",
   },
 };
+
+// 06G.2B (2026-11-19): additive block — reconstruction V2 caption, neutral clip caption, owner gallery, hero film labels.
+// Approved 11 texts above stay unchanged; standalone methodology badges are no longer rendered (provenance stays internal).
+const ADD_06G2B = {
+  de: { y179clip: "Vom Lagerplan zum Stadtgrundriss", holoclip: "Vom Hologramm zum Bild", gal: { eyebrow: "GALERIE", h: "Die Porta im Bild", p: "Fünf Ansichten des Nordtors — heute und im Modell." }, heroFilm: "Die Porta Praetoria entsteht als Lichtmodell und wird zum heutigen Rest" },
+  en: { y179clip: "From the camp plan to the town plan", holoclip: "From hologram to image", gal: { eyebrow: "GALLERY", h: "The Porta in pictures", p: "Five views of the north gate — today and as a model." }, heroFilm: "The Porta Praetoria appears as a model of light and becomes today's remains" },
+  es: { y179clip: "Del plano del campamento al trazado urbano", holoclip: "Del holograma a la imagen", gal: { eyebrow: "GALERÍA", h: "La Porta en imágenes", p: "Cinco vistas de la puerta norte: hoy y en el modelo." }, heroFilm: "La Porta Praetoria aparece como un modelo de luz y se convierte en los restos actuales" },
+};
+LANGS.forEach((l) => { const a = ADD_06G2B[l], s = STR[l]; s.y179.clip = a.y179clip; s.holo.clip = a.holoclip; s.gal = a.gal; s.hero.film = a.heroFilm; s.end.disc = ""; });

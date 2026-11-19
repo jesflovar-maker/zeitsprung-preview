@@ -22,6 +22,7 @@ let craftApi = null; // museum photo gallery (#craftGallery); declared here so i
 import { initMediaFeatures } from "../../js/media-feature.js";
 import { STEINERNE_VIDEO_WEB4_BASE, KFRAMES_4K_WEB_BASE } from "../../js/zt-paths.js";
 import { initBruckmandl } from "./bruckmandl.js";
+import { TIMES as SB_CH_T, STR as SB_CH } from "./sb-index-chapters.js"; // 06G.2B: language-neutral clean timeline + DE/EN/ES chapter overlay
 import { initBruckmandlHotspotBridge } from "./bruckmandl-hotspot-bridge.js";
 // Technical DOM event name only (not QA/provider data) — reused verbatim
 // so the #facts fact-cards dispatch the exact SAME event the Bruckmandl
@@ -484,6 +485,7 @@ function populateLangButtons() {
       if (kframesApi) kframesApi.refreshLabels();
       if (craftApi) craftApi.refreshLabels();
       if (mediaFeatureApi) mediaFeatureApi.refreshLabels();
+      timelineChapterRefresh();
       if (bruckmandlApi) bruckmandlApi.refreshLabels();
       const introStartBtn = document.getElementById("introStartBtn");
       if (introStartBtn) introStartBtn.textContent = t(lang, "introStart");
@@ -544,6 +546,9 @@ function applyMuteUI() {
 
 function setSoundEnabled(next) {
   soundEnabled = next;
+  // 06G.2B: the hero film has a real soundtrack — unmute only through this gesture-driven toggle; replay if it already ended.
+  const iv = document.getElementById("introVideo"); const gate = document.getElementById("intro-gate");
+  if (iv && gate && gate.style.display !== "none") { iv.muted = !next; if (next && iv.ended) { try { iv.currentTime = 0; } catch (e) {} const q = iv.play(); if (q && q.catch) q.catch(() => {}); } }
   ZT_AUDIO_BUS.setMuted(!soundEnabled); // master-gain ramp, never gates any visual/content behavior
   try { sessionStorage.setItem(ZT_SOUND_PREF_KEY, soundEnabled ? "1" : "0"); } catch (e) {}
   applyMuteUI();
@@ -561,6 +566,10 @@ function wireIntroGate() {
   });
 
   const startBtn = document.getElementById("introStartBtn");
+  // 06G.2B — shared hero grammar: START + ALL MONUMENTS in one CTA row; compact ♪ moved to the hero corner.
+  (() => { const gate = document.getElementById("intro-gate"); const all = gate && gate.querySelector(".intro-gate__all");
+    if (gate && all && startBtn && !gate.querySelector(".intro-gate__cta")) { const row = document.createElement("div"); row.className = "intro-gate__cta"; startBtn.before(row); row.append(startBtn, all); }
+    if (gate && soundToggle) gate.append(soundToggle); })();
 
   // Guarded so it can safely be called from two places (the normal click
   // listener below, and the PHASE 2.6B buffered-early-click check) without
@@ -654,7 +663,8 @@ function buildIntroMedia() {
   // single, small (~4.8MB) asset with no shared preload queue needed (the
   // brief explicitly says a dedicated queue is unnecessary for one video);
   // it simply never blocks first paint of the intro-gate's poster/text.
-  video.src = encodeURI(`${WEB_ASSET_BASE}/intro/sb_intro_cinematic_8s_v01_web.mp4`);
+  // 06G.2B: owner hero SB_HERO_ENTRY_V1 (480x854 source, no upscale) — plays once, holds its last frame; sound only via the ♪ gesture.
+  video.src = encodeURI(`${WEB_ASSET_BASE}/intro/sb_hero_entry_v1_480.mp4`);
 
   video.addEventListener("playing", () => {
     gsap.to(video, { opacity: 1, duration: 0.5, ease: "power1.out" });
@@ -727,15 +737,11 @@ async function startExperience() {
   const preloaderFill = document.getElementById("preloaderFill");
   const preloaderPct = document.getElementById("preloaderPct");
 
-  gsap.to(intro, {
-    autoAlpha: 0,
-    duration: 0.6,
-    ease: "power2.out",
-    onComplete: () => { intro.style.display = "none"; }
-  });
-
+  // 06G.2B — single entry (MONUMENT ENTRY STANDARD): the hero stays visible, a thin gold line shows readiness,
+  // no percentage screen; the hero fades only when the experience is revealed (revealApp).
+  preloader.classList.add("preloader--line");
   preloader.hidden = false;
-  gsap.fromTo(preloader, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 });
+  gsap.fromTo(preloader, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 });
 
   // Resolve the manifest-driven pfeiler cutout (kicked off at module load,
   // see pfeilerCutoutPromise above) before building the asset preload list,
@@ -756,7 +762,7 @@ async function startExperience() {
     loaded++;
     const pct = Math.round((loaded / assetsToLoad.length) * 100);
     gsap.to(preloaderFill, { width: pct + "%", duration: 0.25, ease: "power1.out" });
-    preloaderPct.textContent = pct + "%";
+    if (preloaderPct) preloaderPct.textContent = "";
     if (loaded >= assetsToLoad.length) {
       setTimeout(revealApp, 250);
     }
@@ -772,12 +778,18 @@ async function startExperience() {
   // Safety timeout in case an asset never fires load/error
   setTimeout(() => {
     if (loaded < assetsToLoad.length) revealApp();
-  }, 6000);
+  }, 4500);
 }
 
+let appRevealed = false;
 function revealApp() {
+  if (appRevealed) return; appRevealed = true;
   const preloader = document.getElementById("preloader");
   const app = document.getElementById("app");
+  const intro = document.getElementById("intro-gate");
+  const iv = document.getElementById("introVideo");
+  if (iv) { try { iv.pause(); } catch (e) {} }
+  if (intro) gsap.to(intro, { autoAlpha: 0, duration: 0.6, ease: "power2.out", onComplete: () => { intro.style.display = "none"; } });
 
   gsap.to(preloader, {
     autoAlpha: 0,
@@ -1127,7 +1139,20 @@ let mediaFeatureApi = null;
 
 // 2026-10-08 — trailer / timeline film / bridge route. Poster-first, lazy
 // video (see js/media-feature.js). No scroll listeners, no RAF.
+// 06G.2B — chapter overlay on the language-neutral clean timeline (validated K-frame labels, measured seek times).
+let timelineChapterRefresh = () => {};
+function wireTimelineChapters() {
+  const sec = document.getElementById("timelineFilm"); const v = sec && sec.querySelector(".mf__video"); const fr = sec && sec.querySelector(".mf__frame");
+  if (!v || !fr) return;
+  const o = document.createElement("p"); o.className = "mf__chapter"; o.setAttribute("aria-live", "polite"); o.hidden = true; fr.appendChild(o);
+  let k = -2;
+  const upd = (force) => { const tt = v.currentTime || 0; let i = -1; SB_CH_T.forEach((x, j) => { if (tt >= x) i = j; }); if (i === k && !force) return; k = i;
+    const c = i >= 0 ? (SB_CH[lang] || SB_CH.de).tlv[i] : null; o.textContent = c && c.y ? c.y + " — " + c.h : ""; o.hidden = !o.textContent; };
+  v.addEventListener("timeupdate", () => upd(false)); v.addEventListener("seeked", () => upd(true)); v.addEventListener("emptied", () => upd(true));
+  timelineChapterRefresh = () => upd(true);
+}
 function wireMediaFeatures() {
+  wireTimelineChapters();
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   mediaFeatureApi = initMediaFeatures({
     root: document,

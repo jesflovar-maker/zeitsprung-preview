@@ -336,7 +336,7 @@ export function initCraftGallery({ t, getLang }) {
     const l = getLang(), s = STEPS[cur], c = CHAPTERS[s.ch];
     chap.textContent = pad(s.ch + 1) + " · " + c.title[l];
     ti.textContent = s.title[l]; tx.textContent = s.text[l];
-    rf.textContent = s.src ? t(l, "craftRecon") + " · " + t(l, "craftAfter") + " „Die Steinerne Brücke – 2010 bis 2018“" : t(l, "craftRecon");
+    const af = t(l, "craftAfter"); rf.textContent = s.src ? af.charAt(0).toUpperCase() + af.slice(1) + " „Die Steinerne Brücke – 2010 bis 2018“" : ""; rf.hidden = !rf.textContent; // 06G.2B: source kept, "Rekonstruktion" insignia removed
     stage.setAttribute("aria-label", t(l, "craftEnlarge") + ": " + s.title[l]);
     count.textContent = pad(cur + 1) + " / " + pad(n);
   };

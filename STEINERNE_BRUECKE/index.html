@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=20261119k">
 <link rel="stylesheet" href="../css/zt-assistant.css">
 </head>
 <body>
@@ -300,7 +300,6 @@
       <h3 id="craftTitle" data-i18n="craftTitle">Die Menschen hinter der Brücke</h3>
       <p class="craft__lead" data-i18n="craftText">Woraus die Brücke besteht, wer an ihr arbeitete und wie gebaut wurde.</p>
       <div class="craft__groups" id="craftGroups"></div>
-      <p class="craft__note" data-i18n="craftNote">Die Bilder dieser Galerie sind Rekonstruktionen, keine historischen Fotografien.</p>
     </div>
   </section>
 
@@ -430,7 +429,7 @@
   </section>
 
   <!-- MEDIA FEATURE (timeline) — poster-first, lazy video; see js/media-feature.js -->
-  <section id="timelineFilm" class="mf mf--timeline" data-mf data-mf-expand data-mf-mode="click" data-mf-video="sb_timeline_720_v01_web.mp4" data-mf-poster="sb_timeline_poster_v01.jpg" aria-labelledby="timelineFilmTitle">
+  <section id="timelineFilm" class="mf mf--timeline" data-mf data-mf-expand data-mf-mode="click" data-mf-video="sb_timeline_clean_v1_720.mp4" data-mf-poster="sb_timeline_clean_poster_v1.jpg" aria-labelledby="timelineFilmTitle">
     <div class="mf__inner">
       <p class="mf__eyebrow" data-i18n="mfTimelineEyebrow">TIMELINE</p>
       <h3 class="mf__title" id="timelineFilmTitle" data-i18n="mfTimelineTitle"></h3>
@@ -439,7 +438,6 @@
         <video class="mf__video" playsinline preload="none" disablepictureinpicture controlslist="nodownload"></video>
         <button type="button" class="mf__play" aria-label="Play"><span class="mf__play-icon" aria-hidden="true"></span></button>
       </div>
-      <p class="mf__recon" data-i18n="mfRecon">VISUELLE REKONSTRUKTION</p>
     </div>
   </section>
 
@@ -453,7 +451,6 @@
         <video class="mf__video" playsinline preload="none" disablepictureinpicture controlslist="nodownload"></video>
         <button type="button" class="mf__play" aria-label="Play"><span class="mf__play-icon" aria-hidden="true"></span></button>
       </div>
-      <p class="mf__recon" data-i18n="mfRecon">VISUELLE REKONSTRUKTION</p>
     </div>
   </section>
 
@@ -484,7 +481,7 @@
 }
 </script>
 
-<script type="module" src="js/main.js"></script>
+<script type="module" src="js/main.js?v=20261119k"></script>
 <script type="module">
   // BRUCKMANDL_ASSISTANT_PATTERN_V1 — small floating contextual help icon (shared module).
   // Pure consumer of the canonical knowledge provider; the #bruckmandl module, its 8 hotspots

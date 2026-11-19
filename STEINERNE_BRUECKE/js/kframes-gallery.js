@@ -430,7 +430,7 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
     if (frame.public_context_type === "TRADITIONAL_DATING") return tFn(lang, "kfBadgeTraditionalDating");
     if (frame.public_context_type === "HISTORICAL_CONTEXT") return tFn(lang, "kfBadgeHistoricalContext");
     const status = frame.evidence_status;
-    if (!status) return "";
+    if (!status || status === "RECONSTRUCTED") return ""; // 06G.2B: no visible reconstruction insignia
     if (status === "NEEDS_VALIDATION" && frame.uncertainty_type === "DATE") {
       return tFn(lang, "kfDateUnderReview") || status;
     }
