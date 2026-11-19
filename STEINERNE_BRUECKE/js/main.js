@@ -13,7 +13,7 @@
    This is still "GSAP + ScrollTrigger + Lenis as primary motion stack" exactly as
    requested — only the delivery mechanism (CDN vs. bundler) differs. */
 
-import { DICT, getInitialLang, setLang, applyI18n, t } from "./i18n.js";
+import { DICT, getInitialLang, setLang, applyI18n, t } from "./i18n.js?v=20261119m";
 import { buildPortal } from "./portal.js";
 import { initMuseum25D } from "./museum25d.js";
 import { initKframesGallery } from "./kframes-gallery.js";
