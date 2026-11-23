@@ -274,8 +274,10 @@ function buildEnd() {
   draw(ORDER);
   fetch("../monuments.config.json", { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).then((cfg) => {
     const ms = cfg && Array.isArray(cfg.monuments) ? cfg.monuments : null; if (!ms) return;
-    const live = ORDER.filter((id) => { const m = ms.find((x) => x.id === id); if (m && m.route) FALLBACK[id] = String(m.route).replace(/^\/+/, ""); return m && m.enabled === true && m.route && id !== SELF; });
-    if (live.length) draw(live);
+    // every enabled monument with a route (future activations appear automatically), config menu order
+    const live = ms.filter((m) => m && m.enabled === true && m.route && m.id !== SELF).sort((a, b) => (a.menu_order || a.order || 99) - (b.menu_order || b.order || 99));
+    live.forEach((m) => { FALLBACK[m.id] = String(m.route).replace(/^\/+/, ""); if (!LABEL[m.id]) LABEL[m.id] = String(m.short_name || (m.name && (m.name.de || m.name)) || m.id).toUpperCase(); });
+    if (live.length) draw(live.map((m) => m.id));
   }).catch(() => {});
   const trb = el("button", "nend__trailer", { type: "button" }); trb.append(el("i", "", { "aria-hidden": "true" })); const trl = el("span"); bind(trl, (t) => t.end.trailer); trb.append(trl); trb.addEventListener("click", openTrailerViewer);
   more.append(lb, dest, trb); inn.append(copy, more); s.append(inn);

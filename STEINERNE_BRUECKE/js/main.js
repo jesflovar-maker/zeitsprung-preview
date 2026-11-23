@@ -1410,8 +1410,8 @@ function wireNav(lenis) {
 // carry the same routes as the no-JS / fetch-failure fallback.
 // ---------------------------------------------------------------------------
 const SB_SELF_ID = "steinerne-bruecke";
-const SB_END_ORDER = ["dom-st-peter", "porta-praetoria", "altes-rathaus"];
-const SB_END_LABEL = { "dom-st-peter": "DOM ST. PETER", "porta-praetoria": "PORTA PRAETORIA", "altes-rathaus": "ALTES RATHAUS" };
+const SB_END_ORDER = ["dom-st-peter", "porta-praetoria", "altes-rathaus", "neupfarrplatz"];
+const SB_END_LABEL = { "dom-st-peter": "DOM ST. PETER", "porta-praetoria": "PORTA PRAETORIA", "altes-rathaus": "ALTES RATHAUS", "neupfarrplatz": "NEUPFARRPLATZ" };
 let sbTrailer = null;
 
 function wireEnding() {
@@ -1421,7 +1421,7 @@ function wireEnding() {
       const list = cfg && (Array.isArray(cfg.monuments) ? cfg.monuments : null);
       if (!list) return;
       const live = list.filter((m) => m && m.enabled === true && m.route && m.id !== SB_SELF_ID);
-      live.sort((a, b) => (SB_END_ORDER.indexOf(a.id) + 99) % 99 - (SB_END_ORDER.indexOf(b.id) + 99) % 99);
+      live.sort((a, b) => (a.menu_order || a.order || 99) - (b.menu_order || b.order || 99));
       if (!live.length) return;
       dest.textContent = "";
       live.forEach((m) => {
@@ -1429,7 +1429,7 @@ function wireEnding() {
         a.className = "sb-end__btn";
         a.dataset.mid = m.id;
         a.href = "../" + String(m.route).replace(/^\/+/, "");
-        a.textContent = SB_END_LABEL[m.id] || String((m.short_name || m.name || m.id)).toUpperCase();
+        a.textContent = SB_END_LABEL[m.id] || String(m.short_name || (m.name && (m.name.de || m.name)) || m.id).toUpperCase();
         dest.appendChild(a);
       });
     }).catch(() => { /* static fallback links stay */ });
