@@ -160,34 +160,93 @@
       "id": "neupfarrplatz",
       "order": 5,
       "menu_order": 5,
-      "readiness": { "heute_image": null, "card_hero_image": "assets/video/index/monument_presentation/neupfarrplatz/card_poster_01.jpg", "card_hero_status": "TEMPORARY", "monument_heute_ready": false, "monument_card_hero_ready": false, "monument_entry_loader_ready": false, "primary_start_cta_ready": false, "back_to_all_monuments_ready": false, "mobile_action_layout_ready": false },
+      "readiness": {
+        "heute_image": "assets/neupfarrplatz/img/np_anchor_720.webp",
+        "card_hero_image": "assets/neupfarrplatz/img/np_anchor_720.webp",
+        "card_hero_status": "OWNER_APPROVED_PROVISIONAL_ANCHOR_HEUTE (NP_ASSET_001, 1:1 replaceable)",
+        "monument_heute_ready": true,
+        "monument_card_hero_ready": true,
+        "monument_entry_loader_ready": true,
+        "primary_start_cta_ready": true,
+        "back_to_all_monuments_ready": true,
+        "mobile_action_layout_ready": true,
+        "historical_briefing": "PENDING (visual-state labels only, no dates)",
+        "misrach_geometry_review": "PENDING (K09 owner-approved visual, no geometry claims)"
+      },
       "menu_focus": "50% 50%",
-      "menu_timeline": null,
-      "name": { "de": "Neupfarrplatz · Jüdisches Viertel", "en": "Neupfarrplatz · Jewish Quarter", "es": "Neupfarrplatz · Barrio Judío" },
-      "subtitle": { "de": "ALTSTADT", "en": "OLD TOWN", "es": "CASCO ANTIGUO" },
+      "menu_timeline": {
+        "src": "neupfarrplatz/video/np_timeline_540.mp4",
+        "poster": "neupfarrplatz/poster/np_timeline_poster.webp",
+        "base": "web_root",
+        "duration_s": 116.375,
+        "burned_text": "",
+        "has_audio": false,
+        "chapters": {
+          "times": [
+            0,
+            11.0,
+            26.25,
+            36.5,
+            46.125,
+            59.875,
+            72.25,
+            87.375,
+            100.25,
+            105.875
+          ],
+          "labels_module": "NEUPFARRPLATZ/js/np-index-chapters.js?v=20261123a",
+          "labels_key": "tlv"
+        }
+      },
+      "name": {
+        "de": "Neupfarrplatz · Jüdisches Viertel",
+        "en": "Neupfarrplatz · Jewish Quarter",
+        "es": "Neupfarrplatz · Barrio Judío"
+      },
+      "subtitle": {
+        "de": "ALTSTADT",
+        "en": "OLD TOWN",
+        "es": "CASCO ANTIGUO"
+      },
       "description": {
         "de": "Ehemaliges jüdisches Viertel im Herzen der Regensburger Altstadt.",
         "en": "Former Jewish quarter in the heart of Regensburg's old town.",
         "es": "Antiguo barrio judío en el corazón del casco antiguo de Regensburg."
       },
-      "visual": "assets/video/index/monument_presentation/neupfarrplatz/card_poster_01.jpg",
-      "poster": "assets/video/index/monument_presentation/neupfarrplatz/card_poster_01.jpg",
+      "visual": "assets/neupfarrplatz/img/np_anchor_720.webp",
+      "poster": "assets/neupfarrplatz/img/np_anchor_720.webp",
       "video": "assets/video/index/monument_presentation/neupfarrplatz/card_loop_01_web.mp4",
       "video_reverse": null,
       "video_mode": "static",
       "video_mode_previous": "ambient_loop",
       "interactive_route": null,
       "background": "assets/video/index/monument_presentation/neupfarrplatz/card_loop_01_web.mp4",
-      "status": "in_development",
-      "enabled": false,
-      "route": null,
-      "cta": { "de": "IN ARBEIT", "en": "IN DEVELOPMENT", "es": "EN CONSTRUCCIÓN" },
-      "languages": ["de", "en", "es"],
+      "status": "active",
+      "enabled": true,
+      "route": "NEUPFARRPLATZ/index.html",
+      "cta": {
+        "de": "ERLEBNIS STARTEN",
+        "en": "START EXPERIENCE",
+        "es": "INICIAR EXPERIENCIA"
+      },
+      "languages": [
+        "de",
+        "en",
+        "es"
+      ],
       "featureFlags": {
         "_readme": "PHASE 3.0 — data model only; no monument-shell UI exists yet for this in_development monument. All flags false/not-yet-applicable until content is briefed and produced.",
-        "intro": false, "facts": false, "historical_story": false, "kframes": false,
-        "timeline": false, "sources": false, "museum25d": false, "threeD": false,
-        "reel": false, "guide": false, "brueckmandl": false
+        "intro": false,
+        "facts": false,
+        "historical_story": false,
+        "kframes": false,
+        "timeline": false,
+        "sources": false,
+        "museum25d": false,
+        "threeD": false,
+        "reel": false,
+        "guide": false,
+        "brueckmandl": false
       }
     }
   ]

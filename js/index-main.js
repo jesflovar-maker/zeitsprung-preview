@@ -17,7 +17,7 @@
    index.html) — ScrollTrigger/Lenis are NOT loaded here, this page has no
    pinned/scrubbed scroll sections. */
 
-import { getInitialLang, setLang, applyI18n, t } from "./index-i18n.js";
+import { getInitialLang, setLang, applyI18n, t } from "./index-i18n.js?v=20261123a";
 import { ZT_AUDIO_BUS } from "./zt-audio.js";
 import { createZtTypography } from "../STEINERNE_BRUECKE/js/zt-typography.js";
 import { initGallery } from "./gallery.js?v=20260905";

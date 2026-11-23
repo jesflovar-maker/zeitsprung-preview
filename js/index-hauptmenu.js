@@ -62,7 +62,7 @@
    on screen and moving. One short timer (resume delay) after an interaction.
    No scroll / window-resize listeners.
    ============================================================================ */
-import { t } from "./index-i18n.js";
+import { t } from "./index-i18n.js?v=20261123a";
 import { ZT_PATHS } from "./zt-paths.js";
 
 const CONFIG_URL = "./monuments.config.json";
@@ -111,13 +111,16 @@ async function init() {
   const bigPlay = mk("button", "hm__bigplay", { type: "button" }); bigPlay.appendChild(mk("span", "hm__bigplay-icon", { "aria-hidden": "true" }));
   const soon = mk("div", "hm__soonflag");
   media.appendChild(posterImg); media.appendChild(video); media.appendChild(bigPlay); media.appendChild(soon);
+  const fsCap = mk("p", "hm__fscap", { "aria-hidden": "true" }); media.appendChild(fsCap); // 07B: chapter caption kept visible in fullscreen
+  const fsX = mk("button", "hm__fsx", { type: "button" }); fsX.textContent = "×"; media.appendChild(fsX); // exit control inside the fullscreen layer
+  const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
   const info = mk("div", "hm__info");
   const count = mk("p", "hm__count"); const sub = mk("p", "hm__sub"); const name = mk("h2", "hm__name"); const desc = mk("p", "hm__desc");
   const tl = mk("div", "hm__tl zs-glass zs-glass--flat"); const tlHead = mk("div", "hm__tl-head"); const tlLabel = mk("span", "hm__tl-label"); const tlTime = mk("span", "hm__tl-time"); tlHead.appendChild(tlLabel); tlHead.appendChild(tlTime);
   const bar = mk("div", "hm__bar", { role: "slider", tabindex: "0", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": "0" }); const fill = mk("span", "hm__bar-fill"); bar.appendChild(fill);
   const chapters = mk("div", "hm__chapters", { role: "group" });
   const chapterNow = mk("p", "hm__chapter-now"); chapterNow.setAttribute("aria-live", "polite");
-  const ctl = mk("div", "hm__ctl"); const bp = mk("button", "hm__btn zs-glass-control", { type: "button" }); const bm = mk("button", "hm__btn zs-glass-control", { type: "button", "aria-pressed": "false" }); ctl.appendChild(bp); ctl.appendChild(bm); /* 06G.1: LOCAL sound button restored; shares ONE state with the compact nav ♪ (#navSoundToggle) */
+  const ctl = mk("div", "hm__ctl"); const bp = mk("button", "hm__btn zs-glass-control", { type: "button" }); const bm = mk("button", "hm__btn zs-glass-control", { type: "button", "aria-pressed": "false" }); ctl.appendChild(bp); ctl.appendChild(bm); /* 07B: FULLSCREEN (stage media + chapter caption), same control for every active monument */ const bf = mk("button", "hm__btn zs-glass-control", { type: "button" }); ctl.appendChild(bf); /* 06G.1: LOCAL sound button restored; shares ONE state with the compact nav ♪ (#navSoundToggle) */
   const note = mk("p", "hm__note");
   tl.appendChild(tlHead); tl.appendChild(bar); tl.appendChild(chapters); tl.appendChild(chapterNow); tl.appendChild(ctl); tl.appendChild(note);
   const soonText = mk("p", "hm__soontext");
@@ -225,7 +228,7 @@ async function init() {
     const cur = pos.get(sel.id) || 0; let k = 0; times.forEach((x, i) => { if (cur >= x) k = i; });
     if (k === chIdx && !force) return; chIdx = k;
     [...chapters.children].forEach((b) => b.setAttribute("aria-current", String(+b.dataset.i === k)));
-    const c = (lab[langNow()] || lab.de || [])[k]; chapterNow.textContent = c && c.y ? c.y + " — " + c.h : "";
+    const c = (lab[langNow()] || lab.de || [])[k]; chapterNow.textContent = c && c.y ? c.y + " — " + c.h : ""; fsCap.textContent = chapterNow.textContent;
   }
   function renderProgress() {
     const d = dur(), cur = sel ? pos.get(sel.id) || 0 : 0; const f = d ? Math.min(1, cur / d) : 0;
@@ -246,7 +249,8 @@ async function init() {
     video.setAttribute("aria-label", t(l, "hmFilmAria") + " — " + pick(sel.name, l));
     bp.textContent = video.paused ? t(l, "hmPlay") : t(l, "hmPause"); bigPlay.setAttribute("aria-label", t(l, "hmPlay"));
     bm.textContent = video.muted ? t(l, "hmSoundOn") : t(l, "hmSoundOff"); bm.setAttribute("aria-pressed", String(!video.muted));
-    bm.hidden = !(tlm && tlm.has_audio === true); // 06G.1: local sound only for films with real audio (no fake control)
+    bm.hidden = !(tlm && tlm.has_audio === true);
+    bf.textContent = t(l, fsEl() === media || media.classList.contains("is-pfs") ? "hmFullExit" : "hmFull"); bf.hidden = !act; fsX.setAttribute("aria-label", t(l, "hmFullExit")); // 06G.1: local sound only for films with real audio (no fake control)
     // burned-in caption disclosure — only when the film's language is not the visitor's
     const bt = tlm ? tlm.burned_text || "" : ""; note.textContent = !bt || bt.split("+").includes(l) ? "" : t(l, bt === "de" ? "hmNoteDe" : "hmNoteDeEn"); note.hidden = !note.textContent;
     soon.textContent = t(l, "hmSoon"); soonText.textContent = t(l, "hmSoonText");
@@ -290,7 +294,7 @@ async function init() {
     window.scrollTo(0, document.documentElement.scrollHeight);          // the page ends at the orbit: back to the selector, not to the intro
     const cur = cards.find((c) => c.m === sel); if (cur) cur.b.focus({ preventScroll: true });
   }
-  const onStageKey = (e) => { if (e.key === "Escape" && !entering) closeStage(); };
+  const onStageKey = (e) => { if (e.key === "Escape" && media.classList.contains("is-pfs")) { pseudoFs(false); return; } if (e.key === "Escape" && !entering && !fsEl()) closeStage(); };
   function beginEntry(href) {
     if (entering) return; entering = true; stageHost.classList.add("hm__stage--entering");
     setTimeout(() => { location.href = href; }, reduced() ? 0 : 560);          // short transition only — never an artificial wait
@@ -310,6 +314,16 @@ async function init() {
   if (location.hash === "#index-monuments") { const go = () => { if (!stageOpen) window.scrollTo(0, document.documentElement.scrollHeight); }; go(); addEventListener("load", () => { go(); setTimeout(go, 500); }, { once: true }); setTimeout(go, 350); }
   const toggle = () => { nudgeOrbit(); if (video.paused) { userPaused = false; play(); } else { userPaused = true; video.pause(); } };
   bp.addEventListener("click", toggle); bigPlay.addEventListener("click", toggle); video.addEventListener("click", toggle);
+  // native element fullscreen first; if refused / unavailable (e.g. iPhone) a fixed full-viewport layer keeps film + caption
+  const pseudoFs = (on) => { media.classList.toggle("is-pfs", on); document.documentElement.classList.toggle("hm-pfs", on); relabel(); };
+  bf.addEventListener("click", () => { nudgeOrbit();
+    if (media.classList.contains("is-pfs")) { pseudoFs(false); return; }
+    if (fsEl()) { const x = document.exitFullscreen || document.webkitExitFullscreen; if (x) { const r = x.call(document); if (r && r.catch) r.catch(() => {}); } return; }
+    const req = media.requestFullscreen || media.webkitRequestFullscreen; if (!req) { pseudoFs(true); return; }
+    const fb = () => { if (fsEl() !== media && !media.classList.contains("is-pfs")) pseudoFs(true); };
+    try { const r = req.call(media); if (r && r.catch) r.catch(fb); } catch (e) { fb(); } setTimeout(fb, 700); });
+  ["fullscreenchange", "webkitfullscreenchange"].forEach((ev) => document.addEventListener(ev, () => { media.classList.toggle("is-fs", fsEl() === media); relabel(); }));
+  fsX.addEventListener("click", (e) => { e.stopPropagation(); if (media.classList.contains("is-pfs")) { pseudoFs(false); return; } const x = document.exitFullscreen || document.webkitExitFullscreen; if (x && fsEl()) { const r = x.call(document); if (r && r.catch) r.catch(() => {}); } });
   bm.addEventListener("click", () => { nudgeOrbit(); setGlobalSound(video.muted); if (!video.paused || !sel) return; play(); }); // 06G.1: local ↔ nav ♪ share one state
   video.addEventListener("play", () => { media.classList.add("is-playing", "has-started"); relabel(); });
   video.addEventListener("pause", () => { media.classList.remove("is-playing"); relabel(); });
