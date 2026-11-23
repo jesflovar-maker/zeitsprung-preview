@@ -11,9 +11,10 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="css/style.css?v=20261123c">
+<link rel="stylesheet" href="css/style.css?v=20261124a">
 <link rel="stylesheet" href="../css/zt-assistant.css?v=20261123c">
-<link rel="stylesheet" href="../css/zt-typography.css?v=20261123c">
+<link rel="stylesheet" href="../css/zt-typography.css?v=20261124a">
+<link rel="stylesheet" href="../css/zt-film.css?v=20261124a">
 </head>
 <body>
 
@@ -290,19 +291,6 @@
     </div>
   </section>
 
-  <!-- ========================================================== -->
-  <!-- MUSEUM PHOTO GALLERY (2026-11-11) — "Die Menschen hinter der    -->
-  <!-- Brücke". Additive layer directly after #museum25d; deepens its  -->
-  <!-- Material / Bau chapters. Built by js/craft-gallery.js.          -->
-  <!-- ========================================================== -->
-  <section id="craftGallery" class="craft" aria-labelledby="craftTitle">
-    <div class="craft__inner">
-      <p class="craft__eyebrow" data-i18n="craftEyebrow">Handwerk · Material · Bau</p>
-      <h3 id="craftTitle" data-i18n="craftTitle">Die Menschen hinter der Brücke</h3>
-      <p class="craft__lead" data-i18n="craftText">Woraus die Brücke besteht, wer an ihr arbeitete und wie gebaut wurde.</p>
-      <div class="craft__groups" id="craftGroups"></div>
-    </div>
-  </section>
 
   <!-- ========================================================== -->
   <!-- K-FRAMES GALLERY — Phase 2.5. K01–K12 historical-construction   -->
@@ -429,17 +417,15 @@
     </div>
   </section>
 
-  <!-- MEDIA FEATURE (timeline) — poster-first, lazy video; see js/media-feature.js -->
-  <section id="timelineFilm" class="mf mf--timeline" data-mf data-mf-expand data-mf-mode="click" data-mf-video="sb_timeline_clean_v1_720.mp4" data-mf-poster="sb_timeline_clean_poster_v1.jpg" aria-labelledby="timelineFilmTitle">
+  <!-- TIMELINE FILM (07C-H) — shared documentary film player js/zt-film.js (no native controls): chapters, progress,
+       elapsed / total, PLAY / PAUSE, SOUND, FULLSCREEN (phones). Host filled by main.js wireTimelineChapters(). -->
+  <section id="timelineFilm" class="mf mf--timeline sb-film-sec" aria-labelledby="timelineFilmTitle">
     <div class="mf__inner">
       <p class="mf__eyebrow" data-i18n="mfTimelineEyebrow">TIMELINE</p>
       <h3 class="mf__title" id="timelineFilmTitle" data-i18n="mfTimelineTitle"></h3>
       <p class="mf__text" data-i18n="mfTimelineText"></p>
-      <div class="mf__frame">
-        <video class="mf__video" playsinline preload="none" disablepictureinpicture controlslist="nodownload"></video>
-        <button type="button" class="mf__play" aria-label="Play"><span class="mf__play-icon" aria-hidden="true"></span></button>
-      </div>
     </div>
+    <div id="timelineFilmHost"></div>
   </section>
 
   <!-- MEDIA FEATURE (route) — poster-first, lazy video; see js/media-feature.js -->
@@ -454,6 +440,24 @@
       </div>
     </div>
   </section>
+
+  <!-- ========================================================== -->
+  <!-- MUSEUM PHOTO GALLERY (2026-11-11) — "Die Menschen hinter der    -->
+  <!-- Brücke". 07C-H: placed after the films as MUSEUM / MATERIAL DETAILS -->
+  <!-- Material / Bau chapters. Built by js/craft-gallery.js.          -->
+  <!-- ========================================================== -->
+  <section id="craftGallery" class="craft" aria-labelledby="craftTitle">
+    <div class="craft__inner">
+      <p class="craft__eyebrow" data-i18n="craftEyebrow">Handwerk · Material · Bau</p>
+      <h3 id="craftTitle" data-i18n="craftTitle">Die Menschen hinter der Brücke</h3>
+      <p class="craft__lead" data-i18n="craftText">Woraus die Brücke besteht, wer an ihr arbeitete und wie gebaut wurde.</p>
+      <div class="craft__groups" id="craftGroups"></div>
+    </div>
+  </section>
+
+  <!-- TRAILER (07C-H) — dedicated cinematic trailer section before the destination ending (js/zt-film.js, mode "trailer"):
+       Neupfarrplatz title-card language, clean 15 s master, muted autoplay while visible, ZEITSPRUNG controls. -->
+  <section id="trailer" class="sb-trailer-sec" aria-label="Trailer"></section>
 
   <!-- 06G.2B.1 — ZEITSPRUNG destination ending (closing visual = route film above).
        Destinations are rendered from monuments.config.json (enabled + route, never the current monument);
@@ -503,13 +507,13 @@
 }
 </script>
 
-<script type="module" src="js/main.js?v=20261123d"></script>
+<script type="module" src="js/main.js?v=20261124a"></script>
 <script type="module">
   // BRUCKMANDL_ASSISTANT_PATTERN_V1 — small floating contextual help icon (shared module).
   // Pure consumer of the canonical knowledge provider; the #bruckmandl module, its 8 hotspots
   // and its lifecycle are untouched.
   // 07B.1: global entry point — Steinerne keeps its canonical bridge knowledge ("bridge" engine in js/zt-guide-config.js)
-  import { initGuide } from "../js/zt-guide.js?v=20261123e";
+  import { initGuide } from "../js/zt-guide.js?v=20261124a";
   initGuide({ monument: "steinerne-bruecke" });
 </script>
 </body>

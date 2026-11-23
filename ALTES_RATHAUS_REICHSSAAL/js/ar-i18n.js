@@ -237,3 +237,10 @@ LANGS.forEach((l) => { STR[l].end.trailerAlt = ADD_06G[l].trailerAlt; STR[l].snd
     ];
   }
 }
+
+/* 07C-H — GLOBAL VIDEO / TRAILER PRESENTATION V1: dedicated trailer section (js/zt-film.js), Neupfarrplatz title-card
+   language. Title / subtitle / tagline = this page's own hero text (hero.title / hero.sub / hero.tag). */
+STR.de.tr = { eyebrow: "TRAILER", h: "Das Alte Rathaus in Bildern", p: "Ein kurzer Film vom Rathaus in den Reichssaal.", alt: "Trailer Altes Rathaus" };
+STR.en.tr = { eyebrow: "TRAILER", h: "The Old Town Hall in pictures", p: "A short film from the town hall into the Imperial Hall.", alt: "Old Town Hall trailer" };
+STR.es.tr = { eyebrow: "TRÁILER", h: "El Antiguo Ayuntamiento en imágenes", p: "Una breve película del Ayuntamiento al Reichssaal.", alt: "Tráiler del Antiguo Ayuntamiento" };
+for (const l of ["de", "en", "es"]) { const S = STR[l]; Object.assign(S.tr, { l2: S.hero.title, l3: S.hero.sub, line: S.hero.tag }); }

@@ -4,9 +4,10 @@
 // HISTORICAL_BRIEFING = PENDING: only visual-state labels (np-i18n.js), no dates. K09 = OWNER_APPROVED_VISUAL_KFRAME +
 // GEOMETRY_REVIEW_PENDING (no geometry claims). Provisional anchor NP_ASSET_001, provisional trailer NP_ASSET_098 and the
 // hero film NP_ASSET_058 are 1:1 replaceable through the constants below. Visible AI / reconstruction badges = 0.
-import { STR, LANGS, STORAGE_KEY } from "./np-i18n.js?v=20261123c";
-import { initGuide } from "../../js/zt-guide.js?v=20261123e"; // 07B.1: global Brückmandl guide
-import { ztSound } from "../../js/zt-sound.js?v=20261119e";
+import { STR, LANGS, STORAGE_KEY } from "./np-i18n.js?v=20261124a";
+import { initGuide } from "../../js/zt-guide.js?v=20261124a"; // 07B.1: global Brückmandl guide
+import { ztSound } from "../../js/zt-sound.js?v=20261124a";
+import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261124a"; // 07C-H: shared film player (trailer section)
 import { openPhoto, openElement } from "../../js/zs-media-viewer.js";
 
 const A = "../assets/neupfarrplatz/";
@@ -235,28 +236,23 @@ function buildReturn() {
   zoomBtn(st, () => ({ src: full(ANCHOR), alt: im.alt })); w.append(st); s.append(w);
 }
 
-/* ---------- 13 trailer: provisional silent 30 s master, plays on view, pauses off screen, replays on re-entry ---------- */
+/* ---------- 13 trailer: provisional silent 30 s master — THE platform reference (07C-H: shared js/zt-film.js) ----------
+   Title card = the approved 07B composition restored 1:1 (.zt-tc: ZEITSPRUNG · NEUPFARRPLATZ · JÜDISCHES VIERTEL ·
+   tagline). Silent master -> NO sound control. Plays muted on view, pauses off screen, replays on re-entry. A future final
+   trailer is a 1:1 media replacement of TR_SRC / TR_POSTER (no redesign). */
+let trailerFilm = null;
 function buildTrailer() {
-  const s = $("#trailer"); const w = el("div", "awrap ar"); head(w, "tr"); w.append(lead("tr", "p"));
-  const st = el("div", "ntr__film"); const po = el("img", "", { loading: "lazy", decoding: "async", src: TR_POSTER, alt: "" }); st.append(po);
-  const ov = el("div", "ntr__ov zt-ov", { "aria-hidden": "true" }); const l1 = el("p", "zt-ov__k"); const l2 = el("p", "zt-ov__s"); const l3 = el("p", "zt-ov__p"); const ln = el("p", "zt-ov__t");
-  bind(l1, (t) => t.tr.l1); bind(l2, (t) => t.tr.l2); bind(l3, (t) => t.tr.l3); bind(ln, (t) => t.tr.line); ov.append(l1, l2, l3, ln);
-  w.append(st); s.append(w);
-  if (reduced) { st.append(ov); return; }
-  const v = el("video", "", { muted: "", playsinline: "", preload: "none", disablepictureinpicture: "", tabindex: "-1" }); v.muted = true; bind(v, (t) => t.tr.alt, "aria-label"); // poster = the lazy <img> underneath
-  st.append(v, ov);
-  const play = () => { if (!v.getAttribute("src")) v.src = TR_SRC; const p = v.play(); if (p && p.catch) p.catch(() => {}); };
-  v.addEventListener("playing", () => st.classList.add("is-playing"));
-  v.addEventListener("ended", () => { st.classList.remove("is-playing"); v.dataset.done = "1"; });
-  v.addEventListener("error", () => { st.classList.remove("is-playing"); v.remove(); });
-  new IntersectionObserver((es) => es.forEach((en) => { if (en.isIntersecting) { if (v.dataset.done) { delete v.dataset.done; try { v.currentTime = 0; } catch (x) {} } play(); } else if (!v.paused) v.pause(); }), { threshold: 0.55 }).observe(st);
+  const s = $("#trailer"); const w = el("div", "awrap ar"); head(w, "tr"); w.append(lead("tr", "p")); s.append(w);
+  trailerFilm = mountFilm(s, {
+    mode: "trailer", src: TR_SRC, poster: TR_POSTER, duration: 30, hasAudio: false,
+    titleCard: () => ({ k: T().tr.l1, n: T().tr.l2, s: T().tr.l3, l: T().tr.line }),
+    label: () => T().tr.eyebrow, alt: () => T().tr.alt,
+  });
 }
 function openTrailerViewer() {
-  const fr = el("div", "ntrv"); const v = el("video", "", { muted: "", playsinline: "", preload: "auto", poster: TR_POSTER, disablepictureinpicture: "" }); v.muted = true; v.src = TR_SRC; fr.append(v);
-  v.addEventListener("click", () => { if (v.paused) { const p = v.play(); if (p && p.catch) p.catch(() => {}); } else v.pause(); });
-  document.body.append(fr);
-  openElement(fr, { onClose: () => { v.pause(); v.removeAttribute("src"); try { v.load(); } catch (e) {} fr.remove(); } });
-  const p = v.play(); if (p && p.catch) p.catch(() => {});
+  const s = $("#trailer"); if (!s || !trailerFilm) return;
+  s.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
+  trailerFilm.play();
 }
 
 /* ---------- 14 destination ending (routes from monuments.config.json; never this monument) ---------- */

@@ -12,6 +12,7 @@ try { on = sessionStorage.getItem(KEY) === "1"; } catch (e) {}
 let armed = false; // becomes true at the first user gesture on this page
 const vids = new Map(); // video -> { onEnable }
 const btns = new Set();
+const subs = new Set();
 const L10N = { de: { on: "Ton an", off: "Ton aus" }, en: { on: "Sound on", off: "Sound off" }, es: { on: "Activar sonido", off: "Quitar sonido" } };
 let labels = () => L10N[(document.documentElement.lang || "de").slice(0, 2)] || L10N.de;
 
@@ -26,6 +27,7 @@ function apply(fromToggle) {
 }
 function paint() {
   const L = labels();
+  subs.forEach((f) => { try { f(on); } catch (e) {} });
   btns.forEach((b) => { b.setAttribute("aria-pressed", String(on)); b.classList.toggle("is-on", on); b.setAttribute("aria-label", on ? L.off : L.on); b.title = on ? L.off : L.on; });
 }
 function arm() { if (armed) return; armed = true; removeEventListener("pointerdown", arm, true); removeEventListener("keydown", arm, true); apply(false); }
@@ -55,4 +57,8 @@ export const ztSound = {
   /** register a video with genuine audio; opt.onEnable(video) runs when the visitor switches sound on */
   add(v, opt) { vids.set(v, opt || {}); v.muted = !audible(); if (v.muted) v.setAttribute("muted", ""); return v; },
   relabel() { paint(); },
+  /** 07C-H: the same one-state toggle as the ♪ control (for local SOUND buttons inside film players) */
+  toggle() { armed = true; on = !on; try { sessionStorage.setItem(KEY, on ? "1" : "0"); } catch (e) {} apply(true); },
+  /** 07C-H: notified after every state change (local buttons repaint their pressed state) */
+  subscribe(fn) { subs.add(fn); },
 };

@@ -83,6 +83,16 @@ export function initAssistantFab(opt = {}) {
   // 07B.1 optional section awareness (opt.sections = { sectionId: topicId }): measured once when the panel opens
   const secIds = Object.keys(opt.sections || {});
   const sectionTopic = () => { let best = "", bh = 0; secIds.forEach((id) => { const el = document.getElementById(id); if (!el) return; const r = el.getBoundingClientRect(); const h = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0); if (h > bh) { bh = h; best = id; } }); return best ? opt.sections[best] : null; };
+  // 07C-H: in-page "ask the Brückmandl" buttons (Steinerne hotspots) open THIS guide on a canonical topic id
+  document.addEventListener("zt:guide-topic", (e) => { const tp = e && e.detail && e.detail.topic; if (!tp) return; sel = tp; renderAnswer(); if (pn.hidden) openPanel(); });
+  // 07C-H optional: never cover CTAs / film controls on phones — while one of opt.avoid is on screen (panel closed) the icon tucks away
+  if (opt.avoid && "IntersectionObserver" in window) {
+    const onScr = new Set();
+    const ioA = new IntersectionObserver((es) => { es.forEach((e) => { if (e.isIntersecting) onScr.add(e.target); else onScr.delete(e.target); }); fab.classList.toggle("is-tucked", onScr.size > 0 && pn.hidden); }, { threshold: 0.01 });
+    const watch = () => document.querySelectorAll(opt.avoid).forEach((n) => { if (!n.__ztAv) { n.__ztAv = 1; ioA.observe(n); } });
+    watch(); setTimeout(watch, 2500); setTimeout(watch, 6000); // film panels are built asynchronously
+  }
+  function openPanel() { pn.hidden = false; fab.setAttribute("aria-expanded", "true"); fab.classList.remove("is-tucked"); document.addEventListener("keydown", onKey); requestAnimationFrame(() => pn.classList.add("is-open")); cls.focus(); }
   function open() { const st = secIds.length ? sectionTopic() : null; if (st) { sel = st; renderAnswer(); } pn.hidden = false; fab.setAttribute("aria-expanded", "true"); document.addEventListener("keydown", onKey); requestAnimationFrame(() => pn.classList.add("is-open")); cls.focus(); }
   function close(refocus = true) { if (pn.hidden) return; pn.classList.remove("is-open"); pn.hidden = true; fab.setAttribute("aria-expanded", "false"); document.removeEventListener("keydown", onKey); if (refocus) fab.focus(); }
   fab.addEventListener("click", () => (pn.hidden ? open() : close()));

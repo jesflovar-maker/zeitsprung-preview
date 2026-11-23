@@ -1194,7 +1194,7 @@ function render(inner, assets, sourcesMap, t, getLang) {
   ztExplodedPieceEls = {};
   inner.innerHTML = "";
   // 06G.2B.2 FLOW: intro → VIEWS (vertical cinematic scroll) → PARTS → MATERIAL
-  // details (vertical cinematic scroll) → history / legend / fact-check → sources → assistant.
+  // details (vertical cinematic scroll) → history / legend / fact-check → sources (questions → global guide, 07C-H).
   renderIntro(inner, t, lang);
   renderViewsScroll(inner, assets, t, lang, ui);
   renderDetailsScroll(inner, "bruckmandlCutoutsLabel", assets.cutouts, "bruckmandlCutoutLabels", t, lang, HOTSPOT_ENABLED_CUTOUT_IDS, ui, { registerPieces: true, modifier: "bm-details--parts" });
@@ -1207,7 +1207,14 @@ function render(inner, assets, sourcesMap, t, getLang) {
   renderLegend(inner, t, lang);
   renderFactcheck(inner, t, lang);
   renderSources(inner, t, lang, sourcesMap);
-  return renderAssistant(inner, assets, t, lang);
+  // 07C-H: ONE assistant system. The former embedded "FRAG DAS BRUCKMANDL" panel (renderAssistant, a second
+  // character + question UI over the SAME canonical knowledge provider) is retired from the page; every hotspot /
+  // "FRAG DAS BRUCKMANDL" button now opens the GLOBAL Brückmandl guide (js/zt-assistant-fab.js) on that same
+  // validated topic. renderAssistant() stays in this file untouched (not called) for the 06H cleanup decision.
+  return {
+    answerTopic(topic) { document.dispatchEvent(new CustomEvent("zt:guide-topic", { detail: { topic } })); },
+    rootEl: null
+  };
 }
 
 /**

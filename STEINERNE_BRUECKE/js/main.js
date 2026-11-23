@@ -13,16 +13,17 @@
    This is still "GSAP + ScrollTrigger + Lenis as primary motion stack" exactly as
    requested — only the delivery mechanism (CDN vs. bundler) differs. */
 
-import { DICT, getInitialLang, setLang, applyI18n, t } from "./i18n.js?v=20261119m";
+import { DICT, getInitialLang, setLang, applyI18n, t } from "./i18n.js?v=20261124a";
 import { buildPortal } from "./portal.js";
 import { initMuseum25D } from "./museum25d.js";
 import { initKframesGallery } from "./kframes-gallery.js";
 import { initCraftGallery } from "./craft-gallery.js";
 let craftApi = null; // museum photo gallery (#craftGallery); declared here so it exists before any wiring runs
 import { initMediaFeatures } from "../../js/media-feature.js?v=20261119m";
+import { mountFilm } from "../../js/zt-film.js?v=20261124a"; // 07C-H: shared documentary film player (timeline + trailer)
 import { openPhoto, openElement } from "../../js/zs-media-viewer.js"; // same URL as craft-gallery.js -> one shared viewer instance
 import { STEINERNE_VIDEO_WEB4_BASE, KFRAMES_4K_WEB_BASE } from "../../js/zt-paths.js";
-import { initBruckmandl } from "./bruckmandl.js?v=20261119p";
+import { initBruckmandl } from "./bruckmandl.js?v=20261124a";
 import { TIMES as SB_CH_T, STR as SB_CH } from "./sb-index-chapters.js"; // 06G.2B: language-neutral clean timeline + DE/EN/ES chapter overlay
 import { initBruckmandlHotspotBridge } from "./bruckmandl-hotspot-bridge.js";
 // Technical DOM event name only (not QA/provider data) — reused verbatim
@@ -486,7 +487,7 @@ function populateLangButtons() {
       if (kframesApi) kframesApi.refreshLabels();
       if (craftApi) craftApi.refreshLabels();
       if (mediaFeatureApi) mediaFeatureApi.refreshLabels();
-      timelineChapterRefresh();
+      if (sbTimelineFilm) sbTimelineFilm.relabel();
       if (bruckmandlApi) bruckmandlApi.refreshLabels();
       const introStartBtn = document.getElementById("introStartBtn");
       if (introStartBtn) introStartBtn.textContent = t(lang, "introStart");
@@ -545,13 +546,24 @@ function applyMuteUI() {
   }
 }
 
+// 07C-H adapter of the page's ONE sound state for js/zt-film.js players (never audible before the visitor's own gesture)
+const sbFilmVideos = new Set();
+const sbSoundSubs = new Set();
+const sbSound = {
+  isOn: () => soundEnabled,
+  toggle: () => { ZT_AUDIO_BUS.unlock(); setSoundEnabled(!soundEnabled); },
+  register: (v) => { sbFilmVideos.add(v); v.muted = !soundEnabled; },
+  subscribe: (fn) => { sbSoundSubs.add(fn); },
+};
 function setSoundEnabled(next) {
   soundEnabled = next;
   // 06G.2B: the hero film has a real soundtrack — unmute only through this gesture-driven toggle; replay if it already ended.
   const iv = document.getElementById("introVideo"); const gate = document.getElementById("intro-gate");
   if (iv && gate && gate.style.display !== "none") { iv.muted = !next; if (next && iv.ended) { try { iv.currentTime = 0; } catch (e) {} const q = iv.play(); if (q && q.catch) q.catch(() => {}); } }
   // 06G.2B.1: an open ending-trailer follows the same single sound state (the toggle itself is the gesture)
-  if (sbTrailer) { sbTrailer.video.muted = !next; if (next && sbTrailer.video.paused) { const q = sbTrailer.video.play(); if (q && q.catch) q.catch(() => {}); } sbTrailer.sync(); }
+  // 07C-H: films the visitor has touched (timeline, trailer) follow the same single sound state
+  sbFilmVideos.forEach((v) => { v.muted = !next; });
+  sbSoundSubs.forEach((fn) => { try { fn(); } catch (e) {} });
   ZT_AUDIO_BUS.setMuted(!soundEnabled); // master-gain ramp, never gates any visual/content behavior
   try { sessionStorage.setItem(ZT_SOUND_PREF_KEY, soundEnabled ? "1" : "0"); } catch (e) {}
   applyMuteUI();
@@ -873,6 +885,7 @@ function initLenisAndScroll() {
   });
 
   lenis.on("scroll", ScrollTrigger.update);
+  if (/[?&]qa\b/.test(location.search)) window.__ztLenis = lenis; // QA-only handle (no effect on normal visits)
 
   gsap.ticker.add((time) => {
     lenis.raf(time * 1000);
@@ -914,6 +927,7 @@ function initLenisAndScroll() {
   // (not just a visual hide) — see THREE_D_ENABLED above.
   if (THREE_D_ENABLED) wireThreeDChapter();
   wireNav(lenis);
+  wireTrailerSection();
   wireEnding();
   wireZoom(lenis);
 
@@ -1145,26 +1159,23 @@ let mediaFeatureApi = null;
 // 2026-10-08 — trailer / timeline film / bridge route. Poster-first, lazy
 // video (see js/media-feature.js). No scroll listeners, no RAF.
 // 06G.2B — chapter overlay on the language-neutral clean timeline (validated K-frame labels, measured seek times).
-let timelineChapterRefresh = () => {};
+// 07C-H — the timeline film now uses the shared ZEITSPRUNG film player (js/zt-film.js) instead of native browser controls:
+// lower documentary overlay (chapter · date · title, HTML only, DE/EN/ES), chapter chips from the VALIDATED chapter list
+// (gap entries = no chip, no overlay), progress + elapsed / total, PLAY / PAUSE, SOUND (real soundtrack), FULLSCREEN (phones).
+let sbTimelineFilm = null;
 function wireTimelineChapters() {
-  // 07B.1 — ZEITSPRUNG_TYPOGRAPHY_SYSTEM_V1 overlay over the clean timeline film (HTML only, never burned in):
-  // SMALL "01 / 10" · PRIMARY validated date · SECONDARY chapter title. Gap entries (unvalidated film cards) show nothing.
-  const sec = document.getElementById("timelineFilm"); const v = sec && sec.querySelector(".mf__video"); const fr = sec && sec.querySelector(".mf__frame");
-  if (!v || !fr) return;
-  const o = document.createElement("div"); o.className = "zt-ov"; o.setAttribute("aria-live", "polite"); o.hidden = true;
-  const ok = document.createElement("p"); ok.className = "zt-ov__k"; const os = document.createElement("p"); os.className = "zt-ov__s"; const ot = document.createElement("p"); ot.className = "zt-ov__t";
-  o.append(ok, os, ot); fr.appendChild(o);
+  const host = document.getElementById("timelineFilmHost");
+  if (!host) return;
   const list = () => (SB_CH[lang] || SB_CH.de).tlv;
   const N = SB_CH.de.tlv.filter((c) => c && c.y).length;
-  let k = -2;
-  const upd = (force) => { const tt = v.currentTime || 0; let i = -1; SB_CH_T.forEach((x, j) => { if (tt >= x) i = j; }); if (i === k && !force) return; const changed = i !== k; k = i;
-    const c = i >= 0 ? list()[i] : null;
-    if (!c || !c.y || !(v.currentTime > 0)) { o.hidden = true; return; }
-    const n = list().slice(0, i + 1).filter((x) => x && x.y).length;
-    ok.textContent = String(n).padStart(2, "0") + " / " + String(N).padStart(2, "0"); os.textContent = c.y; ot.textContent = c.h; o.hidden = false;
-    if (changed) { o.classList.remove("is-new"); void o.offsetWidth; o.classList.add("is-new"); } };
-  v.addEventListener("timeupdate", () => upd(false)); v.addEventListener("seeked", () => upd(true)); v.addEventListener("emptied", () => upd(true));
-  timelineChapterRefresh = () => upd(true);
+  sbTimelineFilm = mountFilm(host, {
+    mode: "timeline",
+    src: `${STEINERNE_VIDEO_WEB4_BASE}/sb_timeline_clean_v1_720.mp4`,
+    poster: `${STEINERNE_VIDEO_WEB4_BASE}/sb_timeline_clean_poster_v1.jpg`,
+    duration: 154.2, cues: SB_CH_T, hasAudio: true, sound: sbSound,
+    alt: () => t(lang, "mfTimelineTitle"),
+    chapter: (i) => { const c = list()[i]; if (!c || !c.y) return null; const n = list().slice(0, i + 1).filter((x) => x && x.y).length; return { k: String(n).padStart(2, "0") + " / " + String(N).padStart(2, "0"), s: c.y, t: c.h, chip: c.y }; },
+  });
 }
 function wireMediaFeatures() {
   wireTimelineChapters();
@@ -1412,7 +1423,6 @@ function wireNav(lenis) {
 const SB_SELF_ID = "steinerne-bruecke";
 const SB_END_ORDER = ["dom-st-peter", "porta-praetoria", "altes-rathaus", "neupfarrplatz"];
 const SB_END_LABEL = { "dom-st-peter": "DOM ST. PETER", "porta-praetoria": "PORTA PRAETORIA", "altes-rathaus": "ALTES RATHAUS", "neupfarrplatz": "NEUPFARRPLATZ" };
-let sbTrailer = null;
 
 function wireEnding() {
   const dest = document.getElementById("sbEndDest");
@@ -1438,39 +1448,29 @@ function wireEnding() {
   if (tb) tb.addEventListener("click", openEndingTrailer);
 }
 
-// Steinerne clean 15 s trailer in the shared viewer: no native controls, tap toggles pause,
-// sound only through the single ♪ state (never audible unless the visitor enabled it).
+// 07C-H — dedicated cinematic trailer section (#trailer) before the destination ending: the approved Neupfarrplatz
+// title-card language (ZEITSPRUNG · STEINERNE BRÜCKE · subtitle · tagline), clean 15 s master, muted autoplay while
+// visible, ZEITSPRUNG controls, sound only through the page's one state after the visitor's gesture.
+let sbTrailerFilm = null;
+function wireTrailerSection() {
+  const host = document.getElementById("trailer");
+  if (!host) return;
+  sbTrailerFilm = mountFilm(host, {
+    mode: "trailer",
+    src: `${STEINERNE_VIDEO_WEB4_BASE}/sb_trailer_clean_v1_720.mp4`,
+    poster: `${STEINERNE_VIDEO_WEB4_BASE}/sb_trailer_clean_poster_v1.jpg`,
+    duration: 15.02, hasAudio: true, sound: sbSound,
+    head: () => ({ e: t(lang, "trEyebrow"), h: t(lang, "trTitle"), p: t(lang, "trText") }),
+    titleCard: () => ({ k: "ZEITSPRUNG", n: t(lang, "introTitle"), s: t(lang, "introCity") + " · " + t(lang, "introRange"), l: t(lang, "trLine") }),
+    label: () => t(lang, "trEyebrow"),
+    alt: () => t(lang, "trAlt"),
+  });
+}
 function openEndingTrailer() {
-  const frame = document.createElement("div");
-  frame.className = "sb-trailer";
-  const v = document.createElement("video");
-  v.setAttribute("playsinline", ""); v.playsInline = true;
-  v.setAttribute("disablepictureinpicture", "");
-  v.preload = "auto";
-  v.poster = `${STEINERNE_VIDEO_WEB4_BASE}/sb_trailer_clean_poster_v1.jpg`;
-  v.src = `${STEINERNE_VIDEO_WEB4_BASE}/sb_trailer_clean_v1_720.mp4`;
-  v.muted = !soundEnabled;
-  const snd = document.createElement("button");
-  snd.type = "button";
-  snd.className = "sb-trailer__snd";
-  snd.innerHTML = '<span aria-hidden="true">♪</span>';
-  frame.append(v, snd);
-  const sync = () => {
-    snd.classList.toggle("is-on", soundEnabled);
-    snd.setAttribute("aria-pressed", soundEnabled ? "true" : "false");
-    snd.setAttribute("aria-label", t(lang, soundEnabled ? "introSoundOn" : "introSoundOff"));
-  };
-  sync();
-  v.addEventListener("click", () => { if (v.paused) { const q = v.play(); if (q && q.catch) q.catch(() => {}); } else v.pause(); });
-  snd.addEventListener("click", (e) => { e.stopPropagation(); ZT_AUDIO_BUS.unlock(); setSoundEnabled(!soundEnabled); });
-  document.body.appendChild(frame); // openElement re-parents from (and restores to) a real parent
-  sbTrailer = { video: v, sync };
-  openElement(frame, { onClose: () => {
-    v.pause(); v.removeAttribute("src"); try { v.load(); } catch (e) { /* noop */ }
-    frame.remove(); sbTrailer = null;
-  } });
-  const p = v.play();
-  if (p && p.catch) p.catch(() => { v.muted = true; const q = v.play(); if (q && q.catch) q.catch(() => {}); });
+  const sec = document.getElementById("trailer");
+  if (!sec || !sbTrailerFilm) return;
+  sec.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+  sbTrailerFilm.play();
 }
 
 // ---------------------------------------------------------------------------

@@ -38,6 +38,22 @@
 @keyframes ztOvIn{ from{ opacity: 0; transform: translateY(10px); } to{ opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce){ .zt-ov.is-new{ animation: none; } }
 
+/* ---------- CINEMATIC TITLE CARD (MODE A) — official trailer / film title language ----------
+   REFERENCE: the approved NEUPFARRPLATZ trailer card (07B .ntr__l1/l2/l3/line), restored 1:1:
+     SMALL GOLD EYEBROW "ZEITSPRUNG" · LARGE IVORY SERIF monument · TRACKED UPPERCASE subtitle · ELEGANT ITALIC tagline.
+   Restrained lower gradient only (the architecture stays visible); no opaque card, no glow. Size follows the stage width. */
+.zt-tc{ position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; margin: 0; padding: 70px 18px 22px; text-align: left; pointer-events: none;
+  background: linear-gradient(to top, rgba(8,7,6,.85), rgba(8,7,6,0)); }
+.zt-tc__k{ margin: 0; font: 500 10.5px/1 var(--zt-ty-mono); letter-spacing: .42em; text-transform: uppercase; color: var(--zt-ty-gold); }
+.zt-tc__n{ margin: 10px 0 0; font: 300 clamp(26px, 10.5cqi, 46px)/1.02 var(--zt-ty-serif); letter-spacing: .06em; text-transform: uppercase; color: var(--zt-ty-ivory); overflow-wrap: break-word; }
+.zt-tc__s{ margin: 8px 0 0; font: 500 11px/1.35 var(--zt-ty-mono); letter-spacing: .32em; text-transform: uppercase; color: var(--zt-ty-ivory-2); }
+.zt-tc__l{ margin: 12px 0 0; font: italic 400 15px/1.3 var(--zt-ty-serif); color: var(--zt-ty-serif-ink); }
+.zt-tc__s:empty, .zt-tc__l:empty{ display: none; }
+.zt-tc{ transition: opacity .9s cubic-bezier(.22,.61,.36,1); }
+.zt-tc.is-quiet{ opacity: 0; }
+@media (prefers-reduced-motion: reduce){ .zt-tc{ transition: none; } }
+@supports not (font-size: 1cqi){ .zt-tc__n{ font-size: clamp(26px, 8vw, 46px); } }
+
 /* ---------- utility classes for future pages ---------- */
 .zt-type-small{ font: 500 11px/1 var(--zt-ty-mono); letter-spacing: var(--zt-ty-small-track); text-transform: uppercase; }
 .zt-type-primary{ font: 600 var(--zt-ty-primary)/1.05 var(--zt-ty-sans); letter-spacing: .01em; text-transform: uppercase; color: var(--zt-ty-ivory); }
@@ -50,8 +66,9 @@
 /* ================================================================== */
 /* PRIMARY · hero titles (uppercase display; monument-specific size kept) */
 .intro-gate__title, .dhero__title, .phero__title, .ahero__title{ font-family: var(--zt-ty-sans); font-weight: 600; letter-spacing: .01em; text-transform: uppercase; }
-/* SECONDARY · monument subtitles under the hero title (editorial serif) */
-.phero__sub, .ahero__sub{ font-family: var(--zt-ty-serif); font-style: italic; font-weight: 400; letter-spacing: .04em; font-size: clamp(19px, 5.2vw, 26px); line-height: 1.15; color: var(--zt-ty-serif-ink); text-transform: none; }
+/* hero title card (07C-H, Neupfarrplatz reference): TRACKED UPPERCASE subtitle + ELEGANT ITALIC tagline */
+.phero__sub, .ahero__sub{ font: 500 clamp(13px, 3.8vw, 17px)/1.2 var(--zt-ty-mono); letter-spacing: .34em; text-transform: uppercase; color: var(--zt-ty-ivory); }
+.ahero__tag{ font: italic 400 clamp(16px, 4.4vw, 19px)/1.3 var(--zt-ty-serif); color: var(--zt-ty-serif-ink); }
 /* PRIMARY family · major section titles (sentence case kept for readability) */
 h2.ah, h2.dh, h2.ph, .mf__title, .kf__inner h3, .craft__inner > h3, .bruckmandl__title, .museum__inner h3{ font-family: var(--zt-ty-sans); font-weight: 600; }
 /* SECONDARY · chapter / step titles inside cinematic sequences */

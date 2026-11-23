@@ -4,11 +4,12 @@
 // 06C.4 owner override: clean master timeline AR_ASSET_191 is the scroll-scrubbed build scene; chapter/trailer films stay excluded.
 // 06E: hero film AR_ASSET_059, Erker V2 + hologram assembly (scroll-scrub), building-site loops, portal/Erker corrected stills.
 // Visible AI / reconstruction badges = 0 (owner rule 2026-11-18); provenance stays in the media manifest.
-import { STR, LANGS, STORAGE_KEY } from "./ar-i18n.js?v=20261123c";
-import { initGuide } from "../../js/zt-guide.js?v=20261123e"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
+import { STR, LANGS, STORAGE_KEY } from "./ar-i18n.js?v=20261124a";
+import { initGuide } from "../../js/zt-guide.js?v=20261124a"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
 import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
 
-import { ztSound } from "../../js/zt-sound.js?v=20261119e"; // 06G: one compact ♪ control beside DE | EN | ES
+import { ztSound } from "../../js/zt-sound.js?v=20261124a";
+import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261124a"; // 07C-H: shared film player (trailer section) // 06G: one compact ♪ control beside DE | EN | ES
 
 const A = "../assets/altes-rathaus/";
 const img = (n) => `${A}img/${n}_720.webp`;
@@ -147,27 +148,19 @@ function heroFilm(pageReady) {
   pageReady.then(() => setTimeout(() => { if (!vis) return; v.src = SRC; play(); }, 250));
 }
 
-/* ---------- 12 trailer: AR_ASSET_221 (RATH_TRAILER_CLEAN_V1.mp4, owner-approved 06G; burned-in chronology titles approved) ----------
-   Primary visual of "Ein Gebäude, viele Zeiten". HEUTE image = poster + fallback (stays underneath). Muted autoplay only while
-   >= 55 % visible; paused off screen; sound only via the compact ♪; no native controls; at the end it fades back to HEUTE and
-   restarts on the next entry. Reduced motion = HEUTE image only. */
-function endTrailer() {
-  const SRC = `${A}video/ar_trailer_v2_720.mp4`; // 06G.2B: clean 15 s master AR_ASSET_223 (AR_221 34 s trailer kept as reference: ar_trailer_v1_720.mp4)
-  const st = el("div", "astage aend__film"); st.append(pic("ar_heute_v1", (t) => t.hero.alt));
-  if (reduced) return st;
-  const v = el("video", "aend__vid", { playsinline: "", preload: "none", poster: img("ar_heute_v1"), disablepictureinpicture: "", tabindex: "-1" }); bind(v, (t) => t.end.trailerAlt, "aria-label");
-  st.append(v); ztSound.add(v, { onEnable: () => { if (vis && v.paused) play(); } });
-  const play = () => { if (!v.getAttribute("src")) { v.src = SRC; } const p = v.play(); if (p && p.catch) p.catch(() => {}); };
-  let vis = false;
-  v.addEventListener("playing", () => st.classList.add("is-playing"));
-  v.addEventListener("ended", () => { st.classList.remove("is-playing"); v.dataset.done = "1"; });
-  v.addEventListener("error", () => { st.classList.remove("is-playing"); v.remove(); });
-  new IntersectionObserver((es) => es.forEach((en) => {
-    vis = en.isIntersecting;
-    if (vis) { if (v.dataset.done) { delete v.dataset.done; try { v.currentTime = 0; } catch (x) {} } play(); }
-    else if (!v.paused) v.pause();
-  }), { threshold: 0.55 }).observe(st);
-  return st;
+/* ---------- 12 trailer: dedicated cinematic section before the ending (07C-H, js/zt-film.js) ----------
+   Clean 15 s master AR_ASSET_223 (ar_trailer_v2_720.mp4, real soundtrack; AR_221 kept as reference only), HEUTE image as
+   poster, Neupfarrplatz title-card language (hero title / sub / tag), muted autoplay only while >= 55 % visible, paused
+   off screen, clean restart on re-entry, ZEITSPRUNG controls, sound only after the visitor's own gesture. */
+function buildTrailer() {
+  const s = $("#trailer"); if (!s) return;
+  mountFilm(s, {
+    mode: "trailer", src: `${A}video/ar_trailer_v2_720.mp4`, poster: img("ar_heute_v1"), duration: 15.04,
+    hasAudio: true, sound: ztSoundAdapter(ztSound),
+    head: () => ({ e: T().tr.eyebrow, h: T().tr.h, p: T().tr.p }),
+    titleCard: () => ({ k: "ZEITSPRUNG", n: T().tr.l2, s: T().tr.l3, l: T().tr.line }),
+    label: () => T().tr.eyebrow, alt: () => T().end.trailerAlt || T().tr.alt,
+  });
 }
 
 /* ---------- 01 today ---------- */
@@ -316,13 +309,12 @@ function buildToggle() {
 /* ---------- 12 return to today + sources (no visible AI / methodology note: platform footer later) ---------- */
 function buildEnd() {
   // 06F: editorial title treatment (staged reveal: eyebrow -> title scale/opacity -> gold rule -> lead). Same i18n keys.
-  // 06G: cinematic chapter title (small tracked first phrase / large serif second phrase), then the trailer as primary visual.
+  // 06G: cinematic chapter title (small tracked first phrase / large serif second phrase). 07C-H: the trailer is now its own section (#trailer) above.
   const s = $("#ende"); const w = el("div", "awrap ar aend__in");
   const e = el("p", "aeyebrow"); bind(e, (t) => t.end.eyebrow);
   const h = el("h2", "ah aend__title"); const h1 = el("span", "aend__t1"); const h2 = el("span", "aend__t2"); h.append(h1, h2);
   onLang(() => { const m = T().end.h.match(/^(.*?,)\s*(.*)$/); h1.textContent = m ? m[1] : ""; h2.textContent = m ? m[2] : T().end.h; h.setAttribute("aria-label", T().end.h); });
   w.append(e, h, el("span", "aend__rule", { "aria-hidden": "true" }), lead("end", "p"));
-  w.append(endTrailer());
   const cta = el("div", "aend__cta"); const sb = el("button", "abtn", { type: "button" }); bind(sb, (t) => t.end.sources); const ab = el("a", "abtn abtn--primary", { href: "../index.html#index-monuments" }); bind(ab, (t) => t.back); cta.append(sb, ab); w.append(cta); mountDestinations(w, { self: "altes-rathaus", btnClass: "abtn" }); // 07B.1
   s.append(w);
   const dlg = $("#srcDlg"); const list = $("#srcList"); const cl = $("#srcClose");
@@ -348,5 +340,5 @@ buildPortal(); buildSaal();
 buildSeq({ sec: "menschen", key: "people", note: true, files: ["ar_envoy_v1", "ar_pp_scribe_v1", "ar_pp_courier_v1", "ar_pp_council_v1", "ar_pp_official_v1"] }); // AR 007 / 072 / 073 / 063 / 061
 buildRT();
 buildSeq({ sec: "material", key: "mat", files: ["ar_mat_board_v1", "ar_mat_wood_v1", "ar_mat_stone_v1", "ar_window_v1", "ar_mat_iron_v1", "ar_seal_v1"] }); // AR 205 / 018 / 027 / 136 / 023 / 021
-buildToggle(); buildEnd(); reveal(); initGuide({ monument: "altes-rathaus" });
+buildToggle(); buildTrailer(); buildEnd(); reveal(); initGuide({ monument: "altes-rathaus" });
 requestAnimationFrame(run);

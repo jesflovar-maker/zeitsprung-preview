@@ -1,11 +1,25 @@
 // PORTA PRAETORIA · CASTRA REGINA — PUBLIC V1: one vanilla ES module, DE / EN / ES, no external libraries.
 // The DOM is built ONCE; a language switch only re-runs text refreshers (no rebuild, no new listeners / observers / timers).
 // Media: runtime derivatives only (../assets/porta-praetoria/). One video plays at a time; every video loads lazily (preload none + poster).
-import { STR, LANGS, STORAGE_KEY } from "./porta-i18n.js?v=20261123c";
-import { initGuide } from "../../js/zt-guide.js?v=20261123e"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
+import { STR, LANGS, STORAGE_KEY } from "./porta-i18n.js?v=20261124a";
+import { initGuide } from "../../js/zt-guide.js?v=20261124a"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
 import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
 
-import { ztSound } from "../../js/zt-sound.js?v=20261119e"; // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
+import { ztSound } from "../../js/zt-sound.js?v=20261124a";
+import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261124a"; // 07C-H: shared film player (trailer slot)
+/* 07C-H TRAILER SLOT — same architecture as the other monuments, NOT public yet: the corrected final trailer
+   PP_TRAILER_MASTER_CLEAN_V1 is DEFERRED (owner). When approved, set { src, poster, duration, hasAudio } here — the
+   section (#trailer before the ending) is then created automatically; no redesign. */
+const PP_TRAILER = null;
+function buildTrailerSlot() {
+  if (!PP_TRAILER) return;
+  const end = document.getElementById("heute"); if (!end) return;
+  const s = document.createElement("section"); s.id = "trailer"; s.className = "psec ptrailer-sec"; s.setAttribute("aria-label", "Trailer"); end.before(s);
+  mountFilm(s, { mode: "trailer", ...PP_TRAILER, sound: ztSoundAdapter(ztSound),
+    head: () => ({ e: T().tr.eyebrow, h: T().tr.h, p: T().tr.p }),
+    titleCard: () => ({ k: "ZEITSPRUNG", n: T().tr.l2, s: T().tr.l3, l: T().tr.line }),
+    label: () => T().tr.eyebrow, alt: () => T().tr.alt });
+} // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
 
 const A = "../assets/porta-praetoria/";
 const img = (n, w = 720) => `${A}img/${n}_${w}.webp`;
@@ -356,5 +370,5 @@ function reveal() {
 
 try { history.scrollRestoration = "manual"; } catch (e) {}
 root.lang = lang;
-buildNav(); buildHero(); buildCtx(); buildHolo(); buildPass(); buildTower(); buildY179(); buildCastra(); buildPlan(); buildBau(); buildFilm(); buildLoops(); buildGallery(); buildEnd(); reveal(); initGuide({ monument: "porta-praetoria" });
+buildNav(); buildHero(); buildCtx(); buildHolo(); buildPass(); buildTower(); buildY179(); buildCastra(); buildPlan(); buildBau(); buildFilm(); buildLoops(); buildGallery(); buildTrailerSlot(); buildEnd(); reveal(); initGuide({ monument: "porta-praetoria" });
 requestAnimationFrame(runSC);

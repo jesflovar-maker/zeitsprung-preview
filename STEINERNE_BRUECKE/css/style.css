@@ -2667,3 +2667,30 @@ img{ max-width:100%; display:block; }
   .bm-view__img, .bm-view__cap, .bm-view__dots, .bm-detail__img, .bm-detail__cap, .bm-detail__idx{ opacity: 1 !important; transform: none !important; transition: none !important; }
 }
 .mf__frame .zt-ov{z-index:2}
+
+/* ================================================================== */
+/* 07C-H — STEINERNE V1 MODERNIZATION (presentation only; content unchanged)  */
+/* ================================================================== */
+/* FACTS: prototype stack of four full-width boxes -> compact 2 × 2 museum data grid (4 across on desktop),
+   numbers in the PRIMARY display face (ZEITSPRUNG_TYPOGRAPHY_SYSTEM_V1), less legacy padding. */
+.facts{ padding: 56px var(--zt-page-gutter) 48px; }
+.facts__grid{ grid-template-columns: 1fr 1fr; gap: 10px; }
+.fact-card{ padding: 16px 14px 18px; gap: 6px; }
+.fact-card__value, .fact-card--derived .fact-card__value{ font: 600 clamp(30px, 8.6vw, 42px)/1 var(--zt-ty-sans, 'Inter', sans-serif); letter-spacing: .01em; }
+.fact-card__note{ font-size: 11.5px; line-height: 1.4; }
+@media (min-width: 900px){
+  .facts{ padding: 88px 60px 72px; }
+  .facts__grid{ grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .fact-card{ padding: 24px 20px; }
+  .fact-card__value, .fact-card--derived .fact-card__value{ font-size: 46px; }
+}
+/* FILM SECTIONS: title -> media -> caption rhythm; the shared player (css/zt-film.css) owns its own gutters */
+.mf.sb-film-sec{ padding-left: 0; padding-right: 0; padding-bottom: clamp(40px, 8vw, 72px); }
+.sb-film-sec .mf__inner{ padding: 0 var(--zt-page-gutter); }
+.sb-film-sec .mf__text{ margin-bottom: 0; }
+.sb-trailer-sec{ position: relative; background: var(--z-bg); padding: var(--zt-section-space) 0 clamp(40px, 8vw, 72px); }
+.mf--route{ padding-bottom: clamp(48px, 9vw, 80px); }
+.continue.sb-end{ padding-top: 8px; }
+/* SECTION RHYTHM: one platform section space instead of the prototype's 120–130 px one-offs */
+.museum, .bruckmandl, .craft{ padding-top: var(--zt-section-space); }
+.bruckmandl{ padding-bottom: clamp(48px, 9vw, 80px); }

@@ -133,3 +133,7 @@ LANGS.forEach((l) => { const a = ADD_06G2B[l], s = STR[l]; s.y179.clip = a.y179c
     ];
   }
 }
+
+/* 07C-H — TRAILER SLOT (prepared, NOT public): the corrected final trailer PP_TRAILER_MASTER_CLEAN_V1 is DEFERRED until
+   the owner supplies / approves it. porta-main.js renders the section only when PP_TRAILER is set -> later 1:1 drop-in. */
+for (const l of ["de", "en", "es"]) { const S = STR[l]; S.tr = { eyebrow: l === "es" ? "TRÁILER" : "TRAILER", h: S.hero.title, p: "", l2: S.hero.title, l3: S.hero.sub, line: S.hero.range, alt: S.hero.title }; }

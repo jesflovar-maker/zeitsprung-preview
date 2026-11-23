@@ -301,6 +301,7 @@ export const DICT = {
     continueTitle: "Reise fortsetzen",
     continueText: "Regensburg erzählt weiter — wählen Sie Ihr nächstes Monument.",
     endAll: "ALLE MONUMENTE", endNext: "DIREKT WEITER ZU", endTrailer: "TRAILER ANSEHEN", zoomOpen: "Bild vergrößern",
+    trEyebrow: "TRAILER", trTitle: "Die Steinerne Brücke in Bildern", trText: "Ein kurzer Film über die Brücke und ihre Zeit.", trLine: "Seit 1146 über der Donau", trAlt: "Trailer Steinerne Brücke",
     footerBack: "ZURÜCK ZUM ANFANG"
   },
   en: {
@@ -535,6 +536,7 @@ export const DICT = {
     continueTitle: "Continue the journey",
     continueText: "Regensburg's story goes on — choose your next monument.",
     endAll: "ALL MONUMENTS", endNext: "CONTINUE DIRECTLY TO", endTrailer: "WATCH TRAILER", zoomOpen: "Enlarge image",
+    trEyebrow: "TRAILER", trTitle: "The Stone Bridge in pictures", trText: "A short film about the bridge and its time.", trLine: "Spanning the Danube since 1146", trAlt: "Stone Bridge trailer",
     footerBack: "BACK TO START"
   },
   es: {
@@ -769,6 +771,7 @@ export const DICT = {
     continueTitle: "Continuar el viaje",
     continueText: "Regensburg sigue contando su historia: elige tu próximo monumento.",
     endAll: "TODOS LOS MONUMENTOS", endNext: "CONTINUAR DIRECTAMENTE A", endTrailer: "VER TRÁILER", zoomOpen: "Ampliar imagen",
+    trEyebrow: "TRÁILER", trTitle: "El Puente de Piedra en imágenes", trText: "Una breve película sobre el puente y su tiempo.", trLine: "Sobre el Danubio desde 1146", trAlt: "Tráiler del Puente de Piedra",
     footerBack: "VOLVER AL INICIO"
   }
 };

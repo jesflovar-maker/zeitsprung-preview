@@ -8,7 +8,7 @@
    (no scroll listener, no continuous scanning) and its topic is offered first.
    Never touches media or sound. Language follows <html lang> (zeitsprung_v2_lang), relabels instantly.
    Usage: initGuide({ monument: "dom-st-peter" }) */
-import { ZEITSPRUNG_GLOBAL_GUIDE_V1 } from "./zt-guide-config.js?v=20261123d";
+import { ZEITSPRUNG_GLOBAL_GUIDE_V1 } from "./zt-guide-config.js?v=20261124a";
 
 const AVATAR = new URL("../assets/steinerne-bruecke/bruckmandl/ai/", import.meta.url).href;
 const UI = {
@@ -17,15 +17,15 @@ const UI = {
   es: { open: "Preguntar al Brückmandl", close: "Cerrar" },
 };
 // elements the floating icon must never cover on phones (endings, destination lists, timeline control rows)
-const AVOID = "#ende, .nend, .dend__cta, .aend__cta, .pend__cta, .zt-dest, .ntl__panel, .dtlv__ctl, .dtlv__side";
+const AVOID = "#ende, .nend, .dend__cta, .aend__cta, .pend__cta, .zt-dest, .ntl__panel, .dtlv__ctl, .dtlv__side, .ztf__panel, .sb-end__in, .hm__ctl";
 const langNow = () => { const l = (document.documentElement.lang || "de").slice(0, 2).toLowerCase(); return UI[l] ? l : "de"; };
 
 export async function initGuide({ monument } = {}) {
   const cfg = ZEITSPRUNG_GLOBAL_GUIDE_V1.monuments[monument];
   if (!cfg || document.getElementById("ztAssistantFab")) return null;
   if (cfg.engine === "bridge") {
-    const { initAssistantFab } = await import("./zt-assistant-fab.js?v=20261123d");
-    return initAssistantFab({ link: cfg.link, moreLink: cfg.moreLink, sections: cfg.sections });
+    const { initAssistantFab } = await import("./zt-assistant-fab.js?v=20261124a");
+    return initAssistantFab({ link: cfg.link, moreLink: cfg.moreLink, sections: cfg.sections, avoid: AVOID });
   }
   const mod = await import(new URL(cfg.data, import.meta.url).href);
   const STR = mod.STR;
@@ -67,11 +67,11 @@ export async function initGuide({ monument } = {}) {
   const secs = Object.keys(cfg.sections || {}).map((id) => document.getElementById(id)).filter(Boolean);
   const sectionNow = () => { let best = "", bh = 0; secs.forEach((el) => { const r = el.getBoundingClientRect(); const h = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0); if (h > bh) { bh = h; best = el.id; } }); return best; };
   // never cover CTAs / timeline controls on phones: while one of them is on screen the icon tucks away (one observer)
-  const avoid = [...document.querySelectorAll(AVOID)];
-  if (avoid.length && "IntersectionObserver" in window) {
+  if ("IntersectionObserver" in window) {
     const on = new Set();
     const io2 = new IntersectionObserver((es) => { es.forEach((e) => { if (e.isIntersecting) on.add(e.target); else on.delete(e.target); }); fab.classList.toggle("is-tucked", on.size > 0 && pn.hidden); }, { threshold: 0.01 });
-    avoid.forEach((n) => io2.observe(n));
+    const watch = () => document.querySelectorAll(AVOID).forEach((n) => { if (!n.__ztAv) { n.__ztAv = 1; io2.observe(n); } });
+    watch(); setTimeout(watch, 2500); setTimeout(watch, 6000); // late-built panels (films, destinations)
   }
   const onKey = (e) => { if (e.key === "Escape") close(); };
   function open() {

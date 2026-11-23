@@ -1,0 +1,61 @@
+/* ZEITSPRUNG V2 — css/zt-film.css (07C-H) — shared film player (js/zt-film.js): timeline + trailer.
+   Typography = ZEITSPRUNG_TYPOGRAPHY_SYSTEM_V1 tokens (css/zt-typography.css must be linked). Own .ztf namespace;
+   values follow the approved NEUPFARRPLATZ timeline/trailer (07B) — portrait 9:16, black museum stage, thin line. */
+.ztf{ --ztf-line: rgba(241,235,225,.14); --ztf-top: 72px; width: 100%; max-width: 1180px; margin: 0 auto; padding: 0 16px; box-sizing: border-box; color: var(--zt-ty-ivory, #f1ebe1); }
+.ztf *, .ztf *::before, .ztf *::after{ box-sizing: border-box; }
+.ztf__head{ text-align: center; max-width: 640px; margin: 0 auto; }
+.ztf__eyebrow{ margin: 0; font: 500 11px/1 var(--zt-ty-mono); letter-spacing: .32em; text-transform: uppercase; color: var(--zt-ty-gold); }
+.ztf__title{ margin: 12px 0 0; font: 600 clamp(24px, 6.4vw, 36px)/1.1 var(--zt-ty-sans); letter-spacing: .01em; color: var(--zt-ty-ivory); }
+.ztf__lead{ margin: 10px auto 0; max-width: 34em; font: 400 var(--zt-ty-supporting)/1.5 var(--zt-ty-sans); color: var(--zt-ty-ivory-2); }
+.ztf__box{ display: grid; gap: 14px; justify-items: center; margin-top: clamp(18px, 4vw, 32px); }
+/* stage: portrait 9:16, never cropped (contain), media dominates the phone viewport */
+.ztf__stage{ position: relative; aspect-ratio: 9 / 16; max-width: 100%; background: #000; border: 1px solid var(--ztf-line); overflow: hidden; container-type: inline-size; }
+.ztf--timeline .ztf__stage{ height: min(calc(100svh - var(--ztf-top) - 210px), 900px); min-height: 380px; }
+.ztf--trailer .ztf__stage{ width: min(100%, calc(min(calc(100svh - var(--ztf-top) - 120px), 940px) * 9 / 16)); }
+.ztf__poster, .ztf__video{ position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+.ztf__video{ opacity: 0; transition: opacity .8s cubic-bezier(.22,.61,.36,1); cursor: pointer; }
+.ztf__stage.has-started .ztf__video, .ztf__stage.is-playing .ztf__video{ opacity: 1; }
+.ztf__stage.is-error .ztf__video{ display: none; }
+.ztf__stage .zt-ov{ z-index: 3; padding-bottom: 20px; }
+.ztf__big{ position: absolute; inset: 0; z-index: 4; display: grid; place-items: center; margin: 0; padding: 0; border: 0; background: transparent; cursor: pointer; transition: opacity .35s; }
+.ztf__big span{ position: relative; width: 64px; height: 64px; border-radius: 50%; border: 1px solid rgba(241,235,225,.6); background: rgba(8,7,6,.55); }
+.ztf__big span::after{ content: ""; position: absolute; left: 26px; top: 21px; border-left: 16px solid var(--zt-ty-ivory); border-top: 11px solid transparent; border-bottom: 11px solid transparent; }
+.ztf__stage.is-playing .ztf__big{ opacity: 0; pointer-events: none; }
+.ztf__big:focus-visible span{ outline: 2px solid var(--zt-ty-gold); outline-offset: 4px; }
+/* controls panel (tertiary controls · ZEITSPRUNG_ACTION_STANDARD_V1) */
+.ztf__panel{ width: 100%; max-width: 560px; display: grid; gap: 10px; }
+.ztf--trailer .ztf__panel{ max-width: min(100%, 520px); }
+.ztf__row{ display: flex; justify-content: space-between; align-items: baseline; font: 500 10.5px/1 var(--zt-ty-mono); letter-spacing: .18em; text-transform: uppercase; color: rgba(241,235,225,.5); }
+.ztf__bar{ position: relative; height: 28px; cursor: pointer; touch-action: none; }
+.ztf__bar::before{ content: ""; position: absolute; left: 0; right: 0; top: 13px; height: 2px; background: rgba(241,235,225,.16); }
+.ztf__fill{ position: absolute; left: 0; right: 0; top: 13px; height: 2px; background: var(--zt-ty-gold); transform-origin: 0 50%; transform: scaleX(0); }
+.ztf__ticks i{ position: absolute; top: 9px; width: 1px; height: 10px; background: rgba(241,235,225,.35); }
+.ztf__bar:focus-visible{ outline: 2px solid var(--zt-ty-gold); outline-offset: 2px; }
+.ztf__chips{ display: flex; flex-wrap: wrap; gap: 6px; }
+.ztf__chip{ min-height: 44px; min-width: 52px; padding: 0 10px; border: 1px solid var(--ztf-line); background: rgba(11,10,9,.6); font: 500 11px/1 var(--zt-ty-mono); letter-spacing: .12em; color: var(--zt-ty-ivory-2); cursor: pointer; }
+.ztf__chip[aria-current="true"]{ border-color: var(--zt-ty-gold); color: var(--zt-ty-gold); background: rgba(201,169,110,.1); }
+.ztf__now{ margin: 0; min-height: 2.6em; font: 400 clamp(14.5px, 3.7vw, 16px)/1.45 var(--zt-ty-sans); color: var(--zt-ty-ivory-2); }
+.ztf__now b{ color: var(--zt-ty-ivory); font-weight: 600; }
+.ztf__ctl{ display: flex; flex-wrap: wrap; gap: 8px; }
+.ztf__btn{ min-height: 44px; padding: 0 16px; border: 1px solid rgba(241,235,225,.28); background: rgba(11,10,9,.55); color: var(--zt-ty-ivory); font: 500 11px/1 var(--zt-ty-mono); letter-spacing: .18em; text-transform: uppercase; cursor: pointer; }
+.ztf__btn:hover{ border-color: rgba(201,169,110,.7); }
+.ztf__btn[aria-pressed="true"]{ border-color: var(--zt-ty-gold); color: var(--zt-ty-gold); background: rgba(201,169,110,.1); }
+.ztf__btn:focus-visible, .ztf__chip:focus-visible{ outline: 2px solid var(--zt-ty-gold); outline-offset: 2px; }
+/* FULLSCREEN only on phones / small tablets (platform rule: <= 768 px) */
+@media (min-width: 769px){ .ztf__btn--fs{ display: none; } }
+/* fullscreen documentary layout: same element, overlay in the lower caption zone, safe areas respected */
+.ztf__fsbar{ display: none; }
+.ztf__stage:fullscreen, .ztf__stage:-webkit-full-screen{ width: 100vw; height: 100vh; max-width: none; aspect-ratio: auto; border: 0; }
+.ztf__stage.is-pfs{ position: fixed; inset: 0; z-index: 950; width: 100vw; height: 100vh; height: 100dvh; max-width: none; min-height: 0; aspect-ratio: auto; border: 0; }
+.ztf__stage:fullscreen .ztf__fsbar, .ztf__stage:-webkit-full-screen .ztf__fsbar, .ztf__stage.is-pfs .ztf__fsbar{ display: flex; position: absolute; top: max(14px, env(safe-area-inset-top)); right: 14px; z-index: 7; gap: 8px; }
+.ztf__stage:fullscreen .zt-ov, .ztf__stage:-webkit-full-screen .zt-ov, .ztf__stage.is-pfs .zt-ov,
+.ztf__stage:fullscreen .zt-tc, .ztf__stage:-webkit-full-screen .zt-tc, .ztf__stage.is-pfs .zt-tc{ padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+.ztf__stage:fullscreen .ztf__big, .ztf__stage.is-pfs .ztf__big{ top: 70px; }
+html.zt-pfs{ overflow: hidden; }
+html.zt-pfs .zt-assist__fab, html.zt-pfs .zt-assist{ display: none !important; }
+/* desktop: timeline = stage + documentary panel side by side; trailer = centred stage, controls below */
+@media (min-width: 900px){
+  .ztf--timeline .ztf__box{ grid-template-columns: auto minmax(320px, 460px); gap: clamp(36px, 5vw, 80px); justify-content: center; align-items: center; }
+  .ztf--timeline .ztf__stage{ height: min(calc(100svh - var(--ztf-top) - 48px), 940px); }
+}
+@media (prefers-reduced-motion: reduce){ .ztf__video{ transition: none; } }

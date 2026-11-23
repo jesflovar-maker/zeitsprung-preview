@@ -296,3 +296,9 @@ export const STR = {
     ]
   }
 };
+
+/* 07C-H — GLOBAL VIDEO / TRAILER PRESENTATION V1: dedicated trailer section (js/zt-film.js), Neupfarrplatz title-card
+   language. Subtitle / tagline are taken from this page's own hero text (no new historical claims). */
+STR.de.tr = { eyebrow: "TRAILER", h: "Der Dom in Bildern", p: "Ein kurzer Film über die Kathedrale und ihre Bauzeit.", l2: "DOM ST. PETER", l3: "GOTISCHE KATHEDRALE · REGENSBURG", line: "Ein Bau, der über Jahrhunderte in die Höhe wuchs", alt: "Trailer Dom St. Peter" };
+STR.en.tr = { eyebrow: "TRAILER", h: "The cathedral in pictures", p: "A short film about the cathedral and its centuries of construction.", l2: "DOM ST. PETER", l3: "GOTHIC CATHEDRAL · REGENSBURG", line: "A building that rose over centuries", alt: "Dom St. Peter trailer" };
+STR.es.tr = { eyebrow: "TRÁILER", h: "La catedral en imágenes", p: "Una breve película sobre la catedral y sus siglos de construcción.", l2: "DOM ST. PETER", l3: "CATEDRAL GÓTICA · RATISBONA", line: "Un edificio que creció hacia lo alto durante siglos", alt: "Tráiler de la catedral de San Pedro" };

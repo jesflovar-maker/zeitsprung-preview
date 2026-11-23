@@ -2,11 +2,12 @@
 // One runtime, vanilla ES module, no external libraries. Text lives in dom-i18n.js; the DOM is built ONCE and
 // language switches only re-run text refreshers (no rebuild, no new listeners / observers / timers).
 // Media: runtime derivatives only (../assets/dom-st-peter/). One primary video plays at a time; lazy loading.
-import { STR, LANGS, STORAGE_KEY } from "./dom-i18n.js?v=20261123c";
-import { initGuide } from "../../js/zt-guide.js?v=20261123e"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
+import { STR, LANGS, STORAGE_KEY } from "./dom-i18n.js?v=20261124a";
+import { initGuide } from "../../js/zt-guide.js?v=20261124a"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
 import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
 
-import { ztSound } from "../../js/zt-sound.js?v=20261119e"; // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
+import { ztSound } from "../../js/zt-sound.js?v=20261124a";
+import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261124a"; // 07C-H: shared film player (trailer section) // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
 
 const A = "../assets/dom-st-peter/";
 const HI = new Set(["k03", "k05", "k06", "k07", "k08", "k10", "k11", "int_portal", "int_nave", "int_choir", "int_vault", "heute"]); // also exist at 1080 px
@@ -235,18 +236,25 @@ function buildEnd() {
   s.append(br, h, p, cta); mountDestinations(s, { self: "dom-st-peter", btnClass: "dbtn" }); reveal(s); // 06G.2B: methodology note removed from the page (global footer later)
 }
 
-/* ---------- trailer (kept, but only inside the experience) ---------- */
+/* ---------- trailer: dedicated cinematic section before the ending (07C-H, js/zt-film.js) ----------
+   Clean 15 s master (real soundtrack), Neupfarrplatz title-card language, muted autoplay while visible, ZEITSPRUNG
+   controls; sound only via the page's ONE state after the visitor's own gesture. Every [data-trailer] button scrolls
+   here and plays (no second viewer / dialog). */
+let trailerFilm = null;
 function buildTrailer() {
-  const dlg = $("#trailerDlg"), box = $("#trailerStage"); bind(dlg, (t) => t.ui.trailerAria, "aria-label"); bind($("#trailerClose"), (t) => t.ui.close, "aria-label");
-  document.addEventListener("click", (ev) => {
-    if (!ev.target.closest("[data-trailer]") || dlg.open) return;
-    box.replaceChildren(); const t = el("video"); t.controls = false; t.playsInline = true; t.preload = "auto"; t.poster = poster("trailer_clean"); t.src = vid("trailer_clean"); ztSound.add(t); t.addEventListener("click", () => { if (t.paused) { const q = t.play(); if (q && q.catch) q.catch(() => {}); } else t.pause(); }); box.append(t); // 06G.2B: clean 15 s master, no native controls, sound via ♪
-    trailerOpen = true; VM.pause = true; VM.tick(); dlg.showModal(); const p = t.play(); if (p && p.catch) p.catch(() => {});
+  const s = $("#trailer"); if (!s) return;
+  trailerFilm = mountFilm(s, {
+    mode: "trailer", src: vid("trailer_clean"), poster: poster("trailer_clean"), duration: 15.04,
+    hasAudio: true, sound: ztSoundAdapter(ztSound),
+    head: () => ({ e: T().tr.eyebrow, h: T().tr.h, p: T().tr.p }),
+    titleCard: () => ({ k: "ZEITSPRUNG", n: T().tr.l2, s: T().tr.l3, l: T().tr.line }),
+    label: () => T().tr.eyebrow, alt: () => T().tr.alt,
   });
-  const close = () => { try { dlg.close(); } catch (e) {} };
-  $("#trailerClose").addEventListener("click", close);
-  dlg.addEventListener("close", () => { const t = $("video", box); if (t) { t.pause(); t.removeAttribute("src"); } box.replaceChildren(); trailerOpen = false; VM.pause = document.hidden; VM.tick(); });
-  dlg.addEventListener("click", (e) => { if (e.target === dlg) close(); });
+  document.addEventListener("click", (ev) => {
+    if (!ev.target.closest("[data-trailer]") || !trailerFilm) return;
+    s.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+    trailerFilm.play();
+  });
 }
 
 /* ---------- navigation, language switch ---------- */
