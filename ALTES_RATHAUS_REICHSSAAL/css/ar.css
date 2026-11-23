@@ -292,3 +292,7 @@ html.is-reduced .adis .alabel,html.is-reduced .adis__cap{position:static}
   .ahero{--hg:clamp(18px,3.2svh,36px);--sh:min(calc(100svh - var(--nav) - var(--st) - 2 * var(--hg)),1080px);padding-top:calc(var(--nav) + var(--st))}
   .ahero__copy{bottom:calc((100% - var(--nav) - var(--st) - var(--sh)) / 2 + 22px)}
 }
+/* 07B.1 — timeline overlay (shared typography): number / dates / title over the film, the short description stays below */
+.atl2 .aseq__stage .zt-ov{padding-bottom:30px}
+.atl2 .aseq__txt .aseq__k,.atl2 .aseq__txt .aseq__y,.atl2 .aseq__txt .aseq__t{display:none}
+.atl2 .aseq__txt{min-height:0}

@@ -104,3 +104,32 @@ const ADD_06G2B = {
   es: { y179clip: "Del plano del campamento al trazado urbano", holoclip: "Del holograma a la imagen", gal: { eyebrow: "GALERÍA", h: "La Porta en imágenes", p: "Cinco vistas de la puerta norte: hoy y en el modelo." }, heroFilm: "La Porta Praetoria aparece como un modelo de luz y se convierte en los restos actuales" },
 };
 LANGS.forEach((l) => { const a = ADD_06G2B[l], s = STR[l]; s.y179.clip = a.y179clip; s.holo.clip = a.holoclip; s.gal = a.gal; s.hero.film = a.heroFilm; s.end.disc = ""; });
+
+/* 07B.1 — GLOBAL BRÜCKMANDL GUIDE data (ZEITSPRUNG_GLOBAL_GUIDE_V1, engine js/zt-guide.js).
+   Topic answers are composed ONLY from the validated sentences above (same language) — no new historical text.
+   Order = js/zt-guide-config.js "porta-praetoria".go / .sections. Does not depend on the deferred final timeline. */
+{
+  const UIG = {
+    de: { role: "Ihr ZEITSPRUNG-Begleiter", hi: "Grüß Gott! Sonst wache ich auf der Steinernen Brücke — hier begleite ich Sie zur Porta Praetoria. Wählen Sie ein Thema.", go: "Zum Kapitel →", ctx: "PASSEND ZU DIESEM KAPITEL", aria: "Brückmandl — Ihr ZEITSPRUNG-Begleiter",
+      t: ["Porta Praetoria", "Toranlage", "Turm", "179 n. Chr.", "Castra Regina", "Bautechnik", "Zeitreise", "Erhaltene Reste"] },
+    en: { role: "Your ZEITSPRUNG guide", hi: "Grüß Gott! I usually keep watch on the Stone Bridge — here I accompany you to the Porta Praetoria. Choose a topic.", go: "Go to chapter →", ctx: "FOR THIS CHAPTER", aria: "Bruckmandl — your ZEITSPRUNG guide",
+      t: ["Porta Praetoria", "Gateway", "Tower", "AD 179", "Castra Regina", "Building technique", "Time travel", "Surviving remains"] },
+    es: { role: "Su guía ZEITSPRUNG", hi: "¡Grüß Gott! Normalmente vigilo el Puente de Piedra; aquí le acompaño a la Porta Praetoria. Elija un tema.", go: "Ir al capítulo →", ctx: "PARA ESTE CAPÍTULO", aria: "Bruckmandl — su guía ZEITSPRUNG",
+      t: ["Porta Praetoria", "La puerta", "Torre", "179 d. C.", "Castra Regina", "Técnica constructiva", "Viaje en el tiempo", "Restos conservados"] },
+  };
+  const first = (x) => String(x).split(/(?<=\.)\s/)[0];
+  for (const l of LANGS) {
+    const S = STR[l], u = UIG[l];
+    S.guide = { role: u.role, hi: u.hi, go: u.go, ctx: u.ctx, aria: u.aria };
+    S.guideTopics = [
+      [u.t[0], S.ctx.p1],
+      [u.t[1], S.pass.p1 + " " + S.pass.p2],
+      [u.t[2], S.tow.p1 + " " + S.tow.p2],
+      [u.t[3], S.y179.p1],
+      [u.t[4], first(S.cas.p)],
+      [u.t[5], S.bau.states[0].p],
+      [u.t[6], first(S.tl.p)],
+      [u.t[7], S.end.p],
+    ];
+  }
+}

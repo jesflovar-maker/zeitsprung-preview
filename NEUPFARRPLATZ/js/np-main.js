@@ -4,7 +4,8 @@
 // HISTORICAL_BRIEFING = PENDING: only visual-state labels (np-i18n.js), no dates. K09 = OWNER_APPROVED_VISUAL_KFRAME +
 // GEOMETRY_REVIEW_PENDING (no geometry claims). Provisional anchor NP_ASSET_001, provisional trailer NP_ASSET_098 and the
 // hero film NP_ASSET_058 are 1:1 replaceable through the constants below. Visible AI / reconstruction badges = 0.
-import { STR, LANGS, STORAGE_KEY } from "./np-i18n.js?v=20261123a";
+import { STR, LANGS, STORAGE_KEY } from "./np-i18n.js?v=20261123c";
+import { initGuide } from "../../js/zt-guide.js?v=20261123e"; // 07B.1: global Brückmandl guide
 import { ztSound } from "../../js/zt-sound.js?v=20261119e";
 import { openPhoto, openElement } from "../../js/zs-media-viewer.js";
 
@@ -88,7 +89,7 @@ function buildSeq(cfg) {
   const vids = ims.filter((m) => m.tagName === "VIDEO");
   const bar = el("div", "aseq__bar", { "aria-hidden": "true" }); const fill = el("span"); bar.append(fill); stage.append(bar);
   let ov = null, ok, op, os, ot;
-  if (K) { ov = el("div", "nov", { "aria-hidden": "true" }); ok = el("p", "nov__k"); op = el("p", "nov__p"); os = el("p", "nov__s"); ot = el("p", "nov__t"); ov.append(ok, op, os, ot); stage.append(ov); }
+  if (K) { ov = el("div", "nov zt-ov", { "aria-hidden": "true" }); ok = el("p", "zt-ov__k"); op = el("p", "zt-ov__p"); os = el("p", "zt-ov__s"); ot = el("p", "zt-ov__t"); ov.append(ok, op, os, ot); stage.append(ov); }
   const txt = el("div", "aseq__txt", { "aria-live": "polite" }); const k = el("p", "aseq__k"); const t = el("h3", "aseq__t"); const d = el("p", "aseq__d");
   let rail = null; if (K) { rail = el("div", "nkf__rail", { "aria-hidden": "true" }); for (let i = 0; i < N; i++) rail.append(el("i")); txt.append(rail, d); } else txt.append(k, t, d);
   wrap.append(stage, txt); st.append(wrap); tr.append(st); s.append(tr);
@@ -174,7 +175,7 @@ function buildTimeline() {
   const stage = el("div", "ntl__stage");
   const v = el("video", "", { playsinline: "", preload: "none", disablepictureinpicture: "", controlslist: "nodownload noplaybackrate" }); v.muted = true; lazyPoster(v, TL_POSTER); bind(v, (t) => t.tl.alt, "aria-label");
   const big = el("button", "ntl__big", { type: "button" }); big.append(el("span")); bind(big, (t) => t.tl.play, "aria-label");
-  const ov = el("div", "nov", { "aria-hidden": "true" }); const ok = el("p", "nov__k"); const op = el("p", "nov__p"); const os = el("p", "nov__s"); const ot = el("p", "nov__t"); ov.append(ok, op, os, ot);
+  const ov = el("div", "nov zt-ov", { "aria-hidden": "true" }); const ok = el("p", "zt-ov__k"); const op = el("p", "zt-ov__p"); const os = el("p", "zt-ov__s"); const ot = el("p", "zt-ov__t"); ov.append(ok, op, os, ot);
   const fsbar = el("div", "ntl__fsbar"); const fsPlay = el("button", "abtn abtn--sm", { type: "button" }); const fsExit = el("button", "abtn abtn--sm", { type: "button" }); fsbar.append(fsPlay, fsExit);
   stage.append(v, ov, big, fsbar);
   const panel = el("div", "ntl__panel");
@@ -238,7 +239,7 @@ function buildReturn() {
 function buildTrailer() {
   const s = $("#trailer"); const w = el("div", "awrap ar"); head(w, "tr"); w.append(lead("tr", "p"));
   const st = el("div", "ntr__film"); const po = el("img", "", { loading: "lazy", decoding: "async", src: TR_POSTER, alt: "" }); st.append(po);
-  const ov = el("div", "ntr__ov", { "aria-hidden": "true" }); const l1 = el("p", "ntr__l1"); const l2 = el("p", "ntr__l2"); const l3 = el("p", "ntr__l3"); const ln = el("p", "ntr__line");
+  const ov = el("div", "ntr__ov zt-ov", { "aria-hidden": "true" }); const l1 = el("p", "zt-ov__k"); const l2 = el("p", "zt-ov__s"); const l3 = el("p", "zt-ov__p"); const ln = el("p", "zt-ov__t");
   bind(l1, (t) => t.tr.l1); bind(l2, (t) => t.tr.l2); bind(l3, (t) => t.tr.l3); bind(ln, (t) => t.tr.line); ov.append(l1, l2, l3, ln);
   w.append(st); s.append(w);
   if (reduced) { st.append(ov); return; }
@@ -295,5 +296,5 @@ buildSeq({ sec: "licht", key: "holo", files: ["np_h_cutaway", "np_h_interior", "
 buildSeq({ sec: "kirche", key: "church", files: ["np_c_model_east", "np_c_model_apse", "np_c_holo", "np_c_interior", "np_c_organ"] }); // NP 063/068/075/034/076
 buildSeq({ sec: "archaeologie", key: "arch", files: [{ v: `${A}video/np_arch_trans_540.mp4`, poster: `${A}poster/np_arch_trans_poster.webp` }, "np_k08", "np_k08_hr"] }); // NP 020 / 055 (K08 canonical) / 019 (high-res support)
 buildSeq({ sec: "misrach", key: "mis", files: [{ v: `${A}video/np_misrach_trans_540.mp4`, poster: `${A}poster/np_misrach_trans_poster.webp` }, "np_k09", "np_k10"] }); // NP 056 / 057 (K09 required) / 059
-buildReturn(); buildTrailer(); buildEnd(); reveal();
+buildReturn(); buildTrailer(); buildEnd(); reveal(); initGuide({ monument: "neupfarrplatz" });
 requestAnimationFrame(run);

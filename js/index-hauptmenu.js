@@ -111,7 +111,9 @@ async function init() {
   const bigPlay = mk("button", "hm__bigplay", { type: "button" }); bigPlay.appendChild(mk("span", "hm__bigplay-icon", { "aria-hidden": "true" }));
   const soon = mk("div", "hm__soonflag");
   media.appendChild(posterImg); media.appendChild(video); media.appendChild(bigPlay); media.appendChild(soon);
-  const fsCap = mk("p", "hm__fscap", { "aria-hidden": "true" }); media.appendChild(fsCap); // 07B: chapter caption kept visible in fullscreen
+  // 07B.1 — ZEITSPRUNG_TYPOGRAPHY_SYSTEM_V1 chapter overlay over the film (HTML only; also visible in fullscreen).
+  // Not shown for films with burned-in captions (Porta temporary exception: burned_text in monuments.config.json).
+  const ov = mk("div", "zt-ov hm__ov", { "aria-hidden": "true" }); const ovK = mk("p", "zt-ov__k"), ovS = mk("p", "zt-ov__s"), ovT = mk("p", "zt-ov__t"); ov.append(ovK, ovS, ovT); ov.hidden = true; media.appendChild(ov);
   const fsX = mk("button", "hm__fsx", { type: "button" }); fsX.textContent = "×"; media.appendChild(fsX); // exit control inside the fullscreen layer
   const fsEl = () => document.fullscreenElement || document.webkitFullscreenElement;
   const info = mk("div", "hm__info");
@@ -120,7 +122,7 @@ async function init() {
   const bar = mk("div", "hm__bar", { role: "slider", tabindex: "0", "aria-valuemin": "0", "aria-valuemax": "100", "aria-valuenow": "0" }); const fill = mk("span", "hm__bar-fill"); bar.appendChild(fill);
   const chapters = mk("div", "hm__chapters", { role: "group" });
   const chapterNow = mk("p", "hm__chapter-now"); chapterNow.setAttribute("aria-live", "polite");
-  const ctl = mk("div", "hm__ctl"); const bp = mk("button", "hm__btn zs-glass-control", { type: "button" }); const bm = mk("button", "hm__btn zs-glass-control", { type: "button", "aria-pressed": "false" }); ctl.appendChild(bp); ctl.appendChild(bm); /* 07B: FULLSCREEN (stage media + chapter caption), same control for every active monument */ const bf = mk("button", "hm__btn zs-glass-control", { type: "button" }); ctl.appendChild(bf); /* 06G.1: LOCAL sound button restored; shares ONE state with the compact nav ♪ (#navSoundToggle) */
+  const ctl = mk("div", "hm__ctl"); const bp = mk("button", "hm__btn zs-glass-control", { type: "button" }); const bm = mk("button", "hm__btn zs-glass-control", { type: "button", "aria-pressed": "false" }); ctl.appendChild(bp); ctl.appendChild(bm); /* 07B: FULLSCREEN (stage media + chapter caption), same control for every active monument */ const bf = mk("button", "hm__btn hm__btn--fs zs-glass-control", { type: "button" }); ctl.appendChild(bf); /* 07B.1: visible only at <= 768px (owner rule) */ /* 06G.1: LOCAL sound button restored; shares ONE state with the compact nav ♪ (#navSoundToggle) */
   const note = mk("p", "hm__note");
   tl.appendChild(tlHead); tl.appendChild(bar); tl.appendChild(chapters); tl.appendChild(chapterNow); tl.appendChild(ctl); tl.appendChild(note);
   const soonText = mk("p", "hm__soontext");
@@ -228,7 +230,12 @@ async function init() {
     const cur = pos.get(sel.id) || 0; let k = 0; times.forEach((x, i) => { if (cur >= x) k = i; });
     if (k === chIdx && !force) return; chIdx = k;
     [...chapters.children].forEach((b) => b.setAttribute("aria-current", String(+b.dataset.i === k)));
-    const c = (lab[langNow()] || lab.de || [])[k]; chapterNow.textContent = c && c.y ? c.y + " — " + c.h : ""; fsCap.textContent = chapterNow.textContent;
+    const L = lab[langNow()] || lab.de || []; const c = L[k]; chapterNow.textContent = c && c.y ? c.y + " — " + c.h : "";
+    const tlm = tlOf(sel); const burned = !!(tlm && tlm.burned_text);
+    if (burned || !c || !c.y) { ov.hidden = true; } else {
+      const N = L.filter((x) => x && x.y).length, n = L.slice(0, k + 1).filter((x) => x && x.y).length;
+      ovK.textContent = String(n).padStart(2, "0") + " / " + String(N).padStart(2, "0"); ovS.textContent = c.y; ovT.textContent = c.h;
+      if (ov.hidden || force !== true) { ov.classList.remove("is-new"); void ov.offsetWidth; ov.classList.add("is-new"); } ov.hidden = false; }
   }
   function renderProgress() {
     const d = dur(), cur = sel ? pos.get(sel.id) || 0 : 0; const f = d ? Math.min(1, cur / d) : 0;

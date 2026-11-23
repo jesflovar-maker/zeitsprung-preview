@@ -80,7 +80,10 @@ export function initAssistantFab(opt = {}) {
   // one delegated listener for all topic buttons (re-labelling never adds listeners)
   topics.addEventListener("click", (e) => { const b = e.target.closest(".zt-assist__topic"); if (!b) return; sel = b.dataset.topic; renderAnswer(); pn.scrollTo({ top: pn.scrollHeight, behavior: "auto" }); });
   const onKey = (e) => { if (e.key === "Escape") close(); };
-  function open() { pn.hidden = false; fab.setAttribute("aria-expanded", "true"); document.addEventListener("keydown", onKey); requestAnimationFrame(() => pn.classList.add("is-open")); cls.focus(); }
+  // 07B.1 optional section awareness (opt.sections = { sectionId: topicId }): measured once when the panel opens
+  const secIds = Object.keys(opt.sections || {});
+  const sectionTopic = () => { let best = "", bh = 0; secIds.forEach((id) => { const el = document.getElementById(id); if (!el) return; const r = el.getBoundingClientRect(); const h = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0); if (h > bh) { bh = h; best = id; } }); return best ? opt.sections[best] : null; };
+  function open() { const st = secIds.length ? sectionTopic() : null; if (st) { sel = st; renderAnswer(); } pn.hidden = false; fab.setAttribute("aria-expanded", "true"); document.addEventListener("keydown", onKey); requestAnimationFrame(() => pn.classList.add("is-open")); cls.focus(); }
   function close(refocus = true) { if (pn.hidden) return; pn.classList.remove("is-open"); pn.hidden = true; fab.setAttribute("aria-expanded", "false"); document.removeEventListener("keydown", onKey); if (refocus) fab.focus(); }
   fab.addEventListener("click", () => (pn.hidden ? open() : close()));
   cls.addEventListener("click", () => close());

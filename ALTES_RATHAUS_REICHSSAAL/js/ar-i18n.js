@@ -209,3 +209,31 @@ const ADD_06G = {
   es: { trailerAlt: "Tráiler: el Antiguo Ayuntamiento toma forma, de la obra a hoy", on: "Activar sonido", off: "Quitar sonido" },
 };
 LANGS.forEach((l) => { STR[l].end.trailerAlt = ADD_06G[l].trailerAlt; STR[l].snd = { on: ADD_06G[l].on, off: ADD_06G[l].off }; });
+
+/* 07B.1 — GLOBAL BRÜCKMANDL GUIDE data (ZEITSPRUNG_GLOBAL_GUIDE_V1, engine js/zt-guide.js).
+   Topic answers are composed ONLY from the validated sentences above (same language) — no new historical text.
+   Order = js/zt-guide-config.js "altes-rathaus".go / .sections. */
+{
+  const UIG = {
+    de: { role: "Ihr ZEITSPRUNG-Begleiter", hi: "Grüß Gott! Sonst wache ich auf der Steinernen Brücke — hier begleite ich Sie durch das Alte Rathaus. Wählen Sie ein Thema.", go: "Zum Kapitel →", ctx: "PASSEND ZU DIESEM KAPITEL", aria: "Brückmandl — Ihr ZEITSPRUNG-Begleiter",
+      t: ["Baugeschichte", "Turm", "Erker", "Gotisches Portal", "Reichssaal", "Reichstag", "Menschen", "Material"] },
+    en: { role: "Your ZEITSPRUNG guide", hi: "Grüß Gott! I usually keep watch on the Stone Bridge — here I accompany you through the Old Town Hall. Choose a topic.", go: "Go to chapter →", ctx: "FOR THIS CHAPTER", aria: "Bruckmandl — your ZEITSPRUNG guide",
+      t: ["Building history", "Tower", "Oriel", "Gothic portal", "Imperial Hall", "Imperial Diet", "People", "Material"] },
+    es: { role: "Su guía ZEITSPRUNG", hi: "¡Grüß Gott! Normalmente vigilo el Puente de Piedra; aquí le acompaño por el Antiguo Ayuntamiento. Elija un tema.", go: "Ir al capítulo →", ctx: "PARA ESTE CAPÍTULO", aria: "Bruckmandl — su guía ZEITSPRUNG",
+      t: ["Historia constructiva", "Torre", "Mirador", "Portal gótico", "Salón Imperial", "Dieta Imperial", "Personas", "Material"] },
+  };
+  for (const l of LANGS) {
+    const S = STR[l], u = UIG[l];
+    S.guide = { role: u.role, hi: u.hi, go: u.go, ctx: u.ctx, aria: u.aria };
+    S.guideTopics = [
+      [u.t[0], S.now.p1 + " " + S.hall.p1],
+      [u.t[1], S.out.items[0][1]],
+      [u.t[2], S.out.items[1][1] + " " + S.saal.spots[2].d],
+      [u.t[3], S.time.ch[2][2]],
+      [u.t[4], S.hall.p2 + " " + S.saal.spots[0].d],
+      [u.t[5], S.rt.p1],
+      [u.t[6], S.people.items[0][1]],
+      [u.t[7], S.mat.p + " " + S.mat.items[1][1]],
+    ];
+  }
+}

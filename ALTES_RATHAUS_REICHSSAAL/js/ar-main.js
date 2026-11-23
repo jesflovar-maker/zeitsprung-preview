@@ -4,7 +4,10 @@
 // 06C.4 owner override: clean master timeline AR_ASSET_191 is the scroll-scrubbed build scene; chapter/trailer films stay excluded.
 // 06E: hero film AR_ASSET_059, Erker V2 + hologram assembly (scroll-scrub), building-site loops, portal/Erker corrected stills.
 // Visible AI / reconstruction badges = 0 (owner rule 2026-11-18); provenance stays in the media manifest.
-import { STR, LANGS, STORAGE_KEY } from "./ar-i18n.js?v=20261119e";
+import { STR, LANGS, STORAGE_KEY } from "./ar-i18n.js?v=20261123c";
+import { initGuide } from "../../js/zt-guide.js?v=20261123e"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
+import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
+
 import { ztSound } from "../../js/zt-sound.js?v=20261119e"; // 06G: one compact ♪ control beside DE | EN | ES
 
 const A = "../assets/altes-rathaus/";
@@ -244,14 +247,16 @@ function buildTimeline() {
   const v = scrubEl(POSTER, (t) => t.time.alt); stage.append(v);
   const ticks = el("ol", "atl2__ticks", { "aria-hidden": "true" }); const tk = TL_CUE.map(() => { const li = el("li"); ticks.append(li); return li; }); stage.append(ticks);
   const bar = el("div", "aseq__bar", { "aria-hidden": "true" }); const fill = el("span"); bar.append(fill); stage.append(bar);
+  // 07B.1 — ZEITSPRUNG_TYPOGRAPHY_SYSTEM_V1 overlay over the clean timeline (HTML only): SMALL 01/07 · PRIMARY date(s) · SECONDARY title; description below
+  const ov = el("div", "zt-ov", { "aria-hidden": "true" }); const ok = el("p", "zt-ov__k"), os = el("p", "zt-ov__s"), ot = el("p", "zt-ov__t"); ov.append(ok, os, ot); stage.append(ov);
   const txt = el("div", "aseq__txt", { "aria-live": "polite" }); const k = el("p", "aseq__k"); const y = el("p", "aseq__y"); const t = el("h3", "aseq__t"); const d = el("p", "aseq__d"); txt.append(k, y, t, d);
   wrap.append(stage, txt); st.append(wrap); tr.append(st); s.append(tr);
   const DUR = 61.83; const ease = (p) => clamp((p - 0.03) / 0.94, 0, 1);
   const getT = scrubVideo(tr, v, SRC, ease);
   let cur = -1;
-  const paint = () => { const it = ch()[cur]; k.textContent = String(cur + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0"); y.textContent = it[0]; t.textContent = it[1]; d.textContent = it[2]; tk.forEach((li, j) => li.classList.toggle("is-on", j <= cur)); };
+  const paint = () => { const it = ch()[cur]; k.textContent = String(cur + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0"); y.textContent = it[0]; t.textContent = it[1]; d.textContent = it[2]; tk.forEach((li, j) => li.classList.toggle("is-on", j <= cur)); ok.textContent = k.textContent; os.textContent = it[0]; ot.textContent = it[1]; };
   LF.push(() => { if (cur >= 0) paint(); });
-  const show = (i) => { if (i === cur) return; cur = i; txt.classList.remove("is-new"); void txt.offsetWidth; txt.classList.add("is-new"); paint(); };
+  const show = (i) => { if (i === cur) return; cur = i; txt.classList.remove("is-new"); void txt.offsetWidth; txt.classList.add("is-new"); ov.classList.remove("is-new"); void ov.offsetWidth; ov.classList.add("is-new"); paint(); };
   show(0);
   SC.push(() => { if (!near(tr)) return; const p = prog(tr); fill.style.transform = "scaleX(" + p + ")"; const sec = (v.duration ? getT() / (v.duration - 0.05) : ease(p)) * DUR; let i = 0; TL_CUE.forEach((c, j) => { if (sec >= c - 0.01) i = j; }); show(i); });
 }
@@ -318,7 +323,7 @@ function buildEnd() {
   onLang(() => { const m = T().end.h.match(/^(.*?,)\s*(.*)$/); h1.textContent = m ? m[1] : ""; h2.textContent = m ? m[2] : T().end.h; h.setAttribute("aria-label", T().end.h); });
   w.append(e, h, el("span", "aend__rule", { "aria-hidden": "true" }), lead("end", "p"));
   w.append(endTrailer());
-  const cta = el("div", "aend__cta"); const sb = el("button", "abtn", { type: "button" }); bind(sb, (t) => t.end.sources); const ab = el("a", "abtn abtn--primary", { href: "../index.html#index-monuments" }); bind(ab, (t) => t.back); cta.append(sb, ab); w.append(cta);
+  const cta = el("div", "aend__cta"); const sb = el("button", "abtn", { type: "button" }); bind(sb, (t) => t.end.sources); const ab = el("a", "abtn abtn--primary", { href: "../index.html#index-monuments" }); bind(ab, (t) => t.back); cta.append(sb, ab); w.append(cta); mountDestinations(w, { self: "altes-rathaus", btnClass: "abtn" }); // 07B.1
   s.append(w);
   const dlg = $("#srcDlg"); const list = $("#srcList"); const cl = $("#srcClose");
   onLang(() => { $("#srcTitle").textContent = T().end.srcH; list.replaceChildren(...T().end.srcList.map((x) => { const li = el("li"); li.textContent = x; return li; })); cl.textContent = T().end.close; });
@@ -343,5 +348,5 @@ buildPortal(); buildSaal();
 buildSeq({ sec: "menschen", key: "people", note: true, files: ["ar_envoy_v1", "ar_pp_scribe_v1", "ar_pp_courier_v1", "ar_pp_council_v1", "ar_pp_official_v1"] }); // AR 007 / 072 / 073 / 063 / 061
 buildRT();
 buildSeq({ sec: "material", key: "mat", files: ["ar_mat_board_v1", "ar_mat_wood_v1", "ar_mat_stone_v1", "ar_window_v1", "ar_mat_iron_v1", "ar_seal_v1"] }); // AR 205 / 018 / 027 / 136 / 023 / 021
-buildToggle(); buildEnd(); reveal();
+buildToggle(); buildEnd(); reveal(); initGuide({ monument: "altes-rathaus" });
 requestAnimationFrame(run);

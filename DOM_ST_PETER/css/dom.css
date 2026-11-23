@@ -337,3 +337,4 @@ html.is-gated .dn__back{display:flex} /* the "All monuments" action is also avai
 @media (max-width:440px){.dn{gap:10px}.dn__links{display:none}.dn__right{gap:8px}.dn__right .zt-snd{margin-left:0}.dn__lang button{min-width:38px}}
 @media (max-width:440px){.dn__brand{letter-spacing:.18em}.dn__back::after{letter-spacing:.08em}}
 @media (max-width:360px){.dn__brand{font-size:11px;letter-spacing:.1em}.dn__lang button{min-width:34px;padding:0 5px}.dn__back::after{content:none}.dn__back::before{margin-right:0;font-size:15px}}
+.dtlv__stage .zt-ov{z-index:3;padding-bottom:22px}

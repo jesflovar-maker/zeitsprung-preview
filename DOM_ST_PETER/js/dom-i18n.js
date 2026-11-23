@@ -97,7 +97,7 @@ export const STR = {
       ["Glasmalerei", "Mit dem hochgotischen Chor öffnen sich die Wände dem Licht. Um 1310/15 folgt die erste große Verglasung mit Glasmalerei."],
       ["Materialien", "Der Dom ist aus Naturstein errichtet. Die Dombauhütte arbeitet bis heute ausschließlich in Naturstein."],
       ["Dombauhütte", "1923/24 wird die Dombauhütte als staatliche Werkstatt wieder eingerichtet und arbeitet seither ohne Unterbrechung. 2023 feierte sie 100 Jahre ununterbrochene Arbeit."],
-      ["Unter dem Dom", "Unter dem heutigen Dom liegen Schichten früherer Zeiten: Spuren, Fundamente und archäologische Ebenen. Die Bilder dort sind Visualisierungen."],
+      ["Unter dem Dom", "Unter dem heutigen Dom liegen Schichten früherer Zeiten: Spuren, Fundamente und archäologische Ebenen."],
       ["Heute", "Seit 2006 gehört der Dom zum UNESCO-Welterbe „Regensburg mit Stadtamhof“."]
     ]
   },
@@ -194,7 +194,7 @@ export const STR = {
       ["Stained glass", "With the High Gothic choir the walls open up to light. Around 1310/15 the first major glazing with stained glass follows."],
       ["Materials", "The cathedral is built of natural stone. To this day the cathedral workshop works exclusively in natural stone."],
       ["Workshop", "In 1923/24 the Dombauhütte is re-established as a state workshop and has worked without interruption ever since. In 2023 it celebrated 100 years of uninterrupted work."],
-      ["Beneath the cathedral", "Beneath today's cathedral lie layers of earlier times: traces, foundations and archaeological levels. The images there are visualisations."],
+      ["Beneath the cathedral", "Beneath today's cathedral lie layers of earlier times: traces, foundations and archaeological levels."],
       ["Today", "Since 2006 the cathedral has been part of the UNESCO World Heritage site “Old town of Regensburg with Stadtamhof”."]
     ]
   },
@@ -291,7 +291,7 @@ export const STR = {
       ["Vidrieras", "Con el coro del gótico pleno los muros se abren a la luz. Hacia 1310/15 llega el primer gran acristalamiento con vidrieras."],
       ["Materiales", "La catedral está construida en piedra natural. El taller de la catedral trabaja hasta hoy exclusivamente con piedra natural."],
       ["Dombauhütte", "En 1923/24 la Dombauhütte se restablece como taller estatal y trabaja desde entonces sin interrupción. En 2023 celebró 100 años de trabajo ininterrumpido."],
-      ["Bajo la catedral", "Bajo la catedral actual hay capas de épocas anteriores: huellas, cimientos y niveles arqueológicos. Las imágenes de ese capítulo son visualizaciones."],
+      ["Bajo la catedral", "Bajo la catedral actual hay capas de épocas anteriores: huellas, cimientos y niveles arqueológicos."],
       ["Hoy", "Desde 2006 la catedral forma parte del Patrimonio Mundial de la UNESCO «Casco antiguo de Ratisbona con Stadtamhof»."]
     ]
   }

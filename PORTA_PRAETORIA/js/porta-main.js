@@ -1,7 +1,10 @@
 // PORTA PRAETORIA · CASTRA REGINA — PUBLIC V1: one vanilla ES module, DE / EN / ES, no external libraries.
 // The DOM is built ONCE; a language switch only re-runs text refreshers (no rebuild, no new listeners / observers / timers).
 // Media: runtime derivatives only (../assets/porta-praetoria/). One video plays at a time; every video loads lazily (preload none + poster).
-import { STR, LANGS, STORAGE_KEY } from "./porta-i18n.js?v=20261119k";
+import { STR, LANGS, STORAGE_KEY } from "./porta-i18n.js?v=20261123c";
+import { initGuide } from "../../js/zt-guide.js?v=20261123e"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
+import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
+
 import { ztSound } from "../../js/zt-sound.js?v=20261119e"; // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
 
 const A = "../assets/porta-praetoria/";
@@ -336,7 +339,7 @@ function buildGallery() {
 function buildEnd() {
   const s = $("#heute"); const w = el("div", "pwrap pr"); head(w, "end"); w.append(lead("end", "p"));
   const st = el("div", "pstage"); const i = el("img", "", { src: img("pp_heute"), loading: "lazy", decoding: "async" }); bind(i, (t) => t.heute.alt, "alt"); st.append(i); w.append(st); // HEUTE: the owner anchor image, no reconstruction badge
-  const cta = el("div", "pend__cta"); const sb = el("button", "pbtn", { type: "button" }); bind(sb, (t) => t.end.sources); const ab = el("a", "pbtn pbtn--primary", { href: "../index.html#index-monuments" }); bind(ab, (t) => t.back); cta.append(sb, ab); w.append(cta);
+  const cta = el("div", "pend__cta"); const sb = el("button", "pbtn", { type: "button" }); bind(sb, (t) => t.end.sources); const ab = el("a", "pbtn pbtn--primary", { href: "../index.html#index-monuments" }); bind(ab, (t) => t.back); cta.append(sb, ab); w.append(cta); mountDestinations(w, { self: "porta-praetoria", btnClass: "pbtn" }); // 07B.1 (no Porta trailer: final clean trailer deferred)
   s.append(w); // 06G.2B: methodology disclaimer removed from the page (global footer later)
   const dlg = $("#srcDlg"); const list = $("#srcList"); const cl = $("#srcClose");
   onLang(() => { $("#srcTitle").textContent = T().end.srcH; list.replaceChildren(...T().end.srcList.map((x) => { const li = el("li"); li.textContent = x; return li; })); $("#srcDisc").textContent = ""; $("#srcDisc").hidden = true; cl.textContent = T().end.close; });
@@ -353,5 +356,5 @@ function reveal() {
 
 try { history.scrollRestoration = "manual"; } catch (e) {}
 root.lang = lang;
-buildNav(); buildHero(); buildCtx(); buildHolo(); buildPass(); buildTower(); buildY179(); buildCastra(); buildPlan(); buildBau(); buildFilm(); buildLoops(); buildGallery(); buildEnd(); reveal();
+buildNav(); buildHero(); buildCtx(); buildHolo(); buildPass(); buildTower(); buildY179(); buildCastra(); buildPlan(); buildBau(); buildFilm(); buildLoops(); buildGallery(); buildEnd(); reveal(); initGuide({ monument: "porta-praetoria" });
 requestAnimationFrame(runSC);

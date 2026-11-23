@@ -2,7 +2,10 @@
 // One runtime, vanilla ES module, no external libraries. Text lives in dom-i18n.js; the DOM is built ONCE and
 // language switches only re-run text refreshers (no rebuild, no new listeners / observers / timers).
 // Media: runtime derivatives only (../assets/dom-st-peter/). One primary video plays at a time; lazy loading.
-import { STR, LANGS, STORAGE_KEY } from "./dom-i18n.js?v=20261119k";
+import { STR, LANGS, STORAGE_KEY } from "./dom-i18n.js?v=20261123c";
+import { initGuide } from "../../js/zt-guide.js?v=20261123e"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
+import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
+
 import { ztSound } from "../../js/zt-sound.js?v=20261119e"; // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
 
 const A = "../assets/dom-st-peter/";
@@ -173,13 +176,15 @@ function buildTimeline() {
   const v = el("video"); v.dataset.src = vid("timeline_clean"); v.poster = poster("timeline_clean"); bind(v, (t) => t.tl.videoAria, "aria-label"); VM.add(v, { loop: false, role: "timeline" }); ztSound.add(v);
   const rec = VM.list.get(v); rec.hold = false;
   const bar = el("div", "dtlv__bar"); bar.innerHTML = "<span></span>"; st.append(v, bar, tag());
+  // 07B.1 — ZEITSPRUNG_TYPOGRAPHY_SYSTEM_V1 overlay over the clean film (HTML only): SMALL 01/09 · PRIMARY date · SECONDARY title
+  const ov = el("div", "zt-ov", { "aria-hidden": "true" }); const ok = el("p", "zt-ov__k"), os = el("p", "zt-ov__s"), ot = el("p", "zt-ov__t"); ov.append(ok, os, ot); st.append(ov);
   const ctl = el("div", "dtlv__ctl"); const bp = el("button", "dbtn", { type: "button" }); const bm = el("button", "dbtn", { type: "button", "aria-pressed": "false" }); const bt = el("button", "dbtn", { type: "button", "data-trailer": "" }); bind(bt, (t) => t.ui.trailerShort);
   const note = el("p", "dtlv__note"); bind(note, (t) => t.tl.note);
   ctl.append(bp, bt); /* 06G: bm (large sound button) removed from the panel */ col.append(st, ctl, note);
   const side = el("div", "dtlv__side"); const chips = el("div", "dtlv__chips"); chips.setAttribute("role", "list"); const info = el("div", "dtlv__info"); info.setAttribute("aria-live", "polite"); side.append(chips, info);
   g.append(col, side); w.append(g); s.append(w); reveal(s);
   let cur = 0;
-  const fill = () => { const c = T().tlv[cur]; info.innerHTML = `<div class="dtlv__y">${c.y}</div><h3 class="dtlv__h">${c.h}</h3><p class="dtlv__p">${c.p}</p>`; };
+  const fill = () => { const c = T().tlv[cur]; info.innerHTML = `<div class="dtlv__y">${c.y}</div><h3 class="dtlv__h">${c.h}</h3><p class="dtlv__p">${c.p}</p>`; ok.textContent = pad2(cur + 1) + " / " + pad2(TLV_T.length); os.textContent = c.y; ot.textContent = c.h; ov.classList.remove("is-new"); void ov.offsetWidth; ov.classList.add("is-new"); };
   const setCh = (k, force) => { if (k === cur && !force) return; cur = k; [...chips.children].forEach((b, i) => { b.classList.toggle("is-on", i === k); b.setAttribute("aria-current", String(i === k)); }); fill(); const on = chips.children[k]; if (on && chips.scrollWidth > chips.clientWidth) chips.scrollTo({ left: on.offsetLeft - 18, behavior: reduced ? "auto" : "smooth" }); };
   const lab = () => { bp.textContent = v.paused ? T().tl.play : T().tl.pause; bm.textContent = v.muted ? T().tl.soundOn : T().tl.soundOff; };
   TLV_T.forEach((t, i) => { const b = el("button", "dtlv__chip", { type: "button", role: "listitem" }); b.append(el("b"), el("span")); b.addEventListener("click", () => { VM.load(v); const go = () => { try { v.currentTime = t + 0.05; } catch (e) {} setCh(i, true); rec.hold = false; VM.tick(); }; if (v.readyState >= 1) go(); else v.addEventListener("loadedmetadata", go, { once: true }); }); chips.append(b); });
@@ -226,8 +231,8 @@ function buildNow() {
 }
 function buildEnd() {
   const s = $("#ende"); const br = el("div", "dend__brand rv"); br.textContent = "ZEITSPRUNG"; const h = bind(el("h2", "dend__t rv"), (t) => t.end.h); const p = bind(el("p", "dend__p rv"), (t) => t.end.p);
-  const cta = el("div", "dend__cta rv"); const a1 = bind(el("a", "dbtn dbtn--primary", { href: "../index.html" }), (t) => t.end.overview); const a2 = bind(el("a", "dbtn", { href: "../STEINERNE_BRUECKE/index.html" }), (t) => t.end.sb); const tr = bind(el("button", "dbtn", { type: "button", "data-trailer": "" }), (t) => t.ui.trailer); cta.append(a1, a2, tr);
-  s.append(br, h, p, cta); reveal(s); // 06G.2B: methodology note removed from the page (global footer later)
+  const cta = el("div", "dend__cta rv"); const a1 = bind(el("a", "dbtn dbtn--primary", { href: "../index.html#index-monuments" }), (t) => t.ui.back); const tr = bind(el("button", "dbtn", { type: "button", "data-trailer": "" }), (t) => t.ui.trailer); cta.append(a1, tr); // 07B.1: ALL MONUMENTS -> orbit; the single Steinerne link became the shared destination list
+  s.append(br, h, p, cta); mountDestinations(s, { self: "dom-st-peter", btnClass: "dbtn" }); reveal(s); // 06G.2B: methodology note removed from the page (global footer later)
 }
 
 /* ---------- trailer (kept, but only inside the experience) ---------- */
@@ -267,23 +272,7 @@ function setLang(l) {
   if (anchor && !root.classList.contains("is-gated")) { const d = anchor.getBoundingClientRect().top - before; if (Math.abs(d) > 1) scrollBy(0, d); }
 }
 
-/* ---------- Brückmandl: contextual ZEITSPRUNG guide (Dom content, DE / EN / ES; canonical character assets reused) ---------- */
-function buildGuide() {
-  const fab = $("#guideFab"), pn = $("#guidePanel"); if (!fab || !pn) return;
-  const B = "../assets/steinerne-bruecke/bruckmandl/ai/bruckmandl_ai_";
-  pn.innerHTML = `<div class="dguide__head"><img class="dguide__av" src="${B}talk.webp" alt="" width="64" height="64" loading="lazy"><div><div class="dguide__name">BRÜCKMANDL</div><div class="dguide__role"></div></div><button class="dguide__close" type="button">×</button></div><p class="dguide__hi"></p><div class="dguide__topics"></div><p class="dguide__ctx" hidden></p><div class="dguide__ans" aria-live="polite"></div>`;
-  const topics = $(".dguide__topics", pn), ans = $(".dguide__ans", pn), av = $(".dguide__av", pn), ctx = $(".dguide__ctx", pn), cls = $(".dguide__close", pn);
-  let sel = -1;
-  const render = () => { [...topics.children].forEach((x, k) => x.setAttribute("aria-pressed", String(k === sel))); if (sel < 0) { ans.replaceChildren(); return; } av.src = `${B}expression_03_explain.webp`; ans.innerHTML = `<p>${T().guideTopics[sel][1]}</p><a class="dguide__go" href="#${GUIDE_GO[sel]}">${T().guide.go}</a>`; };
-  STR.de.guideTopics.forEach((x, i) => { const b = el("button", "dguide__topic", { type: "button", "aria-pressed": "false" }); b.addEventListener("click", () => { sel = i; ctx.hidden = true; render(); }); topics.append(b); });
-  onLang(() => { const g = T().guide; pn.setAttribute("aria-label", g.aria); $("#guideFabLabel").textContent = g.fab; fab.title = g.fab; fab.setAttribute("aria-label", g.fab); $(".dguide__role", pn).textContent = g.role; $(".dguide__hi", pn).textContent = g.hi; ctx.textContent = g.ctx; cls.setAttribute("aria-label", T().ui.close); [...topics.children].forEach((b, i) => { b.textContent = T().guideTopics[i][0]; }); render(); });
-  const onKey = (e) => { if (e.key === "Escape") close(); };
-  function open() { const c = GUIDE_CTX[curSec]; if (c != null) { sel = c; ctx.hidden = false; render(); } pn.hidden = false; fab.setAttribute("aria-expanded", "true"); document.addEventListener("keydown", onKey); requestAnimationFrame(() => pn.classList.add("is-open")); cls.focus(); }
-  function close(refocus = true) { if (pn.hidden) return; pn.classList.remove("is-open"); pn.hidden = true; fab.setAttribute("aria-expanded", "false"); document.removeEventListener("keydown", onKey); if (refocus) fab.focus(); }
-  fab.addEventListener("click", () => (pn.hidden ? open() : close()));
-  cls.addEventListener("click", () => close());
-  ans.addEventListener("click", (e) => { if (e.target.closest(".dguide__go")) close(false); });
-}
+/* ---------- Brückmandl: 07B.1 — the local guide engine was replaced by the global js/zt-guide.js (same topics, same section mapping, now in js/zt-guide-config.js) ---------- */
 
 /* ---------- boot ---------- */
 try { history.scrollRestoration = "manual"; } catch (e) {}
@@ -295,5 +284,6 @@ buildStory("#zeitreise", "kf", "frames", KF_M);
 buildTimeline();
 buildStory("#glas", "glas", "glasSteps", GLAS_M);
 buildStory("#menschen", "people", "peopleSteps", PEOPLE_M);
-buildUnder(); buildRoute(); buildNow(); buildEnd(); buildTrailer(); buildNav(); buildGuide();
+buildUnder(); buildRoute(); buildNow(); buildEnd(); buildTrailer(); buildNav();
 applyLang();
+initGuide({ monument: "dom-st-peter" });

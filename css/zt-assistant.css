@@ -67,3 +67,11 @@
 #bruckmandl .bruckmandl__ai-status-badge--fact,
 #bruckmandl .bruckmandl__ai-status-badge--uncertain{ display: none; }
 #bruckmandl .bruckmandl__ai-status-badge--legend{ border: 0; padding: 0; background: none; }
+
+/* 07B.1 — global guide: hidden behind entry gates (never over the START row); on phones it tucks away while an
+   ending / destination list / timeline control row is on screen (class set by js/zt-guide.js). */
+html.is-gated .zt-assist__fab, html.is-gated .zt-assist{ display: none; }
+@media (max-width: 759px){
+  .zt-assist__fab.is-tucked{ opacity: 0; transform: translateY(16px) scale(.9); pointer-events: none; }
+}
+.zt-assist__fab{ transition: transform .3s cubic-bezier(.22,.61,.36,1), border-color .3s, opacity .3s; }

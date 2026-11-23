@@ -1147,12 +1147,22 @@ let mediaFeatureApi = null;
 // 06G.2B — chapter overlay on the language-neutral clean timeline (validated K-frame labels, measured seek times).
 let timelineChapterRefresh = () => {};
 function wireTimelineChapters() {
+  // 07B.1 — ZEITSPRUNG_TYPOGRAPHY_SYSTEM_V1 overlay over the clean timeline film (HTML only, never burned in):
+  // SMALL "01 / 10" · PRIMARY validated date · SECONDARY chapter title. Gap entries (unvalidated film cards) show nothing.
   const sec = document.getElementById("timelineFilm"); const v = sec && sec.querySelector(".mf__video"); const fr = sec && sec.querySelector(".mf__frame");
   if (!v || !fr) return;
-  const o = document.createElement("p"); o.className = "mf__chapter"; o.setAttribute("aria-live", "polite"); o.hidden = true; fr.appendChild(o);
+  const o = document.createElement("div"); o.className = "zt-ov"; o.setAttribute("aria-live", "polite"); o.hidden = true;
+  const ok = document.createElement("p"); ok.className = "zt-ov__k"; const os = document.createElement("p"); os.className = "zt-ov__s"; const ot = document.createElement("p"); ot.className = "zt-ov__t";
+  o.append(ok, os, ot); fr.appendChild(o);
+  const list = () => (SB_CH[lang] || SB_CH.de).tlv;
+  const N = SB_CH.de.tlv.filter((c) => c && c.y).length;
   let k = -2;
-  const upd = (force) => { const tt = v.currentTime || 0; let i = -1; SB_CH_T.forEach((x, j) => { if (tt >= x) i = j; }); if (i === k && !force) return; k = i;
-    const c = i >= 0 ? (SB_CH[lang] || SB_CH.de).tlv[i] : null; o.textContent = c && c.y ? c.y + " — " + c.h : ""; o.hidden = !o.textContent; };
+  const upd = (force) => { const tt = v.currentTime || 0; let i = -1; SB_CH_T.forEach((x, j) => { if (tt >= x) i = j; }); if (i === k && !force) return; const changed = i !== k; k = i;
+    const c = i >= 0 ? list()[i] : null;
+    if (!c || !c.y || !(v.currentTime > 0)) { o.hidden = true; return; }
+    const n = list().slice(0, i + 1).filter((x) => x && x.y).length;
+    ok.textContent = String(n).padStart(2, "0") + " / " + String(N).padStart(2, "0"); os.textContent = c.y; ot.textContent = c.h; o.hidden = false;
+    if (changed) { o.classList.remove("is-new"); void o.offsetWidth; o.classList.add("is-new"); } };
   v.addEventListener("timeupdate", () => upd(false)); v.addEventListener("seeked", () => upd(true)); v.addEventListener("emptied", () => upd(true));
   timelineChapterRefresh = () => upd(true);
 }

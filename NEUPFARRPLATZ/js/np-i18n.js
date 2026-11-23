@@ -142,3 +142,30 @@ export const STR = {
     zoom: "Ampliar imagen",
   },
 };
+
+/* 07B.1 — GLOBAL BRÜCKMANDL GUIDE data (ZEITSPRUNG_GLOBAL_GUIDE_V1, engine js/zt-guide.js).
+   HISTORICAL_BRIEFING = PENDING: conservative topics; answers reuse ONLY the visual descriptions above (no dates, no
+   Misrach geometry). A dedicated topic answers requests for precise details with the owner-defined pending sentence. */
+{
+  const UIG = {
+    de: { role: "Ihr ZEITSPRUNG-Begleiter", hi: "Grüß Gott! Sonst wache ich auf der Steinernen Brücke — hier begleite ich Sie über den Neupfarrplatz. Wählen Sie ein Thema.", go: "Zum Kapitel →", ctx: "PASSEND ZU DIESEM KAPITEL", aria: "Brückmandl — Ihr ZEITSPRUNG-Begleiter",
+      t: ["Jüdisches Viertel", "Synagoge", "K01–K10 Entwicklung", "Archäologie", "Neupfarrkirche", "Misrach", "Genaue Daten?"], pending: "Die historische Prüfung dieses Details ist noch nicht abgeschlossen." },
+    en: { role: "Your ZEITSPRUNG guide", hi: "Grüß Gott! I usually keep watch on the Stone Bridge — here I accompany you across Neupfarrplatz. Choose a topic.", go: "Go to chapter →", ctx: "FOR THIS CHAPTER", aria: "Bruckmandl — your ZEITSPRUNG guide",
+      t: ["Jewish Quarter", "Synagogue", "K01–K10 development", "Archaeology", "Neupfarrkirche", "Misrach", "Exact dates?"], pending: "Historical validation for this detail is still pending." },
+    es: { role: "Su guía ZEITSPRUNG", hi: "¡Grüß Gott! Normalmente vigilo el Puente de Piedra; aquí le acompaño por la Neupfarrplatz. Elija un tema.", go: "Ir al capítulo →", ctx: "PARA ESTE CAPÍTULO", aria: "Bruckmandl — su guía ZEITSPRUNG",
+      t: ["Barrio judío", "Sinagoga", "Evolución K01–K10", "Arqueología", "Neupfarrkirche", "Misrach", "¿Fechas exactas?"], pending: "La validación histórica de este detalle aún está pendiente." },
+  };
+  for (const l of LANGS) {
+    const S = STR[l], u = UIG[l], K = S.kf.items;
+    S.guide = { role: u.role, hi: u.hi, go: u.go, ctx: u.ctx, aria: u.aria, pending: u.pending };
+    S.guideTopics = [
+      [u.t[0], S.quarter.p + " " + K[0].d],
+      [u.t[1], S.syn.h + ". " + S.syn.p],
+      [u.t[2], S.kf.p],
+      [u.t[3], K[7].d + " " + S.arch.p],
+      [u.t[4], S.now.p1],
+      [u.t[5], S.mis.p],
+      [u.t[6], u.pending],
+    ];
+  }
+}
