@@ -14,6 +14,7 @@
        fixed full-viewport fallback (html.zt-pfs) when the browser refuses (iPhone) — overlay + controls stay together.
    Usage: import { mountFilm } from "../js/zt-film.js";  const f = mountFilm(hostEl, { mode, src, poster, ... });
      o.sound = { isOn(), toggle(), register(video), subscribe(fn) }  (adapter onto the page's single sound state) */
+import "./zt-media-priority.js?v=20261125e"; // 07D: a starting film has priority on the network
 const UI = {
   de: { play: "ABSPIELEN", pause: "PAUSE", on: "TON AN", off: "TON AUS", full: "VOLLBILD", exit: "SCHLIESSEN", ch: "KAPITEL", seek: "Position im Film", film: "FILM" },
   en: { play: "PLAY", pause: "PAUSE", on: "SOUND ON", off: "SOUND OFF", full: "FULLSCREEN", exit: "CLOSE", ch: "CHAPTERS", seek: "Position in the film", film: "FILM" },
@@ -25,8 +26,11 @@ const fmt = (s) => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 
 const mk = (tag, cls, attrs) => { const e = document.createElement(tag); if (cls) e.className = cls; if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
 const REDUCED = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+/** 07D: on a slow or data-saving connection the same film is taken from its smaller derivative (o.srcLite), decided once */
+const slowNet = () => { const c = navigator.connection; return !!c && (c.saveData || /2g|3g/.test(c.effectiveType || "") || (c.downlink > 0 && c.downlink < 2.2)); };
 export function mountFilm(host, o = {}) {
   if (!host) return null;
+  if (o.srcLite && slowNet()) o = Object.assign({}, o, { src: o.srcLite });
   const trailer = o.mode === "trailer";
   const cues = Array.isArray(o.cues) ? o.cues : [];
   const root = mk("div", "ztf ztf--" + (trailer ? "trailer" : "timeline"));
@@ -67,15 +71,25 @@ export function mountFilm(host, o = {}) {
 
   // ---- playback ----
   let attached = false, engaged = false, cur = -2, userPaused = false, vis = false;
-  const attach = () => { if (attached) return; attached = true; v.preload = "auto"; v.src = o.src; };
+  let warm = false, busy = false, busyT = 0;
+  const focusOn = () => { if (busy) return; busy = true; document.dispatchEvent(new CustomEvent("zt:film-focus")); clearTimeout(busyT); busyT = setTimeout(focusOff, 20000); };
+  const focusOff = () => { if (!busy) return; busy = false; clearTimeout(busyT); document.dispatchEvent(new CustomEvent("zt:film-free")); };
+  // 07D: the index of the file (moov) is fetched when the film comes near, so PLAY only has to fetch pictures
+  const warmUp = () => { if (warm || attached) return; warm = true; v.preload = "metadata"; v.src = o.src; };
+  const attach = () => { if (attached) return; attached = true; focusOn(); v.preload = "auto"; if (!warm) v.src = o.src; else if (v.networkState === 3 || v.error) { v.src = o.src; v.load(); } };
   const engage = () => { if (engaged || !bs) return; engaged = true; o.sound.register(v); };
   const play = (user) => { if (user) { engage(); userPaused = false; } attach(); const p = v.play(); if (p && p.catch) p.catch(() => { if (!v.muted) { v.muted = true; const q = v.play(); if (q && q.catch) q.catch(() => {}); } }); };
   const pause = (user) => { if (user) userPaused = true; v.pause(); };
   const toggle = () => { if (v.paused) play(true); else pause(true); };
   v.addEventListener("playing", () => { stage.classList.add("is-playing", "has-started"); paint(); });
-  v.addEventListener("pause", () => { stage.classList.remove("is-playing"); paint(); });
+  v.addEventListener("pause", () => { stage.classList.remove("is-playing"); focusOff(); paint(); });
+  // network priority ends once the film runs with a few seconds in reserve
+  v.addEventListener("progress", () => { if (!busy || v.paused || !v.buffered.length) return; const e = v.buffered.end(v.buffered.length - 1); if (e - v.currentTime > 8 || e >= v.duration - 0.5) focusOff(); });
+  v.addEventListener("waiting", () => { if (attached && !v.paused && stage.classList.contains("has-started")) focusOn(); stage.classList.add("is-waiting"); });
+  ["playing", "pause", "error"].forEach((n) => v.addEventListener(n, () => stage.classList.remove("is-waiting")));
   v.addEventListener("ended", () => { stage.classList.remove("is-playing"); v.dataset.done = "1"; paint(); });
-  v.addEventListener("error", () => { stage.classList.remove("is-playing"); stage.classList.add("is-error"); });
+  let tries = 0;
+  v.addEventListener("error", () => { focusOff(); stage.classList.remove("is-playing"); if (attached && tries < 2 && v.getAttribute("src")) { tries++; const t = v.currentTime || 0, run = stage.classList.contains("has-started") && !userPaused; setTimeout(() => { v.src = o.src; v.load(); v.addEventListener("loadedmetadata", () => { try { v.currentTime = t; } catch (e) {} if (run && vis) play(false); }, { once: true }); }, 1200 * tries); return; } if (attached) stage.classList.add("is-error"); });
   [bp, big, fsPlay].forEach((b) => b.addEventListener("click", toggle));
   v.addEventListener("click", toggle);
   if (bs) bs.addEventListener("click", () => { engage(); o.sound.toggle(); if (o.sound.isOn() && v.paused && attached && !v.dataset.done) play(true); paint(); });
@@ -120,6 +134,7 @@ export function mountFilm(host, o = {}) {
   ["fullscreenchange", "webkitfullscreenchange"].forEach((ev) => document.addEventListener(ev, () => { stage.classList.toggle("is-fs", fsEl() === stage); paint(); }));
 
   // ---- visibility: trailer = muted autoplay at >= 55 %; timeline = pause off screen ----
+  if (!trailer) new IntersectionObserver((es, i) => { if (es.some((e) => e.isIntersecting)) { i.disconnect(); warmUp(); } }, { rootMargin: "40% 0px" }).observe(stage);
   const auto = trailer && o.autoplay !== false && !REDUCED();
   new IntersectionObserver((es) => es.forEach((en) => {
     vis = en.isIntersecting && en.intersectionRatio >= (trailer ? 0.55 : 0.01);

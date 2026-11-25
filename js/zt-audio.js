@@ -162,8 +162,10 @@ function createZtAudioBus() {
     }
   }
 
+  let wantAmbience = null; // 07D
   function setMuted(next) {
     muted = !!next;
+    if (!muted && wantAmbience) { const w = wantAmbience; wantAmbience = null; startAmbience(w.key, w.opts); }
     if (masterGain && ctx) {
       const t = ctx.currentTime;
       masterGain.gain.cancelScheduledValues(t);
@@ -217,6 +219,7 @@ function createZtAudioBus() {
     const relPath = registry.get(key);
     if (!relPath) return false; // unknown key — never throws, never plays garbage
 
+    if (muted) return false; // 07D: sound is off -> an inaudible effect is not downloaded either
     const eventId = o.eventId || key;
     const cooldown = o.cooldownMs != null ? o.cooldownMs : (EVENT_COOLDOWN_MS[key] != null ? EVENT_COOLDOWN_MS[key] : DEFAULT_COOLDOWN_MS);
     const t = nowMs();
@@ -251,6 +254,8 @@ function createZtAudioBus() {
     if (activeAmbience && activeAmbience.key === key) return; // already the active bed
     const relPath = registry.get(key);
     if (!relPath) return;
+    if (muted) { stopAmbience(0); wantAmbience = { key, opts }; return; } // 07D: fetched when the visitor turns sound on
+    wantAmbience = null;
 
     const fadeOutPrev = o.crossfadeOut != null ? o.crossfadeOut : 0.8;
     stopAmbience(fadeOutPrev);
@@ -286,6 +291,7 @@ function createZtAudioBus() {
   }
 
   function stopAmbience(fadeOutSeconds) {
+    wantAmbience = null;
     if (!activeAmbience) return;
     const dur = fadeOutSeconds != null ? fadeOutSeconds : 1.2;
     const entry = activeAmbience;

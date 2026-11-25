@@ -2,18 +2,19 @@
 // The DOM is built ONCE; a language switch only re-runs text refreshers (no rebuild, no new listeners / observers / timers).
 // Media: runtime derivatives only (../assets/porta-praetoria/). One video plays at a time; every video loads lazily (preload none + poster).
 import { STR, LANGS, STORAGE_KEY } from "./porta-i18n.js?v=20261124a";
-import { initGuide } from "../../js/zt-guide.js?v=20261124a"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
+import { initGuide } from "../../js/zt-guide.js?v=20261125e"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
 import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
 
 import { ztSound } from "../../js/zt-sound.js?v=20261124a";
-import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261124a"; // 07C-H: shared film player (trailer slot)
+import { mountSources, goToSources } from "../../js/zt-sources.js?v=20261125d"; // 07D: one bibliography per page
+import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261125e"; // 07C-H: shared film player (trailer slot)
 /* 07C-H TRAILER SLOT — same architecture as the other monuments, NOT public yet: the corrected final trailer
    PP_TRAILER_MASTER_CLEAN_V1 is DEFERRED (owner). When approved, set { src, poster, duration, hasAudio } here — the
    section (#trailer before the ending) is then created automatically; no redesign. */
 const PP_TRAILER = null;
 function buildTrailerSlot() {
   if (!PP_TRAILER) return;
-  const end = document.getElementById("heute"); if (!end) return;
+  const end = document.getElementById("quellen"); if (!end) return;
   const s = document.createElement("section"); s.id = "trailer"; s.className = "psec ptrailer-sec"; s.setAttribute("aria-label", "Trailer"); end.before(s);
   mountFilm(s, { mode: "trailer", ...PP_TRAILER, sound: ztSoundAdapter(ztSound),
     head: () => ({ e: T().tr.eyebrow, h: T().tr.h, p: T().tr.p }),
@@ -353,13 +354,12 @@ function buildGallery() {
 function buildEnd() {
   const s = $("#heute"); const w = el("div", "pwrap pr"); head(w, "end"); w.append(lead("end", "p"));
   const st = el("div", "pstage"); const i = el("img", "", { src: img("pp_heute"), loading: "lazy", decoding: "async" }); bind(i, (t) => t.heute.alt, "alt"); st.append(i); w.append(st); // HEUTE: the owner anchor image, no reconstruction badge
-  const cta = el("div", "pend__cta"); const sb = el("button", "pbtn", { type: "button" }); bind(sb, (t) => t.end.sources); const ab = el("a", "pbtn pbtn--primary", { href: "../index.html#index-monuments" }); bind(ab, (t) => t.back); cta.append(sb, ab); w.append(cta); mountDestinations(w, { self: "porta-praetoria", btnClass: "pbtn" }); // 07B.1 (no Porta trailer: final clean trailer deferred)
+  const cta = el("div", "pend__cta"); const sb = el("button", "pbtn", { type: "button" }); bind(sb, (t) => t.end.sources); const ab = el("a", "pbtn pbtn--primary", { href: "../index.html#index-monuments" }); bind(ab, (t) => t.back); cta.append(sb, ab);
+  // 07D order: HEUTE (last content) -> trailer slot -> QUELLEN -> destinations (own block after #heute)
+  const tail = el("section", "psec pend ptail"); const tw = el("div", "pwrap"); tw.append(cta); tail.append(tw); s.after(tail);
+  mountSources({ monument: "porta-praetoria", before: tail }); mountDestinations(tw, { self: "porta-praetoria", btnClass: "pbtn" }); // 07B.1 (no Porta trailer: final clean trailer deferred)
   s.append(w); // 06G.2B: methodology disclaimer removed from the page (global footer later)
-  const dlg = $("#srcDlg"); const list = $("#srcList"); const cl = $("#srcClose");
-  onLang(() => { $("#srcTitle").textContent = T().end.srcH; list.replaceChildren(...T().end.srcList.map((x) => { const li = el("li"); li.textContent = x; return li; })); $("#srcDisc").textContent = ""; $("#srcDisc").hidden = true; cl.textContent = T().end.close; });
-  sb.addEventListener("click", () => { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); });
-  cl.addEventListener("click", () => { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); });
-  dlg.addEventListener("click", (e) => { if (e.target === dlg && dlg.close) dlg.close(); });
+  sb.addEventListener("click", () => goToSources()); // 07D: the dialog became the #quellen section
 }
 
 /* ---------- scroll reveal ---------- */
@@ -370,5 +370,5 @@ function reveal() {
 
 try { history.scrollRestoration = "manual"; } catch (e) {}
 root.lang = lang;
-buildNav(); buildHero(); buildCtx(); buildHolo(); buildPass(); buildTower(); buildY179(); buildCastra(); buildPlan(); buildBau(); buildFilm(); buildLoops(); buildGallery(); buildTrailerSlot(); buildEnd(); reveal(); initGuide({ monument: "porta-praetoria" });
+buildNav(); buildHero(); buildCtx(); buildHolo(); buildPass(); buildTower(); buildY179(); buildCastra(); buildPlan(); buildBau(); buildFilm(); buildLoops(); buildGallery(); buildEnd(); buildTrailerSlot(); reveal(); initGuide({ monument: "porta-praetoria" });
 requestAnimationFrame(runSC);

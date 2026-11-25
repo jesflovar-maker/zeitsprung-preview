@@ -127,6 +127,7 @@
    describe the earlier implementation and are kept for history only.
    ============================================================================ */
 
+import { goToSources } from "../../js/zt-sources.js?v=20261125d";
 import { STEINERNE_BRUCKMANDL_ASSET_BASE, STEINERNE_SOURCES_URL } from "../../js/zt-paths.js";
 import { openPhoto } from "../../js/zs-media-viewer.js"; // 06G.2B.2: the ONE shared viewer (same URL as main.js / craft-gallery.js)
 import {
@@ -739,7 +740,8 @@ function renderSources(container, t, lang, sourcesMap) {
 
   const openPanel = () => { panel.hidden = false; };
   const closePanel = () => { panel.hidden = true; };
-  btn.addEventListener("click", openPanel);
+  btn.removeAttribute("aria-haspopup"); btn.setAttribute("aria-controls", "quellen");
+  btn.addEventListener("click", () => goToSources("SB_KDB")); // 07D: one bibliography per page (#quellen)
   closeBtn.addEventListener("click", closePanel);
   panel.addEventListener("click", (e) => { if (e.target === panel) closePanel(); });
   const onSourcesEscape = (e) => { if (e.key === "Escape" && !panel.hidden) closePanel(); };

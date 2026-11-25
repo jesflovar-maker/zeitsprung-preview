@@ -1152,10 +1152,10 @@ export function buildMuseumScrollExperience({
       tl.progress(0);
       tl.progress(p);
 
-      if (window.ScrollTrigger) ScrollTrigger.refresh();
+      if (window.__ztRefreshSoon) window.__ztRefreshSoon(); else if (window.ScrollTrigger) ScrollTrigger.refresh(); // 07D: one refresh per language switch, after the click has been painted
     },
     refresh() {
-      if (window.ScrollTrigger) ScrollTrigger.refresh();
+      if (window.__ztRefreshSoon) window.__ztRefreshSoon(); else if (window.ScrollTrigger) ScrollTrigger.refresh(); // 07D: one refresh per language switch, after the click has been painted
     },
     chapterCount: script.length,
     totalUnits: total,

@@ -132,7 +132,7 @@ export const DICT = {
     craftRecon: "Rekonstruktion",
     craftAfter: "nach:",
     craftEnlarge: "Vergrößern",
-    craftNext: "Weiter: Die Baustelle im Bild →",
+    craftNext: "Weiter: der Trailer →",
     kframesCounterLabel: "BILD",
     kframesHotspotMuseum: "Mehr in der Ausstellung ansehen",
     kframesHotspotStage: "Zur Zeitreise",
@@ -301,7 +301,7 @@ export const DICT = {
     continueTitle: "Reise fortsetzen",
     continueText: "Regensburg erzählt weiter — wählen Sie Ihr nächstes Monument.",
     endAll: "ALLE MONUMENTE", endNext: "DIREKT WEITER ZU", endTrailer: "TRAILER ANSEHEN", zoomOpen: "Bild vergrößern",
-    trEyebrow: "TRAILER", trTitle: "Die Steinerne Brücke in Bildern", trText: "Ein kurzer Film über die Brücke und ihre Zeit.", trLine: "Seit 1146 über der Donau", trAlt: "Trailer Steinerne Brücke",
+    trEyebrow: "TRAILER", trTitle: "Die Steinerne Brücke in Bildern", trText: "Ein kurzer Film über die Brücke und ihre Zeit.", trLine: "Über der Donau seit dem 12. Jahrhundert", trAlt: "Trailer Steinerne Brücke",
     footerBack: "ZURÜCK ZUM ANFANG"
   },
   en: {
@@ -404,7 +404,7 @@ export const DICT = {
     craftRecon: "Reconstruction",
     craftAfter: "based on:",
     craftEnlarge: "Enlarge",
-    craftNext: "Next: the construction site in pictures →",
+    craftNext: "Next: the trailer →",
     kframesCounterLabel: "FRAME",
     kframesHotspotMuseum: "See more in the exhibition",
     kframesHotspotStage: "To the time journey",
@@ -536,7 +536,7 @@ export const DICT = {
     continueTitle: "Continue the journey",
     continueText: "Regensburg's story goes on — choose your next monument.",
     endAll: "ALL MONUMENTS", endNext: "CONTINUE DIRECTLY TO", endTrailer: "WATCH TRAILER", zoomOpen: "Enlarge image",
-    trEyebrow: "TRAILER", trTitle: "The Stone Bridge in pictures", trText: "A short film about the bridge and its time.", trLine: "Spanning the Danube since 1146", trAlt: "Stone Bridge trailer",
+    trEyebrow: "TRAILER", trTitle: "The Stone Bridge in pictures", trText: "A short film about the bridge and its time.", trLine: "Spanning the Danube since the 12th century", trAlt: "Stone Bridge trailer",
     footerBack: "BACK TO START"
   },
   es: {
@@ -639,7 +639,7 @@ export const DICT = {
     craftRecon: "Reconstrucción",
     craftAfter: "según:",
     craftEnlarge: "Ampliar",
-    craftNext: "Siguiente: la obra en imágenes →",
+    craftNext: "Siguiente: el tráiler →",
     kframesCounterLabel: "IMAGEN",
     kframesHotspotMuseum: "Ver más en la exposición",
     kframesHotspotStage: "Al viaje en el tiempo",
@@ -771,7 +771,7 @@ export const DICT = {
     continueTitle: "Continuar el viaje",
     continueText: "Regensburg sigue contando su historia: elige tu próximo monumento.",
     endAll: "TODOS LOS MONUMENTOS", endNext: "CONTINUAR DIRECTAMENTE A", endTrailer: "VER TRÁILER", zoomOpen: "Ampliar imagen",
-    trEyebrow: "TRÁILER", trTitle: "El Puente de Piedra en imágenes", trText: "Una breve película sobre el puente y su tiempo.", trLine: "Sobre el Danubio desde 1146", trAlt: "Tráiler del Puente de Piedra",
+    trEyebrow: "TRÁILER", trTitle: "El Puente de Piedra en imágenes", trText: "Una breve película sobre el puente y su tiempo.", trLine: "Sobre el Danubio desde el siglo XII", trAlt: "Tráiler del Puente de Piedra",
     footerBack: "VOLVER AL INICIO"
   }
 };

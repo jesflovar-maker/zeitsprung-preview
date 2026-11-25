@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="icon" href="data:,">
 <title>ZEITSPRUNG V2 — Steinerne Brücke</title>
 <meta name="description" content="ZEITSPRUNG V2 — experimental GSAP + ScrollTrigger + Lenis prototype, Steinerne Brücke Regensburg.">
 <meta name="robots" content="noindex, nofollow">
@@ -12,9 +13,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <link rel="stylesheet" href="css/style.css?v=20261124a">
-<link rel="stylesheet" href="../css/zt-assistant.css?v=20261123c">
+<link rel="stylesheet" href="../css/zt-assistant.css?v=20261125e">
 <link rel="stylesheet" href="../css/zt-typography.css?v=20261124a">
-<link rel="stylesheet" href="../css/zt-film.css?v=20261124a">
+<link rel="stylesheet" href="../css/zt-film.css?v=20261125e">
+<link rel="stylesheet" href="../css/zt-sources.css?v=20261125d">
 <link rel="stylesheet" href="../css/zt-kinetic.css?v=20261125a">
 </head>
 <body>
@@ -508,13 +510,13 @@
 }
 </script>
 
-<script type="module" src="js/main.js?v=20261125a"></script>
+<script type="module" src="js/main.js?v=20261125e"></script>
 <script type="module">
   // BRUCKMANDL_ASSISTANT_PATTERN_V1 — small floating contextual help icon (shared module).
   // Pure consumer of the canonical knowledge provider; the #bruckmandl module, its 8 hotspots
   // and its lifecycle are untouched.
   // 07B.1: global entry point — Steinerne keeps its canonical bridge knowledge ("bridge" engine in js/zt-guide-config.js)
-  import { initGuide } from "../js/zt-guide.js?v=20261124a";
+  import { initGuide } from "../js/zt-guide.js?v=20261125e";
   initGuide({ monument: "steinerne-bruecke" });
 </script>
 </body>

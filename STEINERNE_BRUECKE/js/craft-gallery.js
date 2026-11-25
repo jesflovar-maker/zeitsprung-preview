@@ -328,7 +328,7 @@ export function initCraftGallery({ t, getLang }) {
   STEPS.forEach((s, i) => { const d = mk("i"); if (i === 0 || STEPS[i - 1].ch !== s.ch) d.className = "is-chapter"; rail.appendChild(d); });
   sticky.appendChild(stage); sticky.appendChild(cap); sticky.appendChild(count); sticky.appendChild(rail);
   track.appendChild(sticky); host.appendChild(track);
-  const next = mk("a", "craft__next"); next.href = "#kframesGallery"; host.appendChild(next);
+  const next = mk("a", "craft__next"); next.href = "#trailer"; host.appendChild(next);
 
   let cur = -1, timer = 0;
   const pad = (x) => String(x).padStart(2, "0");

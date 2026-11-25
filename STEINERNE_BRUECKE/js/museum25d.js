@@ -40,8 +40,9 @@
    touching this file.
    ============================================================================ */
 
-import { CHAPTER_SCRIPT, buildMuseumScrollExperience, buildTimingMap } from "./museum2d-scroll.js";
+import { CHAPTER_SCRIPT, buildMuseumScrollExperience, buildTimingMap } from "./museum2d-scroll.js?v=20261125e";
 import { ZT_AUDIO_BUS } from "../../js/zt-audio.js";
+import { releaseWhenFar, whenQuiet } from "../../js/zt-media-priority.js?v=20261125e"; // 07D
 import { STEINERNE_WEB_ASSET_BASE, ASSET_SWAP_MANIFEST_URL, MUSEUM_CONTENT_MAP_URL as CONTENT_MAP_URL_RESOLVED } from "../../js/zt-paths.js";
 
 const SLOT_BASE = STEINERNE_WEB_ASSET_BASE;
@@ -1459,7 +1460,7 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     if (!assetsRequested) {
       assetsRequested = true;
       const decodes = preloadQueue.map(({ el, url }) => {
-        el.src = url;
+        if (!el.getAttribute("src")) el.src = url;
         if (typeof el.decode === "function") return el.decode().catch(() => {});
         return Promise.resolve();
       });
@@ -1467,19 +1468,19 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
         if (window.ScrollTrigger) ScrollTrigger.refresh();
       });
     }
-    if (fromProximity === true || isDesktopLike) ensureVideos();
+    if (fromProximity === true) { ensureVideos(); releaseWhenFar(section); } // 07D: no idle warm-up of ~30 MB; clips stop downloading when the museum is far away
   }
 
   if (window.ScrollTrigger) {
     ScrollTrigger.create({
       trigger: section,
-      start: "top bottom+=100%",
+      start: "top bottom+=180%",
       once: true,
       onEnter: () => ensureAssets(true)
     });
   }
-  if ("requestIdleCallback" in window) window.requestIdleCallback(() => ensureAssets(false), { timeout: 6000 });
-  else setTimeout(() => ensureAssets(false), 4000);
+  // 07D: ahead of time the pictures come one after the other (decoded, in order), never all at once and never while a film starts
+  setTimeout(() => preloadQueue.forEach(({ el, url }) => whenQuiet(() => { if (assetsRequested || el.getAttribute("src")) return null; el.src = url; return el.decode ? el.decode().catch(() => {}) : null; })), 4500);
 
   // -------------------------------------------------------------------
   // Pointer parallax (desktop) + touch drag (mobile) — rigid layer only, and

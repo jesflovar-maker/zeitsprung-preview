@@ -59,3 +59,9 @@ html.zt-pfs .zt-assist__fab, html.zt-pfs .zt-assist{ display: none !important; }
   .ztf--timeline .ztf__stage{ height: min(calc(100svh - var(--ztf-top) - 48px), 940px); }
 }
 @media (prefers-reduced-motion: reduce){ .ztf__video{ transition: none; } }
+
+/* 07D: quiet line while a film waits for data (no spinner) */
+.ztf__stage::after{ content: ""; position: absolute; left: 0; bottom: 0; z-index: 6; height: 2px; width: 34%; background: var(--zt-ty-gold, #c9a96e); opacity: 0; pointer-events: none; }
+.ztf__stage.is-waiting::after{ opacity: .9; animation: ztfWait 1.3s ease-in-out infinite alternate; }
+@keyframes ztfWait{ from{ transform: translateX(0); } to{ transform: translateX(194%); } }
+@media (prefers-reduced-motion: reduce){ .ztf__stage.is-waiting::after{ animation: none; width: 100%; opacity: .5; } }

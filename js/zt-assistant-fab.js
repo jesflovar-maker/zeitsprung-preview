@@ -5,7 +5,7 @@
      small floating icon  ->  compact context panel  ->  topic-based answer
                           ->  deep link / scroll to the chapter
 
-   NOT a search bar, NOT a chat textbox, NOT a full-width assistant strip.
+   07D (owner revision): one question line on monument pages (js/zt-guide-ask.js); no AI service, no full-width strip.
    See 01_ARCHITECTURE/ZEITSPRUNG_ASSISTANT_AND_LANGUAGE_STANDARD.md.
 
    This shared module is used by the INDEX and by STEINERNE_BRUECKE. It is a
@@ -44,9 +44,9 @@ export function initAssistantFab(opt = {}) {
   if (document.getElementById("ztAssistantFab")) return null;
   const mk = (tag, cls, attrs) => { const e = document.createElement(tag); if (cls) e.className = cls; if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
   const fab = mk("button", "zt-assist__fab", { type: "button", id: "ztAssistantFab", "aria-haspopup": "dialog", "aria-expanded": "false", "aria-controls": "ztAssistantPanel" });
-  const fabImg = mk("img", "", { alt: "", width: "56", height: "56", draggable: "false" }); fabImg.src = AVATAR + "bruckmandl_ai_idle.webp"; fab.appendChild(fabImg);
+  const fabImg = mk("img", "", { alt: "", width: "56", height: "56", draggable: "false" }); fabImg.src = AVATAR + "bruckmandl_ai_idle_208.webp"; fab.appendChild(fabImg);
   const pn = mk("aside", "zt-assist", { id: "ztAssistantPanel", role: "dialog" }); pn.hidden = true;
-  const head = mk("div", "zt-assist__head"); const av = mk("img", "zt-assist__av", { alt: "", width: "56", height: "56", loading: "lazy" }); av.src = AVATAR + "bruckmandl_ai_talk.webp";
+  const head = mk("div", "zt-assist__head"); const av = mk("img", "zt-assist__av", { alt: "", width: "56", height: "56", loading: "lazy" }); av.src = AVATAR + "bruckmandl_ai_talk_208.webp";
   const who = mk("div"); const name = mk("div", "zt-assist__name"); name.textContent = "BRÜCKMANDL"; const role = mk("div", "zt-assist__role"); who.appendChild(name); who.appendChild(role);
   const cls = mk("button", "zt-assist__close", { type: "button" }); cls.textContent = "×";
   head.appendChild(av); head.appendChild(who); head.appendChild(cls);
@@ -54,9 +54,10 @@ export function initAssistantFab(opt = {}) {
   pn.appendChild(head); pn.appendChild(hi); pn.appendChild(topics); pn.appendChild(ans);
   document.body.appendChild(fab); document.body.appendChild(pn);
 
+  let asker = null, place = null; // 07D free text
   let sel = null; // selected topic id
   const renderAnswer = () => {
-    const l = langNow(); ans.replaceChildren();
+    if (asker && asker.active) return; const l = langNow(); ans.replaceChildren();
     topics.querySelectorAll(".zt-assist__topic").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.topic === sel)));
     if (!sel) return;
     const r = LocalValidatedProvider.answerTopic(sel, l);
@@ -66,7 +67,7 @@ export function initAssistantFab(opt = {}) {
     const p = mk("p"); p.textContent = r.text; ans.appendChild(p);
     const lk = MORE_TOPICS.includes(sel) && opt.moreLink ? opt.moreLink : opt.link;
     if (lk) { const a = mk("a", "zt-assist__go", { href: lk.href || "#" + lk.scrollTo }); a.dataset.scroll = lk.scrollTo || ""; a.textContent = lk.label[l] || lk.label.de; ans.appendChild(a); }
-    av.src = AVATAR + "bruckmandl_ai_expression_03_explain.webp";
+    av.src = AVATAR + "bruckmandl_ai_expression_03_explain_208.webp";
   };
   const relabel = () => {
     const l = langNow(), u = UI[l];
@@ -78,28 +79,38 @@ export function initAssistantFab(opt = {}) {
     renderAnswer();
   };
   // one delegated listener for all topic buttons (re-labelling never adds listeners)
-  topics.addEventListener("click", (e) => { const b = e.target.closest(".zt-assist__topic"); if (!b) return; sel = b.dataset.topic; renderAnswer(); pn.scrollTo({ top: pn.scrollHeight, behavior: "auto" }); });
+  topics.addEventListener("click", (e) => { const b = e.target.closest(".zt-assist__topic"); if (!b) return; sel = b.dataset.topic; if (asker) { asker.clear(); ans.replaceChildren(); } renderAnswer(); pn.scrollTo({ top: Math.max(0, ans.offsetTop - 12), behavior: "auto" }); });
   const onKey = (e) => { if (e.key === "Escape") close(); };
   // 07B.1 optional section awareness (opt.sections = { sectionId: topicId }): measured once when the panel opens
   const secIds = Object.keys(opt.sections || {});
   const sectionTopic = () => { let best = "", bh = 0; secIds.forEach((id) => { const el = document.getElementById(id); if (!el) return; const r = el.getBoundingClientRect(); const h = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0); if (h > bh) { bh = h; best = id; } }); return best ? opt.sections[best] : null; };
   // 07C-H: in-page "ask the Brückmandl" buttons (Steinerne hotspots) open THIS guide on a canonical topic id
-  document.addEventListener("zt:guide-topic", (e) => { const tp = e && e.detail && e.detail.topic; if (!tp) return; sel = tp; renderAnswer(); if (pn.hidden) openPanel(); });
-  // 07C-H optional: never cover CTAs / film controls on phones — while one of opt.avoid is on screen (panel closed) the icon tucks away
-  if (opt.avoid && "IntersectionObserver" in window) {
-    const onScr = new Set();
-    const ioA = new IntersectionObserver((es) => { es.forEach((e) => { if (e.isIntersecting) onScr.add(e.target); else onScr.delete(e.target); }); fab.classList.toggle("is-tucked", onScr.size > 0 && pn.hidden); }, { threshold: 0.01 });
-    const watch = () => document.querySelectorAll(opt.avoid).forEach((n) => { if (!n.__ztAv) { n.__ztAv = 1; ioA.observe(n); } });
-    watch(); setTimeout(watch, 2500); setTimeout(watch, 6000); // film panels are built asynchronously
+  document.addEventListener("zt:guide-topic", (e) => { const tp = e && e.detail && e.detail.topic; if (!tp) return; sel = tp; if (asker) { asker.clear(); ans.replaceChildren(); } renderAnswer(); if (pn.hidden) openPanel(); });
+  // 07D: free-text questions (monument page only: opt.ask) + icon placement. Units = canonical bridge answers + the K-frame
+  // story map (validated captions, fetched once on the first question).
+  if (opt.ask) {
+    let story = null; const cache = {};
+    const load = async () => { if (!story) { try { const { KFRAMES_MANIFEST_URL } = await import("./zt-paths.js"); const d = await (await fetch(KFRAMES_MANIFEST_URL)).json(); story = d.frames || d.kframes || []; } catch (e) { story = []; } } return story; };
+    const SRC = { who: ["SB_KDB"], when: ["SB_KDB"], where: ["SB_KDB"], fact_legend: ["SB_KDB", "SB_PANELS"], legend: ["SB_PANELS"], previous_figures: ["SB_PANELS"], material: ["SB_KDB"], detail: ["SB_PANELS"], bridge_overview: ["SB_PANELS", "BLFD"], arches: ["SB_PANELS"], piers: ["SB_PANELS"], bridge_materials: ["SB_BOOK", "SB_PANELS"], timeline: ["SB_PANELS"], construction: ["SB_BOOK"] };
+    const KSRC = [["SB_PANELS"], ["SB_BOOK"], ["SB_PANELS", "BLFD"], [], ["BLFD"], ["SB_PANELS"], ["SB_PANELS"], ["SB_PANELS"], ["SB_PANELS"], ["SB_PANELS"], ["SB_BOOK", "SB_PANELS"], ["SB_PANELS"]], KOPEN = [2, 3, 9];
+    const KW = { who: "bruckmandl maennchen figur figure figura", when: "bruckmandl alter", material: "bruckmandl figur", arches:"bogen boegen bogen arch arches arch arcos arco arch bruecke bridge puente anzahl", piers: "pfeiler anzahl wieviele", construction: "bogen lehrgeruest kran", previous_figures: "bruckmandl" };
+    const units = async (l) => { if (cache[l]) return cache[l]; const st = await load(); const q = [...LocalValidatedProvider.getSuggestedTopics(l).map((x) => x.topic), ...MORE_TOPICS].map((tp) => { const e = getBruckmandlEntry(tp, l); return e && { id: tp, t: e.question, x: e.answer, sec: MORE_TOPICS.includes(tp) ? "museum25d" : "bruckmandl", src: SRC[tp] || [], kw: KW[tp] || "" }; }).filter(Boolean);
+      const k = st.map((f, i) => { const d = (f.date_i18n && f.date_i18n[l]) || f.date || ""; return { id: f.id, t: d + " · " + (f.title[l] || f.title.de), x: f.description[l] || f.description.de, sec: "kframesGallery", src: KSRC[i] || [], note: KOPEN.includes(i) ? "open" : "" }; });
+      return (cache[l] = [...q, ...k]); };
+    const secNow = () => { let best = "", bh = 0; ["kframesGallery", "museum25d", "bruckmandl"].forEach((id) => { const el = document.getElementById(id); if (!el) return; const r = el.getBoundingClientRect(); const h = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0); if (h > bh) { bh = h; best = id; } }); return best; };
+    import("./zt-guide-ask.js?v=20261125d").then(({ mountAsk, keepClear }) => {
+      asker = mountAsk({ monument: opt.monument, panel: pn, before: topics, answer: ans, units, section: secNow, pose: (p) => { av.src = AVATAR + (p === "explain" ? "bruckmandl_ai_expression_03_explain_208.webp" : "bruckmandl_ai_talk_208.webp"); }, onAsk: () => { sel = null; topics.querySelectorAll(".zt-assist__topic").forEach((b) => b.setAttribute("aria-pressed", "false")); }, close: () => close(false) });
+      place = keepClear(fab, () => !pn.hidden);
+    });
   }
   function openPanel() { pn.hidden = false; fab.setAttribute("aria-expanded", "true"); fab.classList.remove("is-tucked"); document.addEventListener("keydown", onKey); requestAnimationFrame(() => pn.classList.add("is-open")); cls.focus(); }
   function open() { const st = secIds.length ? sectionTopic() : null; if (st) { sel = st; renderAnswer(); } pn.hidden = false; fab.setAttribute("aria-expanded", "true"); document.addEventListener("keydown", onKey); requestAnimationFrame(() => pn.classList.add("is-open")); cls.focus(); }
-  function close(refocus = true) { if (pn.hidden) return; pn.classList.remove("is-open"); pn.hidden = true; fab.setAttribute("aria-expanded", "false"); document.removeEventListener("keydown", onKey); if (refocus) fab.focus(); }
+  function close(refocus = true) { if (pn.hidden) return; pn.classList.remove("is-open"); pn.hidden = true; fab.setAttribute("aria-expanded", "false"); document.removeEventListener("keydown", onKey); if (refocus) fab.focus(); if (place) setTimeout(place, 60); }
   fab.addEventListener("click", () => (pn.hidden ? open() : close()));
   cls.addEventListener("click", () => close());
   ans.addEventListener("click", (e) => {
     const a = e.target.closest(".zt-assist__go"); if (!a) return;
-    if (a.dataset.scroll) { e.preventDefault(); const t = document.getElementById(a.dataset.scroll); close(false); if (t) t.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); }
+    if (a.dataset.scroll) { e.preventDefault(); const t = document.getElementById(a.dataset.scroll); close(false); if (t && window.__ztScrollTo) window.__ztScrollTo(t); else if (t) t.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }); }
   });
   new MutationObserver(relabel).observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
   relabel();

@@ -3,12 +3,13 @@
 // language switches only re-run text refreshers (no rebuild, no new listeners / observers / timers).
 // Media: runtime derivatives only (../assets/dom-st-peter/). One primary video plays at a time; lazy loading.
 import { STR, LANGS, STORAGE_KEY } from "./dom-i18n.js?v=20261124a";
-import { initGuide } from "../../js/zt-guide.js?v=20261124a"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
+import { initGuide } from "../../js/zt-guide.js?v=20261125e"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
 import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
 
 import { ztSound } from "../../js/zt-sound.js?v=20261124a";
 import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 07C.0: ZEITSPRUNG_KINETIC_VIDEO_TYPE_V1 (narrative layer, never on timelines)
-import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261124a"; // 07C-H: shared film player (trailer section) // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
+import { mountSources } from "../../js/zt-sources.js?v=20261125d"; // 07D: one bibliography per page
+import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261125e"; // 07C-H: shared film player (trailer section) // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
 
 const A = "../assets/dom-st-peter/";
 const HI = new Set(["k03", "k05", "k06", "k07", "k08", "k10", "k11", "int_portal", "int_nave", "int_choir", "int_vault", "heute"]); // also exist at 1080 px
@@ -57,9 +58,10 @@ addEventListener("resize", () => { if (!scRaf) scRaf = requestAnimationFrame(run
 let trailerOpen = false;
 const VM = {
   list: new Map(), pause: false,
-  io: new IntersectionObserver((es) => { es.forEach((e) => { const r = VM.list.get(e.target); if (!r) return; r.ratio = e.isIntersecting ? e.intersectionRatio : 0; if (e.isIntersecting) VM.load(e.target); }); VM.tick(); }, { threshold: [0, .15, .3, .45, .6, .8, 1], rootMargin: "35% 0px 35% 0px" }),
+  io: new IntersectionObserver((es) => { es.forEach((e) => { const r = VM.list.get(e.target); if (!r) return; r.ratio = e.isIntersecting ? e.intersectionRatio : 0; if (e.isIntersecting) { clearTimeout(r.far); VM.load(e.target); } else if (r.role === "loop" && e.target.dataset.src) { clearTimeout(r.far); r.far = setTimeout(() => VM.release(e.target), 900); } }); VM.tick(); }, { threshold: [0, .15, .3, .45, .6, .8, 1], rootMargin: "35% 0px 35% 0px" }),
   add(v, opt = {}) { v.muted = true; v.setAttribute("playsinline", ""); v.setAttribute("muted", ""); v.preload = "none"; v.disablePictureInPicture = true; if (opt.loop !== false) v.loop = true; this.list.set(v, { ratio: 0, role: opt.role || "loop", eager: !!opt.eager }); this.io.observe(v); if (opt.eager) this.load(v); },
   remove(v) { this.io.unobserve(v); this.list.delete(v); try { v.pause(); } catch (e) {} v.removeAttribute("src"); try { v.load(); } catch (e) {} },
+  release(v) { if (!this.list.has(v) || !v.getAttribute("src") || !v.paused) return; const b = v.buffered; if (b.length && v.duration && b.end(b.length - 1) >= v.duration - 0.3) return; v.removeAttribute("src"); v.preload = "none"; try { v.load(); } catch (e) {} }, // 07D: far away and unfinished -> stop downloading (attached again at 35 % margin)
   load(v) { if (!v.getAttribute("src") && v.dataset.src) { v.src = v.dataset.src; v.preload = "auto"; } },
   tick() {
     if (this.pause) { this.list.forEach((r, v) => { if (r.role !== "scrub" && !v.paused) v.pause(); }); return; }
@@ -236,7 +238,7 @@ function buildNow() {
 function buildEnd() {
   const s = $("#ende"); const br = el("div", "dend__brand rv"); br.textContent = "ZEITSPRUNG"; const h = bind(el("h2", "dend__t rv"), (t) => t.end.h); const p = bind(el("p", "dend__p rv"), (t) => t.end.p);
   const cta = el("div", "dend__cta rv"); const a1 = bind(el("a", "dbtn dbtn--primary", { href: "../index.html#index-monuments" }), (t) => t.ui.back); const tr = bind(el("button", "dbtn", { type: "button", "data-trailer": "" }), (t) => t.ui.trailer); cta.append(a1, tr); // 07B.1: ALL MONUMENTS -> orbit; the single Steinerne link became the shared destination list
-  s.append(br, h, p, cta); mountDestinations(s, { self: "dom-st-peter", btnClass: "dbtn" }); reveal(s); // 06G.2B: methodology note removed from the page (global footer later)
+  s.append(br, h, p, cta); mountSources({ monument: "dom-st-peter", before: s }); mountDestinations(s, { self: "dom-st-peter", btnClass: "dbtn" }); reveal(s); // 06G.2B: methodology note removed from the page (global footer later)
 }
 
 /* ---------- trailer: dedicated cinematic section before the ending (07C-H, js/zt-film.js) ----------

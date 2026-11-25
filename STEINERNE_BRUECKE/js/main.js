@@ -13,17 +13,18 @@
    This is still "GSAP + ScrollTrigger + Lenis as primary motion stack" exactly as
    requested — only the delivery mechanism (CDN vs. bundler) differs. */
 
-import { DICT, getInitialLang, setLang, applyI18n, t } from "./i18n.js?v=20261124a";
+import { DICT, getInitialLang, setLang, applyI18n, t } from "./i18n.js?v=20261125d";
 import { buildPortal } from "./portal.js";
-import { initMuseum25D } from "./museum25d.js";
-import { initKframesGallery } from "./kframes-gallery.js?v=20261125a";
-import { initCraftGallery } from "./craft-gallery.js";
+import { initMuseum25D } from "./museum25d.js?v=20261125e";
+import { initKframesGallery } from "./kframes-gallery.js?v=20261125e";
+import { initCraftGallery } from "./craft-gallery.js?v=20261125d";
 let craftApi = null; // museum photo gallery (#craftGallery); declared here so it exists before any wiring runs
 import { initMediaFeatures } from "../../js/media-feature.js?v=20261119m";
-import { mountFilm } from "../../js/zt-film.js?v=20261124a"; // 07C-H: shared documentary film player (timeline + trailer)
+import { mountSources, goToSources } from "../../js/zt-sources.js?v=20261125d"; // 07D: one bibliography per page
+import { mountFilm } from "../../js/zt-film.js?v=20261125e"; // 07C-H: shared documentary film player (timeline + trailer)
 import { openPhoto, openElement } from "../../js/zs-media-viewer.js"; // same URL as craft-gallery.js -> one shared viewer instance
 import { STEINERNE_VIDEO_WEB4_BASE, KFRAMES_4K_WEB_BASE } from "../../js/zt-paths.js";
-import { initBruckmandl } from "./bruckmandl.js?v=20261124a";
+import { initBruckmandl } from "./bruckmandl.js?v=20261125d";
 import { TIMES as SB_CH_T, STR as SB_CH } from "./sb-index-chapters.js"; // 06G.2B: language-neutral clean timeline + DE/EN/ES chapter overlay
 import { initBruckmandlHotspotBridge } from "./bruckmandl-hotspot-bridge.js";
 // Technical DOM event name only (not QA/provider data) — reused verbatim
@@ -783,12 +784,15 @@ async function startExperience() {
     }
   };
 
-  assetsToLoad.forEach((src) => {
-    const img = new Image();
-    img.onload = updateProgress;
-    img.onerror = updateProgress; // do not block the experience on a single failed asset
+  // 07D: the first picture opens the experience; the rest follows in story order, two at a time, each with two retries
+  let nextI = 0;
+  const loadOne = (src, n) => new Promise((res) => {
+    const img = new Image(); if (n < 2) img.fetchPriority = "high";
+    let tries = 0; img.onload = res; img.onerror = () => { if (tries++ < 2) setTimeout(() => { img.src = ""; img.src = encodeURI(src); }, 900 * tries); else res(); };
     img.src = encodeURI(src);
-  });
+  }).then(updateProgress);
+  const lane = async () => { while (nextI < assetsToLoad.length) { const i = nextI++; await loadOne(assetsToLoad[i], i); if (i === 1 || assetsToLoad.length < 2) setTimeout(revealApp, 250); } };
+  lane(); lane();
 
   // Safety timeout in case an asset never fires load/error
   setTimeout(() => {
@@ -885,6 +889,7 @@ function initLenisAndScroll() {
   });
 
   lenis.on("scroll", ScrollTrigger.update);
+  let rT = 0; window.__ztRefreshSoon = () => { clearTimeout(rT); rT = setTimeout(() => ScrollTrigger.refresh(), 140); }; // 07D: coalesces the language-switch refreshes
   if (/[?&]qa\b/.test(location.search)) window.__ztLenis = lenis; // QA-only handle (no effect on normal visits)
 
   gsap.ticker.add((time) => {
@@ -928,6 +933,8 @@ function initLenisAndScroll() {
   if (THREE_D_ENABLED) wireThreeDChapter();
   wireNav(lenis);
   wireTrailerSection();
+  mountSources({ monument: "steinerne-bruecke", before: document.getElementById("sbEnd") }); // 07D
+  window.__ztScrollTo = (el) => lenis.scrollTo(el, { offset: -56 }); // shared modules scroll through Lenis on this page
   wireEnding();
   wireZoom(lenis);
 
@@ -1171,6 +1178,7 @@ function wireTimelineChapters() {
   sbTimelineFilm = mountFilm(host, {
     mode: "timeline",
     src: `${STEINERNE_VIDEO_WEB4_BASE}/sb_timeline_clean_v1_720.mp4`,
+    srcLite: `${STEINERNE_VIDEO_WEB4_BASE}/sb_timeline_clean_v1_540_lite.mp4`,
     poster: `${STEINERNE_VIDEO_WEB4_BASE}/sb_timeline_clean_poster_v1.jpg`,
     duration: 154.2, cues: SB_CH_T, hasAudio: true, sound: sbSound,
     alt: () => t(lang, "mfTimelineTitle"),

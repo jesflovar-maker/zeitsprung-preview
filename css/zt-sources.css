@@ -1,0 +1,24 @@
+/* ZEITSPRUNG V2 — css/zt-sources.css (07D) — discreet museum bibliography (typography tokens from zt-typography.css) */
+.zt-src{ position: relative; z-index: 2; background: #08090b; color: #f1ebe1; padding: clamp(56px, 11vw, 96px) clamp(18px, 5vw, 48px); outline: none; scroll-margin-top: 64px; }
+.zt-src__in{ max-width: 980px; margin: 0 auto; }
+.zt-src__eyebrow{ margin: 0; font: 500 11px/1 var(--zt-ty-mono, monospace); letter-spacing: .32em; color: var(--zt-ty-gold, #c9a96e); }
+.zt-src__h{ margin: 12px 0 0; font: 600 clamp(22px, 5.6vw, 32px)/1.12 var(--zt-ty-sans, Inter, sans-serif); color: #f1ebe1; }
+.zt-src__lead{ margin: 10px 0 0; max-width: 38em; font: 400 clamp(13.5px, 3.6vw, 15px)/1.5 var(--zt-ty-sans, Inter, sans-serif); color: rgba(241,235,225,.72); }
+.zt-src__list{ list-style: none; margin: 26px 0 0; padding: 0; display: grid; gap: 0; }
+.zt-src__item{ padding: 16px 0 14px; border-top: 1px solid rgba(241,235,225,.12); scroll-margin-top: 80px; }
+.zt-src__item:target{ border-top-color: var(--zt-ty-gold, #c9a96e); }
+.zt-src p{ overflow-wrap: anywhere; }
+.zt-src__kind{ margin: 0 0 6px; font: 500 10px/1 var(--zt-ty-mono, monospace); letter-spacing: .22em; text-transform: uppercase; color: rgba(241,235,225,.56); }
+.zt-src__t{ margin: 0; font: italic 400 clamp(18px, 4.6vw, 21px)/1.25 var(--zt-ty-serif, Georgia, serif); color: #e9dcc0; }
+.zt-src__by{ margin: 6px 0 0; font: 400 13px/1.45 var(--zt-ty-sans, Inter, sans-serif); color: rgba(241,235,225,.66); }
+.zt-src__n{ margin: 6px 0 0; font: 400 14px/1.5 var(--zt-ty-sans, Inter, sans-serif); color: rgba(241,235,225,.86); }
+.zt-src__a{ display: inline-flex; align-items: center; min-height: 44px; font: 500 11px/1 var(--zt-ty-mono, monospace); letter-spacing: .16em; text-transform: uppercase; color: var(--zt-ty-gold, #c9a96e); text-decoration: none; }
+.zt-src__a:hover{ text-decoration: underline; text-underline-offset: 5px; }
+.zt-src__a:focus-visible, .zt-src__open summary:focus-visible{ outline: 2px solid var(--zt-ty-gold, #c9a96e); outline-offset: 3px; }
+.zt-src__open{ margin-top: 10px; border-top: 1px solid rgba(241,235,225,.12); }
+.zt-src__open summary{ min-height: 48px; display: flex; align-items: center; cursor: pointer; font: 500 11px/1 var(--zt-ty-mono, monospace); letter-spacing: .2em; text-transform: uppercase; color: rgba(241,235,225,.8); list-style: none; }
+.zt-src__open summary::-webkit-details-marker{ display: none; }
+.zt-src__open summary::before{ content: "+"; margin-right: 12px; color: var(--zt-ty-gold, #c9a96e); }
+.zt-src__open[open] summary::before{ content: "–"; }
+.zt-src__open ul{ margin: 0 0 8px; padding-left: 20px; display: grid; gap: 8px; font: 400 14px/1.5 var(--zt-ty-sans, Inter, sans-serif); color: rgba(241,235,225,.78); }
+@media (min-width: 900px){ .zt-src__list{ grid-template-columns: 1fr 1fr; column-gap: 48px; } }

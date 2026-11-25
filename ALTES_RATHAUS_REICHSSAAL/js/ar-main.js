@@ -5,12 +5,13 @@
 // 06E: hero film AR_ASSET_059, Erker V2 + hologram assembly (scroll-scrub), building-site loops, portal/Erker corrected stills.
 // Visible AI / reconstruction badges = 0 (owner rule 2026-11-18); provenance stays in the media manifest.
 import { STR, LANGS, STORAGE_KEY } from "./ar-i18n.js?v=20261124a";
-import { initGuide } from "../../js/zt-guide.js?v=20261124a"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
+import { initGuide } from "../../js/zt-guide.js?v=20261125e"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
 import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
 
 import { ztSound } from "../../js/zt-sound.js?v=20261124a";
 import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 07C.0: ZEITSPRUNG_KINETIC_VIDEO_TYPE_V1 (narrative layer, never on timelines)
-import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261124a"; // 07C-H: shared film player (trailer section) // 06G: one compact ♪ control beside DE | EN | ES
+import { mountSources, goToSources } from "../../js/zt-sources.js?v=20261125d"; // 07D: one bibliography per page
+import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261125e"; // 07C-H: shared film player (trailer section) // 06G: one compact ♪ control beside DE | EN | ES
 
 const A = "../assets/altes-rathaus/";
 const img = (n) => `${A}img/${n}_720.webp`;
@@ -319,11 +320,8 @@ function buildEnd() {
   w.append(e, h, el("span", "aend__rule", { "aria-hidden": "true" }), lead("end", "p"));
   const cta = el("div", "aend__cta"); const sb = el("button", "abtn", { type: "button" }); bind(sb, (t) => t.end.sources); const ab = el("a", "abtn abtn--primary", { href: "../index.html#index-monuments" }); bind(ab, (t) => t.back); cta.append(sb, ab); w.append(cta); mountDestinations(w, { self: "altes-rathaus", btnClass: "abtn" }); // 07B.1
   s.append(w);
-  const dlg = $("#srcDlg"); const list = $("#srcList"); const cl = $("#srcClose");
-  onLang(() => { $("#srcTitle").textContent = T().end.srcH; list.replaceChildren(...T().end.srcList.map((x) => { const li = el("li"); li.textContent = x; return li; })); cl.textContent = T().end.close; });
-  sb.addEventListener("click", () => { if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); });
-  cl.addEventListener("click", () => { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); });
-  dlg.addEventListener("click", (e) => { if (e.target === dlg && dlg.close) dlg.close(); });
+  sb.addEventListener("click", () => goToSources()); // 07D: the dialog became the #quellen section
+  mountSources({ monument: "altes-rathaus", before: s });
 }
 
 function reveal() { const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("is-in"); io.unobserve(e.target); } }), { threshold: 0.12 }); document.querySelectorAll(".ar").forEach((n) => io.observe(n)); }

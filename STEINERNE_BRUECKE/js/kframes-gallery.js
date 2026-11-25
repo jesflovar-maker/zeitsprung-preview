@@ -45,6 +45,7 @@
    ============================================================================ */
 
 import { createZtTypography, ztVisualLength } from "./zt-typography.js";
+import { goToSources } from "../../js/zt-sources.js?v=20261125d";
 import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 07C.0: ZEITSPRUNG_KINETIC_VIDEO_TYPE_V1
 import { KFRAMES_MANIFEST_URL, KFRAMES_DEFAULT_ASSET_BASE, KFRAMES_4K_WEB_BASE, STEINERNE_SOURCES_URL } from "../../js/zt-paths.js";
 
@@ -269,7 +270,8 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
     im.style.setProperty("--zt-focus-y", fo.y + "%");
   }
   const altFor = (f) => `${String(f.order).padStart(2, "0")} / ${String(frames.length).padStart(2, "0")} — ${pick(f.title, getLang())}${f.date ? ", " + f.date : ""}`;
-  function setLayer(im, f) { im.src = f.__url; applyFocus(im, f, !!f.__legacy); im.alt = altFor(f); }
+  imgA.fetchPriority = "high"; imgB.fetchPriority = "high"; // 07D
+  function setLayer(im, f) { if (im.getAttribute("src") !== f.__url) im.src = f.__url; applyFocus(im, f, !!f.__legacy); im.alt = altFor(f); }
   frames.forEach((f) => { f.__url = resolveUrl(f); });
   // Any 4K derivative that fails to load falls back to the legacy asset once.
   [imgA, imgB].forEach((im) => im.addEventListener("error", () => {
@@ -283,25 +285,25 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
   // collected (the browser HTTP cache still serves a fast re-fetch if the
   // visitor scrolls back later — this governs live JS/decoded-bitmap memory,
   // not network caching).
+  let currentIdx = 0;
   const imgCache = new Map(); // order -> HTMLImageElement
   function ensurePreloaded(order) {
     const frame = frames[order];
     if (!frame || imgCache.has(order)) return;
     const im = new Image();
-    im.decoding = "async";
+    im.decoding = "async"; if (Math.abs(order - currentIdx) < 1) im.fetchPriority = "high";
     im.src = frame.__url;
     imgCache.set(order, im);
   }
   function pruneCache(centerOrder) {
     Array.from(imgCache.keys()).forEach((k) => {
-      if (Math.abs(k - centerOrder) > 1) imgCache.delete(k);
+      if (Math.abs(k - centerOrder) > 1) { const old = imgCache.get(k); if (old && !old.complete) old.src = ""; imgCache.delete(k); } // 07D: gives its connection back
     });
   }
+  let nearT = 0;
   function preloadWindow(idx) {
-    ensurePreloaded(idx);
-    if (idx > 0) ensurePreloaded(idx - 1);
-    if (idx < frames.length - 1) ensurePreloaded(idx + 1);
-    pruneCache(idx);
+    pruneCache(idx); ensurePreloaded(idx); clearTimeout(nearT);
+    nearT = setTimeout(() => { if (idx < frames.length - 1) ensurePreloaded(idx + 1); if (idx > 0) ensurePreloaded(idx - 1); }, 240); // 07D: neighbours only when the step rests
   }
 
   // -------------------------------------------------------------------
@@ -493,7 +495,7 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
   imgB.style.opacity = "0";
   preloadWindow(0);
 
-  let currentIdx = 0;
+  currentIdx = 0;
   let activeRevealTl = null;
   let activeHideTl = null;
 
@@ -683,7 +685,8 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
   if (sourcesBtn && sourcesPanel) {
     const openPanel = () => { sourcesPanel.hidden = false; };
     const closePanel = () => { sourcesPanel.hidden = true; };
-    sourcesBtn.addEventListener("click", openPanel);
+    sourcesBtn.removeAttribute("aria-haspopup"); sourcesBtn.setAttribute("aria-controls", "quellen");
+    sourcesBtn.addEventListener("click", () => goToSources()); // 07D: one bibliography per page (#quellen); the old panel stays closed
     if (sourcesCloseBtn) sourcesCloseBtn.addEventListener("click", closePanel);
     sourcesPanel.addEventListener("click", (e) => { if (e.target === sourcesPanel) closePanel(); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !sourcesPanel.hidden) closePanel(); });
@@ -698,7 +701,7 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
       // PHASE 2.5 FIX — see the invalidateOnRefresh comment above. Forces
       // this trigger to recompute start/end against the post-switch layout
       // immediately, instead of waiting for some unrelated future refresh.
-      if (window.ScrollTrigger) ScrollTrigger.refresh();
+      if (window.__ztRefreshSoon) window.__ztRefreshSoon(); else if (window.ScrollTrigger) ScrollTrigger.refresh();
     },
     frameCount: frames.length
   };
