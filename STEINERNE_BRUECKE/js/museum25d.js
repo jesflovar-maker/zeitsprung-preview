@@ -42,7 +42,7 @@
 
 import { CHAPTER_SCRIPT, buildMuseumScrollExperience, buildTimingMap } from "./museum2d-scroll.js?v=20261125e";
 import { ZT_AUDIO_BUS } from "../../js/zt-audio.js";
-import { releaseWhenFar, whenQuiet } from "../../js/zt-media-priority.js?v=20261125f"; // 07D
+import { releaseWhenFar, whenQuiet, filmBusy } from "../../js/zt-media-priority.js?v=20261125g"; // 07D
 import { STEINERNE_WEB_ASSET_BASE, ASSET_SWAP_MANIFEST_URL, MUSEUM_CONTENT_MAP_URL as CONTENT_MAP_URL_RESOLVED } from "../../js/zt-paths.js";
 
 const SLOT_BASE = STEINERNE_WEB_ASSET_BASE;
@@ -588,10 +588,11 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
   // fallback_slot_id image, already in the image preload set) as its poster, so
   // a clip that has not decoded its first frame yet never reads as an empty
   // black stage. Visual-only; no new asset.
+  const loopPosters = []; // { el, url } — poster set once the same picture has arrived (06H.1)
   function setLoopPoster(videoEl, slot) {
     if (!slot || !slot.fallback_slot_id) return;
     const fb = resolveSlot(registry, slot.fallback_slot_id);
-    if (fb && fb.ok && fb.url) videoEl.poster = fb.url;
+    if (fb && fb.ok && fb.url) loopPosters.push({ el: videoEl, url: fb.url }); // 06H.1: never at page load — see loadPicture()
   }
   (registry.manifest.slots || []).forEach((slot) => {
     if (!slot || slot.type !== LOOP_TYPE || !slot.chapter_key) return;
@@ -1456,20 +1457,25 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     videoPreloadQueue.forEach(({ el, url }) => { el.src = url; });
     warmAhead("exploded"); // warms piers + arches
   }
+  // 06H.1: every museum picture (and the matching clip poster, same file) is an <img> inside the section, so it can be
+  // given back by releaseWhenFar() the moment a film starts. At most two travel at a time, in chapter order. Before, five
+  // clip posters (2.3 MB) were requested at page load and could not be cancelled — they shared the line with the film.
+  const coverPoster = (url) => loopPosters.forEach((x) => { if (x.url === url && !x.el.poster) x.el.poster = url; });
+  loopPosters.forEach(({ url }) => { if (preloadQueue.some((q) => q.url === url)) return; const im = document.createElement("img"); im.alt = ""; im.hidden = true; im.setAttribute("aria-hidden", "true"); im.decoding = "async"; section.appendChild(im); preloadQueue.push({ el: im, url }); });
+  preloadQueue.forEach(({ el, url }) => el.addEventListener("load", () => coverPoster(url)));
+  const loadPicture = ({ el, url }) => { if (el.dataset.ztParked != null) return null; if (!el.getAttribute("src")) el.src = url; return el.decode ? el.decode().catch(() => {}) : null; };
   function ensureAssets(fromProximity) {
     if (!assetsRequested) {
       assetsRequested = true;
-      const decodes = preloadQueue.map(({ el, url }) => {
-        if (!el.getAttribute("src")) el.src = url;
-        if (typeof el.decode === "function") return el.decode().catch(() => {});
-        return Promise.resolve();
-      });
-      Promise.all(decodes).then(() => {
+      let n = 0;
+      const lane = async () => { while (n < preloadQueue.length) { while (filmBusy() || section.__ztNear === false) await new Promise((r) => setTimeout(r, 250)); const i = n++; if (preloadQueue[i]) await loadPicture(preloadQueue[i]); } };
+      Promise.all([lane(), lane()]).then(() => {
         if (window.ScrollTrigger) ScrollTrigger.refresh();
       });
     }
-    if (fromProximity === true) { ensureVideos(); releaseWhenFar(section); } // 07D: no idle warm-up of ~30 MB; clips stop downloading when the museum is far away
+    if (fromProximity === true) ensureVideos(); // 07D: no idle warm-up of ~30 MB
   }
+  releaseWhenFar(section); // pictures and clips stop downloading when the museum is far away
 
   // 07D: passing by is not arriving — the museum loads only when the visitor stays near it for a moment
   function ensureNear(n) { setTimeout(() => { const r = section.getBoundingClientRect(), vh = window.innerHeight; if (r.top < vh * 2.9 && r.bottom > -vh * 0.6) ensureAssets(true); else if (!videosRequested) watchNear(); }, 380); }
@@ -1483,7 +1489,7 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     });
   }
   // 07D: ahead of time the pictures come one after the other (decoded, in order), never all at once and never while a film starts
-  setTimeout(() => preloadQueue.forEach(({ el, url }) => whenQuiet(() => { if (assetsRequested || el.getAttribute("src")) return null; el.src = url; return el.decode ? el.decode().catch(() => {}) : null; })), 4500);
+  setTimeout(() => preloadQueue.forEach(({ el, url }) => whenQuiet(() => (assetsRequested || el.getAttribute("src") ? null : loadPicture({ el, url })))), 4500);
 
   // -------------------------------------------------------------------
   // Pointer parallax (desktop) + touch drag (mobile) — rigid layer only, and

@@ -2,12 +2,12 @@
 // The DOM is built ONCE; a language switch only re-runs text refreshers (no rebuild, no new listeners / observers / timers).
 // Media: runtime derivatives only (../assets/porta-praetoria/). One video plays at a time; every video loads lazily (preload none + poster).
 import { STR, LANGS, STORAGE_KEY } from "./porta-i18n.js?v=20261124a";
-import { initGuide } from "../../js/zt-guide.js?v=20261125e"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
+import { initGuide } from "../../js/zt-guide.js?v=20261125g"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
 import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
 
 import { ztSound } from "../../js/zt-sound.js?v=20261124a";
 import { mountSources, goToSources } from "../../js/zt-sources.js?v=20261125d"; // 07D: one bibliography per page
-import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261125f"; // 07C-H: shared film player (trailer slot)
+import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261125g"; // 07C-H: shared film player (trailer slot)
 /* 07C-H TRAILER SLOT — same architecture as the other monuments, NOT public yet: the corrected final trailer
    PP_TRAILER_MASTER_CLEAN_V1 is DEFERRED (owner). When approved, set { src, poster, duration, hasAudio } here — the
    section (#trailer before the ending) is then created automatically; no redesign. */

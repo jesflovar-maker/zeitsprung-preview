@@ -676,6 +676,9 @@ function renderDetailsScroll(container, labelKey, rawAssets, labelMapKey, t, lan
     const frame = el("div", "bm-detail__frame");
     const img = el("img", "bm-detail__img", { alt: name, draggable: "false", loading: "lazy", decoding: "async" });
     if (options.nativeWidths && options.nativeWidths[item.id]) img.style.maxWidth = `min(100%, ${options.nativeWidths[item.id]}px)`;
+    // 06H.1: the piece keeps its real place while its picture is on the way (no collapsed stack, no jump); then the CSS decides again
+    const px = DETAIL_PX[item.id];
+    if (px) { const mx = (options.nativeWidths && options.nativeWidths[item.id]) || px[0]; img.style.aspectRatio = px[0] + " / " + px[1]; img.style.width = `min(${mx}px, calc(var(--zt-scene-h) * 0.72 * ${(px[0] / px[1]).toFixed(4)}), calc(100vw - 48px))`; img.addEventListener("load", () => { img.style.width = ""; img.style.aspectRatio = ""; }, { once: true }); }
     img.src = item.url;
     frame.appendChild(img);
     const open = () => openBruckmandlPhoto(item.url, name);
@@ -701,6 +704,8 @@ function renderDetailsScroll(container, labelKey, rawAssets, labelMapKey, t, lan
 
 // Native pixel widths of the five small material close-up crops (measured from the
 // approved WebP files) — they are displayed at most at this CSS width (no upscale).
+// 06H.1: real pixel size of the twelve approved pieces, used only to reserve their place until they have loaded
+const DETAIL_PX = { figure: [1024, 1536], gable_cap: [1024, 1536], shield_panel_keys: [1122, 1402], inscription_hand_panel: [1254, 1254], shield_panel_lion_with_cap: [1254, 1254], capital_cornice: [1122, 1402], column_and_base: [1024, 1536], stone_surface: [320, 320], weathering: [320, 320], inscription_surface: [650, 300], relief_surface: [400, 360], column_surface: [500, 500] };
 const MATERIAL_NATIVE_WIDTHS = { stone_surface: 320, weathering: 320, inscription_surface: 650, relief_surface: 400, column_surface: 500 };
 
 function renderSources(container, t, lang, sourcesMap) {

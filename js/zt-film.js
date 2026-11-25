@@ -14,7 +14,7 @@
        fixed full-viewport fallback (html.zt-pfs) when the browser refuses (iPhone) — overlay + controls stay together.
    Usage: import { mountFilm } from "../js/zt-film.js";  const f = mountFilm(hostEl, { mode, src, poster, ... });
      o.sound = { isOn(), toggle(), register(video), subscribe(fn) }  (adapter onto the page's single sound state) */
-import "./zt-media-priority.js?v=20261125f"; // 07D: a starting film has priority on the network
+import { slowNet } from "./zt-media-priority.js?v=20261125g"; // 07D: a starting film has priority on the network
 const UI = {
   de: { play: "ABSPIELEN", pause: "PAUSE", on: "TON AN", off: "TON AUS", full: "VOLLBILD", exit: "SCHLIESSEN", ch: "KAPITEL", seek: "Position im Film", film: "FILM" },
   en: { play: "PLAY", pause: "PAUSE", on: "SOUND ON", off: "SOUND OFF", full: "FULLSCREEN", exit: "CLOSE", ch: "CHAPTERS", seek: "Position in the film", film: "FILM" },
@@ -26,9 +26,7 @@ const fmt = (s) => { s = Math.max(0, Math.floor(s || 0)); return Math.floor(s / 
 const mk = (tag, cls, attrs) => { const e = document.createElement(tag); if (cls) e.className = cls; if (attrs) for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
 const REDUCED = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-/** 07D: on a slow or data-saving connection the same film is taken from its smaller derivative (o.srcLite), decided once when the film is first needed */
-const measured = () => { let m = 0; try { performance.getEntriesByType("resource").forEach((e) => { if (e.transferSize > 80000 && e.responseEnd > e.responseStart) m = Math.max(m, (e.transferSize * 8) / (e.responseEnd - e.responseStart) / 1000); }); } catch (x) {} return m; }; // Mbit/s actually seen on this visit
-const slowNet = () => { const c = navigator.connection; if (c && c.saveData) return true; if (measured() > 4) return false; return !!c && (c.saveData || /2g|3g/.test(c.effectiveType || "") || (c.downlink > 0 && c.downlink < 2 && c.rtt >= 150)); };
+/** 07D: on a slow or data-saving connection (slowNet) the same film is taken from its smaller derivative (o.srcLite), decided once when the film is first needed */
 export function mountFilm(host, o = {}) {
   if (!host) return null;
   const trailer = o.mode === "trailer";
@@ -77,7 +75,7 @@ export function mountFilm(host, o = {}) {
   // 07D: the index of the file (moov) is fetched when the film comes near, so PLAY only has to fetch pictures
   let file = ""; const pick = () => file || (file = o.srcLite && slowNet() ? o.srcLite : o.src);
   const warmUp = () => { if (warm || attached) return; warm = true; v.preload = "metadata"; v.src = pick(); };
-  const attach = () => { if (attached) return; attached = true; focusOn(); v.preload = "auto"; if (!warm) v.src = pick(); else if (v.networkState === 3 || v.error) { v.src = pick(); v.load(); } };
+  const attach = () => { if (attached) return; attached = true; focusOn(); v.preload = "auto"; if (!v.getAttribute("src")) { delete v.dataset.ztSrc; v.src = pick(); } else if (v.networkState === 3 || v.error) { v.src = pick(); v.load(); } };
   const engage = () => { if (engaged || !bs) return; engaged = true; o.sound.register(v); };
   const play = (user) => { if (user) { engage(); userPaused = false; } attach(); const p = v.play(); if (p && p.catch) p.catch(() => { if (!v.muted) { v.muted = true; const q = v.play(); if (q && q.catch) q.catch(() => {}); } }); };
   const pause = (user) => { if (user) userPaused = true; v.pause(); };

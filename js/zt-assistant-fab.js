@@ -98,7 +98,7 @@ export function initAssistantFab(opt = {}) {
       const k = st.map((f, i) => { const d = (f.date_i18n && f.date_i18n[l]) || f.date || ""; return { id: f.id, t: d + " · " + (f.title[l] || f.title.de), x: f.description[l] || f.description.de, sec: "kframesGallery", src: KSRC[i] || [], note: KOPEN.includes(i) ? "open" : "" }; });
       return (cache[l] = [...q, ...k]); };
     const secNow = () => { let best = "", bh = 0; ["kframesGallery", "museum25d", "bruckmandl"].forEach((id) => { const el = document.getElementById(id); if (!el) return; const r = el.getBoundingClientRect(); const h = Math.min(r.bottom, innerHeight) - Math.max(r.top, 0); if (h > bh) { bh = h; best = id; } }); return best; };
-    import("./zt-guide-ask.js?v=20261125d").then(({ mountAsk, keepClear }) => {
+    import("./zt-guide-ask.js?v=20261125g").then(({ mountAsk, keepClear }) => {
       asker = mountAsk({ monument: opt.monument, panel: pn, before: topics, answer: ans, units, section: secNow, pose: (p) => { av.src = AVATAR + (p === "explain" ? "bruckmandl_ai_expression_03_explain_208.webp" : "bruckmandl_ai_talk_208.webp"); }, onAsk: () => { sel = null; topics.querySelectorAll(".zt-assist__topic").forEach((b) => b.setAttribute("aria-pressed", "false")); }, close: () => close(false) });
       place = keepClear(fab, () => !pn.hidden);
     });

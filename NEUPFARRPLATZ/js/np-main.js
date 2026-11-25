@@ -5,11 +5,11 @@
 // GEOMETRY_REVIEW_PENDING (no geometry claims). Provisional anchor NP_ASSET_001, provisional trailer NP_ASSET_098 and the
 // hero film NP_ASSET_058 are 1:1 replaceable through the constants below. Visible AI / reconstruction badges = 0.
 import { STR, LANGS, STORAGE_KEY } from "./np-i18n.js?v=20261125a";
-import { initGuide } from "../../js/zt-guide.js?v=20261125e"; // 07B.1: global Brückmandl guide
+import { initGuide } from "../../js/zt-guide.js?v=20261125g"; // 07B.1: global Brückmandl guide
 import { ztSound } from "../../js/zt-sound.js?v=20261124a";
 import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 07C.0: ZEITSPRUNG_KINETIC_VIDEO_TYPE_V1 (narrative layer, never on timelines)
 import { mountSources } from "../../js/zt-sources.js?v=20261125d"; // 07D: one bibliography per page
-import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261125f"; // 07C-H: shared film player (trailer section)
+import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261125g"; // 07C-H: shared film player (trailer section)
 import { openPhoto, openElement } from "../../js/zs-media-viewer.js";
 
 const A = "../assets/neupfarrplatz/";

@@ -1,7 +1,7 @@
 /* ZEITSPRUNG V2 — js/zt-guide-ask.js (07D) — free-text questions inside the existing Brückmandl panel (both engines use it).
    Owner revision of BRUCKMANDL_ASSISTANT_PATTERN_V1: the compact panel now also has one question line. Still no chat service:
    answers are verbatim approved passages from js/zt-guide-index.js, with chapter link and registered source. */
-import { createIndex, otherMonument } from "./zt-guide-index.js?v=20261125d";
+import { createIndex, otherMonument } from "./zt-guide-index.js?v=20261125g";
 import { sourceById } from "./zt-sources-data.js?v=20261125d";
 const UI = {
   de: { label: "Frage an das Brückmandl", ph: "Ihre Frage …", send: "Fragen", you: "Ihre Frage", src: "Quelle", more: "Passt dazu", go: "Zum Kapitel →", none: "Dazu habe ich auf dieser Seite keine geprüfte Information. Ich erfinde nichts. Vielleicht hilft eines dieser Themen:", year: (y) => "Zum Jahr " + y + " habe ich keine geprüfte Angabe. Am nächsten kommt:", open: "Zu diesem Punkt ist die Prüfung noch nicht abgeschlossen.", other: (n) => "Das gehört zu einem anderen Monument: " + n + ". Hier beantworte ich nur Fragen zu diesem Ort.", goto: (n) => n + " öffnen →", empty: "Bitte schreiben Sie eine kurze Frage.", sources: "Alle Quellen" },
@@ -46,7 +46,7 @@ export function mountAsk(o) {
     const ix = await index(l); const us = await o.units(l);
     if (om) { const box = mk("div", "zt-ask__res"); const qq = mk("p", "zt-ask__q"); qq.append(mk("span", "", u.you + ": "), document.createTextNode(q)); const a = mk("a", "zt-assist__go", u.goto(NAME[om][0])); a.href = ROOT + NAME[om][1] + "/index.html"; box.append(qq, mk("p", "", u.other(NAME[om][0])), a); box.dataset.other = om; o.answer.replaceChildren(box); return; }
     const r = ix.search(q, { section: o.section ? o.section() : "", prev }); const h = r.hits[0];
-    const ok = h && h.cov >= (r.who ? 0.6 : 0.5) && h.sc >= 0.7;
+    const ok = !!h && r.ok; // 06H.1: the decision is made in the index (evidence rule)
     last.unit = ok ? h.u.id : null; last.rel = r.hits.slice(ok ? 1 : 0, ok ? 4 : 3).filter((x) => x.sc > 0.35).map((x) => x.u.id);
     if (!ok) { prev = null; const sec = o.section ? o.section() : ""; const sug = [...r.hits.slice(0, 2).map((x) => x.u), ...us.filter((x) => x.sec === sec), ...us].filter((x, i, a) => a.findIndex((y) => y.id === x.id) === i).slice(0, 3); last.rel = sug.map((x) => x.id); last.none = true; show(null, sug, u.none); return; }
     prev = { words: r.words, id: h.u.id }; const miss = r.years.find((y) => !us.some((x) => (x.t + x.x).includes(y))); last.year = miss || "";

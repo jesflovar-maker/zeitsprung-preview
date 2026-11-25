@@ -8,8 +8,8 @@
    (no scroll listener, no continuous scanning) and its topic is offered first.
    Never touches media or sound. Language follows <html lang> (zeitsprung_v2_lang), relabels instantly.
    Usage: initGuide({ monument: "dom-st-peter" }) */
-import { mountAsk, keepClear } from "./zt-guide-ask.js?v=20261125d"; // 07D: free-text questions + icon placement
-import { UNITS } from "./zt-guide-index.js?v=20261125d";
+import { mountAsk, keepClear } from "./zt-guide-ask.js?v=20261125g"; // 07D: free-text questions + icon placement
+import { UNITS } from "./zt-guide-index.js?v=20261125g";
 import { ZEITSPRUNG_GLOBAL_GUIDE_V1 } from "./zt-guide-config.js?v=20261125a";
 
 const AVATAR = new URL("../assets/steinerne-bruecke/bruckmandl/ai/", import.meta.url).href;
@@ -24,7 +24,7 @@ export async function initGuide({ monument } = {}) {
   const cfg = ZEITSPRUNG_GLOBAL_GUIDE_V1.monuments[monument];
   if (!cfg || document.getElementById("ztAssistantFab")) return null;
   if (cfg.engine === "bridge") {
-    const { initAssistantFab } = await import("./zt-assistant-fab.js?v=20261125e");
+    const { initAssistantFab } = await import("./zt-assistant-fab.js?v=20261125g");
     return initAssistantFab({ link: cfg.link, moreLink: cfg.moreLink, sections: cfg.sections, monument, ask: true });
   }
   const mod = await import(new URL(cfg.data, import.meta.url).href);

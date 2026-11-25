@@ -5,13 +5,13 @@
 // 06E: hero film AR_ASSET_059, Erker V2 + hologram assembly (scroll-scrub), building-site loops, portal/Erker corrected stills.
 // Visible AI / reconstruction badges = 0 (owner rule 2026-11-18); provenance stays in the media manifest.
 import { STR, LANGS, STORAGE_KEY } from "./ar-i18n.js?v=20261124a";
-import { initGuide } from "../../js/zt-guide.js?v=20261125e"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
+import { initGuide } from "../../js/zt-guide.js?v=20261125g"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
 import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
 
 import { ztSound } from "../../js/zt-sound.js?v=20261124a";
 import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 07C.0: ZEITSPRUNG_KINETIC_VIDEO_TYPE_V1 (narrative layer, never on timelines)
 import { mountSources, goToSources } from "../../js/zt-sources.js?v=20261125d"; // 07D: one bibliography per page
-import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261125f"; // 07C-H: shared film player (trailer section) // 06G: one compact ♪ control beside DE | EN | ES
+import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261125g"; // 07C-H: shared film player (trailer section) // 06G: one compact ♪ control beside DE | EN | ES
 
 const A = "../assets/altes-rathaus/";
 const img = (n) => `${A}img/${n}_720.webp`;

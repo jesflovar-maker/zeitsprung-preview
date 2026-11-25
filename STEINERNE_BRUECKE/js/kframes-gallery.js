@@ -46,7 +46,7 @@
 
 import { createZtTypography, ztVisualLength } from "./zt-typography.js";
 import { goToSources } from "../../js/zt-sources.js?v=20261125d";
-import { releaseWhenFar, filmBusy } from "../../js/zt-media-priority.js?v=20261125f"; // 07D
+import { releaseWhenFar, filmBusy, slowNet } from "../../js/zt-media-priority.js?v=20261125g"; // 07D
 import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 07C.0: ZEITSPRUNG_KINETIC_VIDEO_TYPE_V1
 import { KFRAMES_MANIFEST_URL, KFRAMES_DEFAULT_ASSET_BASE, KFRAMES_4K_WEB_BASE, STEINERNE_SOURCES_URL } from "../../js/zt-paths.js";
 
@@ -225,7 +225,7 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
     const need = cssW * dpr;
     const desktop = window.innerWidth >= 700;
     if (need <= 800 && !desktop) return 720;
-    if (need <= 1300) return 1080;
+    if (need <= 1300) return !desktop && slowNet() ? 720 : 1080; // 06H.1: slow phone line = the 720 derivative (viewer keeps 1440)
     return 1440;
   })();
   const resolveUrl = (frame) => frame.asset_web4k
@@ -303,10 +303,13 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
   }
   let nearT = 0;
   releaseWhenFar(section, "200% 0px"); document.addEventListener("zt:film-focus", () => imgCache.forEach((im, k) => { if (!im.complete) { im.src = ""; imgCache.delete(k); } }));
+  // 06H.1: far from the gallery nothing of it keeps travelling
+  new IntersectionObserver((es) => { if (!es[es.length - 1].isIntersecting) { clearTimeout(nearT); imgCache.forEach((im, k) => { if (!im.complete) { im.src = ""; imgCache.delete(k); } }); } }, { rootMargin: "60% 0px" }).observe(section);
+  let lastIdx = 0;
   function preloadWindow(idx) {
-    if (filmBusy()) return;
+    if (filmBusy()) return; const dir = idx < lastIdx ? -1 : 1; lastIdx = idx;
     pruneCache(idx); ensurePreloaded(idx); clearTimeout(nearT);
-    nearT = setTimeout(() => { if (idx < frames.length - 1) ensurePreloaded(idx + 1); if (idx > 0) ensurePreloaded(idx - 1); }, 240); // 07D: neighbours only when the step rests
+    nearT = setTimeout(() => { ensurePreloaded(idx + dir); nearT = setTimeout(() => ensurePreloaded(idx - dir), 180); }, 60); // 07D: neighbours only when the step rests
   }
 
   // -------------------------------------------------------------------

@@ -15,17 +15,17 @@
 
 import { DICT, getInitialLang, setLang, applyI18n, t } from "./i18n.js?v=20261125d";
 import { buildPortal } from "./portal.js";
-import { initMuseum25D } from "./museum25d.js?v=20261125f";
-import { initKframesGallery } from "./kframes-gallery.js?v=20261125f";
+import { initMuseum25D } from "./museum25d.js?v=20261125g";
+import { initKframesGallery } from "./kframes-gallery.js?v=20261125g";
 import { initCraftGallery } from "./craft-gallery.js?v=20261125d";
 let craftApi = null; // museum photo gallery (#craftGallery); declared here so it exists before any wiring runs
 import { initMediaFeatures } from "../../js/media-feature.js?v=20261119m";
 import { mountSources, goToSources } from "../../js/zt-sources.js?v=20261125d"; // 07D: one bibliography per page
-import { filmBusy } from "../../js/zt-media-priority.js?v=20261125f"; // 07D
-import { mountFilm } from "../../js/zt-film.js?v=20261125f"; // 07C-H: shared documentary film player (timeline + trailer)
+import { filmBusy, viewBusy } from "../../js/zt-media-priority.js?v=20261125g"; // 07D
+import { mountFilm } from "../../js/zt-film.js?v=20261125g"; // 07C-H: shared documentary film player (timeline + trailer)
 import { openPhoto, openElement } from "../../js/zs-media-viewer.js"; // same URL as craft-gallery.js -> one shared viewer instance
 import { STEINERNE_VIDEO_WEB4_BASE, KFRAMES_4K_WEB_BASE } from "../../js/zt-paths.js";
-import { initBruckmandl } from "./bruckmandl.js?v=20261125d";
+import { initBruckmandl } from "./bruckmandl.js?v=20261125g";
 import { TIMES as SB_CH_T, STR as SB_CH } from "./sb-index-chapters.js"; // 06G.2B: language-neutral clean timeline + DE/EN/ES chapter overlay
 import { initBruckmandlHotspotBridge } from "./bruckmandl-hotspot-bridge.js";
 // Technical DOM event name only (not QA/provider data) — reused verbatim
@@ -787,12 +787,17 @@ async function startExperience() {
 
   // 07D: the first picture opens the experience; the rest follows in story order, two at a time, each with two retries
   let nextI = 0;
-  const loadOne = (src, n) => new Promise((res) => {
-    const img = new Image(); if (n < 2) img.fetchPriority = "high";
-    let tries = 0; img.onload = res; img.onerror = () => { if (tries++ < 2) setTimeout(() => { img.src = ""; img.src = encodeURI(src); }, 900 * tries); else res(); };
+  const flying = new Set(); // 06H.1: pictures still travelling give their place to a film that starts, and come back afterwards
+  const hold = () => flying.forEach((f) => { f.held = true; f.img.removeAttribute("src"); }); document.addEventListener("zt:film-focus", hold);
+  let backT = 0; const comeBack = () => { clearTimeout(backT); if (filmBusy()) return; if (viewBusy()) { backT = setTimeout(comeBack, 400); return; } flying.forEach((f) => { if (f.held) { f.held = false; f.img.src = encodeURI(f.src); } }); };
+  document.addEventListener("zt:view-wait", () => { if (!appRevealed) return; hold(); clearTimeout(backT); backT = setTimeout(comeBack, 400); });
+  document.addEventListener("zt:film-free", () => setTimeout(comeBack, 0));
+  const loadOne = (src, n) => new Promise((res0) => {
+    const img = new Image(); if (n < 2) img.fetchPriority = "high"; const f = { img, src, held: false }; flying.add(f); const res = () => { flying.delete(f); res0(); };
+    let tries = 0; img.onload = res; img.onerror = () => { if (f.held) return; if (tries++ < 2) setTimeout(() => { img.src = ""; img.src = encodeURI(src); }, 900 * tries); else res(); };
     img.src = encodeURI(src);
   }).then(updateProgress);
-  const lane = async () => { while (nextI < assetsToLoad.length) { while (filmBusy()) await new Promise((r) => setTimeout(r, 300)); const i = nextI++; await loadOne(assetsToLoad[i], i); if (i === 1 || assetsToLoad.length < 2) setTimeout(revealApp, 250); } };
+  const lane = async () => { while (nextI < assetsToLoad.length) { for (let k = 0; filmBusy() || (appRevealed && k < 30 && viewBusy()); k++) await new Promise((r) => setTimeout(r, 300)); const i = nextI++; await loadOne(assetsToLoad[i], i); if (i === 1 || assetsToLoad.length < 2) setTimeout(revealApp, 250); } };
   lane(); lane();
 
   // Safety timeout in case an asset never fires load/error
@@ -1011,6 +1016,15 @@ function buildStageScrollTrigger() {
   layerB.style.opacity = "0";
   applyStageLayerStyle(layerB, STATES[layerBStateIndex]);
 
+  // 06H.1: while a film starts, a stage background that has not arrived yet (and is off screen) stops downloading; it is
+  // set again when the film has its reserve or when the stage comes back into view.
+  let bgHeld = false;
+  const bgGive = () => { const r = stage.getBoundingClientRect(); if (r.bottom > -innerHeight * 0.3 && r.top < innerHeight * 1.3) return; bgHeld = true; layerA.style.backgroundImage = "none"; layerB.style.backgroundImage = "none"; };
+  const bgBack = () => { if (!bgHeld) return; bgHeld = false; layerA.style.backgroundImage = `url("${encodeURI(STATES[layerAStateIndex].img)}")`; layerB.style.backgroundImage = `url("${encodeURI(STATES[layerBStateIndex].img)}")`; };
+  document.addEventListener("zt:film-focus", bgGive);
+  document.addEventListener("zt:film-free", () => setTimeout(() => { if (!filmBusy()) bgBack(); }, 0));
+  new IntersectionObserver((es) => { if (es[es.length - 1].isIntersecting) bgBack(); }, { rootMargin: "60% 0px" }).observe(stage);
+
   const segmentCount = STATES.length - 1; // transitions between states
 
   const st = ScrollTrigger.create({
@@ -1180,7 +1194,7 @@ function wireTimelineChapters() {
     mode: "timeline",
     src: `${STEINERNE_VIDEO_WEB4_BASE}/sb_timeline_clean_v1_720.mp4`,
     srcLite: `${STEINERNE_VIDEO_WEB4_BASE}/sb_timeline_clean_v1_540_lite.mp4`,
-    poster: `${STEINERNE_VIDEO_WEB4_BASE}/sb_timeline_clean_poster_v1.jpg`,
+    poster: `${STEINERNE_VIDEO_WEB4_BASE}/sb_timeline_clean_poster_v1_720.webp`,
     duration: 154.2, cues: SB_CH_T, hasAudio: true, sound: sbSound,
     alt: () => t(lang, "mfTimelineTitle"),
     chapter: (i) => { const c = list()[i]; if (!c || !c.y) return null; const n = list().slice(0, i + 1).filter((x) => x && x.y).length; return { k: String(n).padStart(2, "0") + " / " + String(N).padStart(2, "0"), s: c.y, t: c.h, chip: c.y }; },
