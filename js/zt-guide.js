@@ -8,7 +8,7 @@
    (no scroll listener, no continuous scanning) and its topic is offered first.
    Never touches media or sound. Language follows <html lang> (zeitsprung_v2_lang), relabels instantly.
    Usage: initGuide({ monument: "dom-st-peter" }) */
-import { ZEITSPRUNG_GLOBAL_GUIDE_V1 } from "./zt-guide-config.js?v=20261124a";
+import { ZEITSPRUNG_GLOBAL_GUIDE_V1 } from "./zt-guide-config.js?v=20261125a";
 
 const AVATAR = new URL("../assets/steinerne-bruecke/bruckmandl/ai/", import.meta.url).href;
 const UI = {

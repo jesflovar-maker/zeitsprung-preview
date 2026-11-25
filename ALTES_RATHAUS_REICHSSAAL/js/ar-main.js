@@ -9,6 +9,7 @@ import { initGuide } from "../../js/zt-guide.js?v=20261124a"; // 07B.1: global B
 import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
 
 import { ztSound } from "../../js/zt-sound.js?v=20261124a";
+import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 07C.0: ZEITSPRUNG_KINETIC_VIDEO_TYPE_V1 (narrative layer, never on timelines)
 import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261124a"; // 07C-H: shared film player (trailer section) // 06G: one compact ♪ control beside DE | EN | ES
 
 const A = "../assets/altes-rathaus/";
@@ -74,6 +75,7 @@ function buildSeq(cfg) {
   const st = el("div", "asticky"); const wrap = el("div", "aseq__wrap"); const stage = el("div", "aseq__stage");
   const ims = cfg.files.map((f, i) => { const im = typeof f === "string" ? pic(f, () => items()[i][D]) : loopVid(f, () => items()[i][D]); if (i) im.classList.add("is-off"); stage.append(im); return im; });
   const vids = ims.filter((m) => m.tagName === "VIDEO");
+  const kin = cfg.kinetic ? mountKinetic(stage, { place: "kf" }) : null; // 07C.0
   const onScreen = () => { const r = tr.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; };
   const syncV = () => { const live = onScreen(); vids.forEach((v) => { const on = live && ims[cur] === v; if (on && v.paused) { if (!v.getAttribute("src")) v.src = v.dataset.src; const pr = v.play(); if (pr && pr.catch) pr.catch(() => {}); } else if (!on && !v.paused) v.pause(); }); };
   const bar = el("div", "aseq__bar", { "aria-hidden": "true" }); const fill = el("span"); bar.append(fill); stage.append(bar);
@@ -83,7 +85,7 @@ function buildSeq(cfg) {
   wrap.append(stage, txt); st.append(wrap); tr.append(st); s.append(tr);
   let cur = -1;
   const paint = () => { const it = items()[cur]; k.textContent = String(cur + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0"); if (D) y.textContent = it[0]; t.textContent = it[D]; d.textContent = it[D + 1]; };
-  const show = (i) => { if (i === cur) return; cur = i; ims.forEach((im, j) => im.classList.toggle("is-off", j !== i)); txt.classList.remove("is-new"); void txt.offsetWidth; txt.classList.add("is-new"); paint(); };
+  const show = (i) => { if (i === cur) return; cur = i; if (kin) kin.set(() => ({ t: items()[cur][D] }), ["scale", "letter"][i % 2]); ims.forEach((im, j) => im.classList.toggle("is-off", j !== i)); txt.classList.remove("is-new"); void txt.offsetWidth; txt.classList.add("is-new"); paint(); };
   LF.push(() => { if (cur >= 0) paint(); });
   show(0);
   SC.push(() => { if (!near(tr)) { if (vids.length) syncV(); return; } const p = prog(tr); fill.style.transform = "scaleX(" + p + ")"; show(clamp(Math.floor(p * N), 0, N - 1)); if (vids.length) syncV(); });
@@ -331,7 +333,7 @@ root.lang = lang;
 buildNav(); buildHero(); buildNow();
 buildSeq({ sec: "aussen", key: "out", files: ["ar_tower_v1", "ar_erker_v2", "ar_night_v1"] });                                   // AR 014 / 201 (06E swap of 015) / 006
 buildTimeline();                                                                                                                   // AR 191 master, scroll-scrubbed
-buildSeq({ sec: "zeit", key: "bau", vh: 85, files: [                                                                               // AR 171 / 181 building-site loops
+buildSeq({ sec: "zeit", key: "bau", vh: 85, kinetic: true, files: [                                                                               // AR 171 / 181 building-site loops
   { v: `${A}video/ar_bau_stonemasons_v1_540.mp4`, poster: `${A}poster/ar_bau_stonemasons_v1_poster.webp` },
   { v: `${A}video/ar_bau_crane_v1_540.mp4`, poster: `${A}poster/ar_bau_crane_v1_poster.webp` }] });
 buildHall();

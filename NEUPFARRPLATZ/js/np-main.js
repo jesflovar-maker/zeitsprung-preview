@@ -4,9 +4,10 @@
 // HISTORICAL_BRIEFING = PENDING: only visual-state labels (np-i18n.js), no dates. K09 = OWNER_APPROVED_VISUAL_KFRAME +
 // GEOMETRY_REVIEW_PENDING (no geometry claims). Provisional anchor NP_ASSET_001, provisional trailer NP_ASSET_098 and the
 // hero film NP_ASSET_058 are 1:1 replaceable through the constants below. Visible AI / reconstruction badges = 0.
-import { STR, LANGS, STORAGE_KEY } from "./np-i18n.js?v=20261124a";
-import { initGuide } from "../../js/zt-guide.js?v=20261124a"; // 07B.1: global Brückmandl guide
+import { STR, LANGS, STORAGE_KEY } from "./np-i18n.js?v=20261125a";
+import { initGuide } from "../../js/zt-guide.js?v=20261125a"; // 07B.1: global Brückmandl guide
 import { ztSound } from "../../js/zt-sound.js?v=20261124a";
+import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 07C.0: ZEITSPRUNG_KINETIC_VIDEO_TYPE_V1 (narrative layer, never on timelines)
 import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261124a"; // 07C-H: shared film player (trailer section)
 import { openPhoto, openElement } from "../../js/zs-media-viewer.js";
 
@@ -69,7 +70,7 @@ const zoomBtn = (stage, current) => {
    cfg: { sec, key, files: [image name | {v, poster, label}], vh, overlay (K mode) }
    Images: lazy 720 WebP on stage, the larger "full" WebP in the shared viewer. Loops play muted only while their step is shown. */
 function buildSeq(cfg) {
-  const s = $("#" + cfg.sec); const w = el("div", "awrap aseq__head ar"); head(w, cfg.key); if (STR.de[cfg.key].p) w.append(lead(cfg.key, "p")); s.append(w);
+  const s = $("#" + cfg.sec); if (!cfg.noHead) { const w = el("div", "awrap aseq__head ar"); head(w, cfg.key); if (STR.de[cfg.key].p) w.append(lead(cfg.key, "p")); s.append(w); }
   const items = () => T()[cfg.key].items; const N = cfg.files.length; const K = !!cfg.overlay;
   const altOf = (i) => { const it = items()[i]; return K ? it.n + " · " + it.state + " — " + it.title : it[0] + " — " + it[1]; };
   const mkMedia = (f, i) => {
@@ -88,6 +89,8 @@ function buildSeq(cfg) {
   const st = el("div", "asticky"); const wrap = el("div", "aseq__wrap"); const stage = el("div", "aseq__stage");
   const ims = cfg.files.map((f, i) => { const m = mkMedia(f, i); if (i) m.classList.add("is-off"); stage.append(m); return m; });
   const vids = ims.filter((m) => m.tagName === "VIDEO");
+  ims.forEach((m, i) => { if (cfg.files[i].once) { m.loop = false; m.removeAttribute("loop"); } }); // 07C.0: plays once per visit of its step and holds the last frame
+  const kin = cfg.kinetic ? mountKinetic(stage, { place: "kf" }) : null;
   const bar = el("div", "aseq__bar", { "aria-hidden": "true" }); const fill = el("span"); bar.append(fill); stage.append(bar);
   let ov = null, ok, op, os, ot;
   if (K) { ov = el("div", "nov zt-ov", { "aria-hidden": "true" }); ok = el("p", "zt-ov__k"); op = el("p", "zt-ov__p"); os = el("p", "zt-ov__s"); ot = el("p", "zt-ov__t"); ov.append(ok, op, os, ot); stage.append(ov); }
@@ -103,9 +106,9 @@ function buildSeq(cfg) {
     else { k.textContent = String(cur + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0"); t.textContent = it[0]; d.textContent = it[1]; }
     zb.hidden = ims[cur].tagName !== "IMG";
   };
-  const show = (i) => { if (i === cur) return; cur = i; ims.forEach((m, j) => m.classList.toggle("is-off", j !== i)); const anim = K ? ov : txt; anim.classList.remove("is-new"); void anim.offsetWidth; anim.classList.add("is-new"); paint(); };
+  const show = (i) => { if (i === cur) return; cur = i; if (cfg.files[i].once && ims[i].ended) { try { ims[i].currentTime = 0; } catch (e) {} } if (kin) { const c = cfg.kinetic(i); kin.set(() => { const it = items()[cur]; return K ? { k: it.n, t: it.state, s: it.title } : { t: it[0] }; }, c); } ims.forEach((m, j) => m.classList.toggle("is-off", j !== i)); const anim = K ? ov : txt; anim.classList.remove("is-new"); void anim.offsetWidth; anim.classList.add("is-new"); paint(); };
   const onScreen = () => { const r = tr.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; };
-  const syncV = () => { const live = onScreen(); vids.forEach((v) => { const on = live && ims[cur] === v; if (on && v.paused) { if (!v.getAttribute("src")) v.src = v.dataset.src; const pr = v.play(); if (pr && pr.catch) pr.catch(() => {}); } else if (!on && !v.paused) v.pause(); }); };
+  const syncV = () => { const live = onScreen(); vids.forEach((v) => { const on = live && ims[cur] === v; if (on && v.paused && !v.ended) { if (!v.getAttribute("src")) v.src = v.dataset.src; const pr = v.play(); if (pr && pr.catch) pr.catch(() => {}); } else if (!on && !v.paused) v.pause(); }); };
   LF.push(() => { if (cur >= 0) paint(); });
   show(0);
   SC.push(() => { if (!near(tr)) { if (vids.length) syncV(); return; } const p = prog(tr); fill.style.transform = "scaleX(" + p + ")"; show(clamp(Math.floor(p * N), 0, N - 1)); if (vids.length) syncV(); });
@@ -236,6 +239,25 @@ function buildReturn() {
   zoomBtn(st, () => ({ src: full(ANCHOR), alt: im.alt })); w.append(st); s.append(w);
 }
 
+/* ---------- 09 Neupfarrkirche: cinematic section opening (07C.0, NP_ASSET_118, seconds 0–6.33 only — the rest is HELD) ----------
+   Section media, never the monument hero. Muted, plays while >= 55 % visible, pauses off screen, holds its last frame;
+   replays from the start when the visitor comes back. No controls, no loop. Reduced motion: the last frame as a still. */
+function buildChurchHero() {
+  const s = $("#kirche"); const w = el("div", "awrap aseq__head ar"); head(w, "church"); w.append(lead("church", "p")); s.append(w);
+  const st = el("div", "nchero"); const cap = () => T().church.hero;
+  const end = `${A}poster/np_c_hero_end.webp`, first = `${A}poster/np_c_hero_poster.webp`;
+  const po = el("img", "", { src: reduced ? end : first, alt: "", loading: "lazy", decoding: "async", width: "720", height: "1280" }); st.append(po); s.append(st);
+  if (reduced) { bind(po, () => cap().alt, "alt"); return; }
+  const v = el("video", "", { muted: "", playsinline: "", preload: "none", disablepictureinpicture: "", tabindex: "-1" }); v.muted = true; bind(v, () => cap().alt, "aria-label"); st.append(v);
+  v.addEventListener("playing", () => st.classList.add("is-on"));
+  v.addEventListener("error", () => v.remove());
+  mountKinetic(st, { video: v, sr: true, cues: [{ at: 0.4, out: 3.1, text: () => ({ t: cap().c1 }), effect: "scale" }, { at: 4.4, out: 6.1, text: () => ({ t: cap().c2 }), effect: "change" }] });
+  new IntersectionObserver((es) => es.forEach((e) => {
+    if (e.intersectionRatio >= 0.55) { if (!v.getAttribute("src")) v.src = `${A}video/np_c_hero_720.mp4`; if (v.ended) return; const p = v.play(); if (p && p.catch) p.catch(() => {}); }
+    else { if (!v.paused) v.pause(); if (!e.isIntersecting && v.ended) { try { v.currentTime = 0; } catch (x) {} } }
+  }), { threshold: [0, 0.55] }).observe(st);
+}
+
 /* ---------- 13 trailer: provisional silent 30 s master — THE platform reference (07C-H: shared js/zt-film.js) ----------
    Title card = the approved 07B composition restored 1:1 (.zt-tc: ZEITSPRUNG · NEUPFARRPLATZ · JÜDISCHES VIERTEL ·
    tagline). Silent master -> NO sound control. Plays muted on view, pauses off screen, replays on re-entry. A future final
@@ -287,11 +309,12 @@ buildNav(); buildHero(); buildNow();
 buildSeq({ sec: "viertel", key: "quarter", files: ["np_q_north_entrance", "np_q_lane", "np_q_houses"] });                     // NP 016 / 006 / 090
 buildSeq({ sec: "alltag", key: "people", files: ["np_p_study", "np_p_pottery", "np_p_carpentry", "np_p_masons"] });               // NP 017 / 011 / 010 / 096
 buildSeq({ sec: "synagoge", key: "syn", vh: 60, files: ["np_s_three_pillars", "np_s_interior", "np_s_vaults", "np_s_hall_bimah", "np_s_bimah", "np_s_ark", "np_s_window", "np_s_oculus", "np_s_bimah_detail"] }); // NP 097/086/083/032/004/002/100/101/036
-buildSeq({ sec: "zeit", key: "kf", overlay: true, vh: 75, files: ["np_k01", "np_k02", "np_k03", "np_k04", "np_k05", "np_k06", "np_k07", "np_k08", "np_k09", "np_k10"] }); // NP 041…059 (K09 owner-approved)
+buildSeq({ sec: "zeit", key: "kf", overlay: true, vh: 75, kinetic: (i) => ["letter", "scale", "reveal", "change"][i % 4], files: ["np_k01", "np_k02", "np_k03", "np_k04", "np_k05", "np_k06", "np_k07", "np_k08", "np_k09", "np_k10"] }); // NP 041…059 (K09 owner-approved)
 buildTimeline();                                                                                                                     // NP 095
 buildSeq({ sec: "grundriss", key: "plan", vh: 55, files: ["np_2d_01", "np_2d_02", "np_2d_03", "np_2d_04", "np_2d_05", "np_2d_06", "np_2d_07", "np_2d_08"] }); // NP 025/026/073/028/029/027/031/030
 buildSeq({ sec: "licht", key: "holo", files: ["np_h_cutaway", "np_h_interior", "np_h_square", "np_h_capital", "np_h_column"] });   // NP 085/084/015/008/012
-buildSeq({ sec: "kirche", key: "church", files: ["np_c_model_east", "np_c_model_apse", "np_c_holo", "np_c_interior", "np_c_organ"] }); // NP 063/068/075/034/076
+buildChurchHero();                                                                                                                    // NP 118 (0–6.33 s)
+buildSeq({ sec: "kirche", key: "church", vh: 60, files: ["np_c_model_east", "np_c_model_apse", "np_c_vault", "np_c_holo", "np_c_reveal", "np_c_wire", { v: `${A}video/np_c_holo_trans_540.mp4`, poster: `${A}poster/np_c_holo_trans_poster.webp`, once: true }, "np_c_cutaway", "np_c_choir_above", "np_c_interior", "np_c_organ"], noHead: true }); // NP 063/068/102/075/113/112/116/110/103/034/076
 buildSeq({ sec: "archaeologie", key: "arch", files: [{ v: `${A}video/np_arch_trans_540.mp4`, poster: `${A}poster/np_arch_trans_poster.webp` }, "np_k08", "np_k08_hr"] }); // NP 020 / 055 (K08 canonical) / 019 (high-res support)
 buildSeq({ sec: "misrach", key: "mis", files: [{ v: `${A}video/np_misrach_trans_540.mp4`, poster: `${A}poster/np_misrach_trans_poster.webp` }, "np_k09", "np_k10"] }); // NP 056 / 057 (K09 required) / 059
 buildReturn(); buildTrailer(); buildEnd(); reveal(); initGuide({ monument: "neupfarrplatz" });

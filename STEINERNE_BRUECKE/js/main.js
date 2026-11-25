@@ -16,7 +16,7 @@
 import { DICT, getInitialLang, setLang, applyI18n, t } from "./i18n.js?v=20261124a";
 import { buildPortal } from "./portal.js";
 import { initMuseum25D } from "./museum25d.js";
-import { initKframesGallery } from "./kframes-gallery.js";
+import { initKframesGallery } from "./kframes-gallery.js?v=20261125a";
 import { initCraftGallery } from "./craft-gallery.js";
 let craftApi = null; // museum photo gallery (#craftGallery); declared here so it exists before any wiring runs
 import { initMediaFeatures } from "../../js/media-feature.js?v=20261119m";

@@ -169,3 +169,17 @@ export const STR = {
     ];
   }
 }
+
+/* 07C.0 — Neupfarrkirche: labels for the new owner media, in stage order. Descriptive only (briefing PENDING): what the
+   picture shows, no dates, no construction or geometry claims. Existing five items keep their text. */
+{
+  const ADD = {
+    de: { hero: { alt: "Film: vom Innenraum der Neupfarrkirche zum Lichtmodell", c1: "Innenraum", c2: "Lichtmodell" },
+      vault: ["Gewölbe und Fenster", "Rippen, Kapitell und Fenster, halb in Lichtlinien."], reveal: ["Stein und Licht", "Die Türme gehen in Lichtlinien über."], wire: ["Linienmodell", "Die Ostansicht, nur aus Linien."], trans: ["Verwandlung", "Aus der Ostansicht wird ein Lichtmodell."], cut: ["Geöffneter Chor", "Der Blick durch die Außenwand."], above: ["Chor von oben", "Altar und drei Fenster."] },
+    en: { hero: { alt: "Film: from the interior of the Neupfarrkirche to the light model", c1: "Interior", c2: "Light model" },
+      vault: ["Vault and window", "Ribs, capital and window, half in lines of light."], reveal: ["Stone and light", "The towers turn into lines of light."], wire: ["Line model", "The east view, in lines only."], trans: ["Transformation", "The east view becomes a light model."], cut: ["Opened choir", "The view through the outer wall."], above: ["Choir from above", "Altar and three windows."] },
+    es: { hero: { alt: "Película: del interior de la Neupfarrkirche al modelo de luz", c1: "Interior", c2: "Modelo de luz" },
+      vault: ["Bóveda y ventana", "Nervios, capitel y ventana, en parte con líneas de luz."], reveal: ["Piedra y luz", "Las torres se convierten en líneas de luz."], wire: ["Modelo de líneas", "La vista oriental, solo con líneas."], trans: ["Transformación", "La vista oriental se convierte en un modelo de luz."], cut: ["Coro abierto", "La mirada a través del muro exterior."], above: ["El coro desde arriba", "El altar y tres ventanas."] },
+  };
+  for (const l of ["de", "en", "es"]) { const C = STR[l].church, a = ADD[l], [east, apse, holo, inter, organ] = C.items; C.hero = a.hero; C.items = [east, apse, a.vault, holo, a.reveal, a.wire, a.trans, a.cut, a.above, inter, organ]; }
+}

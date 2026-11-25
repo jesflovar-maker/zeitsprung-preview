@@ -399,3 +399,9 @@ html.np-pfs,html.np-pfs body{overflow:hidden}
 
 /* 07B.1: overlays use the shared ZEITSPRUNG_TYPOGRAPHY_SYSTEM_V1 (css/zt-typography.css); trailer overlay sits a little higher */
 .ntr__ov.zt-ov{padding:70px 18px 22px}
+
+/* 07C.0 — Neupfarrkirche section opening: large 9:16 stage, black museum ground, last frame held */
+.nchero{position:relative;width:min(100%,calc(min(86svh,940px)*9/16));margin:clamp(20px,4vw,32px) auto clamp(28px,6vw,56px);aspect-ratio:9/16;background:#000;overflow:hidden;border:1px solid var(--line)}
+.nchero img,.nchero video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.nchero video{opacity:0;transition:opacity .6s var(--ease)}
+.nchero.is-on video{opacity:1}

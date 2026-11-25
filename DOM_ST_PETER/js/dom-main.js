@@ -7,6 +7,7 @@ import { initGuide } from "../../js/zt-guide.js?v=20261124a"; // 07B.1: global B
 import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
 
 import { ztSound } from "../../js/zt-sound.js?v=20261124a";
+import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 07C.0: ZEITSPRUNG_KINETIC_VIDEO_TYPE_V1 (narrative layer, never on timelines)
 import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261124a"; // 07C-H: shared film player (trailer section) // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
 
 const A = "../assets/dom-st-peter/";
@@ -152,6 +153,7 @@ function buildStory(sel, key, stepsKey, MEDIA, opt = {}) {
   let bar = null;
   if (opt.gauge) { const g = el("div", "dgauge dgauge--story"); const lab = el("div", "dgauge__lab"); const o = el("span"), we = el("span"); bind(o, (t) => t.bau.ost); bind(we, (t) => t.bau.west); lab.append(o, we); const gb = el("div", "dgauge__bar"); bar = el("span"); gb.append(bar); g.append(lab, gb); sticky.append(g); }
   track.append(sticky); s.append(intro, track); reveal(s);
+  const kin = opt.kinetic ? mountKinetic(st, { place: "kf" }) : null; // 07C.0
   let cur = -1, v = null, capT = -1;
   const ti = (i) => (MEDIA[i].ti != null ? MEDIA[i].ti : i);
   const fill = () => { const f = T()[stepsKey][ti(cur)]; ci.innerHTML = `<div class="dkf__date">${f.d}</div><h3 class="dkf__title">${f.t}</h3><p class="dkf__text">${f.p}</p>`; };
@@ -163,6 +165,7 @@ function buildStory(sel, key, stepsKey, MEDIA, opt = {}) {
     if (MEDIA[i].v) { v = mkVideo(MEDIA[i].v); layers[i].append(v); VM.tick(); }
     if (bar) bar.style.width = `${((i + 1) / n) * 100}%`;
     if (ti(i) === capT) return; capT = ti(i);
+    if (kin) kin.set(() => { const f = T()[stepsKey][ti(cur)]; return { k: pad2(ti(cur) + 1), t: f.d }; }, ["letter", "scale", "reveal", "change"][ti(i) % 4]);
     if (first) fill(); else { ci.classList.add("is-out"); setTimeout(() => { fill(); ci.classList.remove("is-out"); }, 220); }
   }
   show(0);
@@ -287,8 +290,8 @@ try { history.scrollRestoration = "manual"; } catch (e) {}
 scrollTo(0, 0);
 buildHero(); buildScrub(); buildHolo();
 buildStory("#architektur", "arch", "archSteps", ARCH_M);
-buildStory("#bauabfolge", "bau", "bauSteps", BAU_M, { gauge: true });
-buildStory("#zeitreise", "kf", "frames", KF_M);
+buildStory("#bauabfolge", "bau", "bauSteps", BAU_M, { gauge: true, kinetic: true });
+buildStory("#zeitreise", "kf", "frames", KF_M, { kinetic: true });
 buildTimeline();
 buildStory("#glas", "glas", "glasSteps", GLAS_M);
 buildStory("#menschen", "people", "peopleSteps", PEOPLE_M);

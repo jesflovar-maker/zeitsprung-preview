@@ -45,6 +45,7 @@
    ============================================================================ */
 
 import { createZtTypography, ztVisualLength } from "./zt-typography.js";
+import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 07C.0: ZEITSPRUNG_KINETIC_VIDEO_TYPE_V1
 import { KFRAMES_MANIFEST_URL, KFRAMES_DEFAULT_ASSET_BASE, KFRAMES_4K_WEB_BASE, STEINERNE_SOURCES_URL } from "../../js/zt-paths.js";
 
 const MANIFEST_URL = KFRAMES_MANIFEST_URL;
@@ -464,7 +465,17 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
     dotsWrap.appendChild(dot);
   });
 
+  // 07C.0 kinetic narrative title (own layer inside .kf__stage; GSAP keeps owning images and captions)
+  const kin = mountKinetic(section.querySelector(".kf__stage"), { place: "kf" });
+  let kinIdx = -1;
+  const KIN_FX = ["letter", "scale", "reveal", "change"];
+  function updateKinetic(idx) {
+    if (!kin || idx === kinIdx) return; kinIdx = idx;
+    kin.set(() => { const f = frames[idx], l = getLang(); return { k: "K" + String(f.order).padStart(2, "0"), t: dateFor(f, l) || f.title[l] || f.title.de }; /* the validated title stays in the caption below */ }, KIN_FX[idx % 4]);
+  }
+
   function updateDots(idx) {
+    updateKinetic(idx);
     dotsWrap.querySelectorAll(".kf__dot").forEach((d) => {
       d.classList.toggle("is-active", Number(d.dataset.index) === idx);
     });

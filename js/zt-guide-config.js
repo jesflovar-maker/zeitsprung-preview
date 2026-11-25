@@ -35,7 +35,7 @@ export const ZEITSPRUNG_GLOBAL_GUIDE_V1 = {
       sections: { heute: 0, aussen: 1, zeit: 0, saalbau: 2, ansicht: 0, portal: 3, saal: 4, menschen: 6, reichstag: 5, material: 7, "heute-innen": 4, ende: 5 },
     },
     "neupfarrplatz": {
-      data: "../NEUPFARRPLATZ/js/np-i18n.js?v=20261124a",
+      data: "../NEUPFARRPLATZ/js/np-i18n.js?v=20261125a",
       go: ["viertel", "synagoge", "zeit", "archaeologie", "kirche", "misrach", null],
       sections: { heute: 4, viertel: 0, alltag: 0, synagoge: 1, zeit: 2, film: 2, grundriss: 4, licht: 1, kirche: 4, archaeologie: 3, misrach: 5, rueckkehr: 4, trailer: 2, ende: 2 },
     },
