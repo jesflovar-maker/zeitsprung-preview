@@ -9,7 +9,7 @@ import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 
 import { ztSound } from "../../js/zt-sound.js?v=20261124a";
 import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 07C.0: ZEITSPRUNG_KINETIC_VIDEO_TYPE_V1 (narrative layer, never on timelines)
 import { mountSources } from "../../js/zt-sources.js?v=20261125d"; // 07D: one bibliography per page
-import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261125e"; // 07C-H: shared film player (trailer section) // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
+import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261125f"; // 07C-H: shared film player (trailer section) // 06G: compact ♪ beside DE | EN | ES (no in-panel sound button)
 
 const A = "../assets/dom-st-peter/";
 const HI = new Set(["k03", "k05", "k06", "k07", "k08", "k10", "k11", "int_portal", "int_nave", "int_choir", "int_vault", "heute"]); // also exist at 1080 px

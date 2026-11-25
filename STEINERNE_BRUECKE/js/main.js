@@ -15,13 +15,14 @@
 
 import { DICT, getInitialLang, setLang, applyI18n, t } from "./i18n.js?v=20261125d";
 import { buildPortal } from "./portal.js";
-import { initMuseum25D } from "./museum25d.js?v=20261125e";
-import { initKframesGallery } from "./kframes-gallery.js?v=20261125e";
+import { initMuseum25D } from "./museum25d.js?v=20261125f";
+import { initKframesGallery } from "./kframes-gallery.js?v=20261125f";
 import { initCraftGallery } from "./craft-gallery.js?v=20261125d";
 let craftApi = null; // museum photo gallery (#craftGallery); declared here so it exists before any wiring runs
 import { initMediaFeatures } from "../../js/media-feature.js?v=20261119m";
 import { mountSources, goToSources } from "../../js/zt-sources.js?v=20261125d"; // 07D: one bibliography per page
-import { mountFilm } from "../../js/zt-film.js?v=20261125e"; // 07C-H: shared documentary film player (timeline + trailer)
+import { filmBusy } from "../../js/zt-media-priority.js?v=20261125f"; // 07D
+import { mountFilm } from "../../js/zt-film.js?v=20261125f"; // 07C-H: shared documentary film player (timeline + trailer)
 import { openPhoto, openElement } from "../../js/zs-media-viewer.js"; // same URL as craft-gallery.js -> one shared viewer instance
 import { STEINERNE_VIDEO_WEB4_BASE, KFRAMES_4K_WEB_BASE } from "../../js/zt-paths.js";
 import { initBruckmandl } from "./bruckmandl.js?v=20261125d";
@@ -791,7 +792,7 @@ async function startExperience() {
     let tries = 0; img.onload = res; img.onerror = () => { if (tries++ < 2) setTimeout(() => { img.src = ""; img.src = encodeURI(src); }, 900 * tries); else res(); };
     img.src = encodeURI(src);
   }).then(updateProgress);
-  const lane = async () => { while (nextI < assetsToLoad.length) { const i = nextI++; await loadOne(assetsToLoad[i], i); if (i === 1 || assetsToLoad.length < 2) setTimeout(revealApp, 250); } };
+  const lane = async () => { while (nextI < assetsToLoad.length) { while (filmBusy()) await new Promise((r) => setTimeout(r, 300)); const i = nextI++; await loadOne(assetsToLoad[i], i); if (i === 1 || assetsToLoad.length < 2) setTimeout(revealApp, 250); } };
   lane(); lane();
 
   // Safety timeout in case an asset never fires load/error
@@ -807,7 +808,7 @@ function revealApp() {
   const app = document.getElementById("app");
   const intro = document.getElementById("intro-gate");
   const iv = document.getElementById("introVideo");
-  if (iv) { try { iv.pause(); } catch (e) {} }
+  if (iv) { try { iv.pause(); } catch (e) {} setTimeout(() => { if (!iv.getAttribute("src")) return; iv.removeAttribute("src"); iv.preload = "none"; try { iv.load(); } catch (e) {} }, 900); } // 07D: the entry film is over — it must not keep downloading
   if (intro) gsap.to(intro, { autoAlpha: 0, duration: 0.6, ease: "power2.out", onComplete: () => { intro.style.display = "none"; } });
 
   gsap.to(preloader, {

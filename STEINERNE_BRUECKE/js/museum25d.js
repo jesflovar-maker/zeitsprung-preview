@@ -42,7 +42,7 @@
 
 import { CHAPTER_SCRIPT, buildMuseumScrollExperience, buildTimingMap } from "./museum2d-scroll.js?v=20261125e";
 import { ZT_AUDIO_BUS } from "../../js/zt-audio.js";
-import { releaseWhenFar, whenQuiet } from "../../js/zt-media-priority.js?v=20261125e"; // 07D
+import { releaseWhenFar, whenQuiet } from "../../js/zt-media-priority.js?v=20261125f"; // 07D
 import { STEINERNE_WEB_ASSET_BASE, ASSET_SWAP_MANIFEST_URL, MUSEUM_CONTENT_MAP_URL as CONTENT_MAP_URL_RESOLVED } from "../../js/zt-paths.js";
 
 const SLOT_BASE = STEINERNE_WEB_ASSET_BASE;
@@ -1471,12 +1471,15 @@ export async function initMuseum25D({ section, t, getLang, lenis }) {
     if (fromProximity === true) { ensureVideos(); releaseWhenFar(section); } // 07D: no idle warm-up of ~30 MB; clips stop downloading when the museum is far away
   }
 
+  // 07D: passing by is not arriving — the museum loads only when the visitor stays near it for a moment
+  function ensureNear(n) { setTimeout(() => { const r = section.getBoundingClientRect(), vh = window.innerHeight; if (r.top < vh * 2.9 && r.bottom > -vh * 0.6) ensureAssets(true); else if (!videosRequested) watchNear(); }, 380); }
+  function watchNear() { if (watchNear.on) return; watchNear.on = true; const o = new IntersectionObserver((es) => { if (es[es.length - 1].isIntersecting) { o.disconnect(); watchNear.on = false; ensureNear(1); } }, { rootMargin: "180% 0px" }); o.observe(section); }
   if (window.ScrollTrigger) {
     ScrollTrigger.create({
       trigger: section,
       start: "top bottom+=180%",
       once: true,
-      onEnter: () => ensureAssets(true)
+      onEnter: () => ensureNear(0)
     });
   }
   // 07D: ahead of time the pictures come one after the other (decoded, in order), never all at once and never while a film starts

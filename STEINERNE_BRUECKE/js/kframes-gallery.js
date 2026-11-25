@@ -46,6 +46,7 @@
 
 import { createZtTypography, ztVisualLength } from "./zt-typography.js";
 import { goToSources } from "../../js/zt-sources.js?v=20261125d";
+import { releaseWhenFar, filmBusy } from "../../js/zt-media-priority.js?v=20261125f"; // 07D
 import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 07C.0: ZEITSPRUNG_KINETIC_VIDEO_TYPE_V1
 import { KFRAMES_MANIFEST_URL, KFRAMES_DEFAULT_ASSET_BASE, KFRAMES_4K_WEB_BASE, STEINERNE_SOURCES_URL } from "../../js/zt-paths.js";
 
@@ -301,7 +302,9 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
     });
   }
   let nearT = 0;
+  releaseWhenFar(section, "200% 0px"); document.addEventListener("zt:film-focus", () => imgCache.forEach((im, k) => { if (!im.complete) { im.src = ""; imgCache.delete(k); } }));
   function preloadWindow(idx) {
+    if (filmBusy()) return;
     pruneCache(idx); ensurePreloaded(idx); clearTimeout(nearT);
     nearT = setTimeout(() => { if (idx < frames.length - 1) ensurePreloaded(idx + 1); if (idx > 0) ensurePreloaded(idx - 1); }, 240); // 07D: neighbours only when the step rests
   }
