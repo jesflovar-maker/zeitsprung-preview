@@ -15,14 +15,14 @@
 
 import { DICT, getInitialLang, setLang, applyI18n, t } from "./i18n.js?v=20261125d";
 import { buildPortal } from "./portal.js";
-import { initMuseum25D } from "./museum25d.js?v=20261125g";
-import { initKframesGallery } from "./kframes-gallery.js?v=20261125g";
+import { initMuseum25D } from "./museum25d.js?v=20261125h";
+import { initKframesGallery } from "./kframes-gallery.js?v=20261125h";
 import { initCraftGallery } from "./craft-gallery.js?v=20261125d";
 let craftApi = null; // museum photo gallery (#craftGallery); declared here so it exists before any wiring runs
 import { initMediaFeatures } from "../../js/media-feature.js?v=20261119m";
 import { mountSources, goToSources } from "../../js/zt-sources.js?v=20261125d"; // 07D: one bibliography per page
-import { filmBusy, viewBusy } from "../../js/zt-media-priority.js?v=20261125g"; // 07D
-import { mountFilm } from "../../js/zt-film.js?v=20261125g"; // 07C-H: shared documentary film player (timeline + trailer)
+import { filmBusy, viewBusy } from "../../js/zt-media-priority.js?v=20261125h"; // 07D
+import { mountFilm } from "../../js/zt-film.js?v=20261125h"; // 07C-H: shared documentary film player (timeline + trailer)
 import { openPhoto, openElement } from "../../js/zs-media-viewer.js"; // same URL as craft-gallery.js -> one shared viewer instance
 import { STEINERNE_VIDEO_WEB4_BASE, KFRAMES_4K_WEB_BASE } from "../../js/zt-paths.js";
 import { initBruckmandl } from "./bruckmandl.js?v=20261125g";

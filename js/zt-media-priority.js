@@ -5,7 +5,7 @@
      1 RETRY    an <img> that fails to load is asked for again (1 s, 3 s, 8 s, and when the browser is online again / the tab
                 returns) — no manual page refresh. Broken images never stay silent.
      2 DWELL    a lazy image starts only when it has been near for a moment, so scrolling past starts nothing. 06H.1: what is
-                ON SCREEN starts at once; what is only near waits in line (nearest first, at most 3 travelling), a picture
+                ON SCREEN starts at once; what is only near waits in line (nearest first, at most 6 travelling, 1–2 on a slow line), a picture
                 covered by another one of its stack comes last, one at a time. What is already loading may finish, unless too
                 many have been left behind — then the one left longest ago gives its connection back.
      3 RELEASE  clips inside an opted-in container (museum) stop downloading once the container is far away; they are
@@ -39,7 +39,7 @@ const again = () => document.querySelectorAll("img[data-zt-failed]").forEach((im
 const park = (im) => { if (im.dataset.ztParked != null || im.complete && im.naturalWidth || !im.getAttribute("src")) return; im.dataset.ztParked = im.getAttribute("src"); const s = im.getAttribute("srcset"); if (s) { im.dataset.ztSet = s; im.removeAttribute("srcset"); } im.removeAttribute("src"); };
 const unpark = (im) => { if (im.dataset.ztParked == null) return; const s = im.dataset.ztParked; delete im.dataset.ztParked; if (im.dataset.ztSet) { im.setAttribute("srcset", im.dataset.ztSet); delete im.dataset.ztSet; } if (!im.getAttribute("src")) im.src = s; };
 let io = null;
-const left = new Set(); const line = new Set(); const fly = new Set(); const MAXNEAR = 3;
+const left = new Set(); const line = new Set(); const fly = new Set(); const MAXNEAR = 6;
 let slowV = false, slowAt = 0; const slow = () => { const t = Date.now(); if (t - slowAt > 4000) { slowAt = t; slowV = slowNet(); } return slowV; };
 const done = (im) => { io.unobserve(im); lazy.delete(im); left.delete(im); line.delete(im); fly.delete(im); serve(); };
 const watchImg = (im) => { if (!io || lazy.has(im) || im.loading !== "lazy" || im.complete && im.naturalWidth) return; lazy.set(im, false); if (!im.currentSrc || !im.complete) { const r = im.getBoundingClientRect(); if (r.bottom < -innerHeight || r.top > innerHeight * 2 || !r.width) park(im); } io.observe(im); im.addEventListener("load", () => done(im)); im.addEventListener("error", () => { fly.delete(im); serve(); }); };
@@ -57,7 +57,7 @@ function serveNow() {
   line.forEach((im) => { if (im.dataset.ztParked == null) { if (im.complete && im.naturalWidth) line.delete(im); else { line.delete(im); fly.add(im); } return; } const c = covered(im); if (!c && onScreen(im)) { go(im, true); fresh = true; } else wait.push([c ? 10 + dist(im) : dist(im), im, c]); });
   if (fresh && slow()) yieldLine();
   if (focus) return; let n = 0, cv = 0, hi = 0; fly.forEach((im) => { if (im.__ztHi) hi++; else n++; if (covered(im)) cv++; });
-  wait.sort((x, y) => x[0] - y[0]); for (const [, im, c] of wait) { if (n >= (slow() ? (hi ? 1 : 2) : MAXNEAR) || hi > 2 && n >= 1 || c && cv >= 1) { if (!c) break; continue; } go(im, false); n++; if (c) cv++; }
+  wait.sort((x, y) => x[0] - y[0]); for (const [, im, c] of wait) { if (n >= (slow() ? (hi ? 1 : 2) : MAXNEAR) || hi > 2 && n >= 3 || c && cv >= 1) { if (!c) break; continue; } go(im, false); n++; if (c) cv++; }
 }
 // stacked stages (one picture on top, the others transparent): the picture on top comes first
 const covered = (im) => im.classList.contains("is-off") || (im.parentElement && im.parentElement.classList.contains("stage__layer") && !im.parentElement.classList.contains("is-on")) || (im.classList.contains("craft__layer") && !im.classList.contains("is-on")) || (!im.classList.contains("is-on") && im.parentElement && [...im.parentElement.children].some((x) => x !== im && x.tagName === "IMG" && x.classList.contains("is-on")));

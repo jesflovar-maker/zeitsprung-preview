@@ -42,7 +42,7 @@
 
 import { CHAPTER_SCRIPT, buildMuseumScrollExperience, buildTimingMap } from "./museum2d-scroll.js?v=20261125e";
 import { ZT_AUDIO_BUS } from "../../js/zt-audio.js";
-import { releaseWhenFar, whenQuiet, filmBusy } from "../../js/zt-media-priority.js?v=20261125g"; // 07D
+import { releaseWhenFar, whenQuiet, filmBusy } from "../../js/zt-media-priority.js?v=20261125h"; // 07D
 import { STEINERNE_WEB_ASSET_BASE, ASSET_SWAP_MANIFEST_URL, MUSEUM_CONTENT_MAP_URL as CONTENT_MAP_URL_RESOLVED } from "../../js/zt-paths.js";
 
 const SLOT_BASE = STEINERNE_WEB_ASSET_BASE;

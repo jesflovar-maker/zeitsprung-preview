@@ -14,7 +14,7 @@
        fixed full-viewport fallback (html.zt-pfs) when the browser refuses (iPhone) — overlay + controls stay together.
    Usage: import { mountFilm } from "../js/zt-film.js";  const f = mountFilm(hostEl, { mode, src, poster, ... });
      o.sound = { isOn(), toggle(), register(video), subscribe(fn) }  (adapter onto the page's single sound state) */
-import { slowNet } from "./zt-media-priority.js?v=20261125g"; // 07D: a starting film has priority on the network
+import { slowNet } from "./zt-media-priority.js?v=20261125h"; // 07D: a starting film has priority on the network
 const UI = {
   de: { play: "ABSPIELEN", pause: "PAUSE", on: "TON AN", off: "TON AUS", full: "VOLLBILD", exit: "SCHLIESSEN", ch: "KAPITEL", seek: "Position im Film", film: "FILM" },
   en: { play: "PLAY", pause: "PAUSE", on: "SOUND ON", off: "SOUND OFF", full: "FULLSCREEN", exit: "CLOSE", ch: "CHAPTERS", seek: "Position in the film", film: "FILM" },

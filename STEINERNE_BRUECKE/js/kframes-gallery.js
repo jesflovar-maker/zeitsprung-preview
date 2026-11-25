@@ -46,7 +46,7 @@
 
 import { createZtTypography, ztVisualLength } from "./zt-typography.js";
 import { goToSources } from "../../js/zt-sources.js?v=20261125d";
-import { releaseWhenFar, filmBusy, slowNet } from "../../js/zt-media-priority.js?v=20261125g"; // 07D
+import { releaseWhenFar, filmBusy, slowNet } from "../../js/zt-media-priority.js?v=20261125h"; // 07D
 import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 07C.0: ZEITSPRUNG_KINETIC_VIDEO_TYPE_V1
 import { KFRAMES_MANIFEST_URL, KFRAMES_DEFAULT_ASSET_BASE, KFRAMES_4K_WEB_BASE, STEINERNE_SOURCES_URL } from "../../js/zt-paths.js";
 
@@ -309,6 +309,7 @@ export async function initKframesGallery({ section, t, getLang, lenis, reducedMo
   function preloadWindow(idx) {
     if (filmBusy()) return; const dir = idx < lastIdx ? -1 : 1; lastIdx = idx;
     pruneCache(idx); ensurePreloaded(idx); clearTimeout(nearT);
+    if (!slowNet()) ensurePreloaded(idx + dir);
     nearT = setTimeout(() => { ensurePreloaded(idx + dir); nearT = setTimeout(() => ensurePreloaded(idx - dir), 180); }, 60); // 07D: neighbours only when the step rests
   }
 
