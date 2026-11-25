@@ -239,7 +239,7 @@ function buildReturn() {
   zoomBtn(st, () => ({ src: full(ANCHOR), alt: im.alt })); w.append(st); s.append(w);
 }
 
-/* ---------- 09 Neupfarrkirche: cinematic section opening (07C.0, NP_ASSET_118, seconds 0–6.33 only — the rest is HELD) ----------
+/* ---------- 09 Neupfarrkirche: cinematic section opening (07C.0, NP_ASSET_116, seconds 0–6.33 only — the rest is HELD) ----------
    Section media, never the monument hero. Muted, plays while >= 55 % visible, pauses off screen, holds its last frame;
    replays from the start when the visitor comes back. No controls, no loop. Reduced motion: the last frame as a still. */
 function buildChurchHero() {
@@ -313,8 +313,8 @@ buildSeq({ sec: "zeit", key: "kf", overlay: true, vh: 75, kinetic: (i) => ["lett
 buildTimeline();                                                                                                                     // NP 095
 buildSeq({ sec: "grundriss", key: "plan", vh: 55, files: ["np_2d_01", "np_2d_02", "np_2d_03", "np_2d_04", "np_2d_05", "np_2d_06", "np_2d_07", "np_2d_08"] }); // NP 025/026/073/028/029/027/031/030
 buildSeq({ sec: "licht", key: "holo", files: ["np_h_cutaway", "np_h_interior", "np_h_square", "np_h_capital", "np_h_column"] });   // NP 085/084/015/008/012
-buildChurchHero();                                                                                                                    // NP 118 (0–6.33 s)
-buildSeq({ sec: "kirche", key: "church", vh: 60, files: ["np_c_model_east", "np_c_model_apse", "np_c_vault", "np_c_holo", "np_c_reveal", "np_c_wire", { v: `${A}video/np_c_holo_trans_540.mp4`, poster: `${A}poster/np_c_holo_trans_poster.webp`, once: true }, "np_c_cutaway", "np_c_choir_above", "np_c_interior", "np_c_organ"], noHead: true }); // NP 063/068/102/075/113/112/116/110/103/034/076
+buildChurchHero();                                                                                                                    // NP 116 (0–6.33 s)
+buildSeq({ sec: "kirche", key: "church", vh: 60, files: ["np_c_model_east", "np_c_model_apse", "np_c_vault", "np_c_holo", "np_c_reveal", "np_c_wire", { v: `${A}video/np_c_holo_trans_540.mp4`, poster: `${A}poster/np_c_holo_trans_poster.webp`, once: true }, "np_c_cutaway", "np_c_choir_above", "np_c_interior", "np_c_organ"], noHead: true }); // NP 063/068/102/075/113/112/118/110/103/034/076
 buildSeq({ sec: "archaeologie", key: "arch", files: [{ v: `${A}video/np_arch_trans_540.mp4`, poster: `${A}poster/np_arch_trans_poster.webp` }, "np_k08", "np_k08_hr"] }); // NP 020 / 055 (K08 canonical) / 019 (high-res support)
 buildSeq({ sec: "misrach", key: "mis", files: [{ v: `${A}video/np_misrach_trans_540.mp4`, poster: `${A}poster/np_misrach_trans_poster.webp` }, "np_k09", "np_k10"] }); // NP 056 / 057 (K09 required) / 059
 buildReturn(); buildTrailer(); buildEnd(); reveal(); initGuide({ monument: "neupfarrplatz" });
