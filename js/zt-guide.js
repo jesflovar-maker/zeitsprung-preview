@@ -10,7 +10,7 @@
    Usage: initGuide({ monument: "dom-st-peter" }) */
 import { mountAsk, keepClear } from "./zt-guide-ask.js?v=20261125g"; // 07D: free-text questions + icon placement
 import { UNITS } from "./zt-guide-index.js?v=20261125g";
-import { ZEITSPRUNG_GLOBAL_GUIDE_V1 } from "./zt-guide-config.js?v=20261125a";
+import { ZEITSPRUNG_GLOBAL_GUIDE_V1 } from "./zt-guide-config.js?v=20261126a";
 
 const AVATAR = new URL("../assets/steinerne-bruecke/bruckmandl/ai/", import.meta.url).href;
 const UI = {

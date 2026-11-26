@@ -25,9 +25,9 @@ export const ZEITSPRUNG_GLOBAL_GUIDE_V1 = {
       sections: { rundum: 0, holo: 0, architektur: 3, bauabfolge: 2, zeitreise: 0, zeitleiste: 1, glas: 5, menschen: 7, unten: 8, rundgang: 3, heute: 9, ende: 9 },
     },
     "porta-praetoria": {
-      data: "../PORTA_PRAETORIA/js/porta-i18n.js?v=20261124a",
+      data: "../PORTA_PRAETORIA/js/porta-i18n.js?v=20261126a", // 08A: final media (K-frame evolution, clean timeline, trailer)
       go: ["ctx", "durchfahrt", "turm", "y179", "castra", "bau", "film", "heute"],
-      sections: { ctx: 0, holo: 1, durchfahrt: 1, turm: 2, y179: 3, castra: 4, plan: 4, bau: 5, film: 6, alltag: 5, galerie: 0, heute: 7 },
+      sections: { ctx: 0, holo: 1, durchfahrt: 1, turm: 2, y179: 3, castra: 4, plan: 4, bau: 5, kframes: 5, film: 6, alltag: 5, galerie: 0, heute: 7, trailer: 6 },
     },
     "altes-rathaus": {
       data: "../ALTES_RATHAUS_REICHSSAAL/js/ar-i18n.js?v=20261124a",

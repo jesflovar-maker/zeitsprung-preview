@@ -1,17 +1,19 @@
 // PORTA PRAETORIA · CASTRA REGINA — PUBLIC V1: one vanilla ES module, DE / EN / ES, no external libraries.
 // The DOM is built ONCE; a language switch only re-runs text refreshers (no rebuild, no new listeners / observers / timers).
 // Media: runtime derivatives only (../assets/porta-praetoria/). One video plays at a time; every video loads lazily (preload none + poster).
-import { STR, LANGS, STORAGE_KEY } from "./porta-i18n.js?v=20261124a";
-import { initGuide } from "../../js/zt-guide.js?v=20261125g"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
+import { STR, LANGS, STORAGE_KEY, PP_TL_TIMES } from "./porta-i18n.js?v=20261126a";
+import { initGuide } from "../../js/zt-guide.js?v=20261126a"; // 07B.1: global Brückmandl guide (one engine, data from ZEITSPRUNG_GLOBAL_GUIDE_V1)
+import { mountKinetic } from "../../js/zt-kinetic.js?v=20261125a"; // 08A: KINETIC_VIDEO_TYPE_V1 on the K-frame evolution (never on the timeline)
+import { openPhoto } from "../../js/zs-media-viewer.js"; // 08A: shared fullscreen image viewer
 import { mountDestinations } from "../../js/zt-destinations.js?v=20261123c"; // 07B.1: direct links to every other active monument (monuments.config.json)
 
 import { ztSound } from "../../js/zt-sound.js?v=20261124a";
 import { mountSources, goToSources } from "../../js/zt-sources.js?v=20261125d"; // 07D: one bibliography per page
 import { mountFilm, ztSoundAdapter } from "../../js/zt-film.js?v=20261125h"; // 07C-H: shared film player (trailer slot)
-/* 07C-H TRAILER SLOT — same architecture as the other monuments, NOT public yet: the corrected final trailer
-   PP_TRAILER_MASTER_CLEAN_V1 is DEFERRED (owner). When approved, set { src, poster, duration, hasAudio } here — the
-   section (#trailer before the ending) is then created automatically; no redesign. */
-const PP_TRAILER = null;
+/* 07C-H TRAILER SLOT → 08A ACTIVE: final owner trailer OWNER_ALL_INBOX/VIDEO/TRAILER/Trailer.mp4 (15 s, 1080x1920, no audio
+   stream, no burned text) → runtime pp_trailer_v1_720.mp4 (+ 540 lite). Silent → no sound control. Section #trailer sits
+   after the last historical content and before QUELLEN. */
+const PP_TRAILER = { src: "../assets/porta-praetoria/video/pp_trailer_v1_720.mp4", srcLite: "../assets/porta-praetoria/video/pp_trailer_v1_540.mp4", poster: "../assets/porta-praetoria/poster/pp_trailer_v1_poster.webp", duration: 15, hasAudio: false };
 function buildTrailerSlot() {
   if (!PP_TRAILER) return;
   const end = document.getElementById("quellen"); if (!end) return;
@@ -88,7 +90,7 @@ function loop(name, auto = true, cls = "pstage") {
 const tag = () => document.createComment("badge-removed");
 
 /* ---------- 00 header + nav ---------- */
-const NAV = ["ctx", "holo", "durchfahrt", "turm", "y179", "castra", "bau", "film"];
+const NAV = ["ctx", "holo", "durchfahrt", "turm", "y179", "castra", "bau", "kframes", "film"];
 function buildNav() {
   const pn = $("#pn"); const links = $("#pnLinks");
   NAV.forEach((id, i) => { const a = el("a", "", { href: "#" + id }); bind(a, (t) => t.navItems[i]); links.append(a); });
@@ -149,32 +151,55 @@ function heroFilm() {
 
 /* ---------- 06G.2B vertical scroll sequence (one sticky 9:16 stage, one item per scroll step) ----------
    items: [{ img } | { video, poster }], label(i) → title text. Videos: muted loop, only the active one plays while on screen. */
-function vseq(host, items, label, vh = 60) {
+/* 08A: shared viewer button (same grammar as Neupfarrplatz: round ⤢ top-right, tap on the picture also opens) */
+const ZOOM = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+const zoomBtn = (stage, current) => {
+  const b = el("button", "nzoom", { type: "button" }); b.innerHTML = ZOOM; bind(b, (t) => t.zoom, "aria-label"); stage.append(b);
+  const open = () => { const c = current(); if (c) openPhoto({ src: c.src, alt: c.alt }); };
+  b.addEventListener("click", (e) => { e.stopPropagation(); open(); });
+  stage.addEventListener("click", (e) => { if (!e.target.closest("button, a")) open(); });
+  return b;
+};
+/* opt (08A): once → a clip plays once per visit of its step and holds its last frame; kin(i) → { k, t, s } kinetic title,
+   fx(i) → effect; zoom(i) → { src, alt } | null (shared viewer); cap → small caption under the step text */
+function vseq(host, items, label, vh = 60, opt = {}) {
   const N = items.length;
   if (reduced) {
     const list = el("div", "pwrap pvseq__static");
-    items.forEach((it, i) => { const f = el("figure", "pvseq__fig pr"); const st = el("div", "pstage"); const im = el("img", "", { src: it.img || it.poster, loading: "lazy", decoding: "async" }); bind(im, () => label(i) || "", "alt"); st.append(im); const c = el("figcaption", "pvseq__t"); bind(c, () => label(i) || ""); f.append(st, c); list.append(f); });
+    items.forEach((it, i) => { const f = el("figure", "pvseq__fig pr"); const st = el("div", "pstage"); const im = el("img", "", { src: it.img || it.poster, loading: "lazy", decoding: "async" }); bind(im, () => label(i) || "", "alt"); st.append(im); if (opt.zoom && opt.zoom(i)) zoomBtn(st, () => opt.zoom(i)); const c = el("figcaption", "pvseq__t"); bind(c, () => label(i) || ""); f.append(st, c); list.append(f); });
     host.append(list); return;
   }
   const tr = el("div", "ptrack pvseq"); tr.style.height = (N * vh + 40) + "svh";
   const sticky = el("div", "psticky"); const wrap = el("div", "pvseq__wrap"); const st = el("div", "pvseq__stage");
   const els = items.map((it, i) => {
     let m;
-    if (it.video) { m = el("video", "", { playsinline: "", preload: "none", poster: it.poster, disablepictureinpicture: "", tabindex: "-1" }); m.muted = true; m.setAttribute("muted", ""); m.loop = true; m.dataset.src = it.video; }
-    else { m = el("img", "", { src: it.img, loading: "lazy", decoding: "async" }); if (it.srcset) { m.srcset = it.srcset; m.sizes = "(max-width:900px) 92vw, 540px"; } }
+    // 08A (06H.1 rule): no eager <video poster> — the poster is set only when the sequence comes near (see SC below)
+    if (it.video) { m = el("video", "", { playsinline: "", preload: "none", disablepictureinpicture: "", tabindex: "-1" }); m.muted = true; m.setAttribute("muted", ""); m.loop = !opt.once; m.dataset.src = it.video; if (it.poster) m.dataset.poster = it.poster; }
+    else { m = el("img", "", { src: it.img, loading: "lazy", decoding: "async", width: "720", height: "1280" }); if (it.srcset) { m.srcset = it.srcset; m.sizes = "(max-width:900px) 92vw, 540px"; } }
     bind(m, () => label(i) || "", it.video ? "aria-label" : "alt"); if (i) m.classList.add("is-off"); st.append(m); return m;
   });
+  const kin = opt.kin ? mountKinetic(st, { place: "kf" }) : null;
+  const zb = opt.zoom ? zoomBtn(st, () => opt.zoom(cur)) : null;
   const bar = el("div", "pvseq__bar", { "aria-hidden": "true" }); const fill = el("span"); bar.append(fill); st.append(bar);
   const tx = el("div", "pvseq__txt", { "aria-live": "polite" }); const k = el("p", "pvseq__k"); const t = el("h3", "pvseq__t"); tx.append(k, t);
+  const sub = opt.kin ? el("p", "pvseq__s") : null; if (sub) tx.append(sub);
+  if (opt.cap) { const c = el("p", "pvseq__cap"); bind(c, opt.cap); tx.append(c); }
   wrap.append(st, tx); sticky.append(wrap); tr.append(sticky); host.append(tr);
   let cur = -1; const vids = els.filter((m) => m.tagName === "VIDEO");
-  const paint = () => { k.textContent = String(cur + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0"); t.textContent = label(cur) || ""; };
+  const paint = () => { k.textContent = String(cur + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0"); t.textContent = label(cur) || ""; if (sub) sub.textContent = (opt.kin(cur) || {}).s || ""; if (zb) zb.hidden = !opt.zoom(cur); };
   const onScreen = () => { const r = tr.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; };
-  const syncV = () => { const live = onScreen(); vids.forEach((v) => { const on = live && els[cur] === v; if (on && v.paused) { if (!v.getAttribute("src")) v.src = v.dataset.src; const p = v.play(); if (p && p.catch) p.catch(() => {}); } else if (!on && !v.paused) v.pause(); }); };
-  const show = (i) => { if (i === cur) return; cur = i; els.forEach((m, j) => m.classList.toggle("is-off", j !== i)); tx.classList.remove("is-new"); void tx.offsetWidth; tx.classList.add("is-new"); paint(); };
+  const syncV = () => { const live = onScreen(); vids.forEach((v) => { const on = live && els[cur] === v; if (on && v.paused && !v.ended) { if (!v.getAttribute("src")) v.src = v.dataset.src; const p = v.play(); if (p && p.catch) p.catch(() => {}); } else if (!on && !v.paused) v.pause(); }); };
+  const show = (i) => {
+    if (i === cur) return; cur = i; const m = els[i];
+    if (opt.once && m.tagName === "VIDEO" && m.ended) { try { m.currentTime = 0; } catch (e) {} } // 08A: replay on every new visit of the step
+    els.forEach((x, j) => x.classList.toggle("is-off", j !== i)); tx.classList.remove("is-new"); void tx.offsetWidth; tx.classList.add("is-new"); paint();
+    if (kin) kin.set(() => opt.kin(cur), opt.fx ? opt.fx(i) : "reveal");
+  };
   LF.push(() => { if (cur >= 0) paint(); });
   show(0);
-  SC.push(() => { const r = tr.getBoundingClientRect(); if (r.bottom < -innerHeight || r.top > innerHeight * 2) { if (vids.length) syncV(); return; } const p = prog(tr); fill.style.transform = "scaleX(" + p + ")"; show(clamp(Math.floor(p * N), 0, N - 1)); if (vids.length) syncV(); });
+  SC.push(() => { const r = tr.getBoundingClientRect(); if (r.bottom < -innerHeight || r.top > innerHeight * 2) { if (vids.length) syncV(); return; }
+    [cur, cur + 1].forEach((j) => { const v = els[j]; if (v && v.dataset.poster && !v.getAttribute("poster")) v.poster = v.dataset.poster; }); // only the shown + next step
+    const p = prog(tr); fill.style.transform = "scaleX(" + p + ")"; show(clamp(Math.floor(p * N), 0, N - 1)); if (vids.length) syncV(); });
 }
 
 /* ---------- section helpers ---------- */
@@ -191,8 +216,13 @@ const stageImg = (name, altKey, cls = "pstage", w = [720]) => {
 
 /* ---------- 02 context ---------- */
 function buildCtx() {
-  const s = $("#ctx"); const w = el("div", "pwrap pr"); head(w, "ctx");
-  w.append(lead("ctx", "p1"), lead("ctx", "p2"));
+  // 08A: WAS IST HEUTE ERHALTEN? — the owner HEUTE anchor (OWNER_ALL_INBOX/IMAGES/HEUTE/ANCLA.png = PP_ASSET_151) as large
+  // vertical media, shared viewer (native 941 px, never upscaled), the short factual text below.
+  const s = $("#ctx"); s.classList.add("pvert"); const w = el("div", "pwrap pvert__in");
+  const hd = el("div", "pr"); head(hd, "ctx"); w.append(hd);
+  const st = el("div", "pstage pvert__media pr"); const im = el("img", "", { src: img("pp_heute"), loading: "lazy", decoding: "async", width: "720", height: "1280" }); bind(im, (t) => t.heute.alt, "alt"); st.append(im);
+  zoomBtn(st, () => ({ src: img("pp_heute", 941), alt: im.alt })); w.append(st);
+  const tx = el("div", "pr pctx__txt"); tx.append(lead("ctx", "p1"), lead("ctx", "p2")); w.append(tx);
   const g = el("div", "pfacts"); [1, 2, 3].forEach((n) => { const d = el("div"); const b = el("b"); const sp = el("span"); bind(b, (t) => t.ctx["fact" + n]); bind(sp, (t) => t.ctx["fact" + n + "s"]); d.append(b, sp); g.append(d); }); w.append(g); s.append(w);
 }
 
@@ -308,30 +338,42 @@ function buildBau() {
   if (reduced) { const lite = el("div", "pbau__lite pwrap"); BAU.forEach(([n], i) => { const a = el("article"); const im = el("img", "", { src: img(n), loading: "lazy", alt: "" }); const ti = el("h3", "pbau__t"); const pp = el("p", "pbau__p"); bind(ti, (T_) => T_.bau.states[i].k + " · " + T_.bau.states[i].t); bind(pp, (T_) => T_.bau.states[i].p); a.append(im, ti, pp); lite.append(a); }); s.append(lite); }
 }
 
-/* ---------- 10 film player (play / pause, sound, progress, time, keyboard ±5 s) ---------- */
-function player(host, name, labelKey, noteKey) {
-  const w = el("div", "pplayer"); const st = el("div", "pplayer__stage", { tabindex: "0", role: "group" });
-  const v = el("video", "", { playsinline: "", preload: "none" }); v.muted = true; v.setAttribute("muted", ""); v.poster = vposter(name); v.dataset.src = vsrc(name); v.setAttribute("aria-label", name);
-  st.append(v); const ctl = el("div", "pplayer__ctl"); const pb = el("button", "pbtn pbtn--sm", { type: "button" }); const sb = el("button", "pbtn pbtn--sm", { type: "button" }); const tm = el("span", "pplayer__time"); ctl.append(pb, tm); ztSound.add(v); // 06G: sb (large sound button) removed from the panel
-  const rg = el("input", "", { type: "range", min: "0", max: "1000", value: "0", step: "1" }); bind(rg, (t) => t.tl.seek, "aria-label");
-  const kb = el("p", "pplayer__kbd"); bind(kb, (t) => t.tl.kbd); w.append(st, ctl, rg, kb); if (noteKey) { const n = el("p", "pnote"); bind(n, (t) => t.tl.note); w.append(n); } host.append(w);
-  let dur = 0, drag = false, pend = null;
-  const draw = () => { const c = v.currentTime || 0; tm.textContent = fmt(c) + " / " + fmt(dur); if (!drag && dur) rg.value = String(Math.round((c / dur) * 1000)); };
-  const sync = () => { const on = !v.paused; pb.textContent = on ? T().tl.pause : T().tl.play; pb.setAttribute("aria-pressed", String(on)); sb.textContent = v.muted ? T().tl.sound : T().tl.mute; sb.setAttribute("aria-pressed", String(!v.muted)); };
-  LF.push(sync); onLang(draw);
-  v.addEventListener("loadedmetadata", () => { dur = v.duration || dur; if (pend != null) { v.currentTime = pend; pend = null; } draw(); });
-  ["timeupdate", "durationchange"].forEach((e) => v.addEventListener(e, () => { dur = v.duration || dur; draw(); }));
-  ["play", "pause", "volumechange", "ended"].forEach((e) => v.addEventListener(e, sync));
-  pb.addEventListener("click", () => { if (v.paused) { v._user = false; VM.play(v); } else { v._user = true; v.pause(); } });
-  sb.addEventListener("click", () => { v.muted = !v.muted; if (v.muted) v.setAttribute("muted", ""); else v.removeAttribute("muted"); sync(); });
-  const seekTo = (s) => { VM.ensure(v); if (v.readyState >= 1) v.currentTime = clamp(s, 0, v.duration || s); else pend = s; };
-  rg.addEventListener("input", () => { drag = true; const s = (+rg.value / 1000) * (dur || 191); tm.textContent = fmt(s) + " / " + fmt(dur || 191); }); rg.addEventListener("change", () => { drag = false; seekTo((+rg.value / 1000) * (dur || 191)); });
-  st.addEventListener("keydown", (e) => { if (e.key === "ArrowRight") { e.preventDefault(); seekTo((v.currentTime || 0) + 5); } else if (e.key === "ArrowLeft") { e.preventDefault(); seekTo((v.currentTime || 0) - 5); } else if (e.key === " " || e.key === "Enter") { e.preventDefault(); pb.click(); } });
-  VM.register(v, "main", false); sync(); draw(); return { v, w };
+/* ---------- 08A: K-frame evolution — the 9 owner transition clips K01–K09 (one fixed camera, continuous chain) ----------
+   Step 0 = the empty site (k01 state image); steps 1–9 = one clip each, played ONCE per visit (muted, last frame held).
+   Kinetic title (KINETIC_VIDEO_TYPE_V1) from the page's own DE/EN/ES strings; ⤢ opens the matching owner state image. */
+const KF_IMG = ["k01", "k02", "k03", "k04", "k05", "k07", "k08", null, null, null]; // state reached by each step (viewer)
+const KF_FX = ["reveal", "letter", "scale", "change", "reveal", "letter", "change", "scale", "change", "letter"];
+function buildKframes() {
+  const s = $("#kframes"); const w = el("div", "pwrap pr pgal__head"); head(w, "kf"); w.append(lead("kf", "p")); s.append(w);
+  const kimg = (n) => img("pp_kf_" + n);
+  const items = [{ img: kimg("k01") }].concat([1, 2, 3, 4, 5, 6, 7, 8, 9].map((n, i) => {
+    const id = "kt" + String(n).padStart(2, "0"); const st = KF_IMG[i + 1];
+    return { video: vsrc(id), poster: vposter(id), img: st ? kimg(st) : vposter(id) };
+  }));
+  const step = (i) => T().kf.steps[i] || ["", ""];
+  vseq(s, items, (i) => step(i)[0], 75, {
+    once: true,
+    kin: (i) => ({ k: "K" + String(i + 1).padStart(2, "0"), t: step(i)[0], s: step(i)[1] }),
+    fx: (i) => KF_FX[i] || "reveal",
+    zoom: (i) => (KF_IMG[i] ? { src: img("pp_kf_" + KF_IMG[i], 941), alt: step(i)[0] + " — " + step(i)[1] } : null),
+    cap: (t) => t.kf.cap,
+  });
 }
+
+/* ---------- 10 timeline — 08A: final clean owner film on the SHARED film player (js/zt-film.js) ----------
+   OWNER_ALL_INBOX/VIDEO/TIMELINE/TimeLine.mov (46.67 s, 1080x1920, PCM track = digital silence) → pp_timeline_v2_720 / _540.
+   No burned text → the old burned-badge exception is gone; documentary overlay (chapter · period · title) is HTML, DE/EN/ES.
+   Silent → no SOUND control. FULLSCREEN only ≤ 768 px (CSS). Keyboard on the progress bar: ← → ±5 s, Home (no helper text). */
 function buildFilm() {
-  const s = $("#film"); const w = el("div", "pwrap pr"); head(w, "tl"); w.append(lead("tl", "p")); const wrap = el("div"); w.append(wrap); s.append(w);
-  player(wrap, "timeline", "work", true);
+  const s = $("#film"); const w = el("div", "pwrap pr"); head(w, "tl"); w.append(lead("tl", "p")); s.append(w);
+  const host = el("div", "ptl__film"); s.append(host);
+  const N = PP_TL_TIMES.length;
+  mountFilm(host, {
+    mode: "timeline", src: `${A}video/pp_timeline_v2_720.mp4`, srcLite: `${A}video/pp_timeline_v2_540.mp4`, poster: `${A}poster/pp_timeline_v2_poster.webp`,
+    duration: 46.67, cues: PP_TL_TIMES, hasAudio: false,
+    alt: () => T().tl.h,
+    chapter: (i) => { const c = T().tlv[i]; if (!c) return null; return { k: String(i + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0"), p: i > 0 && i < N - 1 ? T().tlPeriod : "", s: c.y, t: c.h, d: c.d, chip: c.y }; },
+  });
 }
 
 /* ---------- 11 loops strip + master film ---------- */
@@ -339,8 +381,11 @@ function buildLoops() {
   const s = $("#alltag"); const w = el("div", "pwrap pr"); head(w, "loops"); w.append(lead("loops", "p")); s.append(w);
   // 06G.2B: vertical worker sequence (no horizontal scroll-snap strip); the active loop plays muted only while on screen.
   vseq(s, STR.de.loops.items.map(([name]) => ({ video: vsrc(name), poster: vposter(name) })), (i) => T().loops.items[i] ? T().loops.items[i][1] : "", 50);
-  const m = el("div", "pwrap ploops__master pr"); const h3 = el("h3", "ph"); h3.style.fontSize = "clamp(20px,5vw,28px)"; bind(h3, (t) => t.loops.master); const mp = el("p", "plead"); bind(mp, (t) => t.loops.masterP); m.append(h3, mp); const host = el("div"); m.append(host); s.append(m);
-  player(host, "master", "recAi", false);
+  const m = el("div", "pwrap ploops__master pr"); const h3 = el("h3", "ph"); h3.style.fontSize = "clamp(20px,5vw,28px)"; bind(h3, (t) => t.loops.master); const mp = el("p", "plead"); bind(mp, (t) => t.loops.masterP); m.append(h3, mp); s.append(m);
+  // 08A: the overview film moves from the legacy mini-player (native range, "±5 s" helper) to the shared film player
+  // (no chapters → no overlay; no audio track → no sound control)
+  const host = el("div", "ptl__film"); s.append(host);
+  mountFilm(host, { mode: "timeline", src: vsrc("master"), poster: vposter("master"), duration: 82.57, cues: [], hasAudio: false, alt: () => T().loops.master, chapter: () => null });
 }
 
 /* ---------- 06G.2B owner gallery: the 5 approved ZEITSPRUNG_Porta_Praetoria_01…05 images (PP_ASSET 06G.2A set), vertical ---------- */
@@ -353,11 +398,11 @@ function buildGallery() {
 /* ---------- 12 return + sources ---------- */
 function buildEnd() {
   const s = $("#heute"); const w = el("div", "pwrap pr"); head(w, "end"); w.append(lead("end", "p"));
-  const st = el("div", "pstage"); const i = el("img", "", { src: img("pp_heute"), loading: "lazy", decoding: "async" }); bind(i, (t) => t.heute.alt, "alt"); st.append(i); w.append(st); // HEUTE: the owner anchor image, no reconstruction badge
+  const st = el("div", "pstage pvert__media"); const i = el("img", "", { src: img("pp_heute"), loading: "lazy", decoding: "async", width: "720", height: "1280" }); bind(i, (t) => t.heute.alt, "alt"); st.append(i); zoomBtn(st, () => ({ src: img("pp_heute", 941), alt: i.alt })); w.append(st); // HEUTE: the owner anchor image (08A: large stage + shared viewer)
   const cta = el("div", "pend__cta"); const sb = el("button", "pbtn", { type: "button" }); bind(sb, (t) => t.end.sources); const ab = el("a", "pbtn pbtn--primary", { href: "../index.html#index-monuments" }); bind(ab, (t) => t.back); cta.append(sb, ab);
   // 07D order: HEUTE (last content) -> trailer slot -> QUELLEN -> destinations (own block after #heute)
   const tail = el("section", "psec pend ptail"); const tw = el("div", "pwrap"); tw.append(cta); tail.append(tw); s.after(tail);
-  mountSources({ monument: "porta-praetoria", before: tail }); mountDestinations(tw, { self: "porta-praetoria", btnClass: "pbtn" }); // 07B.1 (no Porta trailer: final clean trailer deferred)
+  mountSources({ monument: "porta-praetoria", before: tail }); mountDestinations(tw, { self: "porta-praetoria", btnClass: "pbtn" }); // 07B.1 · 08A: the trailer (buildTrailerSlot) goes between #heute and #quellen
   s.append(w); // 06G.2B: methodology disclaimer removed from the page (global footer later)
   sb.addEventListener("click", () => goToSources()); // 07D: the dialog became the #quellen section
 }
@@ -370,5 +415,5 @@ function reveal() {
 
 try { history.scrollRestoration = "manual"; } catch (e) {}
 root.lang = lang;
-buildNav(); buildHero(); buildCtx(); buildHolo(); buildPass(); buildTower(); buildY179(); buildCastra(); buildPlan(); buildBau(); buildFilm(); buildLoops(); buildGallery(); buildEnd(); buildTrailerSlot(); reveal(); initGuide({ monument: "porta-praetoria" });
+buildNav(); buildHero(); buildCtx(); buildHolo(); buildPass(); buildTower(); buildY179(); buildCastra(); buildPlan(); buildBau(); buildKframes(); buildFilm(); buildLoops(); buildGallery(); buildEnd(); buildTrailerSlot(); reveal(); initGuide({ monument: "porta-praetoria" });
 requestAnimationFrame(runSC);

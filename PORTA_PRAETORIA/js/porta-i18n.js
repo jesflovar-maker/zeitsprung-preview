@@ -105,6 +105,50 @@ const ADD_06G2B = {
 };
 LANGS.forEach((l) => { const a = ADD_06G2B[l], s = STR[l]; s.y179.clip = a.y179clip; s.holo.clip = a.holoclip; s.gal = a.gal; s.hero.film = a.heroFilm; s.end.disc = ""; });
 
+/* 08A (2026-11-26) — final Porta media (OWNER_ALL_INBOX): HEUTE anchor in chapter 01 (owner wording of the heading), the
+   K-frame evolution (9 owner transition clips, one fixed camera), the final clean timeline (46.67 s, no burned text, silent)
+   and the final trailer. NO new historical claims: step titles describe the VISIBLE state; the only facts reused are the
+   validated ones above (north gate towards the Danube, ≈ 540 × 450 m, inauguration around AD 179, typical Roman building
+   practice, schematic interior). Chapter boundaries measured on the new film (not the old 191 s cues). */
+const ADD_08A = {
+  de: {
+    ctxH: "Was ist heute erhalten?", zoom: "Bild vergrößern",
+    navKf: "Entstehung",
+    kf: { eyebrow: "09 · ENTSTEHUNG", h: "Vom Lagerplan zum Legionslager", p: "Scrollen Sie: In einer festen Ansicht über der Donau entsteht das Lager Schritt für Schritt — vom abgesteckten Plan bis zu Castra Regina.", cap: "Typische römische Bauweise — nicht Porta-spezifisch belegt. Die Innenbebauung ist nur schematisch dargestellt.",
+      steps: [["Das Gelände", "An der Donau"], ["Vermessung", "Der Lagerplan wird abgesteckt"], ["Gräben & Fundamente", "Die Erdarbeiten beginnen"], ["Die Mauer wächst", "Mauer und Tore entstehen"], ["Die Lagermauer", "Gründungszeit des Lagers"], ["Das Nordtor", "Die Porta Praetoria zur Donau"], ["Tor & Innenbauten", "Das Lager füllt sich"], ["Castra Regina", "≈ 540 × 450 m"], ["Jahreszeiten", "Das Lager im Lauf des Jahres"], ["um 179 n. Chr.", "Einweihung des Lagers"]] },
+    tl: { eyebrow: "10 · ZEITREISE", h: "Zeitreise: der Film", p: "Der Film zeigt in 47 Sekunden, wie das Lager entsteht — Kapitel antippen, um zu springen.",
+      ch: [{ y: "An der Donau", h: "Das Gelände des Lagers", d: "Das Nordtor des Lagers öffnete sich zur Donau." }, { y: "Vermessung", h: "Der Lagerplan wird abgesteckt", d: "Typische römische Bauweise — nicht Porta-spezifisch belegt." }, { y: "Gräben & Fundamente", h: "Die Erdarbeiten beginnen", d: "Typische römische Bauweise — nicht Porta-spezifisch belegt." }, { y: "Lagermauer", h: "Mauer und Tore entstehen", d: "Mauer und Tore entstehen im Zuge der Gründung des Legionslagers." }, { y: "Porta Praetoria", h: "Das Nordtor zur Donau", d: "Die Porta Praetoria entstand in der Gründungszeit des Lagers." }, { y: "Um 179 n. Chr.", h: "Castra Regina · ≈ 540 × 450 m", d: "Castra Regina wird um 179 n. Chr. eingeweiht. Die Innenbebauung ist nur schematisch dargestellt." }], period: "GRÜNDUNGSZEIT" },
+    loops: { eyebrow: "11 · BAUALLTAG", survey: "Vermessung bei Nacht", trench: "Fundamentgraben" },
+    end: { eyebrow: "12 · HEUTE" }, master: "Der Rundblick", tagline: "Vom erhaltenen Tor zum verlorenen Legionslager",
+  },
+  en: {
+    ctxH: "What remains today?", zoom: "Enlarge image",
+    navKf: "Evolution",
+    kf: { eyebrow: "09 · EVOLUTION", h: "From camp plan to legionary fortress", p: "Scroll: from one fixed view above the Danube, the fortress takes shape step by step — from the staked-out plan to Castra Regina.", cap: "Typical Roman building practice — not documented specifically for the Porta. The interior is shown only schematically.",
+      steps: [["The site", "On the Danube"], ["Surveying", "The camp plan is staked out"], ["Ditches & foundations", "Earthworks begin"], ["The wall rises", "Wall and gates take shape"], ["The camp wall", "Foundation period of the camp"], ["The north gate", "The Porta Praetoria facing the Danube"], ["Gate & interior", "The camp fills up"], ["Castra Regina", "≈ 540 × 450 m"], ["Seasons", "The camp through the year"], ["around AD 179", "Inauguration of the camp"]] },
+    tl: { eyebrow: "10 · TIME JOURNEY", h: "Time journey: the film", p: "In 47 seconds the film shows how the fortress takes shape — tap a chapter to jump.",
+      ch: [{ y: "On the Danube", h: "The site of the camp", d: "The north gate of the camp opened towards the Danube." }, { y: "Surveying", h: "The camp plan is staked out", d: "Typical Roman building practice — not documented specifically for the Porta." }, { y: "Ditches & foundations", h: "Earthworks begin", d: "Typical Roman building practice — not documented specifically for the Porta." }, { y: "Camp wall", h: "Wall and gates take shape", d: "Wall and gates rise as part of the founding of the legionary fortress." }, { y: "Porta Praetoria", h: "The north gate facing the Danube", d: "The Porta Praetoria was built in the foundation period of the camp." }, { y: "Around AD 179", h: "Castra Regina · ≈ 540 × 450 m", d: "Castra Regina was inaugurated around AD 179. The interior is shown only schematically." }], period: "FOUNDATION PERIOD" },
+    loops: { eyebrow: "11 · LIFE ON SITE", survey: "Surveying at night", trench: "Foundation trench" },
+    end: { eyebrow: "12 · TODAY" }, master: "The overview", tagline: "From the surviving gate to the lost fortress",
+  },
+  es: {
+    ctxH: "¿Qué queda hoy?", zoom: "Ampliar imagen",
+    navKf: "Evolución",
+    kf: { eyebrow: "09 · EVOLUCIÓN", h: "Del plano al campamento legionario", p: "Desplácese: desde una vista fija sobre el Danubio, el campamento surge paso a paso, desde el plano replanteado hasta Castra Regina.", cap: "Construcción romana típica — no documentada específicamente para la Porta. El interior se representa solo de forma esquemática.",
+      steps: [["El terreno", "Junto al Danubio"], ["Replanteo", "Se marca el plano del campamento"], ["Fosos y cimientos", "Comienzan los movimientos de tierra"], ["Crece el muro", "Se levantan muro y puertas"], ["El muro del campamento", "Época de fundación del campamento"], ["La puerta norte", "La Porta Praetoria hacia el Danubio"], ["Puerta e interior", "El campamento se llena"], ["Castra Regina", "≈ 540 × 450 m"], ["Estaciones", "El campamento a lo largo del año"], ["hacia 179 d. C.", "Inauguración del campamento"]] },
+    tl: { eyebrow: "10 · VIAJE EN EL TIEMPO", h: "Viaje en el tiempo: la película", p: "En 47 segundos la película muestra cómo surge el campamento; toque un capítulo para saltar.",
+      ch: [{ y: "Junto al Danubio", h: "El terreno del campamento", d: "La puerta norte del campamento se abría hacia el Danubio." }, { y: "Replanteo", h: "Se marca el plano del campamento", d: "Construcción romana típica — no documentada específicamente para la Porta." }, { y: "Fosos y cimientos", h: "Comienzan los movimientos de tierra", d: "Construcción romana típica — no documentada específicamente para la Porta." }, { y: "Muro del campamento", h: "Se levantan muro y puertas", d: "Muro y puertas se levantan al fundar el campamento legionario." }, { y: "Porta Praetoria", h: "La puerta norte hacia el Danubio", d: "La Porta Praetoria se construyó en la época de la fundación del campamento." }, { y: "Hacia 179 d. C.", h: "Castra Regina · ≈ 540 × 450 m", d: "Castra Regina se inauguró hacia el 179 d. C. El interior se representa solo de forma esquemática." }], period: "ÉPOCA DE FUNDACIÓN" },
+    loops: { eyebrow: "11 · VIDA EN LA OBRA", survey: "Replanteo de noche", trench: "Zanja de cimentación" },
+    end: { eyebrow: "12 · HOY" }, master: "La vista general", tagline: "De la puerta conservada al campamento perdido",
+  },
+};
+export const PP_TL_TIMES = [0, 2.0, 12.5, 21.5, 32.25, 36.5]; // 08A: measured on TimeLine.mov (46.67 s) — see PORTA_PRAETORIA_MEDIA_MANIFEST_V1 _meta.phase_08A
+LANGS.forEach((l) => { const a = ADD_08A[l], s = STR[l];
+  s.ctx.h = a.ctxH; s.zoom = a.zoom; s.navItems.splice(7, 0, a.navKf); s.kf = a.kf;
+  Object.assign(s.tl, { eyebrow: a.tl.eyebrow, h: a.tl.h, p: a.tl.p, note: "", kbd: "" }); s.tlv = a.tl.ch; s.tlPeriod = a.tl.period;
+  s.loops.eyebrow = a.loops.eyebrow; s.loops.items.push(["survey_night", a.loops.survey], ["trench", a.loops.trench]);
+  s.loops.master = a.master; s.end.eyebrow = a.end.eyebrow; s.tagline = a.tagline; });
+
 /* 07B.1 — GLOBAL BRÜCKMANDL GUIDE data (ZEITSPRUNG_GLOBAL_GUIDE_V1, engine js/zt-guide.js).
    Topic answers are composed ONLY from the validated sentences above (same language) — no new historical text.
    Order = js/zt-guide-config.js "porta-praetoria".go / .sections. Does not depend on the deferred final timeline. */
@@ -136,4 +180,4 @@ LANGS.forEach((l) => { const a = ADD_06G2B[l], s = STR[l]; s.y179.clip = a.y179c
 
 /* 07C-H — TRAILER SLOT (prepared, NOT public): the corrected final trailer PP_TRAILER_MASTER_CLEAN_V1 is DEFERRED until
    the owner supplies / approves it. porta-main.js renders the section only when PP_TRAILER is set -> later 1:1 drop-in. */
-for (const l of ["de", "en", "es"]) { const S = STR[l]; S.tr = { eyebrow: l === "es" ? "TRÁILER" : "TRAILER", h: S.hero.title, p: "", l2: S.hero.title, l3: S.hero.sub, line: S.hero.range, alt: S.hero.title }; }
+for (const l of ["de", "en", "es"]) { const S = STR[l]; S.tr = { eyebrow: l === "es" ? "TRÁILER" : "TRAILER", h: S.hero.title + " · " + S.hero.sub, p: "", l2: S.hero.title, l3: S.hero.sub, line: S.tagline, alt: S.hero.title + " · " + S.hero.sub + " — Trailer" }; } // 08A: final trailer active

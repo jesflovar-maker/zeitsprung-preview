@@ -274,3 +274,27 @@ html.is-reduced .pbau__lite{display:grid}
 .pgal__head{padding-bottom:12px}
 .ploops .pwrap.pr:first-child{padding-bottom:12px}
 @media (prefers-reduced-motion:reduce){.pvert__media.pr{transform:none}.pvseq__txt.is-new{animation:none}}
+
+/* ======================================================================
+   08A — final Porta media: HEUTE anchor stage, K-frame evolution, shared film players, shared viewer
+   ====================================================================== */
+.pctx__txt{width:100%;max-width:640px}
+.pkf{padding-top:var(--section-space)}
+.pvseq__s{font:400 clamp(14px,3.6vw,16px)/1.45 var(--font-sans);color:var(--z-ink-dim);margin-top:6px}
+.pvseq__cap{font:400 11px/1.55 var(--font-mono);letter-spacing:.06em;color:var(--z-ink-faint);margin-top:12px}
+.pkf .pvseq__stage video{object-fit:cover}
+@media (max-width:899px){.pkf .pvseq__stage{height:min(calc(100svh - 270px),900px)}.pkf .pvseq__wrap{gap:10px}}
+/* shared film player (timeline + overview) inside the Porta museum column */
+.ptl__film{margin-top:clamp(18px,4vw,30px)}
+.ploops .ptl__film{padding-bottom:var(--section-space)}
+/* tap to enlarge — shared zs-viewer (same grammar as Neupfarrplatz) */
+.nzoom{position:absolute;top:10px;right:10px;z-index:7;width:44px;height:44px;border-radius:50%;border:1px solid rgba(241,235,225,.3);background:rgba(8,7,6,.55);color:var(--z-ink);display:grid;place-items:center;cursor:zoom-in;padding:0}
+.nzoom[hidden]{display:none}
+.nzoom svg{width:18px;height:18px}
+.pstage:has(.nzoom),.pvseq__stage:has(.nzoom:not([hidden])){cursor:zoom-in}
+.zs-viewer-open,.zs-viewer-open body{overflow:hidden}
+.zs-viewer{position:fixed;inset:0;z-index:900;display:flex;align-items:center;justify-content:center;background:rgba(5,5,6,.97);padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));overscroll-behavior:contain;touch-action:pinch-zoom}
+.zs-viewer__stage{display:flex;align-items:center;justify-content:center;max-inline-size:100%;max-block-size:100%}
+.zs-viewer__photo{display:block;max-inline-size:calc(100vw - 24px);max-block-size:calc(100svh - 24px);object-fit:contain;touch-action:pinch-zoom;background:#000}
+.zs-viewer__close{position:absolute;top:max(10px,env(safe-area-inset-top));right:max(10px,env(safe-area-inset-right));inline-size:48px;block-size:48px;border-radius:50%;z-index:2;font-size:30px;line-height:1;color:var(--z-ink);background:rgba(8,7,6,.7);border:1px solid rgba(241,235,225,.3);cursor:pointer}
+.pend .pstage.pvert__media{width:min(100%,calc(min(78svh,860px)*9/16));margin:28px auto 0}

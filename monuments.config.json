@@ -128,7 +128,19 @@
       "menu_order": 3,
       "readiness": { "heute_image": "assets/porta-praetoria/img/pp_heute_720.webp", "card_hero_image": "assets/porta-praetoria/img/pp_heute_720.webp", "card_hero_status": "HEUTE_OWNER_ANCHOR", "monument_heute_ready": true, "monument_card_hero_ready": true, "monument_entry_loader_ready": true, "primary_start_cta_ready": true, "back_to_all_monuments_ready": true, "mobile_action_layout_ready": true },
       "menu_focus": "47% 50%",
-      "menu_timeline": { "src": "porta-praetoria/video/pp_timeline_540.mp4", "poster": "porta-praetoria/poster/pp_timeline_poster.webp", "base": "web_root", "duration_s": 191, "burned_text": "de+en+es", "has_audio": true, "chapters": { "times": [0, 7.25, 29.25, 36.0, 103.25, 108.25, 115.5, 180.5, 187.75], "labels_module": "PORTA_PRAETORIA/js/pp-index-chapters.js?v=20261119g", "labels_key": "tlv" } },
+      "menu_timeline": {
+        "src": "porta-praetoria/video/pp_timeline_v2_540.mp4",
+        "poster": "porta-praetoria/poster/pp_timeline_v2_poster.webp",
+        "base": "web_root",
+        "duration_s": 46.67,
+        "burned_text": "",
+        "has_audio": false,
+        "chapters": {
+          "times": [0, 2.0, 12.5, 21.5, 32.25, 36.5],
+          "labels_module": "PORTA_PRAETORIA/js/pp-index-chapters.js?v=20261126a",
+          "labels_key": "tlv"
+        }
+      },
       "name": { "de": "Porta Praetoria · Castra Regina", "en": "Porta Praetoria · Castra Regina", "es": "Porta Praetoria · Castra Regina" },
       "subtitle": { "de": "RÖMISCHES REGENSBURG", "en": "ROMAN REGENSBURG", "es": "REGENSBURG ROMANA" },
       "description": {
@@ -181,6 +193,7 @@
         "duration_s": 116.375,
         "burned_text": "",
         "has_audio": false,
+        "soundtrack": { "status": "SOUNDTRACK_PENDING_OWNER", "src": null, "license": null, "note": "08A: no owner-approved audible soundtrack is associated with np_timeline (digitally silent). Drop-in: set src (+ license), then has_audio: true." },
         "chapters": {
           "times": [
             0,
